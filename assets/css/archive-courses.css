@@ -1,0 +1,987 @@
+/* ====================================================
+   تنظیمات پایه و متغیرها
+   ==================================================== */
+.eduf-archive-main {
+    direction: rtl;
+    font-family: inherit;
+    /* از فونت قالب شما مثلا ایران‌سنس یا یکان ارث می‌برد */
+    color: #333;
+    background-color: #fafafa;
+    /* رنگ پس زمینه ملایم */
+    padding: 30px 0 60px;
+}
+
+.eduf-container {
+    margin: 0 auto;
+    max-width: 1400px;
+    width: 100%;
+}
+
+/* ====================================================
+   مسیر راهنما (Breadcrumb) و عنوان
+   ==================================================== */
+.eduf-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.eduf-breadcrumb a {
+    color: var(--text-color-bl);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.eduf-breadcrumb svg {
+    width: 14px;
+    height: 14px;
+    color: #aaa;
+}
+
+.eduf-breadcrumb .current {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.eduf-category-header {
+    margin: 19px 0 48px 0;
+}
+
+.eduf-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-color-bl);
+    margin-bottom: 18px;
+}
+
+.eduf-desc {
+    font-size: 16px;
+    line-height: 28px;
+    color: var(--text-color-bl);
+    font-weight: 400;
+}
+
+/* ====================================================
+   ساختار کلی (گرید دسکتاپ)
+   ==================================================== */
+.eduf-layout-wrapper {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 25px;
+    align-items: start;
+}
+
+/* ====================================================
+   سایدبار و فیلترها
+   ==================================================== */
+.eduf-sidebar {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    overflow: hidden;
+    position: sticky;
+    top: 108px;
+}
+
+.eduf-filter-header {
+    background-color: var(--Primary-Tint-1);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    color: var(--text-color-bl);
+    font-weight: 600;
+}
+
+.eduf-widget {
+
+    margin: 0 10px;
+}
+
+.eduf-widget:last-child {
+    border-bottom: none;
+}
+
+.eduf-widget-toggle {
+    width: 100%;
+    background: none;
+    padding: 14px 12px 14px 0;
+    text-align: right;
+    font-weight: 500;
+    border: 0;
+    color: #333;
+    border-top: 1px solid #E5E5E5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.eduf-widget-toggle svg {
+    transition: transform 0.3s;
+    height: 22px;
+    width: 22px;
+    color: #757575;
+}
+
+.eduf-widget-toggle.active svg {
+    transform: rotate(180deg);
+}
+
+.eduf-widget-content {
+    padding: 0 8px 15px;
+    display: none;
+}
+
+.eduf-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #444;
+    cursor: pointer;
+}
+
+.eduf-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary-blue);
+}
+
+/* ====================================================
+   نوار ابزار (Toolbar)
+   ==================================================== */
+.eduf-toolbar {
+    border-radius: 8px;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    background-color: var(--Tertiary);
+}
+
+.eduf-sorting {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.85rem;
+}
+
+.eduf-sort-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #666;
+    font-weight: bold;
+}
+
+.eduf-sorting a {
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: 0.2s;
+    color: var(--text-color-bl);
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.eduf-sorting a.active,
+.eduf-sorting a:hover {
+    font-weight: 600;
+    color: var(--text-color-bl);
+    font-size: 14px;
+}
+
+.eduf-course-count {
+    color: var(--text-color-bl);
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.eduf-mobile-actions {
+    display: none;
+}
+
+/* مخفی در دسکتاپ */
+
+/* ====================================================
+   گرید دوره‌ها (کارت‌ها در دسکتاپ)
+   ==================================================== */
+.eduf-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 ستون در دسکتاپ طبق عکس */
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.eduf-card {
+    background: #fff;
+    border: 1px solid #DADADA;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.3s, transform 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.eduf-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    transform: translateY(-3px);
+}
+
+.eduf-card-thumb img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+}
+
+.eduf-card-body {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.eduf-card-title {
+    font-size: 0.9rem;
+    font-weight: bold;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.eduf-card-title a {
+    color: #222;
+    text-decoration: none;
+}
+
+.eduf-card-teacher {
+    font-size: 12px;
+    color: #000;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 12px;
+}
+
+.eduf-card-badges {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 10px;
+    color: var(--text-color-bl);
+    font-weight: 400;
+}
+
+.badge-purple {
+    background: #f4ebff;
+}
+
+.badge-orange {
+    background: #fff4e5;
+}
+
+.eduf-card-price {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+}
+
+.eduf-card-price del {
+    font-size: 14px;
+    color: #696969;
+}
+
+.eduf-card-price ins {
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #222;
+    margin-right: auto;
+}
+
+.eduf-card-price ins span {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-color-bl);
+}
+
+/* ====================================================
+   صفحه‌بندی (Pagination)
+   ==================================================== */
+.eduf-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.eduf-pagination a,
+.eduf-pagination span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    text-decoration: none;
+    color: #555;
+    font-size: 0.95rem;
+    transition: 0.2s;
+}
+
+.eduf-pagination a:hover {
+    background: #eee;
+}
+
+.eduf-pagination .current {
+    background: #ff9800;
+    /* رنگ نارنجی فعال مطابق عکس */
+    color: #fff;
+    font-weight: bold;
+}
+
+/* ====================================================
+   بخش SEO و سوالات متداول
+   ==================================================== */
+.eduf-bottom-content {
+    margin-top: 50px;
+    padding-top: 40px;
+}
+
+.eduf-seo-text h3 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #222;
+}
+
+.eduf-seo-text {
+    background-color: var(--bg-white);
+    border: 1px solid;
+    border-color: var(--border-color);
+    padding: 24px;
+    border-radius: 8px;
+}
+
+.eduf-seo-text p {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #555;
+}
+
+.eduf-faq-section {
+    margin-top: 40px;
+}
+
+.eduf-faq-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.eduf-faq-item {
+    border-radius: 12px;
+    background-color: var(--bg-white);
+    margin-bottom: 10px;
+    overflow: hidden;
+    border: 1px solid;
+    border-color: var(--border-color);
+}
+.eduf-seo-text ul{
+    list-style-type: disc !important;
+    padding-right: 24px !important; /* فاصله از راست برای لیست‌های RTL */
+}
+.eduf-faq-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 18px 20px;
+    text-align: right;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.eduf-faq-toggle svg {
+    color: #999;
+}
+
+.eduf-faq-content {
+    padding: 0 20px 20px;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #555;
+    display: none;
+}
+
+.close-eduf-sidebar,
+.close-eduf-sorting,
+.eduf-widget-btn {
+    display: none;
+}
+
+.filter-options input[type="radio"] {
+    display: none;
+}
+
+.container-eduf-sorting,
+.container-eduf-sorting-close {
+    display: flex;
+}
+
+.filter-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 22px;
+    color: #000;
+
+}
+
+.filter-options {
+    display: flex;
+    gap: 10px;
+    padding: 12px 24px;
+}
+
+/* ====================================================
+   ریسپانسیو: مخصوص موبایل (تطابق با "دسته بندی دوره ها موبایل.jpg")
+   ==================================================== */
+@media (max-width: 1400px) {
+    .eduf-archive-main {
+        padding: 30px 16px 60px 16px;
+    }
+}
+
+@media (max-width: 991px) {
+    .eduf-layout-wrapper {
+        grid-template-columns: 1fr;
+        /* سایدبار حذف یا جابجا می‌شود */
+    }
+
+    /* .eduf-widget-btn{
+        display: flex;
+    } */
+    .close-eduf-sorting {
+        display: flex;
+    }
+
+    .container-filter-close {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        padding: 16px 0px;
+    }
+
+    .container-eduf-sorting-close {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        padding: 24px;
+    }
+
+    .filter-options input[type="radio"] {
+        display: flex;
+    }
+
+    .eduf-sidebar {
+        display: block;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 100%;
+        height: 100dvh;
+        z-index: 99;
+        transition: .3s;
+        background: #ffffff00;
+    }
+
+
+    .filter-options {
+        display: flex;
+        gap: 10px;
+        padding: 12px 24px;
+        flex-direction: column;
+    }
+
+    .filter-options input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 1px solid #444444;
+        background: #fff;
+        cursor: pointer;
+        transition: .2s;
+        position: relative;
+        margin-left: 6px;
+    }
+
+    .filter-options input[type="radio"]:checked::after {
+        content: "";
+        position: absolute;
+        width: 5px;
+        height: 10px;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -60%) rotate(45deg);
+        top: 50%;
+        left: 50%;
+    }
+
+    .filter-options input[type="radio"]:checked {
+        background: #0a3762;
+    }
+
+    .filter-options label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 22px;
+        color: #000;
+
+    }
+
+    .eduf-sorting.active {
+        display: flex;
+        position: fixed;
+        top: 7%;
+        height: 90%;
+        background: #ffffff;
+        min-width: 300px;
+        width: 100%;
+        max-width: 112px;
+        z-index: 99;
+        flex-direction: column;
+        padding: 16px;
+        border-radius: 15px;
+        transition: .3s;
+    }
+
+    .container-eduf-sidebar {
+        min-width: 340px;
+        width: 80%;
+        max-width: 500px;
+        position: relative;
+        z-index: 999999999999999999999999999999999;
+        background: #fff;
+        height: 100%;
+    }
+
+    .eduf-sorting-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(3px);
+        z-index: 9;
+        display: none;
+    }
+
+    .active .eduf-sorting-overlay {
+        display: block;
+    }
+
+    .container-eduf-sorting {
+        z-index: 999;
+        background: #fff;
+        width: 100%;
+        max-width: 85%;
+        height: 100%;
+        top: 0;
+        right: 0;
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        transition: .3s;
+    }
+
+    .eduf-seo-text h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #000;
+    }
+
+    .eduf-desc {
+        font-size: 14px;
+        line-height: 28px;
+    }
+
+    .eduf-sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(3px);
+        z-index: 9999999;
+        display: none;
+    }
+
+    .active .eduf-sidebar-overlay {
+        display: block;
+    }
+
+    .eduf-sidebar.active {
+        right: 0;
+        transition: .3s;
+    }
+
+    .eduf-sidebar .eduf-filter-header {
+        background-color: transparent;
+        border-radius: 0;
+    }
+
+    .eduf-faq-toggle {
+        padding: 14px 12px;
+        text-align: right;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .eduf-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-color-bl);
+    }
+
+    .eduf-seo-text p {
+        font-size: 14px;
+        line-height: 28px;
+        color: #333;
+        margin-bottom: 25px;
+    }
+
+    .eduf-faq-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .badge {
+        font-size: 10px;
+    }
+
+    .eduf-faq-content {
+        font-size: 12px;
+        line-height: 1.7;
+        color: #555;
+        padding-right: 12px;
+    }
+
+    .eduf-toolbar {
+        flex-direction: column;
+        padding: 0;
+        border: none;
+        background: transparent;
+        margin-bottom: 15px;
+    }
+
+    .eduf-sorting,
+    .eduf-course-count {
+        display: none;
+        /* مخفی کردن مرتب‌سازی دسکتاپ */
+    }
+
+    .eduf-seo-text {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+    }
+
+    .eduf-bottom-content {
+        margin-top: 0;
+        padding-top: 40px;
+    }
+
+    /* دکمه‌های فیلتر و مرتب‌سازی در موبایل */
+    .eduf-mobile-actions {
+        display: flex;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .eduf-btn-mobile {
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-family: inherit;
+        font-weight: bold;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .eduf-mobile-actions .eduf-btn-mobile:first-child {
+        background-color: var(--Primary-Tint-1);
+    }
+
+    .eduf-mobile-actions .eduf-btn-mobile:nth-child(2) {
+        background-color: var(--Tertiary);
+    }
+
+    /* تبدیل کارت‌ها به حالت افقی (Image Right, Content Left) */
+    .eduf-grid {
+        grid-template-columns: 1fr;
+        /* تک ستونه در موبایل */
+        gap: 15px;
+    }
+
+    .eduf-card {
+        flex-direction: row;
+        /* چیدمان افقی */
+        padding: 12px;
+        align-items: stretch;
+    }
+
+    .eduf-card-thumb {
+        width: 110px;
+        flex-shrink: 0;
+    }
+
+    .eduf-card-thumb img {
+        border-radius: 12px;
+        height: auto;
+    }
+
+    .eduf-card-body {
+        padding: 0 15px 0 0;
+        /* فاصله از عکس (چون راست‌چین هستیم) */
+    }
+
+    .eduf-card-title {
+        font-size: 14px;
+        margin-bottom: 8px;
+        font-weight: 600;
+        line-height: 20px;
+    }
+
+    .eduf-card-price {
+        border-top: none;
+        /* حذف خط چین در موبایل */
+        padding-top: 0;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .close-eduf-sidebar {
+        display: flex;
+        justify-content: end;
+        padding: 10px;
+
+    }
+}
+
+
+/* ====================================================
+   استایل‌های مخصوص کارت اساتید (اضافه شده به کدهای قبلی)
+   ==================================================== */
+
+.eduf-instructor-card {
+    text-align: center;
+    transition: transform 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 15px;
+    /* در نسخه دسکتاپ طبق عکس شما کادر و بک‌گراند سفید ندارند */
+}
+
+.eduf-instructor-card:hover {
+    transform: translateY(-5px);
+}
+
+.eduf-instructor-thumb {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 15px;
+    box-shadow: 0px 0px 3px 0px #28282833;
+    border-radius: 12px;
+}
+
+/* فرض بر این است که عکسی که آپلود میکنید خودش بک‌گراند شکل‌دار (زرد و آبی) را دارد */
+.eduf-instructor-thumb img {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 12px;
+
+}
+
+.eduf-instructor-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-color-bl, #222);
+    margin-bottom: 8px;
+}
+
+.eduf-instructor-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.eduf-instructor-desc {
+    font-size: 13px;
+    line-height: 1.8;
+    color: #666;
+    padding: 0 10px;
+}
+
+/* ====================================================
+   ریسپانسیو مخصوص کارت اساتید (تطابق با مدل گوشی)
+   ==================================================== */
+@media (max-width: 991px) {
+    .eduf-instructor-card {
+        flex-direction: row;
+        /* افقی شدن کارت در موبایل */
+        text-align: right;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #DADADA;
+        /* اضافه شدن کادر در موبایل شبیه کارت دوره */
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .eduf-instructor-thumb {
+        width: 100px;
+        flex-shrink: 0;
+        margin-bottom: 0;
+        margin-left: 15px;
+    }
+
+    .eduf-instructor-thumb img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+
+    .eduf-instructor-title {
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+
+    .eduf-instructor-desc {
+        font-size: 12px;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        /* محدود کردن توضیحات به ۲ خط در موبایل */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .eduf-archive-instructor-main .eduf-instructor-card {
+        flex-direction: column;
+        background: none;
+        border: 0;
+        border-radius: 12px;
+        padding: 0;
+    }
+
+    .eduf-archive-instructor-main .eduf-grid-instructor {
+        gap: 15px;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .eduf-archive-instructor-main .eduf-mobile-actions .eduf-btn-mobile:nth-child(2) {
+        display: none;
+    }
+
+    .eduf-archive-instructor-main .eduf-mobile-actions {
+        margin-bottom: 14px;
+    }
+
+    .eduf-archive-instructor-main .eduf-instructor-thumb {
+        width: 100%;
+        flex-shrink: 0;
+        margin-bottom: 14px;
+        margin-left: 0;
+    }
+
+    .eduf-archive-instructor-main .eduf-instructor-thumb img {
+        width: 100%;
+        height: 100%;
+    }
+
+    button.filter-submit {
+        width: 48%;
+        background: #082b4c;
+        border-radius: 8px;
+        padding: 10px;
+        color: #fff;
+        font-weight: 400;
+        font-size: 12px;
+        border: none;
+    }
+
+    button.filter-reset {
+        width: 48%;
+        background: #fff;
+        border-radius: 8px;
+        padding: 10px;
+        color: #082b4c;
+        font-weight: 400;
+        font-size: 12px;
+        padding: 10px 24px;
+    }
+
+    .eduf-widget-btn {
+        padding: 10px 24px;
+        display: flex;
+        gap: 16px;
+        width: 100%;
+        position: absolute;
+        bottom: 24px;
+    }
+
+    .eduf-widget {
+        margin: 0 24px;
+    }
+}
