@@ -1,9 +1,9 @@
 /* 
-Theme Name: edu falnic
-Description: edu falnic
-Author: falnic team
-Author URI: https://falnic.com/
+Theme Name: evented-edu
+Description: قالب آموزشگاه آنلاین evented-edu (ویژهٔ LearnDash) — وارث قالب edu falnic
+Author: evented team
 Version: 1.0.0
+Text Domain: evented-edu
 */
 
 /* تنظیمات پایه */
@@ -34,7 +34,7 @@ Version: 1.0.0
 @font-face {
     font-family: 'دانا';
     font-display: swap;
-    src: url('assets/fonts/falnic-font.woff2') format('woff2');
+    src: url('assets/fonts/evented-edu-font.woff2') format('woff2');
 }
 
 body {
@@ -300,7 +300,7 @@ ul {
 }
 
 .footer-wrapper:before {
-    background-image: url(https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/Subtract.svg);
+    background-image: url(assets/img/front-page/Subtract.svg);
     content: '';
     background-position: top right;
     position: absolute;

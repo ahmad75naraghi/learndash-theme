@@ -13,7 +13,7 @@ get_header(); // هدر قالب
         <div id="hero-container" class="container hero-container">
             <!-- <canvas id="particle-canvas"></canvas> -->
             <div class="hero-content">
-                <h1><span class="highlight">متخصص</span> شدن<br> در دنیای IT با <span class="highlight">فالنیک</span></h1>
+                <h1><span class="highlight">متخصص</span> شدن<br> در دنیای IT با <span class="highlight">evented-edu</span></h1>
                 <p>با دوره‌های کاربردی و اساتید خبره، مهارت‌های تخصصی شبکه، سرور و امنیت را به صورت عملی یاد بگیرید و بازار کار را فتح کنید.</p>
                 <div class="hero-buttons">
                     <a href="/login/" class="btn-yellow">ثبت نام و شروع یادگیری</a>
@@ -21,12 +21,10 @@ get_header(); // هدر قالب
                 </div>
             </div>
             <div class="hero-image">
-                <img src='/wp-content/themes/edu-falnic/assets/img/front-page/heroimg.webp' alt="عکس هیرو">
+                <img src='<?php echo PATH_DIR_URL; ?>/assets/img/front-page/heroimg.webp' alt="عکس هیرو">
             </div>
         </div>
-        </div>
     </section>
-    <!-- <script>!function(){const t=document.getElementById("particle-canvas"),e=t.getContext("2d"),n=document.getElementById("hero"),i=document.getElementById("hero-container");let o=[],s=!1,h=null;const l={x:null,y:null,radius:130};function r(){const t=i.getBoundingClientRect();return{w:t.width,h:t.height}}function a(){const{w:n,h:i}=r(),o=Math.min(window.devicePixelRatio||1,2);t.width=n*o,t.height=i*o,t.style.width=n+"px",t.style.height=i+"px",e.setTransform(1,0,0,1,0,0),e.scale(o,o)}i.addEventListener("mousemove",t=>{const e=i.getBoundingClientRect();l.x=t.clientX-e.left,l.y=t.clientY-e.top}),i.addEventListener("mouseleave",()=>{l.x=null,l.y=null});class c{constructor(t,e,n,i,o,s){this.x=t,this.y=e,this.vx=n,this.vy=i,this.size=o,this.color=s}draw(){e.beginPath(),e.arc(this.x,this.y,this.size,0,2*Math.PI),e.fillStyle=this.color,e.fill()}update(t,e){if((this.x>t||this.x<0)&&(this.vx=-this.vx),(this.y>e||this.y<0)&&(this.vy=-this.vy),null!==l.x&&null!==l.y){let t=this.x-l.x,e=this.y-l.y,n=Math.sqrt(t*t+e*e);if(n<l.radius&&n>0){let i=(l.radius-n)/l.radius,o=t/n*i*4,s=e/n*i*4;this.x+=o,this.y+=s}}this.x+=this.vx,this.y+=this.vy,this.draw()}}function d(){o=[];const{w:t,h:e}=r(),n=Math.min(180,Math.floor(t*e/7e3));for(let i=0;i<n;i++){const n=1.8*Math.random()+.8,i=Math.random()*t,s=Math.random()*e,h=.4*(Math.random()-.5),l=.4*(Math.random()-.5),r="rgba(255,255,255,0.7)";o.push(new c(i,s,h,l,n,r))}}function u(){if(!s)return;h=requestAnimationFrame(u);const{w:t,h:n}=r();e.clearRect(0,0,t,n);for(let e=0;e<o.length;e++)o[e].update(t,n);!function(){const{w:t,h:n}=r(),i=Math.min(t,n)/5;for(let t=0;t<o.length;t++)for(let n=t+1;n<o.length;n++){const s=o[t].x-o[n].x,h=o[t].y-o[n].y,l=s*s+h*h;if(l<i*i){const s=1-Math.sqrt(l)/i;e.strokeStyle="rgba(180, 210, 255,"+(.5*s).toFixed(3)+")",e.lineWidth=.7,e.beginPath(),e.moveTo(o[t].x,o[t].y),e.lineTo(o[n].x,o[n].y),e.stroke()}}}()}function m(){s||(s=!0,u())}let g;new IntersectionObserver(t=>{t.forEach(t=>{t.isIntersecting?m():(s=!1,h&&cancelAnimationFrame(h))})},{threshold:.05}).observe(n),window.addEventListener("resize",()=>{clearTimeout(g),g=setTimeout(()=>{a(),d()},150)}),a(),d(),n.getBoundingClientRect().top<window.innerHeight&&n.getBoundingClientRect().bottom>0&&m();const y=document.getElementById("hero-students-img"),f=["https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/heroimg.webp","/wp-content/themes/edu-falnic/assets/img/front-page/heroimg.webp"];let x=0;!function t(){x>=f.length||(y.onerror=()=>{x++,t()},y.onload=()=>{},y.src=f[x])}()}();</script> -->
     <!-- بخش دسته بندی دوره ها -->
     <section id="categories-section" class="categories-section">
         <div class="container">
@@ -232,12 +230,12 @@ get_header(); // هدر قالب
 
                 <div class="webinar-card">
                     <div class="webinar-image">
-                        <img src='/wp-content/themes/edu-falnic/assets/img/front-page/webinar-recent.webp' alt="عکس وبینار">
+                        <img src='<?php echo PATH_DIR_URL; ?>/assets/img/front-page/webinar-recent.webp' alt="عکس وبینار">
                     </div>
                     <div class="webinar-details">
                         <h3>لورم ایپسوم متن ساختگی با تولید نامفهوم لورم ایپسوم</h3>
                         <p>
-                            فالنیک ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است، چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فالنیک ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
+                            evented-edu ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است، چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط evented-edu ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
                         </p>
                         <!-- تایمر شمارش معکوس -->
                         <div class="countdown-timer">
@@ -307,7 +305,7 @@ get_header(); // هدر قالب
                             </span>بیشتر</a>
                     </div>
                     <div class="instructor-image-wrapper">
-                        <img src="/wp-content/themes/edu-falnic/assets/img/front-page/ali-kazemi.webp" alt="علی کاظمی" class="instructor-img">
+                        <img src="<?php echo PATH_DIR_URL; ?>/assets/img/front-page/ali-kazemi.webp" alt="علی کاظمی" class="instructor-img">
                     </div>
                 </div>
 
@@ -325,7 +323,7 @@ get_header(); // هدر قالب
                     </div>
                     <div class="instructor-image-wrapper">
                         <div class="instructor-bg bg-solid-blue"></div>
-                        <img src="/wp-content/themes/edu-falnic/assets/img/front-page/mohammad-nasiri.webp" alt="محمد نصیری" class="instructor-img">
+                        <img src="<?php echo PATH_DIR_URL; ?>/assets/img/front-page/mohammad-nasiri.webp" alt="محمد نصیری" class="instructor-img">
                     </div>
                 </div>
             </div>
@@ -340,7 +338,7 @@ get_header(); // هدر قالب
                 <!-- بخش سمت راست (متن) -->
                 <div class="learning-info">
                     <h2 class="section-title">مراحل یادگیری</h2>
-                    <p class="learning-desc">در آموزشگاه فالنیک، یادگیری مهارتی شما در ۵ مرحله ساده و کاملاً هدفمند طی می‌شود.</p>
+                    <p class="learning-desc">در آموزشگاه evented-edu، یادگیری مهارتی شما در ۵ مرحله ساده و کاملاً هدفمند طی می‌شود.</p>
                 </div>
 
                 <!-- بخش سمت چپ (تایم‌لاین موج‌دار) -->
@@ -477,7 +475,7 @@ get_header(); // هدر قالب
                                         <?php if (has_post_thumbnail()) : ?>
                                             <?php the_post_thumbnail("medium", ['alt' => get_the_title()]); ?>
                                         <?php else : ?>
-                                            <img src="/wp-content/themes/edu-falnic/assets/img/front-page/Screenshot.webp" alt="<?php the_title_attribute(); ?>">
+                                            <img src="<?php echo PATH_DIR_URL; ?>/assets/img/front-page/Screenshot.webp" alt="<?php the_title_attribute(); ?>">
                                         <?php endif; ?>
                                     </a>
                                 </div>
@@ -538,8 +536,8 @@ get_header(); // هدر قالب
 
                 <!-- سمت راست: عنوان و دکمه‌ها -->
                 <div class="reviews-sidebar">
-                    <h2 class="reviews-title">تجربیات دانشجویان فالنیک</h2>
-                    <p class="reviews-subtitle">ببینید دانش‌پذیران ما چگونه با گذراندن دوره‌های تخصصی فالنیک، مسیر حرفه‌ای خود را تغییر داده و در بازار کار درخشیدند.</p>
+                    <h2 class="reviews-title">تجربیات دانشجویان evented-edu</h2>
+                    <p class="reviews-subtitle">ببینید دانش‌پذیران ما چگونه با گذراندن دوره‌های تخصصی evented-edu، مسیر حرفه‌ای خود را تغییر داده و در بازار کار درخشیدند.</p>
                     <div class="reviews-slider-controls">
                         <!-- دکمه بعدی (راست) -->
                         <button class="review-btn custom-review-next">
@@ -611,7 +609,7 @@ get_header(); // هدر قالب
                                 </svg>
 
                             </div>
-                            <p class="rc-text">مطالب همایش‌های فالنیک (ایران اچ پی) همیشه مفید بوده‌اند و مباحث پایه‌ای تا تخصصی را پوشش می‌دهند. اساتید با تسلط بالا به انتقال مطالب و درک بهتر مخاطب کمک می‌کنند. رویدادهای فالنیک در افزایش آگاهی علمی مشتریان و انتخاب‌های دقیق‌تر ما نقش زیادی دارند.</p>
+                            <p class="rc-text">مطالب همایش‌های evented-edu (ایران اچ پی) همیشه مفید بوده‌اند و مباحث پایه‌ای تا تخصصی را پوشش می‌دهند. اساتید با تسلط بالا به انتقال مطالب و درک بهتر مخاطب کمک می‌کنند. رویدادهای evented-edu در افزایش آگاهی علمی مشتریان و انتخاب‌های دقیق‌تر ما نقش زیادی دارند.</p>
                         </div>
 
                         <!-- کارت نظر ۲ -->
@@ -665,7 +663,7 @@ get_header(); // هدر قالب
                                 </svg>
 
                             </div>
-                            <p class="rc-text">حضور اساتید و مدرسین شناخته‌شده در حوزه سرور و شبکه ایران، نقطه‌قوت بزرگی برای رویدادها و همایش‌های فالنیک (ایران اچ پی) به‌شمار می‌آید. همین مورد، بسیاری از فعالان این حوزه را به شرکت در این رویدادها ترغیب می‌کند</p>
+                            <p class="rc-text">حضور اساتید و مدرسین شناخته‌شده در حوزه سرور و شبکه ایران، نقطه‌قوت بزرگی برای رویدادها و همایش‌های evented-edu (ایران اچ پی) به‌شمار می‌آید. همین مورد، بسیاری از فعالان این حوزه را به شرکت در این رویدادها ترغیب می‌کند</p>
                         </div>
 
                         <!-- کارت نظر ۳ -->
@@ -720,7 +718,7 @@ get_header(); // هدر قالب
                                 </svg>
 
                             </div>
-                            <p class="rc-text">از مجموعه فالنیک (ایران اچ پی) به‌دلیل برگزاری همایش‌های کاربردی و با کیفیت تشکر می‌کنم. امیدوارم همایش‌های فالنیک (ایران اچ پی) ادامه داشته باشد و ما بتوانیم با حضور در آنها علاوه بر دریافت اطلاعات علمی روز، با مدیران و علاقه‌مندان IT از سراسر کشور نیز ارتباط برقرار کنیم.</p>
+                            <p class="rc-text">از مجموعه evented-edu (ایران اچ پی) به‌دلیل برگزاری همایش‌های کاربردی و با کیفیت تشکر می‌کنم. امیدوارم همایش‌های evented-edu (ایران اچ پی) ادامه داشته باشد و ما بتوانیم با حضور در آنها علاوه بر دریافت اطلاعات علمی روز، با مدیران و علاقه‌مندان IT از سراسر کشور نیز ارتباط برقرار کنیم.</p>
                         </div>
 
                         <!-- کارت نظر 4 -->
@@ -775,7 +773,7 @@ get_header(); // هدر قالب
                                 </svg>
 
                             </div>
-                            <p class="rc-text">همایش‌های فالنیک (ایران اچ پی) بسیار مفید هستند و سرنخ‌های کاربردی برای استفاده‌های عملی در سازمان‌ها را در اختیار شرکت‌کنندگان قرار می‌دهند. نکته قابل توجه درباره همایش‌های فالنیک (ایران اچ پی)، رایگان بودن آن است که شرایط را برای شرکت تمام علاقه‌مندان و به‌خصوص جوانان فراهم می‌کند.</p>
+                            <p class="rc-text">همایش‌های evented-edu (ایران اچ پی) بسیار مفید هستند و سرنخ‌های کاربردی برای استفاده‌های عملی در سازمان‌ها را در اختیار شرکت‌کنندگان قرار می‌دهند. نکته قابل توجه درباره همایش‌های evented-edu (ایران اچ پی)، رایگان بودن آن است که شرایط را برای شرکت تمام علاقه‌مندان و به‌خصوص جوانان فراهم می‌کند.</p>
                         </div>
 
                     </div>
@@ -787,7 +785,7 @@ get_header(); // هدر قالب
 
     <section class="banner-show-courses">
         <div class="contanet-banner-show-courses">
-            <img src="/wp-content/themes/edu-falnic/assets/img/front-page/show-courses-banner.webp" alt="استاد" class="instructor-img">
+            <img src="<?php echo PATH_DIR_URL; ?>/assets/img/front-page/show-courses-banner.webp" alt="استاد" class="instructor-img">
             <span>آموزش جامع <span class="highlight">سرور</span>؛ از انتخاب تا خرید </span>
             <a href="/courses/training-comprehensive-server-from-selection-to-purchase/">رفتن به دوره</a>
         </div>

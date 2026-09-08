@@ -86,7 +86,7 @@ $faqs              = get_term_meta($term_id, 'ld_category_faqs', true);
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg></button>
                         <div class="eduf-widget-content">
-                            <label class="eduf-checkbox"><input type="checkbox"> <span>فالنیک</span></label>
+                            <label class="eduf-checkbox"><input type="checkbox"> <span>evented-edu</span></label>
                             <label class="eduf-checkbox"><input type="checkbox"> <span>رضا کاظمی</span></label>
                             <label class="eduf-checkbox"><input type="checkbox"> <span>محمد نصیری</span></label>
                             <label class="eduf-checkbox"><input type="checkbox"> <span>احمد نراقی</span></label>

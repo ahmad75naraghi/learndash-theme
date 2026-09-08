@@ -565,13 +565,13 @@ if ($course_categories && !is_wp_error($course_categories)) {
                                 <div class="map-directions">
                                     <?php if (!empty($webinar_gmap_link)): ?>
                                         <a href="<?php echo esc_url($webinar_gmap_link); ?>" target="_blank" title="مسیریابی با گوگل مپ">
-                                            <img src="https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/single-page/google-map-icon.png">
+                                            <img src="<?php echo PATH_DIR_URL; ?>/assets/img/single-page/google-map-icon.png">
                                         </a>
                                     <?php endif; ?>
 
                                     <?php if (!empty($webinar_neshan_link)): ?>
                                         <a href="<?php echo esc_url($webinar_neshan_link); ?>" target="_blank" title="مسیریابی با نشان">
-                                            <img src="https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/single-page/neshan-map-icon.png">
+                                            <img src="<?php echo PATH_DIR_URL; ?>/assets/img/single-page/neshan-map-icon.png">
                                         </a>
                                     <?php endif; ?>
                                 </div>

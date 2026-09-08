@@ -24,7 +24,7 @@ get_header(); // فراخوانی هدر
                         
                         // اگر در برگه از صفحه‌بندی (تگ Nextpage) استفاده شده باشد
                         wp_link_pages( array(
-                            'before' => '<div class="page-links">' . esc_html__( 'صفحات:', 'textdomain' ),
+                            'before' => '<div class="page-links">' . esc_html__( 'صفحات:', 'evented-edu' ),
                             'after'  => '</div>',
                         ) );
                     ?>
