@@ -21,7 +21,7 @@
 flowchart TD
     A["functions.php<br/>(define PATH_DIR / PATH_DIR_URL)"] --> B["assets/assets_functions.php<br/>hook: wp_enqueue_scripts"]
     A --> C["inc/includes.php"]
-    C --> D["inc/login.php — FalnicAuthHandler<br/>8 AJAX + filters(login_url/logout)"]
+    C --> D["inc/login.php — FalnicAuthHandler<br/>8 AJAX hooks + login_url/logout_redirect filters"]
     C --> E["inc/sms.php — send_pattern_sms (SOAP)"]
     C --> F["inc/meta_functions.php — metaboxes + avatar filter"]
     C --> G["inc/theme_options.php — roles, redirects, is_current_path"]
@@ -33,7 +33,7 @@ flowchart TD
 نکات:
 - `FalnicAuthHandler` با `add_action('init', fn => new FalnicAuthHandler())` نمونه‌سازی می‌شود.
 - `inc/captcha.php` و `captcha_verify()` (در login.php) فعلاً **به هیچ فرمی متصل نیستند** (کد مردهٔ آماده).
-- هوک‌های ریدایرکت: `login_url` → `/login/`، `logout_redirect` → خانه، و برای نقش subscriber بعد از لاگین → `/panel`.
+- هوک‌های ریدایرکت: `login_url` → `/login/` و `logout_redirect` → خانه (هر دو در `inc/login.php`)؛ `login_redirect` برای نقش subscriber → `/panel` (در `inc/theme_options.php`).
 
 ## ۳. ساختار پایگاه‌داده (Data Structures)
 
@@ -150,32 +150,32 @@ CREATE TABLE IF NOT EXISTS {wp}_falnic_transactions (
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as User (/login)
-    participant P as page-login.php (JS)
-    participant A as admin-ajax.php
-    participant S as inc/login.php
-    participant X as External SMS/Bale
+    actor U as "User (/login)"
+    participant P as "page-login.php (JS)"
+    participant A as "admin-ajax.php"
+    participant S as "inc/login.php"
+    participant X as "External SMS / Bale"
 
     U->>P: enters mobile 09XXXXXXXXX
     P->>A: POST falnic_check_mobile_and_send_otp (nonce)
     A->>S: handle_check_mobile_and_send_otp
     alt user exists (login = mobile)
-        S-->>P: {status:"login"} -> show password form
+        S-->>P: {status:login} -> show password form
     else new user
         S->>X: send_pattern_sms + falnic_send_otp_with_bale (OTP 5-digit)
         X-->>S: ok
-        S-->>P: {status:"register"} -> show OTP step
+        S-->>P: {status:register} -> show OTP step
     end
 
     U->>P: enters OTP
     P->>A: POST falnic_verify_otp
-    A->>S: handle_verify_otp (compare $_SESSION['fl_otp'])
-    alt purpose == reset_password
-        S-->>P: {result:"reset_password"} -> new-password step
+    A->>S: handle_verify_otp (compare session fl_otp)
+    alt purpose = reset_password
+        S-->>P: {result:reset_password} -> new-password step
     else new user (not found)
         S-->>P: {is_new_user:true} -> name step
     else existing user (login by OTP)
-        S-->>P: auto login + {result:"login", nonce}
+        S-->>P: auto login + {result:login, nonce}
     end
 ```
 
@@ -188,23 +188,23 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    participant U as User (enrolled)
-    participant M as lesson modal (single-courses.js)
-    participant A as admin-ajax.php
-    participant S as inc/ajax_functions.php
-    participant LD as LearnDash
+    participant U as "User (enrolled)"
+    participant M as "lesson modal (single-courses.js)"
+    participant A as "admin-ajax.php"
+    participant S as "inc/ajax_functions.php"
+    participant LD as "LearnDash"
 
-    U->>M: click "video after / finish lesson"
-    M->>A: POST custom_mark_lesson_complete<br/>(security=mark_complete_nonce_{lesson_id})
+    U->>M: click "next video" / "finish lesson"
+    M->>A: POST custom_mark_lesson_complete (security=mark_complete_nonce_lessonId)
     A->>S: handle_custom_mark_lesson_complete
-    S->>LD: learndash_video_complete_for_step(...) | fallback meta
-    S->>LD: update_user_meta(learndash_timer_complete_{id})
-    S->>LD: learndash_process_mark_complete(...)
+    S->>LD: learndash_video_complete_for_step(..) / fallback meta
+    S->>LD: update_user_meta(learndash_timer_complete_lessonId)
+    S->>LD: learndash_process_mark_complete(..)
     alt still not saved
-        S->>S: force write _sfwd-course_progress[course_id][lessons][id]=1
-        S->>LD: learndash_update_user_activity(...)
+        S->>S: force write _sfwd-course_progress[courseId][lessons][id]=1
+        S->>LD: learndash_update_user_activity(..)
     end
-    S->>LD: learndash_course_progress(array:true)
+    S->>LD: learndash_course_progress(array=true)
     S-->>M: progress data -> updateProgressUI(bar %)
 ```
 
@@ -222,16 +222,16 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    FRONT[is_front_page] --> F[front-page.php]
-    SING[is_singular sfwd-courses] --> SC[single-sfwd-courses.php]
-    ARCH[is_post_type_archive sfwd-courses] --> AX[archive-sfwd-courses.php]
-    AX -->|get_template_part| TAX
-    TAXT[is_tax ld_course_category] --> TAX[taxonomy-ld_course_category.php]
-    AUTH[is_author] --> AU[author.php]
-    LOGIN[page slug = login] --> PL[page-login.php]
-    PANEL[page slug = panel or child] --> PP[page-panel.php + panel/*.php]
-    OTHER[other pages] --> PG[page.php]
-    FALLBACK[else] --> IDX[index.php debug]
+    FRONT["is_front_page"] --> F["front-page.php"]
+    SING["is_singular sfwd-courses"] --> SC["single-sfwd-courses.php"]
+    ARCH["is_post_type_archive sfwd-courses"] --> AX["archive-sfwd-courses.php"]
+    AX -->|get_template_part| TAX["taxonomy-ld_course_category.php"]
+    TAXT["is_tax ld_course_category"] --> TAX
+    AUTH["is_author"] --> AU["author.php"]
+    LOGIN["page slug = login"] --> PL["page-login.php"]
+    PANEL["page slug = panel or child"] --> PP["page-panel.php + panel templates"]
+    OTHER["other pages"] --> PG["page.php"]
+    FALLBACK["else"] --> IDX["index.php (debug)"]
 ```
 
 - **قوانین فعلی صفحهٔ دوره**: درس باز است اگر `sfwd_lms_has_access()` **یا** `sample_lesson === 'on'`؛ دکمه‌های «بعدی/تکمیل» بین `$unlocked_lessons` با شمارندهٔ «درس/پیش‌نمایش X از Y»؛ آخرین درس بدون دسترسی → کلیک روی `#start_course`.
@@ -242,21 +242,21 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    START[theme_enqueue: style.css + owl + main.js] --> C1{is front/home?}
-    C1 -- yes --> FP[front-page.css + js]
-    C1 -- no --> C2{archive/tax courses?}
-    C2 -- yes --> AC[archive-courses.css]
-    C2 -- no --> C3{is_author?}
-    C3 -- yes --> AU[author.css + author.js]
-    C3 -- no --> C4{is_singular course?}
-    C4 -- yes --> CS[plyr + single-courses.css + js]
-    C4 -- no --> C5{archive/category/tag/blog?}
-    C5 -- yes --> AP[archive-post.css (0B) + archive-post.js MISSING]
-    C5 -- no --> C6{post?}
-    C6 -- yes --> SP[single-post.css/js MISSING]
-    C6 -- no --> C7{page?}
-    C7 -- yes --> SGP[single-page.css + archive-product.css MISSING]
-    C7 -- no --> END[+ panel assets if is page under 'panel']
+    START["theme_enqueue: style.css + owl + main.js"] --> C1{"is front/home?"}
+    C1 -- yes --> FP["front-page.css + js"]
+    C1 -- no --> C2{"archive/tax courses?"}
+    C2 -- yes --> AC["archive-courses.css"]
+    C2 -- no --> C3{"is_author?"}
+    C3 -- yes --> AU["author.css + author.js"]
+    C3 -- no --> C4{"is_singular course?"}
+    C4 -- yes --> CS["plyr + single-courses.css + js"]
+    C4 -- no --> C5{"archive/category/tag/blog?"}
+    C5 -- yes --> AP["archive-post.css (0B) + archive-post.js MISSING"]
+    C5 -- no --> C6{"post?"}
+    C6 -- yes --> SP["single-post.css/js MISSING"]
+    C6 -- no --> C7{"page?"}
+    C7 -- yes --> SGP["single-page.css + archive-product.css MISSING"]
+    C7 -- no --> END["+ panel assets if is page under 'panel'"]
 ```
 
 - `main.js` لوکال‌سازی: `ajax_object = {ajax_url, nonce}` — nonce مربوط به `notification_nonce` است و استفاده نمی‌شود؛ اسکریپت‌های واقعی nonce را از `data-nonce` می‌خوانند.

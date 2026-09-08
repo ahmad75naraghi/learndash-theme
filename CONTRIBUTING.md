@@ -15,11 +15,11 @@
 
 | حوزه | قانون | نمونه |
 |---|---|---|
-| توابع PHP | پیشوند `falnic_` یا `custom_` (سراسری) | `falnic_send_otp_with_bale`, `custom_mark_lesson_complete` |
+| توابع PHP | توابع جدید را با پیشوند `falnic_` بنویسید؛ نام‌های تاریخیِ بدون پیشوند (`send_pattern_sms`, `theme_enqueue`, `is_current_path`, `captcha_verify`, `handle_*`) را برای سازگاری تغییر ندهید | `falnic_get_course_price_label()` (جدید) |
 | کلاس‌های PHP | `Falnic*` (PascalCase) | `FalnicAuthHandler` |
 | اکشن/هوک | `falnic_*` (lowercase snake) | `falnic_verify_otp` |
 | post/user/term meta | snake_case با پیشوند `_` برای post-meta | `_course_outcomes`, `first_name_fa` |
-| غیره | snake_case | `ld_cat_image_id` |
+| توابع کمکی در `inc/` | `falnic_*` (هنگام استخراج helpers تکراری) | `falnic_get_course_thumbnail()` |
 | هندل‌های CSS | کلاس‌های صفحه‌ای معنادار + پیشوندهای موجود | `.eduf-*`, `.ld-*`, `.lesson-*` |
 | JS | camelCase؛ تعریف متغیر با `const/let` | `coursescarousel` (موجود)، `updateProgressUI` |
 | handle های enqueue | kebab/lowercase | `courses-page`, `panel-js` |
@@ -27,7 +27,8 @@
 ## ۳. استانداردهای کدنویسی
 
 ### PHP (هم‌سو با WordPress Coding Standards)
-- **هرگز short open tag** استفاده نکنید: `<? if`, `<? }`, `<?=` → فقط `<?php` (و `<?=` مجاز نیست مگر در قالب‌های موجود برای خروجی ساده — ترجیحاً `echo`).
+- **هرگز short open tagِ خالص** ننویسید — `<? if`, `<? }` (بدون `php`) ممنوع است؛ فقط `<?php`.
+- برای خروجیِ ساده در قالب‌ها `<?=` (echo کوتاه) مطابق کد موجود مجاز است؛ در کد جدید ترجیحاً `<?php echo … ?>` بنویسید و **خروجی همیشه escape** شود.
 - **خروجی‌ها را escape کنید**: `esc_html()`, `esc_url()`, `esc_attr()`, `wp_kses_post()`.
 - **ورودی‌ها را sanitize کنید**: `sanitize_text_field()`, `intval()`.
 - **همهٔ اکشن‌های AJAX** باید `check_ajax_referer()` داشته باشند و پیام خطای مناسب `wp_send_json_error`.
@@ -56,12 +57,20 @@
   "singleQuote": true,
   "semi": true,
   "tabWidth": 4,
-  "endOfLine": "lf",
-  "overrides": [{ "files": "*.php", "options": { "parser": "none" } }]
+  "endOfLine": "lf"
 }
 ```
 
-> PHP را با Prettier فرمت نکنید (پارس‌گر ندارد) — PHP را با `php -l` و (اختیاری) `PHP_CodeSniffer` + استاندارد WP چک کنید.
+و فایل `.prettierignore`:
+
+```
+# PHP را Prettier فرمت نمی‌کند (پارس‌گر ندارد)
+*.php
+*.md
+screenshot.png
+```
+
+> PHP را با Prettier فرمت نکنید — PHP را با `php -l` و (اختیاری) `PHP_CodeSniffer` + استاندارد WP چک کنید. فایل‌های `.md` هم معمولاً خارج از Prettier نگه داشته می‌شوند.
 
 ### `.eslintrc` پیشنهادی (برای `assets/js/*.js`)
 

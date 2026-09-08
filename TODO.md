@@ -7,7 +7,7 @@
 
 - [ ] **محافظت از فراخوانی تابع بله** — `inc/login.php` در دو نقطه `falnic_send_otp_with_bale($mobile, $otp)` را بدون `function_exists` صدا می‌زند؛ در نبودِ آن (mu-plugin/افزونه) Fatal Error رخ می‌دهد.
   راه‌حل: `if (function_exists('falnic_send_otp_with_bale')) { falnic_send_otp_with_bale(...); }`
-- [ ] **escape کردن `redirect_to`** — `page-login.php` (۴ نقطهٔ چاپ در inline JS):
+- [ ] **escape کردن `redirect_to`** — `page-login.php` (۳ نقطهٔ فعال + ۱ نمونهٔ کامنت‌شده در inline JS):
   `window.location.href = '<?= $_GET['redirect_to'] ?? home_url(); ?>'` — باید `esc_url_raw()` + `esc_js()` شود (و باگ double-encode ناشی از `urlencode` در `FalnicAuthHandler::redirect_login_url` هم رفع شود).
 - [ ] **الزام تأیید OTP در ساخت حساب** — `handle_save_user_register_name` (`inc/login.php`) بدون بررسی `fl_otp_verified` با دانستن nonce کاربر می‌سازد.
 - [ ] **اعتبارنامهٔ SMS در سورس** — `inc/sms.php`: username/رمز/bodyId هاردکد → انتقال به wp-config/option.
@@ -45,7 +45,7 @@
 | `assets/css/archive-post.css` | موجود، ۰ بایت | پر کردن یا حذف enqueue |
 | `screenshot.png` | ۰ بایت | تصویر واقعی ۱۲۰۰×۹۰۰ |
 | `assets/css/photoswipe.min .css` | نام دارای فاصله | اصلاح نام / حذف |
-| `assets/img/.../default-cat.jpg` | مفقود (fallback دسته‌ها در page-courses-cat) | افزودن |
+| `images/default-cat.jpg` (در ریشهٔ قالب؛ fallback در `page-courses-cat.php`) | مفقود | افزودن فایل |
 | `assets/fonts/DanaVF.ttf` | مفقود (برای captcha) | افزودن یا حذف captcha |
 | فونت FontAwesome | لودر نیست (آیکن fa-facebook در author.php) | حذف آیکن یا لود واقعی |
 

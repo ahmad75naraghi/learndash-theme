@@ -29,7 +29,7 @@
 | پیامک OTP | SOAP پنل پیامک (payamak-panel) | `inc/sms.php` — ⚠️ اعتبارنامه هاردکد |
 | پیام‌رسان | ربات بله — تابع `falnic_send_otp_with_bale()` | ⚠️ در قالب تعریف **نشده** (باید افزونه/mu-plugin باشد) |
 | پایگاه‌دادهٔ تراکنش | جدول سفارشی `{wp}_falnic_transactions` | ⚠️ سازندهٔ جدول در این قالب نیست |
-| تست | ندارد (در این مرحله) | بخش ۶ را ببینید |
+| تست | ندارد (در این مرحله) | بخش ۷ را ببینید |
 
 ## ۳. ساختار دایرکتوری‌ها
 
@@ -46,7 +46,7 @@ learndash-theme/                  (در سرور: wp-content/themes/edu-falnic/)
 ├── author.php                    پروفایل مدرس  |  template-instructors.php  لیست اساتید
 ├── page-login.php                صفحهٔ ورود/OTP (HTML مستقل، بدون wp_head)
 ├── page-panel.php / page.php / page-courses.php / page-courses-cat.php / 404.php
-├── index.php                     ⚠️ فایل دیباگ (اطلاعات وردپرس را چاپ می‌کند!) — به TOD.md مراجعه
+├── index.php                     ⚠️ فایل دیباگ (اطلاعات وردپرس را چاپ می‌کند!) — به TODO.md مراجعه
 ├── assets/
 │   ├── assets_functions.php      منطق enqueue همهٔ CSS/JS
 │   ├── css/  front-page · single-courses · archive-courses · author · panel · vendorها
@@ -102,18 +102,22 @@ wp-content/themes/edu-falnic/
 
 # ۲) در پیشخوان: نمایش ← پوسته‌ها ← فعال‌سازی «edu falnic»
 # ۳) افزونهٔ LearnDash را نصب/فعال کنید (برای دیدن پست‌تایپ دوره‌ها ضروری است)
-# ۴) برگه‌های زیر را بسازید و «قالب صفحه» (Template) را ست کنید:
-#      /login   → (پیش‌فرض page.php؛ محتوا مهم نیست؛ page-login.php خودکار)
-#      /panel   → پیش‌فرض (گارد لاگین) — زیربرگه‌ها با تمپلیت‌های panel/*
-#      /panel/my-courses → Template Name: Panel - My Courses
-#      /panel/certificates → Panel - Cerificates    (املای «Cerificates» در فایل!)
+# ۴) برگهٔ «ورود»: یک برگه با اسلاگ login بسازید (نیازی به انتخاب قالب نیست؛
+#      وردپرس به‌صورت خودکار از page-login.php استفاده می‌کند؛ محتوای برگه خالی باشد).
+# ۵) برگهٔ «پنل کاربری» با اسلاگ panel بسازید:
+#      - یا قالب پیش‌فرض (page-panel.php → فقط گارد لاگین، بدنهٔ خالی) را نگه دارید،
+#      - یا «Template Name: Panel - Dashboard» را برای همین برگه انتخاب کنید.
+# ۶) زیربرگه‌ها را با «والد = panel» بسازید (فرزند بودن الزامی است؛ چون استایل/اسکریپت پنل
+#      فقط وقتی enqueue می‌شود که برگه، خودِ panel یا زیرمجموعهٔ آن باشد) و Template ست کنید:
+#      /panel/my-courses → Panel - My Courses
+#      /panel/certificates → Panel - Cerificates   (املای «Cerificates» در فایل همین است!)
 #      /panel/wishlist  → Panel - Wishlist
 #      /panel/payments  → Panel - Payments
 #      /panel/profile   → Panel - Profile
 #      /panel/settings  → Panel - Account Settings
-# ۵) تنظیمات ← پیوندهای یکتا ← «نام پست» (Post name)
-# ۶) جدول تراکنش‌ها را بسازید (DDL در ARCHITECTURE.md) و درگاه/ثبت‌کنندهٔ تراکنش را وصل کنید
-# ۷) تابع بله (falnic_send_otp_with_bale) را در mu-plugin تعریف کنید
+# ۷) تنظیمات ← پیوندهای یکتا ← «نام پست» (Post name)
+# ۸) جدول تراکنش‌ها را بسازید (DDL در ARCHITECTURE.md) و درگاه/ثبت‌کنندهٔ تراکنش را وصل کنید
+# ۹) تابع بله (falnic_send_otp_with_bale) را در mu-plugin تعریف کنید
 ```
 
 > ⚠️ **نکتهٔ حیاتی برای لوکال**: قالب هنوز چند URL هاردکدِ دامنهٔ تولید دارد (`https://edu.falnic.com/...` و `/wp-content/themes/edu-falnic/...`).

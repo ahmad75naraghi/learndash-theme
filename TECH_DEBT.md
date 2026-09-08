@@ -18,7 +18,7 @@
 
 | محل | مشکل | ریسک | راه‌حل |
 |---|---|---|---|
-| `page-login.php` | `$_GET['redirect_to']` بدون escape در inline JS (۴ نقطه) + double-encode از `redirect_login_url()` | XSS بالقوه/ریدایرکت خراب | `esc_url_raw()` + `esc_js()`؛ حذف `urlencode` اضافی |
+| `page-login.php` | `$_GET['redirect_to']` بدون escape در inline JS (۳ نقطهٔ فعال؛ سطرهای ~۱۰۱۳، ~۱۱۴۱، ~۱۳۳۶) + double-encode از `redirect_login_url()` | XSS بالقوه/ریدایرکت خراب | `esc_url_raw()` + `esc_js()`؛ حذف `urlencode` اضافی |
 | `inc/login.php` | `handle_save_user_register_name` بدون بررسی OTP | ساخت حساب انبوه | الزام `fl_otp_verified` + تطابق `fl_mobile` |
 | `inc/login.php` | `handle_register_user`: `$user = get_user_by('id', $user_id)` که null است چون `wp_set_password` id برنمی‌گرداند | لاگین خودکار اجرا نمی‌شود / اخطار | `wp_set_password($p, $user->ID)` سپس همان `$user` را استفاده کن |
 | `inc/login.php` | عدم throttle برای `falnic_login_user` | Brute-force | محدودسازی بر اساس `wp_login_failed`/ترنزینت |
