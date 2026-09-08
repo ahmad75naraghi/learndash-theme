@@ -1,4 +1,11 @@
+<?php
+// اعتبارسنجی redirect_to یک‌بار در ابتدای صفحه (جلوگیری از تزریق در inline JS)
+$evented_redirect_to = isset($_GET['redirect_to'])
+    ? (string) wp_validate_redirect(wp_unslash($_GET['redirect_to']), home_url('/'))
+    : home_url('/');
+?>
 <!DOCTYPE html>
+
 <html lang="fa" dir="rtl">
 
 <head>
@@ -9,7 +16,7 @@
         @font-face {
             font-family: 'دانا';
             font-display: swap;
-            src: url('<?= get_template_directory_uri(); ?>/assets/fonts/falnic-font.woff2') format('woff2');
+            src: url('<?= get_template_directory_uri(); ?>/assets/fonts/evented-edu-font.woff2') format('woff2');
         }
 
         :root {
@@ -585,7 +592,7 @@
         <div class="auth-content">
             <div class="brand-logo">
                 <div class="logo-placeholder">
-                    <img src="<?= get_template_directory_uri(); ?>/assets/img/front-page/falnic-logo-login.png" />
+                    <img src="<?= get_template_directory_uri(); ?>/assets/img/front-page/evented-edu-logo-login.png" />
                 </div>
             </div>
 
@@ -598,7 +605,7 @@
                 </div>
 
                 <button class="btn-submit" id="btn-to-otp" disabled>تایید و ادامه</button>
-                <p class="terms-text">ورود شما به معنی پذیرش <a href="#">قوانین</a> و <a href="#">مقررات</a> فالنیک است</p>
+                <p class="terms-text">ورود شما به معنی پذیرش <a href="#">قوانین</a> و <a href="#">مقررات</a> evented-edu است</p>
             </div>
 
             <div class="auth-step" id="step-password-option">
@@ -768,8 +775,8 @@
     </div>
 
     <script>
-        const falnic_ajax_url = "<?php echo admin_url('admin-ajax.php'); ?>";
-        const falnic_auth_nonce = "<?php echo wp_create_nonce('falnic_nonce'); ?>";
+        const evented_ajax_url = "<?php echo admin_url('admin-ajax.php'); ?>";
+        const evented_auth_nonce = "<?php echo wp_create_nonce('evented_nonce'); ?>";
         let otpTimerInterval = null;
 
         // تشخیص تایپ فارسی
@@ -856,10 +863,10 @@
             if (phone) {
                 try {
                     const formData = new FormData();
-                    formData.append('action', 'falnic_check_mobile_and_send_otp');
+                    formData.append('action', 'evented_check_mobile_and_send_otp');
                     formData.append('mobile', phone);
-                    formData.append('nonce', falnic_auth_nonce);
-                    const response = await fetch(falnic_ajax_url, {
+                    formData.append('nonce', evented_auth_nonce);
+                    const response = await fetch(evented_ajax_url, {
                         method: 'POST',
                         body: formData
                     });
@@ -906,12 +913,12 @@
             try {
 
                 const formData = new FormData();
-                formData.append('action', 'falnic_send_otp');
+                formData.append('action', 'evented_send_otp');
                 formData.append('mobile', state.mobile);
                 formData.append('purpose', 'login_otp');
-                formData.append('nonce', falnic_auth_nonce);
+                formData.append('nonce', evented_auth_nonce);
 
-                const response = await fetch(falnic_ajax_url, {
+                const response = await fetch(evented_ajax_url, {
                     method: 'POST',
                     body: formData
                 });
@@ -943,12 +950,12 @@
             try {
 
                 const formData = new FormData();
-                formData.append('action', 'falnic_send_otp');
+                formData.append('action', 'evented_send_otp');
                 formData.append('mobile', state.mobile);
                 formData.append('purpose', 'reset_password');
-                formData.append('nonce', falnic_auth_nonce);
+                formData.append('nonce', evented_auth_nonce);
 
-                const response = await fetch(falnic_ajax_url, {
+                const response = await fetch(evented_ajax_url, {
                     method: 'POST',
                     body: formData
                 });
@@ -992,11 +999,11 @@
 
 
             const formData = new FormData();
-            formData.append('action', 'falnic_login_user');
+            formData.append('action', 'evented_login_user');
             formData.append('password', loginPass);
             formData.append('mobile', state.mobile);
-            formData.append('nonce', falnic_auth_nonce);
-            const response = await fetch(falnic_ajax_url, {
+            formData.append('nonce', evented_auth_nonce);
+            const response = await fetch(evented_ajax_url, {
                 method: 'POST',
                 body: formData
             });
@@ -1010,7 +1017,7 @@
                 showSuccessToast(res.data.message);
 
                 setTimeout(() => {
-                    window.location.href = '<?= $_GET['redirect_to'] ?? home_url();?>'
+                    window.location.href = <?php echo wp_json_encode($evented_redirect_to); ?>
                 }, 1000);
 
             } else {
@@ -1058,12 +1065,12 @@
             try {
 
                 const formData = new FormData();
-                formData.append('action', 'falnic_send_otp');
+                formData.append('action', 'evented_send_otp');
                 formData.append('mobile', state.mobile);
                 formData.append('purpose', state.otpPurpose);
-                formData.append('nonce', falnic_auth_nonce);
+                formData.append('nonce', evented_auth_nonce);
 
-                const response = await fetch(falnic_ajax_url, {
+                const response = await fetch(evented_ajax_url, {
                     method: 'POST',
                     body: formData
                 });
@@ -1110,12 +1117,12 @@
 
 
             const formData = new FormData();
-            formData.append('action', 'falnic_verify_otp');
+            formData.append('action', 'evented_verify_otp');
             formData.append('otp', otpCode);
             formData.append('phone', state.mobile);
             formData.append('purpose', state.otpPurpose);
-            formData.append('nonce', falnic_auth_nonce);
-            const response = await fetch(falnic_ajax_url, {
+            formData.append('nonce', evented_auth_nonce);
+            const response = await fetch(evented_ajax_url, {
                 method: 'POST',
                 body: formData
             });
@@ -1138,12 +1145,12 @@
                         break;
 
                     case 'login_otp':
-                        window.location.href = '<?= $_GET['redirect_to'] ?? home_url();?>';
+                        window.location.href = <?php echo wp_json_encode($evented_redirect_to); ?>;
                         break;
                 }
                 // if (res.data.result === 'login') {
                 //     // کاربر از قبل ثبت نام کرده بود و لاگین شد -> انتقال به صفحه اصلی
-                //     setTimeout(() => window.location.href = '<?= $_GET['redirect_to'] ?? home_url();?>', 1500);
+                //     setTimeout(() => window.location.href = <?php echo wp_json_encode($evented_redirect_to); ?>, 1500);
                 // } else if (res.data.is_new_user === true) {
                 //     // کاربر جدید است -> هدایت به بخش تعیین پسورد
                 //     goToStep('step-new-password');
@@ -1182,8 +1189,8 @@
             formData.append('mobile', state.mobile);
             formData.append('firstname', state.firstName);
             formData.append('lastname', state.lastName);
-            formData.append('nonce', falnic_auth_nonce);
-            const response = await fetch(falnic_ajax_url, {
+            formData.append('nonce', evented_auth_nonce);
+            const response = await fetch(evented_ajax_url, {
                 method: 'POST',
                 body: formData
             });
@@ -1306,10 +1313,10 @@
             const password = newPassword.value.trim();
             const confirmPass = confirmPassword.value.trim();
 
-            let actionName = 'falnic_register_user';
+            let actionName = 'evented_register_user';
 
             if (state.otpPurpose === 'reset_password') {
-                actionName = 'falnic_reset_password';
+                actionName = 'evented_reset_password';
             }
 
             const formData = new FormData();
@@ -1317,8 +1324,8 @@
             formData.append('phone', state.mobile);
             formData.append('password', password);
             formData.append('confirmPassword', confirmPass);
-            formData.append('nonce', falnic_auth_nonce);
-            const response = await fetch(falnic_ajax_url, {
+            formData.append('nonce', evented_auth_nonce);
+            const response = await fetch(evented_ajax_url, {
                 method: 'POST',
                 body: formData
             });
@@ -1333,7 +1340,7 @@
                 
                 if (res.data.result === 'login') {
                     // کاربر از قبل ثبت نام کرده بود و لاگین شد -> انتقال به صفحه اصلی
-                    setTimeout(() => window.location.href = '<?= $_GET['redirect_to'] ?? home_url();?>', 1500);
+                    setTimeout(() => window.location.href = <?php echo wp_json_encode($evented_redirect_to); ?>, 1500);
                 } else if (res.data.is_new_user === true) {
                     // کاربر جدید است -> هدایت به بخش تعیین پسورد
                     goToStep('step-name');
