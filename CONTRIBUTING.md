@@ -1,6 +1,6 @@
 # CONTRIBUTING — استانداردهای توسعه و مشارکت
 
-این سند قوانین مشارکت در کدبیس قالب «edu falnic» است. همهٔ تغییرات (توسط انسان یا AI) باید با این استانداردها هم‌خوانی داشته باشند.
+این سند قوانین مشارکت در کدبیس قالب «evented-edu» است. همهٔ تغییرات (توسط انسان یا AI) باید با این استانداردها هم‌خوانی داشته باشند.
 
 ---
 
@@ -15,11 +15,11 @@
 
 | حوزه | قانون | نمونه |
 |---|---|---|
-| توابع PHP | توابع جدید را با پیشوند `falnic_` بنویسید؛ نام‌های تاریخیِ بدون پیشوند (`send_pattern_sms`, `theme_enqueue`, `is_current_path`, `captcha_verify`, `handle_*`) را برای سازگاری تغییر ندهید | `falnic_get_course_price_label()` (جدید) |
-| کلاس‌های PHP | `Falnic*` (PascalCase) | `FalnicAuthHandler` |
-| اکشن/هوک | `falnic_*` (lowercase snake) | `falnic_verify_otp` |
+| توابع PHP | توابع جدید را با پیشوند `evented_` بنویسید؛ نام‌های تاریخیِ بدون پیشوند (`send_pattern_sms`, `theme_enqueue`, `is_current_path`, `captcha_verify`, `handle_*`) را برای سازگاری تغییر ندهید | `evented_get_course_price_label()` (جدید) |
+| کلاس‌های PHP | `Evented*` (PascalCase) | `EventedAuthHandler` |
+| اکشن/هوک | `evented_*` (lowercase snake) | `evented_verify_otp` |
 | post/user/term meta | snake_case با پیشوند `_` برای post-meta | `_course_outcomes`, `first_name_fa` |
-| توابع کمکی در `inc/` | `falnic_*` (هنگام استخراج helpers تکراری) | `falnic_get_course_thumbnail()` |
+| توابع کمکی در `inc/` | `evented_*` (هنگام استخراج helpers تکراری) | `evented_get_course_thumbnail()` |
 | هندل‌های CSS | کلاس‌های صفحه‌ای معنادار + پیشوندهای موجود | `.eduf-*`, `.ld-*`, `.lesson-*` |
 | JS | camelCase؛ تعریف متغیر با `const/let` | `coursescarousel` (موجود)، `updateProgressUI` |
 | handle های enqueue | kebab/lowercase | `courses-page`, `panel-js` |
@@ -33,7 +33,7 @@
 - **ورودی‌ها را sanitize کنید**: `sanitize_text_field()`, `intval()`.
 - **همهٔ اکشن‌های AJAX** باید `check_ajax_referer()` داشته باشند و پیام خطای مناسب `wp_send_json_error`.
 - **کوئری‌های دیتابیس**: فقط با `$wpdb->prepare()`؛ جدول‌ها با `$wpdb->prefix`.
-- **هیچ آدرس/اعتبارنامه‌ای هاردکد نشود** — به‌جای `https://edu.falnic.com/...` از `home_url()`, `get_template_directory_uri()`, `PATH_DIR_URL` استفاده کنید.
+- **هیچ آدرس/اعتبارنامه‌ای هاردکد نشود** — هیچ دامنه‌ای (حتی `evented-edu`) داخل کد ننویسید؛ از `home_url()`, `get_template_directory_uri()`, `PATH_DIR_URL` استفاده کنید.
 - PHP 7.4+ (نوشتن کد 8.x سازگار)؛ اجتناب از توابع حذف‌شده.
 
 ### JS
@@ -144,7 +144,7 @@ Closes #<issue>
 ## ۷. قوانین ویژهٔ این کدبیس (نبایدها)
 
 - **نخورید به** `learndash_*` داخلی/متاهایش به‌جز API های عمومی.
-- ساختار جدول `falnic_transactions` را بدون هماهنگی با مصرف‌کننده‌ها (payments/dashboard) تغییر ندهید.
-- تابع `falnic_send_otp_with_bale()` را **داخل قالب تعریف نکنید** مگر تصمیم صریح معماری — فعلاً وابستگی بیرونی است.
+- ساختار جدول `evented_transactions` را بدون هماهنگی با مصرف‌کننده‌ها (payments/dashboard) تغییر ندهید؛ نصب‌های قدیمی‌تر با جدول `falnic_transactions` باید پیش از ارتقا آن را rename کنند.
+- بدنهٔ ارسال واقعی بله (تابع `evented_send_otp_with_bale()` یا legacy `falnic_send_otp_with_bale()`) را **داخل قالب تعریف نکنید** — در mu-plugin/افزونه تعریف می‌شود؛ قالب فقط wrapper محافظت‌شده دارد.
 - فایل‌های `panel/*.php` را از زیرپوشه خارج نکنید (Template Name وابسته به مسیر نیست اما نظم فعلی را حفظ کنید).
 - کلاس‌های CSS صفحه‌ای را به فایل CSS نادرست منتقل نکنید (رجوع به جدول enqueue).

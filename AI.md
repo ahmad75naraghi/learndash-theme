@@ -20,14 +20,14 @@
 
 ### ۲.۱ هرگز (Never)
 1. **هرگز URL دامنه یا آدرس asset را هاردکد نکنید.**
-   - ممنوع: `https://edu.falnic.com/...`، `/wp-content/themes/edu-falnic/...`
+   - ممنوع: هر دامنهٔ هاردکد (مثل نمونهٔ تاریخی `https://edu.falnic.com/...`) و هر مسیر وابسته به نام پوشهٔ تم.
    - مجاز: `home_url()`, `site_url()`, `get_template_directory_uri()`, `PATH_DIR_URL`.
 2. **هرگز ورودی کاربر را بدون sanitize و خروجی را بدون escape چاپ نکنید.**
    - به‌ویژه: `$_GET['redirect_to']` و هر مقدار سشن/کوکی.
 3. **هرگز short open tagِ خالص ننویسید** (`<?` بدون `php`) — مثل `<? if`. فقط `<?php ... ?>` یا `<?= ... ?>` (echo کوتاه، مطابق کد موجود قالب‌ها) استفاده کنید و خروجی را escape کنید.
 4. **هرگز اکشن AJAX بدون nonce و بدون sanitize نسازید.**
 5. **هرگز مقدار جدیدی را بدون ثبت در مستندات اضافه نکنید** (متا/اکشن/صفحه/تمپلیت/فیلد) — حداقل `CHANGELOG.md` + جدول مربوطه در `ARCHITECTURE.md`.
-6. **هرگز `index.php` دیباگ را در تولید نگه ندارید** و هرگز قالب جدیدی را جایگزین آن نکنید بدون بازبینی همهٔ fallback ها.
+6. **هرگز `index.php` را به اسکریپت دیباگ/چاپ اطلاعات تبدیل نکنید** — این فایل fallback استاندارد قالب است و باید HTML صفحه را رندر کند.
 7. **هرگز اعتبارنامه/کلید (SMS، API،…) را داخل کد نگذارید**؛ به ثابت wp-config/option ارجاع دهید.
 8. **هرگز به‌صورت خودسرانه** نام تمپلیت‌ها (`Template Name: Panel - …`)، اسلاگ برگه‌ها، یا کلیدهای متا را عوض نکنید — محتوای دیتابیس لایو به آن‌ها وابسته است.
 
@@ -42,8 +42,8 @@
 
 - پشته: PHP 7.4+/8، وردپرس + LearnDash؛ فرانت: jQuery/Owl/Plyr بدون باندلر.
 - صفحات پنل = برگه‌ها با `Template Name` در زیرپوشهٔ `panel/`؛ مسیر واقعی برگه‌ها از اسلاگ آن‌ها می‌آید (نه مسیر فایل).
-- احراز هویت: OTP با سشن (`fl_otp*`)؛ ارسال از طریق `inc/sms.php` + تابع بیرونی `falnic_send_otp_with_bale` — هر دو سرویس بیرونی‌اند؛ در لوکال باید mock شوند.
-- جدول `{wp}_falnic_transactions` خارج از قالب ساخته می‌شود؛ قالب فقط `SELECT` می‌کند.
+- احراز هویت: OTP با سشن (`evented_otp*`/`evented_mobile`)؛ ارسال از طریق `inc/sms.php` + wrapper بله `evented_send_otp_with_bale` (ارسال واقعی بیرونی است؛ در لوکال mock شود).
+- جدول `{wp}_evented_transactions` خارج از قالب ساخته می‌شود؛ قالب فقط `SELECT` می‌کند (نصب‌های قدیمی باید جدول را rename کنند).
 - دسترسی درس: `sfwd_lms_has_access()` یا `sample_lesson === 'on'`.
 - سبک خطا: پیام‌های فارسی، کاربرپسند؛ خطاهای AJAX با `wp_send_json_error(['message'=>...])`.
 
@@ -51,10 +51,10 @@
 
 | ضدالگو | محل نمونه | جایگزین |
 |---|---|---|
-| هاردکد دامنه | `header.php`, `footer.php`, `inc/meta_functions.php`, `panel/*`, `page-login.php`, `front-page.php`, `single-sfwd-courses.php`, `style.css` | توابع وردپرس |
-| چاپ خام `$_GET` در inline JS | `page-login.php` (redirect_to) | `esc_url_raw` + `esc_js` |
+| هاردکد دامنه (رفع‌شده) | هیچ — در کد فعلی وجود ندارد | در کد جدید هم دامنه ننویسید؛ توابع وردپرس |
+| چاپ خام `$_GET` در inline JS (رفع‌شده) | هیچ — `page-login.php` با `wp_validate_redirect` + `wp_json_encode` مقداردهی می‌کند | در کد جدید هم همین الگو |
 | HTML با رشتهٔ PHP برای مودال/کارت | `single-sfwd-courses.php` (`$modals_html`) | قالب/partial با escape |
-| کد مردهٔ نیمه‌فعال | `inc/captcha.php`, `falnic_submit_cta`, `if(false)` وبینار، PhotoSwipe, `Untitled-1.json` | حذف یا اتصال کامل |
+| کد مردهٔ نیمه‌فعال | `inc/captcha.php`, `if(false)` وبینار، PhotoSwipe, `Untitled-1.json` | حذف یا اتصال کامل |
 | توابع کمکی تکراری در چند فایل | helpers قیمت/تصویر در front-page و panel | `inc/helpers.php` متمرکز |
 | session بدون نام/طول عمر | `inc/login.php` | تنظیمات امن سشن یا جایگزین |
 

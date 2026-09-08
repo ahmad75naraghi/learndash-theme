@@ -1,6 +1,6 @@
-# README — قالب وردپرس «edu falnic» (لرن‌دش)
+# README — قالب وردپرس «evented-edu» (لرن‌دش)
 
-قالب اختصاصی سایت آموزش آنلاین **فالنیک** (`https://edu.falnic.com/`) برای وردپرس + افزونهٔ **LearnDash**.
+قالب اختصاصی سایت آموزش آنلاین **evented-edu** (وارث قالب «edu falnic»/«فالنیک») برای وردپرس + افزونهٔ **LearnDash**. قالب از هر دامنه‌ای قابل اجراست و هیچ URL هاردکد دامنه ندارد.
 این قالب شامل سیستم ورود/ثبت‌نام با **پیامک OTP**، فروش دورهٔ لرن‌دش، پنل کاربری کامل، آرشیو/صفحهٔ تکی دوره، پروفایل مدرس و صفحهٔ اصلی فروشگاهی است. زبان رابط: **فارسی (RTL)**؛ فونت اختصاصی «دانا».
 
 > 📌 این مستندات «منبع حقیقت» پروژه است. قبل از هر تغییری در کد، ترتیب خواندن پیشنهادی:
@@ -25,16 +25,16 @@
 | LMS | **LearnDash** (نسخهٔ 3.6+) | پست‌تایپ `sfwd-courses`، درس، سکشن، گواهینامه، پرداخت |
 | زبان/سمت‌سرور | PHP 8.x (سازگار با 7.4) | استفاده از `str_starts_with()` و `??` |
 | فرانت‌اند | jQuery + Owl Carousel + Plyr | اسکریپت‌های دستی در `assets/js` |
-| فونت | «دانا» (`assets/fonts/falnic-font.woff2`) | `@font-face` در `style.css` |
+| فونت | «دانا» (`assets/fonts/evented-edu-font.woff2`) | `@font-face` در `style.css` |
 | پیامک OTP | SOAP پنل پیامک (payamak-panel) | `inc/sms.php` — ⚠️ اعتبارنامه هاردکد |
-| پیام‌رسان | ربات بله — تابع `falnic_send_otp_with_bale()` | ⚠️ در قالب تعریف **نشده** (باید افزونه/mu-plugin باشد) |
-| پایگاه‌دادهٔ تراکنش | جدول سفارشی `{wp}_falnic_transactions` | ⚠️ سازندهٔ جدول در این قالب نیست |
+| پیام‌رسان | ربات بله — تابع `evented_send_otp_with_bale()` | قالب یک wrapper محافظت‌شده دارد؛ ارسال واقعی به mu-plugin/افزونه (هم‌نام یا legacy با نام `falnic_send_otp_with_bale`) واگذار می‌شود |
+| پایگاه‌دادهٔ تراکنش | جدول سفارشی `{wp}_evented_transactions` | ⚠️ سازندهٔ جدول در این قالب نیست؛ نصب‌های قدیمی باید جدول را تغییر نام دهند (migration) |
 | تست | ندارد (در این مرحله) | بخش ۷ را ببینید |
 
 ## ۳. ساختار دایرکتوری‌ها
 
 ```
-learndash-theme/                  (در سرور: wp-content/themes/edu-falnic/)
+learndash-theme/                  (در سرور: wp-content/themes/<نام-پوشه> — کد از get_template_directory_uri() می‌خواند)
 ├── style.css / functions.php     هدر قالب + بوت‌استرپ (PATH_DIR* + require ها)
 ├── README.md / ARCHITECTURE.md / CHANGELOG.md / CONTRIBUTING.md / AI.md
 ├── ROADMAP.md / TODO.md / TECH_DEBT.md
@@ -51,7 +51,7 @@ learndash-theme/                  (در سرور: wp-content/themes/edu-falnic/)
 │   ├── assets_functions.php      منطق enqueue همهٔ CSS/JS
 │   ├── css/  front-page · single-courses · archive-courses · author · panel · vendorها
 │   ├── js/   main · front-page · single-courses · author · panel + vendorها
-│   ├── fonts/falnic-font.woff2   فونت «دانا»
+│   ├── fonts/evented-edu-font.woff2   فونت «دانا»
 │   └── img/  front-page (۲۳) · single-page (۸) · panel (۲)
 ├── inc/
 │   ├── includes.php              فقط require کردن ۵ ماژول پایین
@@ -91,21 +91,21 @@ learndash-theme/                  (در سرور: wp-content/themes/edu-falnic/)
 | وردپرس | 6.x |
 | LearnDash | نسخهٔ فعال (با Course Builder) |
 | فونت TTF برای captcha | `DanaVF.ttf` در `assets/fonts/` — در ریپو **نیست** (اختیاری تا زمان فعال‌سازی captcha) |
-| جدول `{wp}_falnic_transactions` | باید ساخته شود (DDL در `ARCHITECTURE.md` §3) |
-| تابع `falnic_send_otp_with_bale()` | تعریف‌شده در یک mu-plugin/افزونه |
+| جدول `{wp}_evented_transactions` | باید ساخته شود (DDL در `ARCHITECTURE.md` §3) |
+| تابع بله | اختیاری: `evented_send_otp_with_bale()` یا legacy `falnic_send_otp_with_bale()` در mu-plugin (بدون آن، فقط پیامک ارسال می‌شود) |
 
 ### ۵.۲ نصب (لوکال)
 
 ```bash
 # ۱) قالب را در مسیر تم‌ها قرار دهید:
-wp-content/themes/edu-falnic/
+wp-content/themes/<theme-folder>/
 
-# ۲) در پیشخوان: نمایش ← پوسته‌ها ← فعال‌سازی «edu falnic»
+# ۲) در پیشخوان: نمایش ← پوسته‌ها ← فعال‌سازی «evented-edu»
 # ۳) افزونهٔ LearnDash را نصب/فعال کنید (برای دیدن پست‌تایپ دوره‌ها ضروری است)
 # ۴) برگهٔ «ورود»: یک برگه با اسلاگ login بسازید (نیازی به انتخاب قالب نیست؛
 #      وردپرس به‌صورت خودکار از page-login.php استفاده می‌کند؛ محتوای برگه خالی باشد).
 # ۵) برگهٔ «پنل کاربری» با اسلاگ panel بسازید:
-#      - یا قالب پیش‌فرض (page-panel.php → فقط گارد لاگین، بدنهٔ خالی) را نگه دارید،
+#      - یا قالب پیش‌فرض (page-panel.php → گارد لاگین؛ کاربرِ لاگین‌شده به /panel/my-courses هدایت می‌شود) را نگه دارید،
 #      - یا «Template Name: Panel - Dashboard» را برای همین برگه انتخاب کنید.
 # ۶) زیربرگه‌ها را با «والد = panel» بسازید (فرزند بودن الزامی است؛ چون استایل/اسکریپت پنل
 #      فقط وقتی enqueue می‌شود که برگه، خودِ panel یا زیرمجموعهٔ آن باشد) و Template ست کنید:
@@ -117,13 +117,9 @@ wp-content/themes/edu-falnic/
 #      /panel/settings  → Panel - Account Settings
 # ۷) تنظیمات ← پیوندهای یکتا ← «نام پست» (Post name)
 # ۸) جدول تراکنش‌ها را بسازید (DDL در ARCHITECTURE.md) و درگاه/ثبت‌کنندهٔ تراکنش را وصل کنید
-# ۹) تابع بله (falnic_send_otp_with_bale) را در mu-plugin تعریف کنید
+# ۹) (اختیاری) تابع بله `evented_send_otp_with_bale` (یا legacy `falnic_send_otp_with_bale`) را در mu-plugin تعریف کنید
 ```
 
-> ⚠️ **نکتهٔ حیاتی برای لوکال**: قالب هنوز چند URL هاردکدِ دامنهٔ تولید دارد (`https://edu.falnic.com/...` و `/wp-content/themes/edu-falnic/...`).
-> برای اجرای لوکال از جستجو/جایگزینی زیر استفاده کنید (جزئیات کامل: `TECH_DEBT.md` → «هاردکد دامنه»):
-> - `https://edu.falnic.com` → `home_url()` یا `site_url()`
-> - `/wp-content/themes/edu-falnic` → `get_template_directory_uri()`
 
 ## ۶. پیکربندی (متغیرهای محیطی)
 
@@ -158,7 +154,7 @@ node --check assets/js/main.js
   2. ورود با رمز عبور و بازیابی رمز با OTP.
   3. ثبت نظر دوره (بررسی وضعیت «در انتظار تایید»).
   4. تکمیل درس → آپدیت درصد پیشرفت در سایدبار و داشبورد.
-  5. تراکنش‌ها/دانلود رسید پس از ساخت یک رکورد دستی در `falnic_transactions`.
+  5. تراکنش‌ها/دانلود رسید پس از ساخت یک رکورد دستی در `evented_transactions`.
   6. رندر همهٔ صفحات پنل با و بدون لاگین.
 
 ## ۸. سایر مستندات

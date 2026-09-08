@@ -1,4 +1,4 @@
-# ARCHITECTURE — معماری قالب «edu falnic»
+# ARCHITECTURE — معماری قالب «evented-edu»
 
 این سند معماری نرم‌افزار، الگوهای استفاده‌شده، جریان داده، ساختار پایگاه‌داده و قراردادهای AJAX را شرح می‌دهد. همهٔ دیاگرام‌ها با **سینتکس Mermaid.js** نوشته شده‌اند تا مستقیماً توسط انسان و مدل‌های AI قابل درک باشند.
 
@@ -13,7 +13,7 @@
 | **Assets** | `assets/` + `assets/assets_functions.php` | CSS/JS/فونت و بارگذاری شرطی |
 | **Integration** | خارج از قالب | LearnDash، درگاه پرداخت، جدول تراکنش، سرویس پیامک/بله |
 
-الگوی کلی: **WP Theme + MVC-lite** — قالب‌ها = View، `inc/*` = Controller/Service، وردپرس/لرن‌دش = Model/DB. هیچ فریم‌ورک یا autoloader/PHP مودرن (namespace) استفاده نشده؛ کد به‌صورت توابع `falnic_*` و کلاس‌های ساده نوشته شده است.
+الگوی کلی: **WP Theme + MVC-lite** — قالب‌ها = View، `inc/*` = Controller/Service، وردپرس/لرن‌دش = Model/DB. هیچ فریم‌ورک یا autoloader/PHP مودرن (namespace) استفاده نشده؛ کد به‌صورت توابع `evented_*` و کلاس‌های ساده نوشته شده است (پس از برندینگ، وارث نام‌های `falnic_*`).
 
 ## ۲. بوت‌استرپ و ترتیب بارگذاری
 
@@ -21,17 +21,17 @@
 flowchart TD
     A["functions.php<br/>(define PATH_DIR / PATH_DIR_URL)"] --> B["assets/assets_functions.php<br/>hook: wp_enqueue_scripts"]
     A --> C["inc/includes.php"]
-    C --> D["inc/login.php — FalnicAuthHandler<br/>8 AJAX hooks + login_url/logout_redirect filters"]
+    C --> D["inc/login.php — EventedAuthHandler<br/>7 AJAX actions + login_url/logout_redirect filters"]
     C --> E["inc/sms.php — send_pattern_sms (SOAP)"]
     C --> F["inc/meta_functions.php — metaboxes + avatar filter"]
     C --> G["inc/theme_options.php — roles, redirects, is_current_path"]
     C --> H["inc/ajax_functions.php — 5 AJAX (review/progress/wishlist/profile/settings)"]
-    D --> I["(external) falnic_send_otp_with_bale()<br/>must exist outside theme"]
+    D --> I["(external Bale provider) evented_send_otp_with_bale()<br/>optional mu-plugin; legacy falnic_… also honored"]
     E --> J["(external) Payamak SOAP API"]
 ```
 
 نکات:
-- `FalnicAuthHandler` با `add_action('init', fn => new FalnicAuthHandler())` نمونه‌سازی می‌شود.
+- `EventedAuthHandler` با `add_action('init', fn => new EventedAuthHandler())` نمونه‌سازی می‌شود.
 - `inc/captcha.php` و `captcha_verify()` (در login.php) فعلاً **به هیچ فرمی متصل نیستند** (کد مردهٔ آماده).
 - هوک‌های ریدایرکت: `login_url` → `/login/` و `logout_redirect` → خانه (هر دو در `inc/login.php`)؛ `login_redirect` برای نقش subscriber → `/panel` (در `inc/theme_options.php`).
 
@@ -47,7 +47,7 @@ erDiagram
     COURSE ||--o{ COMMENT : "course reviews"
     COMMENT ||--|| COMMENT_META : "review_rating 1..5"
     USER ||--o{ USER_META : "profile/avatar/fav_courses"
-    USER ||--o{ TRANSACTION : "wp_falnic_transactions"
+    USER ||--o{ TRANSACTION : "wp_evented_transactions"
     TRANSACTION }o--|| COURSE : "course_id"
 
     COURSE { int ID PK "post_type=sfwd-courses" }
@@ -59,7 +59,7 @@ erDiagram
     USER_META { varchar meta_key "fav_courses, first_name_fa, ..." }
 ```
 
-### ۳.۲ جدول سفارشی `{wp}_falnic_transactions`
+### ۳.۲ جدول سفارشی `{wp}_evented_transactions`
 
 قالب **فقط از این جدول می‌خواند** (صفحات `payments` و `dashboard`)؛ سازنده/درگاه خارج از قالب است.
 ستون‌های استفاده‌شده در کد (مستخرج از `panel/payments.php` و `panel/dashboard.php`): `user_id`, `course_id`, `status` (مقادیر غیر از `success` = ناموفق), `tracking_code`, `amount`, `created_at`.
@@ -67,7 +67,7 @@ erDiagram
 DDL پیشنهادی (سازگار با کد — در صورت نبودِ جدول در نصب):
 
 ```sql
-CREATE TABLE IF NOT EXISTS {wp}_falnic_transactions (
+CREATE TABLE IF NOT EXISTS {wp}_evented_transactions (
     id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id       BIGINT UNSIGNED NOT NULL DEFAULT 0,
     course_id     BIGINT UNSIGNED NOT NULL DEFAULT 0,
@@ -157,18 +157,18 @@ sequenceDiagram
     participant X as "External SMS / Bale"
 
     U->>P: enters mobile 09XXXXXXXXX
-    P->>A: POST falnic_check_mobile_and_send_otp (nonce)
+    P->>A: POST evented_check_mobile_and_send_otp (nonce)
     A->>S: handle_check_mobile_and_send_otp
     alt user exists (login = mobile)
         S-->>P: {status:login} -> show password form
     else new user
-        S->>X: send_pattern_sms + falnic_send_otp_with_bale (OTP 5-digit)
+        S->>X: send_pattern_sms + evented_send_otp_with_bale (OTP 5-digit)
         X-->>S: ok
         S-->>P: {status:register} -> show OTP step
     end
 
     U->>P: enters OTP
-    P->>A: POST falnic_verify_otp
+    P->>A: POST evented_verify_otp
     A->>S: handle_verify_otp (compare session fl_otp)
     alt purpose = reset_password
         S-->>P: {result:reset_password} -> new-password step
@@ -179,9 +179,9 @@ sequenceDiagram
     end
 ```
 
-مسیرهای تکمیلی (خلاصه): ثبت‌نام نهایی = `save_user_register_name` (ساخت کاربر: login=موبایل، ایمیل `{mobile}@falnic.user`) سپس `falnic_register_user` (ست رمز + لاگین). ورود با رمز = `falnic_login_user`. بازیابی رمز = `falnic_send_otp(purpose=reset_password)` → `falnic_verify_otp` → `falnic_reset_password`.
+مسیرهای تکمیلی (خلاصه): ثبت‌نام نهایی = `save_user_register_name` (ساخت کاربر: login=موبایل، ایمیل `{mobile}@evented-edu.user`) سپس `evented_register_user` (ست رمز + لاگین). ورود با رمز = `evented_login_user`. بازیابی رمز = `evented_send_otp(purpose=reset_password)` → `evented_verify_otp` → `evented_reset_password`.
 
-> ⚠️ «خط طلایی»های مستند در `TECH_DEBT.md`: `save_user_register_name` تأیید OTP را چک نمی‌کند؛ `handle_register_user` از `wp_set_password()` که `user_id` برنمی‌گرداند استفاده می‌کند.
+> ✅ این دو «خط طلایی» رفع شده‌اند: `save_user_register_name` فقط با OTP تأییدشدهٔ همان شماره کاربر می‌سازد و `handle_register_user` با `$user->ID` (نه خروجی void تابع `wp_set_password`) لاگین خودکار را انجام می‌دهد.
 
 ### ۴.۲ تکمیل درس (دور زدن قفل ویدیو/تایمر)
 
@@ -269,14 +269,13 @@ flowchart TD
 
 | اکشن | nonce | دسترسی | سمت |
 |---|---|---|---|
-| `falnic_check_mobile_and_send_otp` | `falnic_nonce` | مهمان+کاربر | `login.php` |
-| `falnic_send_otp` | `falnic_nonce` | مهمان+کاربر | `login.php` |
-| `falnic_verify_otp` | `falnic_nonce` | مهمان+کاربر | `login.php` |
-| `save_user_register_name` | `falnic_nonce` | مهمان+کاربر | `login.php` |
-| `falnic_register_user` | `falnic_nonce` | مهمان+کاربر | `login.php` |
-| `falnic_login_user` | `falnic_nonce` | مهمان+کاربر | `login.php` |
-| `falnic_reset_password` | `falnic_nonce` | مهمان+کاربر | `login.php` |
-| `falnic_submit_cta` | `falnic_nonce` | مهمان+کاربر | ⚠️ hook بدون متد (`handle_cta_submit` وجود ندارد) |
+| `evented_check_mobile_and_send_otp` | `evented_nonce` | مهمان+کاربر | `login.php` |
+| `evented_send_otp` | `evented_nonce` | مهمان+کاربر | `login.php` |
+| `evented_verify_otp` | `evented_nonce` | مهمان+کاربر | `login.php` |
+| `save_user_register_name` (بدون پیشوند) | `evented_nonce` | مهمان+کاربر | `login.php` |
+| `evented_register_user` | `evented_nonce` | مهمان+کاربر | `login.php` |
+| `evented_login_user` | `evented_nonce` | مهمان+کاربر | `login.php` |
+| `evented_reset_password` | `evented_nonce` | مهمان+کاربر | `login.php` |
 | `submit_course_review` | `course_review_nonce` | مهمان+کاربر (لاگین الزامی داخل هندلر) | `ajax_functions.php` |
 | `custom_mark_lesson_complete` | `mark_complete_nonce_{lesson_id}` | فقط کاربر | `ajax_functions.php` |
 | `toggle_course_wishlist` | `wishlist_nonce` | فقط کاربر | `ajax_functions.php` |
