@@ -1,0 +1,346 @@
+/* =========================================================
+   evented-edu — صفحهٔ اصلی (بازطراحی pastel مطابق الگوی شمیم)
+   فقط برای front-page استفاده می‌شود؛ با کلاس‌های ee- پیشوندگذاری
+   ========================================================= */
+
+.ee-home {
+    --ee-mint: #E8F5E9;
+    --ee-mintMd: #A5D6A7;
+    --ee-mintDk: #2E7D32;
+    --ee-tealL: #E0F2F1;
+    --ee-teal: #80CBC4;
+    --ee-tealP: #00897B;
+    --ee-peachL: #FFF3E0;
+    --ee-peachMd: #FFE0B2;
+    --ee-peachDk: #E65100;
+    --ee-amber: #FFF8E1;
+    --ee-amberA: #FFA726;
+    --ee-lavL: #F3E8FF;
+    --ee-lavS: #D8B4FE;
+    --ee-lavD: #7E22CE;
+    --ee-roseL: #FCE7F3;
+    --ee-rose: #F472B6;
+    --ee-bg: #F8FAF9;
+    --ee-ink: #334155;
+    --ee-soft: #64748B;
+    --ee-line: #E2E8F0;
+    --ee-sh-sm: 0 2px 8px -1px rgba(0,137,123,.08), 0 1px 4px -1px rgba(0,0,0,.04);
+    --ee-sh-md: 0 8px 20px -3px rgba(0,137,123,.1), 0 4px 10px -2px rgba(0,0,0,.03);
+    --ee-r-2xl: 1.25rem;
+    --ee-r-3xl: 1.75rem;
+
+    font-family: "Vazirmatn", "دانا", "evented-edu-font", Tahoma, sans-serif;
+    background: var(--ee-bg);
+    color: var(--ee-ink);
+    line-height: 1.7;
+    overflow-x: hidden;
+}
+.ee-home *, .ee-home *::before, .ee-home *::after { box-sizing: border-box; }
+.ee-home a { text-decoration: none; color: inherit; }
+.ee-home img { max-width: 100%; display: block; }
+.ee-wrap { max-width: 80rem; margin-inline: auto; padding-inline: 1.25rem; }
+.ee-ic { display: inline-flex; align-items: center; justify-content: center; }
+
+/* فونت: اول وزیرمتن از گوگل‌فونت؛ در نبود آن دانای محلی */
+.ee-home { font-family: "Vazirmatn", "دانا", Tahoma, sans-serif; }
+
+/* ---------- نوار ابزار بالای هدر ---------- */
+.ee-topbar {
+    display: none;
+}
+@media (min-width: 768px) {
+    .ee-topbar {
+        display: block;
+        background: linear-gradient(to left, var(--ee-tealL), #F1F8F6, var(--ee-mint));
+        border-bottom: 1px solid rgb(209 250 229 / .6);
+        padding: .4rem .75rem;
+        font-size: .78rem;
+        color: var(--ee-soft);
+    }
+    .ee-topbar-in { display: flex; align-items: center; justify-content: space-between; }
+    .ee-topbar .tb-right { display: flex; align-items: center; gap: 1.25rem; }
+    .ee-tb-item { display: inline-flex; align-items: center; gap: .35rem; }
+    .ee-tb-item .dot { width: .5rem; height: .5rem; border-radius: 999px; display: inline-block; }
+    .ee-tb-links { display: flex; gap: 1rem; }
+    .ee-tb-links a { transition: color .15s; }
+    .ee-tb-links a:hover { color: var(--ee-tealP); }
+}
+.ee-topbar .ee-tb-sep { opacity: .5; }
+
+/* ---------- هدر اصلی (چسبان، شیشه‌ای) ---------- */
+.ee-header {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: rgba(255,255,255,.86);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgb(209 250 229 / .7);
+}
+.ee-header-in { padding-block: .7rem; }
+.ee-header-row { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.ee-logo { display: flex; align-items: center; gap: .6rem; }
+.ee-logo img, .ee-logo .logo-fallback { height: 42px; width: auto; }
+.ee-logo .logo-fallback { font-weight: 900; color: var(--ee-tealP); display:flex; align-items:center; font-size:1.15rem; gap:.4rem;}
+.ee-logo .logo-fallback svg { width: 30px; height: 30px; }
+.ee-search { display: none; flex: 0 1 24rem; position: relative; }
+.ee-search input {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--ee-line);
+    border-radius: 999px;
+    padding: .55rem 2.4rem .55rem 2.2rem;
+    font-family: inherit;
+    font-size: .82rem;
+    color: var(--ee-ink);
+    outline: none;
+    transition: all .15s;
+}
+.ee-search input:focus { border-color: var(--ee-teal); box-shadow: 0 0 0 3px var(--ee-tealL); }
+.ee-search .s-ic { position: absolute; right: .9rem; top: 50%; transform: translateY(-50%); color: var(--ee-tealP); pointer-events: none; }
+.ee-search .s-tune { position: absolute; left: .6rem; top: 50%; transform: translateY(-50%); color: var(--ee-soft); }
+@media (min-width: 900px) { .ee-search { display: block; } }
+
+.ee-h-actions { display: flex; align-items: center; gap: .5rem; }
+.ee-btn {
+    display: inline-flex; align-items: center; gap: .45rem;
+    border-radius: 999px; padding: .5rem 1rem;
+    font-size: .8rem; font-weight: 700;
+    border: 1px solid transparent;
+    cursor: pointer; transition: all .15s; background: none; font-family: inherit;
+    white-space: nowrap;
+}
+.ee-btn-ghost { background: var(--ee-mint); color: var(--ee-tealP); border-color: rgb(209 250 229); }
+.ee-btn-ghost:hover { background: rgb(209 250 229); }
+.ee-btn-primary { background: var(--ee-tealP); color: #fff; }
+.ee-btn-primary:hover { background: #00796b; }
+.ee-btn-soft { background: #fff; color: var(--ee-soft); border-color: var(--ee-line); width: 2.4rem; height: 2.4rem; padding: 0; justify-content: center; border-radius: 999px; position: relative; }
+.ee-hamb { display: inline-flex; width: 2.4rem; height: 2.4rem; border-radius: 999px; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--ee-line); color: var(--ee-ink); }
+
+/* منوی دسکتاپ (قرصی) */
+.ee-nav { display: none; }
+@media (min-width: 900px) {
+    .ee-nav { display: flex; align-items: center; gap: .2rem; padding-top: .55rem; border-top: 1px solid rgb(240 253 250); flex-wrap: wrap; }
+    .ee-nav a { font-size: .82rem; font-weight: 600; padding: .4rem .85rem; border-radius: 999px; color: var(--ee-ink); transition: all .15s; }
+    .ee-nav a.ee-active { background: var(--ee-tealP); color: #fff; }
+    .ee-nav a:hover { background: var(--ee-mint); color: var(--ee-tealP); }
+}
+
+/* موبایل: جستجو زیر ردیف اول */
+.ee-search-m { display: block; padding-bottom: .6rem; }
+@media (min-width: 900px) { .ee-search-m { display: none; } }
+
+/* ---------- هیرو ---------- */
+.ee-hero { padding-top: 1.2rem; padding-bottom: .5rem; }
+.ee-hero-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: stretch; }
+@media (min-width: 1024px) { .ee-hero-grid { grid-template-columns: 8fr 4fr; } }
+
+.ee-feature {
+    position: relative; overflow: hidden; border-radius: var(--ee-r-3xl);
+    border: 1px solid rgb(209 250 229);
+    box-shadow: var(--ee-sh-md);
+    background: linear-gradient(135deg, var(--ee-tealL), #fff 55%, var(--ee-mint));
+    display: flex; flex-direction: column; justify-content: flex-end;
+    min-height: 280px;
+}
+.ee-feature .feat-media { position: absolute; inset: 0; }
+.ee-feature .feat-media img { width: 100%; height: 100%; object-fit: cover; }
+.ee-feature .feat-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgb(15 23 42 / .78), rgb(15 23 42 / .25) 45%, transparent); }
+.ee-feature .feat-tags { position: absolute; top: .9rem; right: 1rem; display: flex; gap: .5rem; z-index: 2; }
+.ee-chip { font-size: .7rem; font-weight: 800; padding: .3rem .8rem; border-radius: 999px; }
+.ee-chip-amber { background: var(--ee-amberA); color: #fff; }
+.ee-chip-glass { background: rgb(255 255 255 / .92); color: #065f46; backdrop-filter: blur(6px); }
+.ee-feature .feat-body { position: relative; z-index: 2; padding: 1.1rem; color: #fff; }
+.ee-feature .feat-kicker { font-size: .75rem; color: var(--ee-peachMd); font-weight: 600; }
+.ee-feature .feat-title { font-size: 1.15rem; font-weight: 900; line-height: 1.5; margin: .2rem 0 .2rem; text-shadow: 0 1px 2px rgb(0 0 0 / .2); }
+.ee-feature .feat-desc { font-size: .78rem; color: rgb(226 232 240); max-width: 42ch; }
+.ee-feature .feat-cta-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .8rem; }
+.ee-btn-light { background: var(--ee-mint); color: var(--ee-tealP); }
+.ee-btn-light:hover { background: var(--ee-tealP); color: #fff; }
+.ee-btn-solid { background: var(--ee-tealP); color: #fff; }
+.ee-btn-solid:hover { background: #00796b; }
+@media (min-width: 640px) {
+    .ee-feature { min-height: 340px; }
+    .ee-feature .feat-title { font-size: 1.4rem; }
+}
+
+/* ستون کناری هیرو: آخرین مقالات */
+.ee-latest {
+    display: flex; flex-direction: column; gap: .9rem;
+}
+.ee-latest-card {
+    background: #fff; border: 1px solid rgb(209 250 229 / .8);
+    border-radius: var(--ee-r-3xl); box-shadow: var(--ee-sh-sm);
+    padding: .9rem;
+}
+.ee-latest-card .lc-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: .65rem; border-bottom: 1px solid #f1f5f9; margin-bottom: .35rem; }
+.ee-latest-card .lc-title { display: flex; align-items: center; gap: .45rem; font-size: .85rem; font-weight: 800; color: #1e293b; }
+.ee-latest-card .lc-title i { color: var(--ee-tealP); font-style: normal; }
+.ee-latest-card .lc-more { font-size: .72rem; font-weight: 700; color: var(--ee-tealP); display: inline-flex; gap: .2rem; align-items: center; }
+.ee-latest-card .lc-more:hover { text-decoration: underline; }
+.ee-news-list { display: flex; flex-direction: column; }
+.ee-news-list a { display: flex; gap: .7rem; align-items: center; padding: .55rem 0; border-bottom: 1px dashed #f1f5f9; }
+.ee-news-list a:last-child { border-bottom: 0; }
+.ee-news-list .th { width: 3rem; height: 3rem; border-radius: .8rem; object-fit: cover; flex-shrink: 0; background: var(--ee-tealL); }
+.ee-news-list .n-tag { font-size: .62rem; font-weight: 800; display: inline-block; padding: .15rem .5rem; border-radius: .45rem; }
+.ee-news-list h4 { font-size: .76rem; font-weight: 700; color: var(--ee-ink); margin: .15rem 0 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.ee-latest-card .lc-foot { margin-top: .5rem; padding-top: .6rem; border-top: 1px solid #f1f5f9; display: flex; align-items: center; gap: .7rem; }
+.ee-latest-card .lc-foot .channels-ic { width: 2.2rem; height: 2.2rem; border-radius: .9rem; background: var(--ee-mint); color: var(--ee-tealP); display: inline-flex; align-items: center; justify-content: center; }
+.ee-latest-card .lc-foot .ch-label { font-size: .78rem; font-weight: 800; }
+.ee-latest-card .lc-foot .ch-sub { font-size: .66rem; color: var(--ee-soft); }
+
+/* ---------- دسترسی سریع (کاشی‌ها) ---------- */
+.ee-quick { padding-block: 1rem; }
+.ee-sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-inline: .25rem; }
+.ee-sec-title { display: flex; align-items: center; gap: .55rem; font-size: 1rem; font-weight: 900; color: #1e293b; }
+.ee-sec-title .bar { width: .55rem; height: .55rem; border-radius: 999px; background: var(--ee-tealP); }
+.ee-sec-title.purple .bar { background: #a855f7; }
+.ee-sec-sub { font-size: .75rem; color: var(--ee-soft); }
+.ee-qgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem 1rem; }
+@media (min-width: 1024px) { .ee-qgrid { grid-template-columns: repeat(8, 1fr); } }
+.ee-qitem { display: flex; flex-direction: column; align-items: center; padding: .8rem .3rem; border-radius: 1.2rem; transition: all .15s; background: var(--ee-mint); border: 1px solid rgb(209 250 229); }
+.ee-qitem:hover { transform: translateY(-2px); }
+.ee-qitem .qi-ic { width: 2.6rem; height: 2.6rem; border-radius: 1rem; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: .5rem; font-size: 1.5rem; }
+.ee-qitem span { font-size: .72rem; font-weight: 800; color: #475569; }
+.ee-q-amber { background: var(--ee-peachL); border-color: #fde8cd; }
+.ee-q-purple { background: var(--ee-lavL); border-color: #f3e8ff; }
+.ee-q-teal { background: var(--ee-tealL); border-color: #ccfbf1; }
+.ee-q-rose { background: var(--ee-roseL); border-color: #fce7f3; }
+
+/* ---------- بخش دوره‌ها ---------- */
+.ee-courses { background: linear-gradient(to bottom, rgb(224 242 241 / .5), #F3F9F7 40%, #fff); border: 1px solid rgb(209 250 229 / .8); border-radius: var(--ee-r-3xl); padding: 1.2rem 1rem; margin-block: 1rem; }
+.ee-courses-head { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1rem; }
+@media (min-width: 640px) { .ee-courses-head { flex-direction: row; align-items: center; justify-content: space-between; } }
+.ee-courses-head .ch2 { display: flex; align-items: center; gap: .5rem; font-size: 1.1rem; font-weight: 900; color: #1e293b; }
+.ee-courses-head .ch2 .dot { width: .7rem; height: .7rem; border-radius: 999px; background: #10b981; }
+.ee-courses-head .ch2 small { font-size: .78rem; color: var(--ee-soft); font-weight: 400; display: block; }
+.ee-count-badge { background: #fff; border: 1px solid rgb(209 250 229); color: var(--ee-tealP); font-size: .75rem; font-weight: 800; padding: .4rem .9rem; border-radius: 999px; }
+.ee-chips { display: flex; gap: .5rem; overflow-x: auto; padding: .3rem 0 .7rem; }
+.ee-chip-btn { flex-shrink: 0; padding: .4rem 1rem; border-radius: 999px; font-size: .75rem; font-weight: 700; background: #fff; color: #475569; border: 1px solid var(--ee-line); cursor: pointer; transition: all .15s; font-family: inherit; }
+.ee-chip-btn:hover, .ee-chip-btn.ee-on { background: var(--ee-mint); color: var(--ee-tealP); }
+.ee-chip-btn.ee-on { background: var(--ee-tealP); color: #fff; border-color: var(--ee-tealP); }
+.ee-cgrid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 640px) { .ee-cgrid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1024px) { .ee-cgrid { grid-template-columns: repeat(4, 1fr); } }
+.ee-course-card { background: #fff; border: 1px solid rgb(209 250 229); border-radius: 1.3rem; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--ee-sh-sm); transition: all .2s; }
+.ee-course-card:hover { box-shadow: var(--ee-sh-md); transform: translateY(-3px); }
+.ee-course-card .cc-thumb { position: relative; aspect-ratio: 4/3; overflow: hidden; background: var(--ee-tealL); }
+.ee-course-card .cc-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+.ee-course-card:hover .cc-thumb img { transform: scale(1.05); }
+.ee-course-card .cc-thumb .cc-badge { position: absolute; top: .6rem; right: .6rem; font-size: .62rem; font-weight: 800; color: #fff; background: var(--ee-mintDk); padding: .25rem .7rem; border-radius: 999px; }
+.ee-course-card .cc-badge.hot { background: var(--ee-peachDk); }
+.ee-course-card .cc-badge.free { background: var(--ee-tealP); }
+.ee-course-card .cc-body { padding: .8rem; display: flex; flex-direction: column; flex: 1; }
+.ee-course-card .cc-title { font-size: .85rem; font-weight: 800; color: var(--ee-ink); line-height: 1.6; margin-bottom: .5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.7em; }
+.ee-course-card .cc-title a:hover { color: var(--ee-tealP); }
+.ee-course-card .cc-instructor { display: flex; align-items: center; gap: .4rem; font-size: .72rem; color: var(--ee-tealP); margin-bottom: .5rem; }
+.ee-course-card .cc-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: .6rem; font-size: .74rem; }
+.ee-course-card .cc-lessons { color: #047857; font-weight: 700; }
+.ee-course-card .cc-price { background: var(--ee-mint); color: #065f46; font-weight: 800; padding: .2rem .6rem; border-radius: 999px; font-size: .7rem; }
+.ee-course-card .cc-price.amber { background: var(--ee-peachMd); color: #7c2d12; }
+
+/* نوار CTA کهربایی پایین دوره‌ها */
+.ee-cta-amber { margin-top: 1.2rem; background: linear-gradient(to left, var(--ee-peachL), #fffbeb, var(--ee-amber)); border: 1px solid rgb(253 230 138 / .8); border-radius: var(--ee-r-3xl); padding: 1rem; display: flex; flex-direction: column; gap: .9rem; align-items: center; justify-content: space-between; }
+@media (min-width: 640px) { .ee-cta-amber { flex-direction: row; } }
+.ee-cta-amber .cta-ic { width: 2.6rem; height: 2.6rem; border-radius: 1rem; background: var(--ee-amberA); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.4rem; }
+.ee-cta-amber .cta-text { display: flex; gap: .8rem; align-items: center; text-align: right; }
+.ee-cta-amber h4 { font-size: .9rem; font-weight: 800; color: #451a03; }
+.ee-cta-amber p { font-size: .72rem; color: #92400e; }
+.ee-cta-amber .ee-btn-amber { background: #f59e0b; color: #fff; border-radius: 1rem; padding: .7rem 1.4rem; font-weight: 800; font-size: .8rem; white-space: nowrap; }
+.ee-cta-amber .ee-btn-amber:hover { background: #d97706; }
+
+/* ---------- ۳ گام ---------- */
+.ee-steps { background: linear-gradient(135deg, rgb(224 242 241 / .4), #fff 60%, rgb(232 245 233 / .3)); border: 1px solid rgb(209 250 229 / .8); border-radius: var(--ee-r-3xl); padding: 1.2rem 1rem; margin-block: 1rem; position: relative; overflow: hidden; }
+.ee-steps-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem; padding-bottom: .9rem; margin-bottom: .9rem; border-bottom: 1px solid rgb(209 250 229 / .6); }
+.ee-steps-top .st-badge { display: inline-flex; align-items: center; gap: .4rem; background: var(--ee-mint); border: 1px solid rgb(209 250 229); color: var(--ee-tealP); border-radius: 999px; font-size: .72rem; font-weight: 800; padding: .3rem .8rem; }
+.ee-steps-top h3 { font-size: 1.05rem; font-weight: 900; color: #1e293b; }
+.ee-steps-top p { font-size: .78rem; color: var(--ee-soft); }
+.ee-steps-grid { display: grid; grid-template-columns: 1fr; gap: .8rem; }
+@media (min-width: 768px) { .ee-steps-grid { grid-template-columns: repeat(3, 1fr); } }
+.ee-step { background: rgb(255 255 255 / .9); border: 1px solid rgb(209 250 229 / .8); border-radius: 1.2rem; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; gap: .7rem; transition: all .15s; }
+.ee-step:hover { box-shadow: var(--ee-sh-md); }
+.ee-step .st-top { display: flex; align-items: center; justify-content: space-between; }
+.ee-step .st-num { width: 2.2rem; height: 2.2rem; border-radius: .8rem; background: var(--ee-mint); color: #065f46; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; }
+.ee-step.st2 .st-num { background: var(--ee-peachMd); color: #7c2d12; }
+.ee-step.st3 .st-num { background: var(--ee-lavL); color: var(--ee-lavD); }
+.ee-step .st-ic { font-size: 1.5rem; font-style: normal; color: var(--ee-tealP); }
+.ee-step.st2 .st-ic { color: #f59e0b; }
+.ee-step.st3 .st-ic { color: var(--ee-lavD); }
+.ee-step h5 { font-size: .9rem; font-weight: 900; color: #1e293b; }
+.ee-step p { font-size: .75rem; color: var(--ee-soft); }
+.ee-step .st-foot { border-top: 1px solid #f1f5f9; padding-top: .55rem; font-size: .7rem; font-weight: 800; color: var(--ee-tealP); display: flex; justify-content: space-between; align-items: center; }
+.ee-step.st2 .st-foot { color: #b45309; }
+.ee-step.st3 .st-foot { color: var(--ee-lavD); }
+
+/* ---------- مقالات ---------- */
+.ee-articles { padding-block: .8rem; }
+.ee-agrid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 768px) { .ee-agrid { grid-template-columns: repeat(3, 1fr); } }
+.ee-art-card { background: #fff; border: 1px solid rgb(240 253 250); border-radius: 1.3rem; padding: .8rem; display: flex; flex-direction: column; box-shadow: var(--ee-sh-sm); transition: all .2s; }
+.ee-art-card:hover { box-shadow: var(--ee-sh-md); transform: translateY(-2px); }
+.ee-art-card .art-thumb { aspect-ratio: 16/9; border-radius: .9rem; overflow: hidden; background: #f1f5f9; margin-bottom: .7rem; }
+.ee-art-card .art-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.ee-art-card:hover .art-thumb img { transform: scale(1.04); }
+.ee-art-card .art-tag { font-size: .65rem; font-weight: 800; padding: .25rem .7rem; border-radius: .5rem; display: inline-block; }
+.ee-art-card h4 { font-size: .85rem; font-weight: 800; color: var(--ee-ink); margin: .5rem 0 .3rem; line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ee-art-card p { font-size: .74rem; color: var(--ee-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ee-art-card .art-foot { margin-top: auto; padding-top: .6rem; border-top: 1px solid #f8fafc; display: flex; align-items: center; justify-content: space-between; font-size: .72rem; color: #94a3b8; }
+.ee-art-card .art-foot .read { color: var(--ee-tealP); font-weight: 600; display: inline-flex; align-items: center; gap: .2rem; }
+.ee-art-card .art-foot .read:hover { text-decoration: underline; }
+
+/* ---------- اساتید ---------- */
+.ee-instructors { background: linear-gradient(to bottom, #fff, rgb(232 245 233 / .3)); border: 1px solid rgb(209 250 229 / .7); border-radius: var(--ee-r-3xl); padding: 1.4rem 1rem; text-align: center; margin-block: 1rem; }
+.ee-instructors .sec-title { margin-bottom: .4rem; }
+.ee-instructors .sec-sub { font-size: .78rem; color: var(--ee-soft); margin-bottom: 1.2rem; }
+.ee-instr-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem 2rem; }
+.ee-instr { display: flex; flex-direction: column; align-items: center; width: 7rem; }
+.ee-instr .av-wrap { width: 4.6rem; height: 4.6rem; border-radius: 999px; padding: 3px; background: conic-gradient(from 180deg, #34d399, #5eead4, #fcd34d, #34d399); }
+.ee-instr .av-wrap .av { width: 100%; height: 100%; border-radius: 999px; overflow: hidden; background: #fff; display:flex; align-items:center; justify-content:center; }
+.ee-instr .av-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.ee-instr .av-wrap .noimg { font-size: 1.6rem; color: var(--ee-tealP); }
+.ee-instr strong { font-size: .82rem; margin-top: .5rem; color: var(--ee-ink); }
+.ee-instr .ee-role { font-size: .68rem; color: var(--ee-tealP); }
+
+/* ---------- فوتر ---------- */
+.ee-footer { background: #0f172a; color: #cbd5e1; margin-top: 1.6rem; border-top: 1px solid #1e293b; }
+.ee-footer .ee-fwrap { padding: 2rem .25rem 1.6rem; }
+.ee-fgrid { display: grid; grid-template-columns: 1fr; gap: 1.6rem; }
+@media (min-width: 768px) { .ee-fgrid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .ee-fgrid { grid-template-columns: repeat(4, 1fr); } }
+.ee-footer h4 { color: #fff; font-size: .92rem; margin-bottom: .8rem; padding-bottom: .45rem; border-bottom: 1px solid #1e293b; }
+.ee-footer ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .55rem; font-size: .8rem; }
+.ee-footer ul a:hover { color: #34d399; }
+.ee-footer .about p { font-size: .78rem; color: #94a3b8; line-height: 1.9; }
+.ee-f-logo { background: rgb(255 255 255 / .95); border-radius: 1rem; padding: .35rem .7rem; display: inline-flex; margin-bottom: .9rem; }
+.ee-f-logo .logo-fallback { color: var(--ee-tealP); font-weight: 900; display:flex; gap:.4rem; align-items:center; font-size:1rem;}
+.ee-footer .ee-license { display: inline-flex; align-items: center; gap: .5rem; font-size: .75rem; color: #34d399; margin-top: .9rem; }
+.ee-license .pulse { width: .55rem; height: .55rem; border-radius: 999px; background: #10b981; animation: eePulse 2s infinite; }
+@keyframes eePulse { 0%,100% {opacity: 1;} 50% {opacity: .35;} }
+.ee-fchan { display: flex; flex-direction: column; gap: .55rem; }
+.ee-fchan a { display: flex; align-items: center; justify-content: space-between; background: rgb(30 41 59 / .7); border: 1px solid rgb(51 65 85 / .6); padding: .5rem .8rem; border-radius: .9rem; font-size: .78rem; transition: all .15s; }
+.ee-fchan a:hover { background: #1e293b; }
+.ee-fchan .cn { display: flex; align-items: center; gap: .55rem; }
+.ee-fchan .cn .dot { width: .55rem; height: .55rem; border-radius: 999px; }
+.ee-fchan .id { font-size: .7rem; direction: ltr; font-family: monospace; }
+.ee-fchan .id em { color: #6ee7b7; font-style: normal; }
+.ee-fmeta { background: rgb(30 41 59 / .4); border: 1px solid rgb(51 65 85 / .6); border-radius: 1rem; padding: .7rem .9rem; display: flex; flex-direction: column; gap: .4rem; font-size: .75rem; margin-top: .7rem; }
+.ee-fmeta div { display: flex; justify-content: space-between; }
+.ee-fmeta .mk { color: #94a3b8; }
+.ee-fmeta .mv { direction: ltr; font-family: monospace; text-align: left; }
+.ee-fbottom { border-top: 1px solid #1e293b; padding: 1rem .25rem; text-align: center; font-size: .72rem; color: #64748b; }
+
+/* ---------- نوار پایین موبایل ---------- */
+.ee-mnav { position: fixed; bottom: 0; inset-inline: 0; z-index: 70; background: rgb(255 255 255 / .95); backdrop-filter: blur(10px); border-top: 1px solid var(--ee-line); display: flex; justify-content: space-around; padding: .45rem .5rem calc(.45rem + env(safe-area-inset-bottom)); }
+.ee-mnav a { display: flex; flex-direction: column; align-items: center; gap: .15rem; font-size: .62rem; font-weight: 700; color: #94a3b8; }
+.ee-mnav a.ee-active, .ee-mnav a:hover { color: var(--ee-tealP); }
+.ee-mnav a i { font-size: 1.35rem; font-style: normal; line-height: 1.2; }
+@media (min-width: 768px) { .ee-mnav { display: none; } }
+.ee-body-pad { padding-bottom: 3.8rem; }
+@media (min-width: 768px) { .ee-body-pad { padding-bottom: 0; } }
+
+/* انیمیشن ورود */
+@keyframes eeFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.ee-fade { animation: eeFadeUp .5s ease both; }
+
+/* خطا/خالی (هیچ دوره/مقاله‌ای نبود) */
+.ee-empty { background: #fff; border: 1px dashed var(--ee-line); border-radius: 1.2rem; padding: 1.4rem; text-align: center; font-size: .85rem; color: var(--ee-soft); }
