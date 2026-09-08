@@ -13,6 +13,7 @@ $about_teacher = get_the_author_meta('about_teacher', $author_id);
 $author_avatar = get_avatar_url($author_id, array('size' => 150));
 
 // دریافت شبکه‌های اجتماعی (فیلدهای پیش‌فرض یا سفارشی پروفایل)
+$facebook  = get_user_meta($author_id, 'facebook', true); // کلید اختیاری؛ در پیشخوان کاربر ست می‌شود
 $youtube   = get_user_meta($author_id, 'youtube', true);
 $linkedin  = get_user_meta($author_id, 'linkedin', true);
 $instagram = get_user_meta($author_id, 'instagram', true);

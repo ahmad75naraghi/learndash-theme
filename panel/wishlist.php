@@ -2,7 +2,7 @@
 /* Template Name: Panel - Wishlist */
 
 if ( ! is_user_logged_in() ) {
-    wp_redirect('https://edu.falnic.com/login?redirect_to=https://edu.falnic.com/panel/wishlist.php');
+    wp_redirect(add_query_arg('redirect_to', home_url('/panel/wishlist'), wp_login_url()));
     exit;
 }
 

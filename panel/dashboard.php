@@ -2,7 +2,7 @@
 /* Template Name: Panel - Dashboard */
 
 if (! is_user_logged_in()) {
-    wp_redirect('https://edu.falnic.com/login?redirect_to=https://edu.falnic.com/panel');
+    wp_redirect(add_query_arg('redirect_to', home_url('/panel'), wp_login_url()));
     exit;
 }
 
@@ -11,7 +11,7 @@ $current_user_id = get_current_user_id();
 $enrolled_courses = function_exists('learndash_user_get_enrolled_courses') ? learndash_user_get_enrolled_courses($current_user_id) : array();
 $courses_count = count($enrolled_courses);
 
-$payments_table_name = $wpdb->prefix . 'falnic_transactions';
+$payments_table_name = $wpdb->prefix . 'evented_transactions';
 $transactions_count = $wpdb->get_var( $wpdb->prepare(
     "SELECT COUNT(*) FROM $payments_table_name WHERE user_id = %d ORDER BY created_at DESC", 
     $current_user_id

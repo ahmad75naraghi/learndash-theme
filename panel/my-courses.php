@@ -2,7 +2,7 @@
 /* Template Name: Panel - My Courses */
 
 if (! is_user_logged_in()) {
-    wp_redirect('https://edu.falnic.com/login?redirect_to=https://edu.falnic.com/panel/my-courses.php');
+    wp_redirect(add_query_arg('redirect_to', home_url('/panel/my-courses'), wp_login_url()));
     exit;
 }
 
@@ -13,7 +13,9 @@ $user_id = get_current_user_id();
  * دوره‌های ثبت‌نام‌شده کاربر (LearnDash)
  * -------------------------------------------------------
  */
-$enrolled_course_ids = learndash_user_get_enrolled_courses($user_id, array(), true);
+$enrolled_course_ids = function_exists('learndash_user_get_enrolled_courses')
+    ? learndash_user_get_enrolled_courses($user_id, array(), true)
+    : array();
 
 // اگر کاربر هیچ دوره‌ای نداشت، آرایه خالی برمی‌گردد نه false
 if (! is_array($enrolled_course_ids)) {
@@ -23,7 +25,7 @@ if (! is_array($enrolled_course_ids)) {
 /**
  * تابع کمکی: گرفتن دسته‌بندی‌های یک دوره
  */
-function falnic_get_course_categories($course_id)
+function evented_get_course_categories($course_id)
 {
     $terms = get_the_terms($course_id, 'ld_course_category');
     if (empty($terms) || is_wp_error($terms)) {
@@ -35,7 +37,7 @@ function falnic_get_course_categories($course_id)
 /**
  * تابع کمکی: نام استاد دوره
  */
-function falnic_get_course_instructor($course_id)
+function evented_get_course_instructor($course_id)
 {
     $author_id = get_post_field('post_author', $course_id);
     $name      = get_the_author_meta('display_name', $author_id);
@@ -45,7 +47,7 @@ function falnic_get_course_instructor($course_id)
 /**
  * تابع کمکی: قیمت دوره (رایگان / مبلغ)
  */
-function falnic_get_course_price_label($course_id)
+function evented_get_course_price_label($course_id)
 {
     $price_type = learndash_get_course_meta_setting($course_id, 'course_price_type');
 
@@ -64,7 +66,7 @@ function falnic_get_course_price_label($course_id)
 /**
  * تابع کمکی: تصویر شاخص دوره (در صورت نبود، بازگشت خالی تا از CSS پیش‌فرض استفاده شود)
  */
-function falnic_get_course_thumbnail($course_id)
+function evented_get_course_thumbnail($course_id)
 {
     $thumb = get_the_post_thumbnail_url($course_id, 'medium');
     return $thumb ? $thumb : '';
@@ -73,7 +75,7 @@ function falnic_get_course_thumbnail($course_id)
 /**
  * تابع کمکی: تبدیل اعداد انگلیسی به فارسی (برای درصد پیشرفت)
  */
-function falnic_to_persian_digits($number)
+function evented_to_persian_digits($number)
 {
     $en = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
     $fa = array('۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹');
@@ -112,9 +114,9 @@ get_header(); ?>
 
                         $course_title      = get_the_title($course_id);
                         $course_link       = get_permalink($course_id);
-                        $course_image      = falnic_get_course_thumbnail($course_id);
-                        $course_instructor = falnic_get_course_instructor($course_id);
-                        $course_categories = falnic_get_course_categories($course_id);
+                        $course_image      = evented_get_course_thumbnail($course_id);
+                        $course_instructor = evented_get_course_instructor($course_id);
+                        $course_categories = evented_get_course_categories($course_id);
 
                         // درصد پیشرفت
                         $progress = learndash_course_progress(
@@ -159,7 +161,7 @@ get_header(); ?>
                                     <div class="progress-track">
                                         <div class="progress-fill" style="width: <?php echo esc_attr($percentage); ?>%"></div>
                                     </div>
-                                    <span class="progress-percent"><?php echo falnic_to_persian_digits($percentage) . '٪'; ?></span>
+                                    <span class="progress-percent"><?php echo evented_to_persian_digits($percentage) . '٪'; ?></span>
                                 </div>
                                 <p class="progress-desc">
                                     <?php
@@ -211,10 +213,10 @@ get_header(); ?>
                     while ($suggested_query->have_posts()) : $suggested_query->the_post();
 
                         $s_course_id     = get_the_ID();
-                        $s_image         = falnic_get_course_thumbnail($s_course_id);
-                        $s_instructor    = falnic_get_course_instructor($s_course_id);
-                        $s_categories    = falnic_get_course_categories($s_course_id);
-                        $s_price_label   = falnic_get_course_price_label($s_course_id);
+                        $s_image         = evented_get_course_thumbnail($s_course_id);
+                        $s_instructor    = evented_get_course_instructor($s_course_id);
+                        $s_categories    = evented_get_course_categories($s_course_id);
+                        $s_price_label   = evented_get_course_price_label($s_course_id);
                         ?>
 
                         <a href="<?php the_permalink(); ?>" class="course-card">

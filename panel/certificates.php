@@ -3,7 +3,7 @@
 
 if (! is_user_logged_in()) {
     // ریدایرکت به صفحه لاگین
-    wp_redirect('https://edu.falnic.com/login?redirect_to=https://edu.falnic.com/panel/payments.php');
+    wp_redirect(add_query_arg('redirect_to', home_url('/panel/certificates'), wp_login_url()));
     exit;
 }
 
