@@ -26,8 +26,8 @@
     --ee-line: #E2E8F0;
     --ee-sh-sm: 0 2px 8px -1px rgba(0,137,123,.08), 0 1px 4px -1px rgba(0,0,0,.04);
     --ee-sh-md: 0 8px 20px -3px rgba(0,137,123,.1), 0 4px 10px -2px rgba(0,0,0,.03);
-    --ee-r-2xl: 1.25rem;
-    --ee-r-3xl: 1.75rem;
+    --ee-r-2xl: 1rem;
+    --ee-r-3xl: 1.5rem;
 
     font-family: "Vazirmatn", "دانا", "evented-edu-font", Tahoma, sans-serif;
     background: var(--ee-bg);
@@ -117,6 +117,12 @@
 .ee-btn-soft { background: #fff; color: var(--ee-soft); border-color: var(--ee-line); width: 2.4rem; height: 2.4rem; padding: 0; justify-content: center; border-radius: 999px; position: relative; }
 .ee-hamb { display: inline-flex; width: 2.4rem; height: 2.4rem; border-radius: 999px; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--ee-line); color: var(--ee-ink); }
 
+/* هَمبرگر فقط موبایل */
+.ee-hamb { display: none; }
+@media (max-width: 899.98px) {
+    .ee-hamb { display: inline-flex; }
+}
+
 /* منوی دسکتاپ (قرصی) */
 .ee-nav { display: none; }
 @media (min-width: 900px) {
@@ -134,6 +140,32 @@
 .ee-hero { padding-top: 1.2rem; padding-bottom: .5rem; }
 .ee-hero-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: stretch; }
 @media (min-width: 1024px) { .ee-hero-grid { grid-template-columns: 8fr 4fr; } }
+
+/* ستون بنر (شامل اسلایدر + کنترل‌ها) */
+.ee-hero-feat { display: flex; flex-direction: column; gap: .6rem; min-width: 0; }
+.ee-hero-feat > .ee-slider,
+.ee-hero-feat > .ee-feature { flex: 1 1 auto; }
+
+/* اسلایدر هیرو: اسلایدها روی هم (grid stack) */
+.ee-slider { display: grid; }
+.ee-slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity .45s ease; pointer-events: none; }
+.ee-slide.is-active { opacity: 1; visibility: visible; pointer-events: auto; z-index: 1; }
+
+/* کنترل‌های اسلایدر */
+.ee-slider-controls { display: flex; align-items: center; justify-content: center; gap: .5rem; }
+.ee-slide-arrow {
+    width: 2.1rem; height: 2.1rem; border-radius: 999px; border: 1px solid rgb(209 250 229);
+    background: #fff; color: var(--ee-tealP); display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s; box-shadow: var(--ee-sh-sm);
+}
+.ee-slide-arrow:hover { background: var(--ee-tealP); color: #fff; }
+.ee-slider-dots { display: flex; align-items: center; gap: .4rem; }
+.ee-slide-dot {
+    width: .5rem; height: .5rem; border-radius: 999px; border: 0; padding: 0;
+    background: #cbd5e1; cursor: pointer; transition: all .25s;
+}
+.ee-slide-dot.is-active { width: 1.4rem; background: var(--ee-tealP); }
+
 
 .ee-feature {
     position: relative; overflow: hidden; border-radius: var(--ee-r-3xl);
@@ -215,7 +247,10 @@
 .ee-courses-head .ch2 .dot { width: .7rem; height: .7rem; border-radius: 999px; background: #10b981; }
 .ee-courses-head .ch2 small { font-size: .78rem; color: var(--ee-soft); font-weight: 400; display: block; }
 .ee-count-badge { background: #fff; border: 1px solid rgb(209 250 229); color: var(--ee-tealP); font-size: .75rem; font-weight: 800; padding: .4rem .9rem; border-radius: 999px; }
-.ee-chips { display: flex; gap: .5rem; overflow-x: auto; padding: .3rem 0 .7rem; }
+.ee-chips { display: flex; gap: .5rem; overflow-x: auto; padding: .3rem 0 .7rem; scrollbar-width: none; }
+.ee-chips::-webkit-scrollbar { display: none; }
+.ee-news-list a:hover h4 { color: var(--ee-tealP); }
+.ee-news-list h4 { transition: color .15s; }
 .ee-chip-btn { flex-shrink: 0; padding: .4rem 1rem; border-radius: 999px; font-size: .75rem; font-weight: 700; background: #fff; color: #475569; border: 1px solid var(--ee-line); cursor: pointer; transition: all .15s; font-family: inherit; }
 .ee-chip-btn:hover, .ee-chip-btn.ee-on { background: var(--ee-mint); color: var(--ee-tealP); }
 .ee-chip-btn.ee-on { background: var(--ee-tealP); color: #fff; border-color: var(--ee-tealP); }

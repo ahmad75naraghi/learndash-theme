@@ -65,11 +65,46 @@ $ee_instructors = get_users(array(
 $ee_course_count = wp_count_posts('sfwd-courses');
 $ee_course_count = isset($ee_course_count->publish) ? (int) $ee_course_count->publish : 0;
 
-// تصویر بنر: تصویر شاخص دورهٔ ویژه یا تصویر پیش‌فرض محلی
-$ee_hero_img = get_the_post_thumbnail_url($ee_featured ? $ee_featured->ID : 0, 'large');
-if (!$ee_hero_img) {
-    $ee_hero_img = PATH_DIR_URL . '/assets/img/front-page/evented-edu-hero.png';
+/* ۷) اسلایدر هیرو — از تنظیمات قالب (تصویر/عنوان/توضیح/لینک)؛
+   اگر اسلایدی تنظیم نشده باشد، یک بنر پیش‌فرض از آخرین دورهٔ ویژه ساخته می‌شود. */
+$ee_feature_slides = array();
+
+$ee_saved_slides = function_exists('evented_get_home_slides') ? evented_get_home_slides() : array();
+
+if (!empty($ee_saved_slides)) {
+    foreach ($ee_saved_slides as $s) {
+        // اول سایز میانه (large) پیوست؛ اگر نبود همان URL ذخیره‌شده
+        $slide_img = wp_get_attachment_image_url(absint($s['id']), 'large');
+        if (!$slide_img) {
+            $slide_img = $s['image'];
+        }
+        $ee_feature_slides[] = array(
+            'img'       => $slide_img,
+            'badge'     => !empty($s['badge']) ? $s['badge'] : '',
+            'title'     => !empty($s['title']) ? $s['title'] : 'دوره‌های تخصصی فناوری اطلاعات',
+            'desc'      => $s['desc'],
+            'link'      => $s['link'],
+            'link_text' => 'مشاهده و شروع',
+        );
+    }
+} else {
+    // حالت پیش‌فرض: آخرین دورهٔ دارای تصویر شاخص
+    $ee_fallback_img = get_the_post_thumbnail_url($ee_featured ? $ee_featured->ID : 0, 'large');
+    if (!$ee_fallback_img) {
+        $ee_fallback_img = PATH_DIR_URL . '/assets/img/front-page/evented-edu-hero.png';
+    }
+    $ee_feature_slides[] = array(
+        'img'       => $ee_fallback_img,
+        'badge'     => 'دورهٔ ویژه',
+        'title'     => $ee_featured ? get_the_title($ee_featured) : 'متخصص شدن در دنیای IT',
+        'desc'      => 'دوره‌های کاربردی شبکه، سرور، امنیت و مجازی‌سازی با اساتید خبره — مسیر یادگیری تا بازار کار.',
+        'link'      => $ee_featured ? get_permalink($ee_featured) : '',
+        'link_text' => 'مشاهده دوره',
+    );
 }
+
+$ee_slide_count  = count($ee_feature_slides);
+$ee_slider_mode  = $ee_slide_count > 1;
 
 /* یافتن «بله» یا پیام‌رسان در فوتر فعلی: placeholder ثابت استفاده می‌شود (انتخاب کاربر) */
 $ee_channel_id = 'channel-id'; // TODO: شناسهٔ واقعی کانال
@@ -160,30 +195,55 @@ $ee_channel_id = 'channel-id'; // TODO: شناسهٔ واقعی کانال
 
     <main class="ee-home-main">
 
-        <!-- ======= هیرو: بنر شاخص + آخرین مقالات ======= -->
+        <!-- ======= هیرو: اسلایدر بنر + آخرین مقالات ======= -->
         <section class="ee-hero">
             <div class="ee-wrap ee-hero-grid">
 
-                <div class="ee-feature ee-fade">
-                    <div class="feat-media">
-                        <img src="<?php echo esc_url($ee_hero_img); ?>" alt="evented-edu">
-                        <div class="feat-shade"></div>
-                    </div>
-                    <div class="feat-tags">
-                        <span class="ee-chip ee-chip-amber">دورهٔ ویژه</span>
-                        <span class="ee-chip ee-chip-glass"><?php echo $ee_featured ? esc_html(get_the_title($ee_featured)) : 'دوره‌های تخصصی IT'; ?></span>
-                    </div>
-                    <div class="feat-body">
-                        <div class="feat-kicker"><?php echo esc_html('آموزشگاه آنلاین تخصصی فناوری اطلاعات'); ?></div>
-                        <h1 class="feat-title"><?php echo $ee_featured ? esc_html(get_the_title($ee_featured)) : 'متخصص شدن در دنیای IT'; ?></h1>
-                        <p class="feat-desc"><?php echo esc_html('دوره‌های کاربردی شبکه، سرور، امنیت و مجازی‌سازی با اساتید خبره — مسیر یادگیری تا بازار کار.'); ?></p>
-                        <div class="feat-cta-row">
-                            <?php if ($ee_featured) : ?>
-                                <a class="ee-btn ee-btn-light" href="<?php echo esc_url(get_permalink($ee_featured)); ?>"><span class="material-symbols-outlined ee-ic">visibility</span> مشاهده دوره</a>
+                <div class="ee-hero-feat ee-fade">
+
+                    <?php if ($ee_slider_mode) : ?>
+                        <div class="ee-slider" id="eeSlider" data-count="<?php echo esc_attr($ee_slide_count); ?>">
+                    <?php endif; ?>
+
+                    <?php foreach ($ee_feature_slides as $ee_i => $ee_s) : ?>
+                        <div class="ee-feature<?php echo $ee_slider_mode ? ' ee-slide' : ''; ?><?php echo ($ee_slider_mode && $ee_i === 0) ? ' is-active' : ''; ?>"<?php echo $ee_slider_mode ? ' data-index="' . esc_attr($ee_i) . '"' : ''; ?>>
+                            <div class="feat-media">
+                                <img src="<?php echo esc_url($ee_s['img']); ?>" alt="<?php echo esc_attr($ee_s['title']); ?>" loading="<?php echo $ee_i === 0 ? 'eager' : 'lazy'; ?>">
+                                <div class="feat-shade"></div>
+                            </div>
+                            <?php if (!empty($ee_s['badge'])) : ?>
+                                <div class="feat-tags">
+                                    <span class="ee-chip ee-chip-amber"><?php echo esc_html($ee_s['badge']); ?></span>
+                                </div>
                             <?php endif; ?>
-                            <a class="ee-btn ee-btn-solid" href="#ee-courses">مشاهده همه دوره‌ها</a>
+                            <div class="feat-body">
+                                <h1 class="feat-title"><?php echo esc_html($ee_s['title']); ?></h1>
+                                <?php if (!empty($ee_s['desc'])) : ?>
+                                    <p class="feat-desc"><?php echo esc_html($ee_s['desc']); ?></p>
+                                <?php endif; ?>
+                                <div class="feat-cta-row">
+                                    <?php if (!empty($ee_s['link'])) : ?>
+                                        <a class="ee-btn ee-btn-light" href="<?php echo esc_url($ee_s['link']); ?>"><span class="material-symbols-outlined ee-ic">visibility</span> <?php echo esc_html($ee_s['link_text']); ?></a>
+                                    <?php endif; ?>
+                                    <a class="ee-btn ee-btn-solid" href="#ee-courses">مشاهده همه دوره‌ها</a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    <?php endforeach; ?>
+
+                    <?php if ($ee_slider_mode) : ?>
+                        </div><!-- /.ee-slider -->
+                        <div class="ee-slider-controls" id="eeSliderControls">
+                            <button type="button" class="ee-slide-arrow" data-dir="-1" aria-label="اسلاید قبلی"><span class="material-symbols-outlined ee-ic">chevron_right</span></button>
+                            <div class="ee-slider-dots" id="eeSliderDots">
+                                <?php for ($ee_d = 0; $ee_d < $ee_slide_count; $ee_d++) : ?>
+                                    <button type="button" class="ee-slide-dot<?php echo $ee_d === 0 ? ' is-active' : ''; ?>" data-go="<?php echo esc_attr($ee_d); ?>" aria-label="اسلاید <?php echo esc_attr($ee_d + 1); ?>"></button>
+                                <?php endfor; ?>
+                            </div>
+                            <button type="button" class="ee-slide-arrow" data-dir="1" aria-label="اسلاید بعدی"><span class="material-symbols-outlined ee-ic">chevron_left</span></button>
+                        </div>
+                    <?php endif; ?>
+
                 </div>
 
                 <aside class="ee-latest ee-fade">
