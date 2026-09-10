@@ -1,0 +1,178 @@
+/* =========================================================
+   evented-edu — تک‌نوشته (single.php)
+   کارت مقاله + تایپوگرافی متن + نویسنده + مرتبط‌ها + دیدگاه‌ها
+   وابسته به ee-shell.css (توکن‌ها، هدر/فوتر، ویجت‌های سایدبار)
+   ========================================================= */
+
+/* ---------- چیدمان ---------- */
+.ee-single-main { padding-block: 1.1rem 2rem; }
+.ee-single-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
+@media (min-width: 1024px) { .ee-single-grid { grid-template-columns: 8fr 4fr; } }
+
+.ee-post {
+    background: #fff; border: 1px solid rgb(209 250 229 / .8);
+    border-radius: var(--ee-r-3xl); box-shadow: var(--ee-sh-sm);
+    padding: 1.1rem;
+}
+@media (min-width: 768px) { .ee-post { padding: 1.8rem 2rem; } }
+
+/* ---------- مسیریابی ---------- */
+.ee-crumb { display: flex; align-items: center; gap: .25rem; flex-wrap: wrap; font-size: .72rem; color: var(--ee-soft); margin-bottom: .9rem; }
+.ee-crumb a:hover { color: var(--ee-tealP); }
+.ee-crumb .material-symbols-outlined { font-size: 1rem; opacity: .6; }
+.ee-crumb-current { color: #1e293b; font-weight: 700; }
+
+/* ---------- عنوان و تصویر ---------- */
+.ee-post-title { font-size: 1.25rem; font-weight: 900; line-height: 1.9; text-align: center; color: #1e293b; margin-bottom: 1rem; }
+@media (min-width: 768px) { .ee-post-title { font-size: 1.6rem; } }
+
+.ee-post-hero { margin: 0 0 1.1rem; border-radius: var(--ee-r-2xl); overflow: hidden; border: 1px solid #f1f5f9; background: var(--ee-tealL); }
+.ee-post-hero img { width: 100%; height: auto; max-height: 460px; object-fit: cover; display: block; }
+
+/* ---------- نوار اطلاعات ---------- */
+.ee-post-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem .9rem; font-size: .72rem; color: var(--ee-soft);
+    padding-bottom: .85rem; border-bottom: 1px solid #f1f5f9; margin-bottom: 1.1rem; }
+.ee-meta-item { display: inline-flex; align-items: center; gap: .3rem; }
+.ee-meta-item .material-symbols-outlined { font-size: 1rem; }
+a.ee-meta-item:hover { color: var(--ee-tealP); }
+.ee-meta-cat { background: var(--ee-mint); color: #065f46; padding: .2rem .6rem; border-radius: .5rem; font-weight: 800; }
+.ee-meta-views { background: #ecfeff; color: #0e7490; padding: .2rem .6rem; border-radius: .5rem; font-weight: 700; }
+
+/* ---------- نوار نویسنده ---------- */
+.ee-post-authorline { display: flex; align-items: center; gap: .7rem; padding: .7rem; border-radius: 1rem;
+    background: #f8fafc; border: 1px solid #f1f5f9; margin-bottom: 1.3rem; }
+.ee-post-authorline .ee-av img { width: 2.6rem; height: 2.6rem; border-radius: 999px; object-fit: cover; display: block; }
+.ee-al-txt { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.ee-al-txt strong { font-size: .88rem; color: #1e293b; }
+.ee-al-txt span { font-size: .7rem; color: var(--ee-soft); line-height: 1.8; }
+.ee-al-link { font-size: .72rem; font-weight: 700; color: var(--ee-tealP); display: inline-flex; align-items: center; gap: .2rem; white-space: nowrap; }
+.ee-al-link:hover { text-decoration: underline; }
+
+/* ---------- تایپوگرافی متن مقاله ---------- */
+.ee-post-body { font-size: .9rem; line-height: 2.15; color: #334155; text-align: justify; text-justify: inter-word; }
+.ee-post-body > *:first-child { margin-top: 0; }
+.ee-post-body p { margin: 0 0 1.05rem; }
+.ee-post-body h2, .ee-post-body h3, .ee-post-body h4 { color: #0f172a; line-height: 1.9; margin: 1.5rem 0 .7rem; font-weight: 800; }
+.ee-post-body h2 { font-size: 1.12rem; }
+.ee-post-body h3 { font-size: 1rem; }
+.ee-post-body h4 { font-size: .92rem; }
+.ee-post-body a { color: var(--ee-tealP); text-decoration: underline; text-underline-offset: 3px; }
+.ee-post-body img { border-radius: 1rem; margin: 1rem auto; height: auto; }
+.ee-post-body ul, .ee-post-body ol { padding-inline-start: 1.3rem; margin: 0 0 1.05rem; }
+.ee-post-body li { margin-bottom: .4rem; }
+.ee-post-body blockquote { border-inline-start: 4px solid var(--ee-teal); background: var(--ee-tealL);
+    border-radius: 0 1rem 1rem 0; padding: .9rem 1rem; margin: 1.3rem 0; color: #134e4a; font-weight: 600; }
+.ee-post-body blockquote p:last-child { margin-bottom: 0; }
+.ee-post-body table { width: 100%; border-collapse: collapse; margin: 1.3rem 0; font-size: .82rem; }
+.ee-post-body th, .ee-post-body td { border: 1px solid var(--ee-line); padding: .5rem .6rem; text-align: right; }
+.ee-post-body th { background: #f8fafc; }
+.ee-post-body pre { background: #0f172a; color: #e2e8f0; padding: 1rem; border-radius: 1rem; overflow: auto;
+    direction: ltr; text-align: left; font-size: .78rem; line-height: 1.9; margin: 1.3rem 0; }
+.ee-post-body code { background: #f1f5f9; color: #0f172a; padding: .1rem .35rem; border-radius: .35rem; font-size: .82em; }
+.ee-post-body pre code { background: transparent; color: inherit; padding: 0; }
+.ee-post-body hr { border: 0; border-top: 1px solid #f1f5f9; margin: 1.6rem 0; }
+.ee-page-links { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; font-size: .8rem; margin-top: 1.3rem; }
+.ee-page-links a, .ee-page-links > span { border: 1px solid var(--ee-line); border-radius: .6rem; padding: .25rem .6rem; }
+
+/* ---------- برچسب‌ها و اشتراک ---------- */
+.ee-post-tags { display: flex; align-items: center; flex-wrap: wrap; gap: .4rem; margin-top: 1.5rem; padding-top: 1.1rem; border-top: 1px solid #f1f5f9; }
+.ee-tags-label { display: inline-flex; align-items: center; gap: .3rem; font-size: .75rem; font-weight: 800; color: #1e293b; }
+.ee-tags-label .material-symbols-outlined { color: var(--ee-tealP); font-size: 1.05rem; }
+.ee-post-tags a { font-size: .72rem; background: var(--ee-mint); color: #065f46; border: 1px solid rgb(209 250 229);
+    padding: .25rem .75rem; border-radius: 999px; transition: all .15s; }
+.ee-post-tags a:hover { background: var(--ee-tealP); color: #fff; }
+.ee-post-share { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-top: 1.1rem; }
+.ee-post-share .ee-share-label { margin-bottom: 0; }
+
+/* ---------- ناوبری نوشتهٔ قبلی/بعدی ---------- */
+.ee-post-nav { display: grid; grid-template-columns: 1fr; gap: .6rem; margin-top: 1.5rem; }
+@media (min-width: 640px) { .ee-post-nav { grid-template-columns: 1fr 1fr; } }
+.ee-pn a { display: flex; align-items: center; gap: .6rem; height: 100%; background: #f8fafc;
+    border: 1px solid #f1f5f9; border-radius: 1rem; padding: .7rem .8rem; transition: all .15s; }
+.ee-pn a:hover { background: var(--ee-mint); border-color: rgb(209 250 229); }
+.ee-pn .material-symbols-outlined { color: var(--ee-tealP); flex-shrink: 0; }
+.ee-pn em { display: block; font-style: normal; font-size: .66rem; color: var(--ee-soft); }
+.ee-pn strong { display: block; font-size: .8rem; color: #1e293b; line-height: 1.8; }
+.ee-pn-next a { flex-direction: row-reverse; text-align: left; }
+
+/* ---------- دربارهٔ نویسنده ---------- */
+.ee-author-box { display: flex; gap: .9rem; align-items: flex-start; background: linear-gradient(135deg, var(--ee-tealL), #fff 60%);
+    border: 1px solid rgb(209 250 229); border-radius: var(--ee-r-2xl); padding: 1rem; margin-top: 1.5rem; }
+.ee-ab-av img { width: 4rem; height: 4rem; border-radius: 999px; object-fit: cover; border: 3px solid #fff; display: block; }
+.ee-ab-txt h3 { font-size: .95rem; color: #0f172a; margin-bottom: .3rem; }
+.ee-ab-txt p { font-size: .78rem; color: #475569; line-height: 1.95; }
+.ee-ab-link { display: inline-flex; align-items: center; gap: .25rem; font-size: .74rem; font-weight: 800; color: var(--ee-tealP); margin-top: .45rem; }
+.ee-ab-link:hover { text-decoration: underline; }
+
+/* ---------- نوشته‌های مرتبط ---------- */
+.ee-related { margin-top: 1.7rem; }
+.ee-related-grid { display: grid; grid-template-columns: 1fr; gap: .7rem; }
+@media (min-width: 640px) { .ee-related-grid { grid-template-columns: repeat(3, 1fr); } }
+.ee-related-card { display: flex; flex-direction: column; background: #f8fafc; border: 1px solid #f1f5f9;
+    border-radius: 1rem; overflow: hidden; transition: all .15s; }
+.ee-related-card:hover { border-color: var(--ee-teal); background: #fff; box-shadow: var(--ee-sh-sm); }
+.ee-rc-thumb { display: flex; align-items: center; justify-content: center; height: 7.5rem; background: var(--ee-tealL);
+    color: var(--ee-tealP); overflow: hidden; }
+.ee-rc-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.ee-rc-thumb .material-symbols-outlined { font-size: 2rem; }
+.ee-rc-txt { padding: .7rem; }
+.ee-rc-txt strong { font-size: .78rem; color: #1e293b; line-height: 1.8; margin-bottom: .25rem;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ee-rc-txt em { display: block; font-style: normal; font-size: .66rem; color: var(--ee-tealP); font-weight: 700; }
+
+/* ---------- دیدگاه‌ها ---------- */
+.ee-comments { margin-top: 1.9rem; padding-top: 1.3rem; border-top: 1px solid #f1f5f9; }
+.ee-comments-title, .ee-reply-title { margin-bottom: .9rem; }
+.ee-comment-list { list-style: none; margin: 0 0 1.3rem; padding: 0; }
+.ee-comment-list .comment { margin-bottom: .8rem; }
+.ee-comment-list .comment-body { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 1rem; padding: .9rem; }
+.ee-comment-list .comment-author { display: flex; align-items: center; gap: .5rem; font-size: .8rem; font-weight: 700; color: #1e293b; }
+.ee-comment-list .comment-author img { border-radius: 999px; }
+.ee-comment-list .comment-author .says { display: none; }
+.ee-comment-list .comment-meta { font-size: .68rem; color: var(--ee-soft); margin: .25rem 0 .5rem; }
+.ee-comment-list .comment-meta a { color: var(--ee-soft); }
+.ee-comment-list .comment-meta a:hover { color: var(--ee-tealP); }
+.ee-comment-list .comment-content { font-size: .82rem; line-height: 2.05; color: #334155; }
+.ee-comment-list .comment-content p { margin-bottom: .5rem; }
+.ee-comment-list .comment-content p:last-child { margin-bottom: 0; }
+.ee-comment-list .reply { margin-top: .5rem; }
+.ee-comment-list .reply a { font-size: .72rem; font-weight: 700; color: var(--ee-tealP); }
+.ee-comment-list .children { list-style: none; margin: .6rem 0 0; padding-inline-start: 1rem; border-inline-start: 2px dashed #e2e8f0; }
+.ee-comment-list .bypostauthor > .comment-body { border-color: var(--ee-teal); background: var(--ee-tealL); }
+.ee-comment-list .comment-awaiting-moderation { font-size: .7rem; color: #b45309; display: block; margin-top: .4rem; }
+.ee-comment-nav { display: flex; gap: .8rem; font-size: .78rem; margin-bottom: 1.1rem; }
+.ee-comments-closed { font-size: .8rem; color: var(--ee-soft); background: #f8fafc; border: 1px dashed var(--ee-line);
+    border-radius: 1rem; padding: .8rem; text-align: center; }
+
+.ee-comment-form { display: flex; flex-direction: column; gap: .7rem; }
+.ee-comment-form .comment-form-comment { margin: 0; }
+.ee-comment-notes { font-size: .72rem; color: var(--ee-soft); }
+.ee-comment-form label { display: block; font-size: .75rem; font-weight: 700; color: #1e293b; margin-bottom: .25rem; }
+.ee-comment-form .screen-reader-text { position: absolute !important; clip: rect(1px, 1px, 1px, 1px); width: 1px; height: 1px; overflow: hidden; }
+.ee-comment-form input[type="text"],
+.ee-comment-form input[type="email"],
+.ee-comment-form input[type="url"],
+.ee-comment-form textarea { width: 100%; border: 1px solid var(--ee-line); border-radius: 1rem; padding: .6rem .8rem;
+    font-family: inherit; font-size: .82rem; color: var(--ee-ink); background: #fbfdff; outline: none; transition: all .15s; }
+.ee-comment-form textarea { min-height: 9rem; resize: vertical; line-height: 2; }
+.ee-comment-form input:focus, .ee-comment-form textarea:focus { border-color: var(--ee-teal); background: #fff; box-shadow: 0 0 0 3px var(--ee-tealL); }
+.ee-comment-form .comment-form-cookies-consent { display: flex; align-items: center; gap: .4rem; font-size: .72rem; color: var(--ee-soft); }
+.ee-comment-form .comment-form-cookies-consent label { display: inline; font-weight: 400; margin: 0; }
+.ee-comment-submit-row { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
+.ee-comment-submit { display: inline-flex; align-items: center; gap: .4rem; background: #0284c7; color: #fff; border: 0;
+    border-radius: .85rem; padding: .6rem 1.5rem; font-family: inherit; font-size: .82rem; font-weight: 700;
+    cursor: pointer; transition: all .15s; box-shadow: var(--ee-sh-sm); }
+.ee-comment-submit:hover { background: #0369a1; box-shadow: var(--ee-sh-md); }
+.ee-comment-submit .material-symbols-outlined { font-size: 1.05rem; }
+.ee-comment-form .logged-in-as, .ee-comment-form .must-log-in { font-size: .75rem; color: var(--ee-soft); }
+.ee-comment-form .logged-in-as a, .ee-comment-form .must-log-in a { color: var(--ee-tealP); }
+.ee-comment-form p.form-submit { margin: 0; }
+.ee-comment-form .comment-form-author,
+.ee-comment-form .comment-form-email,
+.ee-comment-form .comment-form-url { margin: 0; }
+@media (min-width: 640px) {
+    .ee-comment-form .comment-form-author,
+    .ee-comment-form .comment-form-email,
+    .ee-comment-form .comment-form-url { display: inline-block; width: calc(50% - .35rem); }
+    .ee-comment-form .comment-form-url { width: 100%; }
+}

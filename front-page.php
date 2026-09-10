@@ -106,92 +106,11 @@ if (!empty($ee_saved_slides)) {
 $ee_slide_count  = count($ee_feature_slides);
 $ee_slider_mode  = $ee_slide_count > 1;
 
-/* یافتن «بله» یا پیام‌رسان در فوتر فعلی: placeholder ثابت استفاده می‌شود (انتخاب کاربر) */
-$ee_channel_id = 'channel-id'; // TODO: شناسهٔ واقعی کانال
-
 ?>
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php wp_head(); ?>
-</head>
-<body <?php body_class('ee-home ee-body-pad'); ?>>
+<?php get_template_part('template-parts/ee', 'head'); ?>
 
 
-    <!-- ======= نوار ابزار بالایی (فقط دسکتاپ) ======= -->
-    <div class="ee-topbar">
-        <div class="ee-wrap ee-topbar-in">
-            <div class="tb-right">
-                <span class="ee-tb-item">
-                    <span class="material-symbols-outlined ee-ic" style="color:var(--ee-tealP);font-size:1rem;">calendar_month</span>
-                    <?php
-                    /* تاریخ شمسی: اگر افزونهٔ جلالی نبود از میلادی استفاده می‌کنیم */
-                    $ee_now = current_time('Y/m/d');
-                    echo esc_html('امروز: ' . $ee_now);
-                    ?>
-                </span>
-                <span class="ee-tb-sep">|</span>
-                <span class="ee-tb-item"><span class="text-slate-500 font-medium">کانال‌های رسمی:</span></span>
-                <a class="ee-tb-item" href="#" style="color:var(--ee-tealP);font-weight:600;"><span class="dot" style="background:#10b981;"></span>بله</a>
-                <a class="ee-tb-item" href="#" style="color:#b45309;font-weight:600;"><span class="dot" style="background:#f59e0b;"></span>ایتا</a>
-                <a class="ee-tb-item" href="#" style="color:#7e22ce;font-weight:600;"><span class="dot" style="background:#a855f7;"></span>روبیکا</a>
-            </div>
-            <div class="ee-tb-links">
-                <a href="#">راهنمای دوره‌ها</a>
-                <span class="ee-tb-sep">|</span>
-                <a href="#">گواهی پایان دوره</a>
-                <span class="ee-tb-sep">|</span>
-                <a href="#">پشتیبانی آنلاین</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- ======= هدر (چسبان، شیشه‌ای) ======= -->
-    <header class="ee-header">
-        <div class="ee-wrap">
-            <div class="ee-header-row">
-                <div class="ee-hamb ee-ic" id="eeHamb" aria-label="منو"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
-
-                <a class="ee-logo" href="<?php echo esc_url(home_url('/')); ?>">
-                    <img src="<?php echo esc_url(PATH_DIR_URL . '/assets/img/front-page/evented-edu-logo.webp'); ?>" alt="evented-edu">
-                </a>
-
-                <form class="ee-search" role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
-                    <span class="s-ic material-symbols-outlined ee-ic">search</span>
-                    <input type="search" name="s" placeholder="جستجو در دوره‌ها، اساتید، مقالات..." value="<?php echo esc_attr(get_search_query()); ?>">
-                    <span class="s-tune material-symbols-outlined ee-ic">tune</span>
-                </form>
-
-                <div class="ee-h-actions">
-                    <?php if (is_user_logged_in()) : ?>
-                        <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/panel')); ?>"><span class="material-symbols-outlined ee-ic">person</span> پنل کاربری</a>
-                    <?php else : ?>
-                        <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/login')); ?>"><span class="material-symbols-outlined ee-ic">person</span> ورود / عضویت</a>
-                    <?php endif; ?>
-                    <button class="ee-btn ee-btn-soft ee-ic" type="button" aria-label="اعلان‌ها"><span class="material-symbols-outlined ee-ic">notifications_none</span></button>
-                </div>
-            </div>
-
-            <div class="ee-search-m">
-                <form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
-                    <div class="ee-search" style="display:block;">
-                        <span class="s-ic material-symbols-outlined ee-ic">search</span>
-                        <input type="search" name="s" placeholder="جستجو در دوره‌ها، مقالات، اساتید..." value="<?php echo esc_attr(get_search_query()); ?>">
-                    </div>
-                </form>
-            </div>
-
-            <nav class="ee-nav" id="eeNav">
-                <a href="<?php echo esc_url(home_url('/')); ?>" class="ee-active">صفحه نخست</a>
-                <a href="#ee-courses">دوره‌های آموزشی</a>
-                <a href="#ee-articles">مقالات و پژوهش‌ها</a>
-                <a href="#ee-instructors">اساتید و کارشناسان</a>
-                <a href="#ee-contact">درباره و تماس</a>
-            </nav>
-        </div>
-    </header>
+    <?php get_template_part('template-parts/ee', 'header', array('ee_active' => 'home')); ?>
 
     <main class="ee-home-main">
 
@@ -473,62 +392,4 @@ $ee_channel_id = 'channel-id'; // TODO: شناسهٔ واقعی کانال
 
     </main>
 
-    <!-- ======= فوتر ======= -->
-    <footer class="ee-footer" id="ee-contact">
-        <div class="ee-wrap ee-fwrap">
-            <div class="ee-fgrid">
-                <div class="about">
-                    <div class="ee-f-logo">
-                        <img src="<?php echo esc_url(PATH_DIR_URL . '/assets/img/front-page/evented-edu-logo.webp'); ?>" alt="evented-edu" style="height:38px;width:auto;">
-                    </div>
-                    <p>مرجع تخصصی آموزش‌های آنلاین فناوری اطلاعات؛ شبکه، سرور، امنیت، مجازی‌سازی و CRM با همراهی برترین اساتید کشور.</p>
-                    <div class="ee-license"><span class="pulse"></span> دارای مجوز رسمی برگزاری دوره‌های آموزش فناوری</div>
-                </div>
-                <div>
-                    <h4>دوره‌های تخصصی</h4>
-                    <ul>
-                        <li><a href="#ee-courses">• شبکه و زیرساخت</a></li>
-                        <li><a href="#ee-courses">• سرور و مجازی‌سازی</a></li>
-                        <li><a href="#ee-courses">• امنیت اطلاعات</a></li>
-                        <li><a href="#ee-courses">• مدیریت سیستم و CRM</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4>بخش‌های پایگاه</h4>
-                    <ul>
-                        <li><a href="#ee-articles">• مقالات تخصصی</a></li>
-                        <li><a href="#ee-instructors">• اساتید و کارشناسان</a></li>
-                        <li><a href="#ee-courses">• آزمون و گواهی</a></li>
-                        <li><a href="#">• درباره ما</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4>کانال‌های رسمی در پیام‌رسان‌ها</h4>
-                    <div class="ee-fchan">
-                        <a href="#"><span class="cn"><span class="dot" style="background:#10b981;"></span> پیام‌رسان بله</span><span class="id"><em>ble.ir/</em><?php echo esc_html($ee_channel_id); ?></span></a>
-                        <a href="#"><span class="cn"><span class="dot" style="background:#f59e0b;"></span> پیام‌رسان ایتا</span><span class="id"><em>eitaa.com/</em><?php echo esc_html($ee_channel_id); ?></span></a>
-                        <a href="#"><span class="cn"><span class="dot" style="background:#a855f7;"></span> پیام‌رسان روبیکا</span><span class="id"><em>rubika.ir/</em><?php echo esc_html($ee_channel_id); ?></span></a>
-                    </div>
-                    <div class="ee-fmeta">
-                        <div><span class="mk">شناسه کانال‌ها:</span><span class="mv" style="direction:ltr;">@<?php echo esc_html($ee_channel_id); ?></span></div>
-                        <div><span class="mk">پشتیبانی:</span><span class="mv"><?php echo esc_html(get_bloginfo('admin_email')); ?></span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="ee-fbottom">
-            <div class="ee-wrap">تمام حقوق مادی و معنوی این وب‌سایت متعلق به آموزشگاه آنلاین evented-edu است.</div>
-        </div>
-    </footer>
-
-    <!-- نوار پایین موبایل -->
-    <nav class="ee-mnav">
-        <a href="<?php echo esc_url(home_url('/')); ?>" class="ee-active"><span class="material-symbols-outlined ee-ic">home</span> خانه</a>
-        <a href="#ee-courses"><span class="material-symbols-outlined ee-ic">school</span> دوره‌ها</a>
-        <a href="#ee-articles"><span class="material-symbols-outlined ee-ic">article</span> مقالات</a>
-        <a href="<?php echo is_user_logged_in() ? esc_url(home_url('/panel')) : esc_url(home_url('/login')); ?>"><span class="material-symbols-outlined ee-ic">account_circle</span> حساب من</a>
-    </nav>
-
-<?php wp_footer(); ?>
-</body>
-</html>
+    <?php get_template_part('template-parts/ee', 'footer', array('ee_active' => 'home')); ?>

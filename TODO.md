@@ -24,7 +24,7 @@
 - [ ] **ریدایرکت اشتباه `panel/certificates.php`** — گارد مهمان به `https://edu.falnic.com/panel/payments.php` می‌رود (باید به صفحهٔ certificates خودش).
 - [ ] **redirect_to های دارای `.php`** — در `panel/my-courses.php`, `panel/payments.php`, `panel/wishlist.php`, `panel/settings.php` مقدار `.../panel/xxx.php` است (باید بدون `.php`).
 - [ ] **`page-panel.php` خالی** — بین هدر/فوتر محتوایی ندارد؛ باید داشبورد را include کند یا ریدایرکت به اولین زیرصفحه.
-- [ ] **`index.php` باکس دیباگ** — هر صفحهٔ بدون قالب (درس، quiz، آرشیو عمومی) اطلاعات وردپرس را چاپ می‌کند → نوشتن `index.php` واقعی.
+- [x] **`index.php` باکس دیباگ** — با یک قالب بازگشتی واقعی جایگزین شد؛ آرشیو/برگهٔ نوشته‌ها/جستجو هم به `archive.php`/`home.php`/`search.php` منتقل شدند.
 - [ ] **لاگین با OTP برای کاربر موجود → `wp_set_current_user($user->ID)` روی null** در `handle_register_user` (چون `wp_set_password` id برنمی‌گرداند) — تست و اصلاح.
 - [ ] **`falnic_submit_cta`** — hook ثبت شده اما متد `handle_cta_submit` وجود ندارد (در صورت فراخوانی Fatal).
 - [ ] **`author.php` لینک فیسبوک** — متغیر `$facebook` تعریف نمی‌شود؛ بلوک `!empty($facebook)` همیشه false.
@@ -37,12 +37,12 @@
 
 | فایل | وضعیت | پیشنهاد |
 |---|---|---|
-| `assets/js/archive-post.js` | ❌ مفقود ولی enqueue می‌شود | ساخت یا حذف شرط |
-| `assets/js/single-post.js` | ❌ مفقود ولی enqueue می‌شود | ساخت یا حذف شرط |
-| `assets/css/single-post.css` | ❌ مفقود | ساخت یا حذف شرط |
+| ~~`assets/js/archive-post.js`~~ | ✅ enqueue حذف شد (رفتار آرشیو در `evented-home.js`) | — |
+| ~~`assets/js/single-post.js`~~ | ✅ enqueue حذف شد | — |
+| ~~`assets/css/single-post.css`~~ | ✅ ساخته شد (استایل تک‌نوشته) | — |
 | `assets/css/single-page.css` | ❌ مفقود | ساخت یا حذف شرط |
 | `assets/css/archive-product.css` | ❌ مفقود | ساخت یا حذف شرط |
-| `assets/css/archive-post.css` | موجود، ۰ بایت | پر کردن یا حذف enqueue |
+| ~~`assets/css/archive-post.css`~~ | ✅ پر شد (استایل آرشیو نوشته‌ها) | — |
 | `screenshot.png` | ۰ بایت | تصویر واقعی ۱۲۰۰×۹۰۰ |
 | `assets/css/photoswipe.min .css` | نام دارای فاصله | اصلاح نام / حذف |
 | `images/default-cat.jpg` (در ریشهٔ قالب؛ fallback در `page-courses-cat.php`) | مفقود | افزودن فایل |

@@ -227,12 +227,42 @@ flowchart TD
     ARCH["is_post_type_archive sfwd-courses"] --> AX["archive-sfwd-courses.php"]
     AX -->|get_template_part| TAX["taxonomy-ld_course_category.php"]
     TAXT["is_tax ld_course_category"] --> TAX
+    POST["is_singular post"] --> SP["single.php"]
+    BLOG["is_home (برگهٔ نوشته‌ها)"] --> HM["home.php"]
+    PARCH["is_category / is_tag / is_date"] --> AR["archive.php"]
+    SEARCH["is_search"] --> SE["search.php"]
+    HM --> AM["template-parts/ee-archive-main.php"]
+    AR --> AM
+    SE --> AM
+    AM --> SB["template-parts/ee-sidebar.php"]
+    SP --> SB
     AUTH["is_author"] --> AU["author.php"]
     LOGIN["page slug = login"] --> PL["page-login.php"]
     PANEL["page slug = panel or child"] --> PP["page-panel.php + panel templates"]
     OTHER["other pages"] --> PG["page.php"]
-    FALLBACK["else"] --> IDX["index.php (debug)"]
+    FALLBACK["else"] --> IDX["index.php (fallback)"]
 ```
+
+### ۵.۱ پوستهٔ مشترک «ee-*» (template-parts)
+
+قالب‌های صفحهٔ اصلی، تک‌نوشته، آرشیو/برگهٔ نوشته‌ها و جستجو سند HTML کامل را خودشان چاپ
+می‌کنند (`get_header()`/`get_footer()` قدیمی را صدا نمی‌زنند) و از قطعه‌های مشترک زیر استفاده می‌کنند:
+
+| قطعه | نقش |
+| --- | --- |
+| `template-parts/ee-head.php` | از `<!DOCTYPE html>` تا `wp_head()` و باز شدن `<body>`؛ آرگومان `ee_body_class`. |
+| `template-parts/ee-header.php` | نوار ابزار بالا + هدر چسبان + منو + جستجوی موبایل؛ آرگومان `ee_active`. در صفحهٔ اصلی لینک‌ها لنگر (`#ee-…`) و در سایر صفحات آدرس کامل‌اند. |
+| `template-parts/ee-footer.php` | فوتر + نوار پایین موبایل + `wp_footer()` و بستن سند. |
+| `template-parts/ee-sidebar.php` | ویجت‌های سایدبار نوشته‌ها: جستجو، اشتراک‌گذاری، آخرین مطالب، ویژه‌ها، پربازدید، دوره‌ها، دنبال‌کردن کانال‌ها. |
+| `template-parts/ee-archive-main.php` | سربرگ بایگانی + چیپ دسته‌بندی + شبکهٔ کارت‌ها + صفحه‌بندی (مشترک بین archive/home/search). |
+
+هلپرهای این پوسته در `inc/template_helpers.php` هستند: `evented_is_ee_view()`،
+`evented_current_url()`، `evented_gregorian_to_jalali()`/`evented_format_jalali()` (تبدیل شمسی
+فقط وقتی افزونهٔ شمسی‌ساز فعال نباشد)، `evented_post_date()`/`evented_post_time()`،
+`evented_reading_time()`، `evented_get_post_views()`/`evented_track_post_view()`
+(متای `evented_post_views`)، `evented_share_links()`/`evented_channel_links()` (فیلترپذیر) و
+`evented_related_posts()`. دیدگاه‌ها از `comments.php` قالب با لیبل‌های فارسی و
+`comment_form()` استایل‌خورده نمایش داده می‌شوند.
 
 - **قوانین فعلی صفحهٔ دوره**: درس باز است اگر `sfwd_lms_has_access()` **یا** `sample_lesson === 'on'`؛ دکمه‌های «بعدی/تکمیل» بین `$unlocked_lessons` با شمارندهٔ «درس/پیش‌نمایش X از Y»؛ آخرین درس بدون دسترسی → کلیک روی `#start_course`.
 - **سایدبار دوره**: کاربر دارای دسترسی → `learndash_course_progress` + دکمهٔ شروع/ادامه/مرور (و `learndash_course_get_resume_step_url`)؛ بدون دسترسی → قیمت + `learndash_payment_buttons()` (یا لینک ورود وقتی `price_type !== 'closed'`).
@@ -242,23 +272,37 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    START["theme_enqueue: style.css + owl + main.js"] --> C1{"is front/home?"}
-    C1 -- yes --> FP["front-page.css + js"]
+    START["theme_enqueue: style.css + owl + main.js"] --> C1{"is_page('home') یا is_front_page?"}
+    C1 -- yes --> FP["front-page.css + js (خانهٔ قدیمی)"]
     C1 -- no --> C2{"archive/tax courses?"}
     C2 -- yes --> AC["archive-courses.css"]
     C2 -- no --> C3{"is_author?"}
     C3 -- yes --> AU["author.css + author.js"]
     C3 -- no --> C4{"is_singular course?"}
     C4 -- yes --> CS["plyr + single-courses.css + js"]
-    C4 -- no --> C5{"archive/category/tag/blog?"}
-    C5 -- yes --> AP["archive-post.css (0B) + archive-post.js MISSING"]
-    C5 -- no --> C6{"post?"}
-    C6 -- yes --> SP["single-post.css/js MISSING"]
-    C6 -- no --> C7{"page?"}
+    C4 -- no --> C7{"page?"}
     C7 -- yes --> SGP["single-page.css + archive-product.css MISSING"]
     C7 -- no --> END["+ panel assets if is page under 'panel'"]
+
+    START2["functions.php @priority 20"] --> EE{"evented_is_ee_view()?"}
+    EE -- no --> SKIP["—"]
+    EE -- yes --> SHELL["ee-shell.css + ee-home-js + وزیرمتن + Material Symbols"]
+    SHELL --> B1{"is_front_page?"}
+    B1 -- yes --> EEH["evented-home.css"]
+    B1 -- no --> B2{"is_singular post?"}
+    B2 -- yes --> SPC["single-post.css"]
+    B2 -- no --> B3{"is_home / is_archive / is_search?"}
+    B3 -- yes --> APC["archive-post.css"]
 ```
 
+- **پوستهٔ ee-***: `functions.php` با اولویت ۲۰ و شرط `evented_is_ee_view()` بارگذاری می‌کند:
+  فونت وزیرمتن + Material Symbols + `assets/css/newhome/ee-shell.css` (توکن‌ها، هدر/فوتر،
+  نوار موبایل، ویجت‌های سایدبار) + `assets/js/newhome/evented-home.js` (منوی موبایل،
+  اسلایدر هیرو، کپی لینک اشتراک). سپس بسته به صفحه یکی از `evented-home.css`،
+  `single-post.css` یا `archive-post.css` (هر سه با وابستگی به `ee-shell`).
+- `evented-home.css` فقط بخش‌های اختصاصی صفحهٔ اصلی را دارد (hero/quick/courses/steps/articles/instructors)؛
+  بخش مشترک به `ee-shell.css` منتقل شده و هیچ سلکتور مشترکی بین دو فایل نیست.
+- `is_home()` دیگر در شاخهٔ `front-page.css` نیست؛ برگهٔ نوشته‌ها از قالب آرشیو جدید استفاده می‌کند.
 - `main.js` لوکال‌سازی: `ajax_object = {ajax_url, nonce}` — nonce مربوط به `notification_nonce` است و استفاده نمی‌شود؛ اسکریپت‌های واقعی nonce را از `data-nonce` می‌خوانند.
 - پنل: `panel.css` + `jalalidatepicker.min.js` + `panel.js` وقتی برگه، خودِ `panel` یا زیرمجموعهٔ آن باشد.
 - کتابخانه‌ها: Owl Carousel (سراسری)، Plyr (فقط single دوره)، Jalali Date Picker (پنل)، PhotoSwipe (enqueue نشده — بدون استفاده)، Font Awesome (یک آیکن در `author.php` بدون لودر!).

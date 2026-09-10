@@ -97,6 +97,57 @@
         }
     }
 
+    /* ---------- کپی لینک (دکمهٔ اشتراک‌گذاری) ---------- */
+    var copyBtns = document.querySelectorAll('.ee-share-copy');
+    if (copyBtns.length) {
+        var toast = document.getElementById('eeShareToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'eeShareToast';
+            toast.className = 'ee-share-toast';
+            document.body.appendChild(toast);
+        }
+
+        var toastTimer = null;
+        var showToast = function (message) {
+            toast.textContent = message;
+            toast.classList.add('is-on');
+            window.clearTimeout(toastTimer);
+            toastTimer = window.setTimeout(function () {
+                toast.classList.remove('is-on');
+            }, 2200);
+        };
+
+        copyBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var value = btn.getAttribute('data-copy') || window.location.href;
+
+                var done = function () { showToast('لینک کپی شد'); };
+                var failed = function () { showToast('کپی لینک ممکن نشد'); };
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(value).then(done).catch(failed);
+                    return;
+                }
+
+                /* مسیر جایگزین برای مرورگرهای قدیمی/بدون HTTPS */
+                var field = document.createElement('textarea');
+                field.value = value;
+                field.setAttribute('readonly', '');
+                field.style.position = 'fixed';
+                field.style.opacity = '0';
+                document.body.appendChild(field);
+                field.select();
+                try {
+                    document.execCommand('copy') ? done() : failed();
+                } catch (err) {
+                    failed();
+                }
+                document.body.removeChild(field);
+            });
+        });
+    }
+
     /* ---------- لینک‌های placeholder داخلی (#) بی‌صدا باشند ---------- */
     document.querySelectorAll('.ee-home a[href="#"]').forEach(function (a) {
         a.addEventListener('click', function (e) {

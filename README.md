@@ -40,25 +40,33 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 ├── ROADMAP.md / TODO.md / TECH_DEBT.md
 ├── header.php / footer.php       هدر/فوتر + action-bar موبایل + منوی کشویی
 ├── front-page.php                صفحهٔ اصلی (بخش‌های داینامیک/استاتیک — رجوع: ARCHITECTURE §5)
+├── single.php                    تک‌نوشته (پوستهٔ ee-*؛ مقاله + سایدبار + دیدگاه)
+├── archive.php / home.php / search.php   آرشیو نوشته‌ها، برگهٔ نوشته‌ها، نتایج جستجو
+├── comments.php                  فهرست دیدگاه‌ها + فرم دیدگاه (فارسی)
+├── template-parts/               ee-head · ee-header · ee-footer · ee-sidebar · ee-archive-main
 ├── single-sfwd-courses.php       صفحهٔ تکی دوره (سرفصل/ویدیو/خرید/نظر/گواهینامه)
 ├── taxonomy-ld_course_category.php  آرشیو دسته/دوره
 ├── archive-sfwd-courses.php      شیم: فقط get_template_part از قالب دسته
 ├── author.php                    پروفایل مدرس  |  template-instructors.php  لیست اساتید
 ├── page-login.php                صفحهٔ ورود/OTP (HTML مستقل، بدون wp_head)
 ├── page-panel.php / page.php / page-courses.php / page-courses-cat.php / 404.php
-├── index.php                     ⚠️ فایل دیباگ (اطلاعات وردپرس را چاپ می‌کند!) — به TODO.md مراجعه
+├── index.php                     قالب بازگشتی عمومی (fallback) برای انواع پست بدون قالب اختصاصی
 ├── assets/
 │   ├── assets_functions.php      منطق enqueue همهٔ CSS/JS
-│   ├── css/  front-page · single-courses · archive-courses · author · panel · vendorها
+│   ├── css/  front-page · single-courses · archive-courses · single-post · archive-post · author · panel · vendorها
+│   ├── css/newhome/  ee-shell (پوستهٔ مشترک) · evented-home (صفحهٔ اصلی)
 │   ├── js/   main · front-page · single-courses · author · panel + vendorها
+│   ├── js/newhome/evented-home.js  منوی موبایل · اسلایدر هیرو · کپی لینک اشتراک
 │   ├── fonts/evented-edu-font.woff2   فونت «دانا»
 │   └── img/  front-page (۲۳) · single-page (۸) · panel (۲)
 ├── inc/
-│   ├── includes.php              فقط require کردن ۵ ماژول پایین
+│   ├── includes.php              فقط require کردن ماژول‌های پایین
+│   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها)
 │   ├── login.php                 کلاس FalnicAuthHandler (OTP/ورود) + captcha_verify
 │   ├── sms.php                   send_pattern_sms (SOAP)
 │   ├── meta_functions.php        متاباکس دوره/دسته/کاربر + فیلتر آواتار
 │   ├── theme_options.php         MIME ها، گارد subscriber، is_current_path()
+│   ├── theme_settings.php        مدیر اسلایدر هیرو در پیشخوان (آپشن evented_home_slides)
 │   ├── ajax_functions.php        ۵ اکشن AJAX (نظر/تکمیل درس/علاقه‌مندی/پروفایل/تنظیمات)
 │   └── captcha.php               کپچای GD (⚠️ متصل نیست + فونتش مفقود)
 └── panel/                        تمپلیت‌های پنل (Template Name: Panel - …)
@@ -73,13 +81,17 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 | `/` | `front-page.php` | لندینگ |
 | `/courses/` و `/courses/<cat>/` | `taxonomy-ld_course_category.php` (+ شیم archive) | آرشیو/دسته دوره |
 | `/courses/<slug>/` | `single-sfwd-courses.php` | صفحهٔ دوره |
+| `/<post-slug>/` | `single.php` | تک‌نوشته (مقاله + سایدبار + دیدگاه) |
+| برگهٔ «نوشته‌ها» (is_home) | `home.php` | آرشیو همهٔ نوشته‌ها |
+| `/category/<cat>/` و `/tag/<tag>/` | `archive.php` | آرشیو دسته/برچسب با چیپ فیلتر |
+| `/?s=<عبارت>` | `search.php` | نتایج جستجو |
 | `/login` | `page-login.php` (برگهٔ `login`) | ورود/OTP |
 | `/panel` و زیرصفحه‌ها | `panel/*.php` (برگه‌ها با Template Name) | پنل کاربر |
 | `/author/<user>/` | `author.php` | پروفایل مدرس |
 | برگهٔ «لیست اساتید» | `template-instructors.php` | نقش `group_leader` |
 | برگهٔ «دسته‌بندی دوره‌ها» | `page-courses-cat.php` | گرید همهٔ دسته‌ها |
 | سایر برگه‌ها | `page.php` | عمومی |
-| هر چیز دیگر | ⚠️ `index.php` | باکس دیباگ — برای تولید باید جایگزین شود |
+| هر چیز دیگر | `index.php` | قالب بازگشتی عمومی (عنوان + چکیده + صفحه‌بندی) |
 
 ## ۵. پیش‌نیازها و نصب
 
