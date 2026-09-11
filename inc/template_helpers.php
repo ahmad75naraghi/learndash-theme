@@ -994,6 +994,65 @@ function evented_logo_html($context = 'header')
 	return (string) apply_filters('evented_logo_html', $html, $context);
 }
 
+/**
+ * نوشته‌های ویژه برای بخش «بلاگ ویژه» صفحهٔ اصلی.
+ *
+ * اولویت: نوشته‌های چسبان (Sticky) وردپرس، و در ادامه آخرین نوشته‌ها تا رسیدن
+ * به تعداد خواسته‌شده. اگر هیچ نوشته‌ای نباشد آرایهٔ خالی برمی‌گردد و قالب
+ * بخش را چاپ نمی‌کند.
+ *
+ * @param int $limit حداکثر تعداد نوشته.
+ * @return WP_Post[]
+ */
+function evented_featured_posts($limit = 4)
+{
+	$limit = max(1, (int) $limit);
+	$ids   = array();
+
+	$sticky = get_option('sticky_posts');
+	if (is_array($sticky)) {
+		$sticky = array_filter(array_map('absint', $sticky));
+		$ids    = array_slice(array_values($sticky), 0, $limit);
+	}
+
+	$need = $limit - count($ids);
+	if ($need > 0) {
+		$query = new WP_Query(array(
+			'post_type'           => 'post',
+			'posts_per_page'      => $need,
+			'post__not_in'        => $ids,
+			'ignore_sticky_posts' => true,
+			'no_found_rows'       => true,
+			'orderby'             => 'date',
+			'order'               => 'DESC',
+		));
+
+		foreach ($query->posts as $ee_fp) {
+			if ($ee_fp instanceof WP_Post) {
+				$ids[] = (int) $ee_fp->ID;
+			}
+		}
+
+		wp_reset_postdata();
+	}
+
+	$posts = array();
+	foreach (array_slice($ids, 0, $limit) as $ee_id) {
+		$ee_post = get_post($ee_id);
+		if ($ee_post instanceof WP_Post) {
+			$posts[] = $ee_post;
+		}
+	}
+
+	/**
+	 * فهرست نوشته‌های ویژهٔ صفحهٔ اصلی.
+	 *
+	 * @param WP_Post[] $posts نوشته‌ها.
+	 * @param int       $limit تعداد درخواستی.
+	 */
+	return apply_filters('evented_featured_posts', $posts, $limit);
+}
+
 /* =========================================================================
  * بخش LMS — کارت دوره، بایگانی دوره‌ها، اساتید و آزمون
  * ========================================================================= */

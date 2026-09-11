@@ -16,7 +16,7 @@ get_header();
 <div class="container">
 
     <!-- Sidebar -->
-    <?php include_once 'sidebar.php'; ?>
+    <?php locate_template('panel/sidebar.php', true, false); ?>
     
     <!-- Main Content -->
      <main class="main-content">

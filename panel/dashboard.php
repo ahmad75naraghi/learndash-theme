@@ -11,9 +11,11 @@ $current_user_id = get_current_user_id();
 $enrolled_courses = function_exists('learndash_user_get_enrolled_courses') ? learndash_user_get_enrolled_courses($current_user_id) : array();
 $courses_count = count($enrolled_courses);
 
+// جدول تراکنش‌ها — $wpdb در scope قالب در دسترس نیست، پس global می‌شود.
+global $wpdb;
 $payments_table_name = $wpdb->prefix . 'evented_transactions';
-$transactions_count = $wpdb->get_var( $wpdb->prepare(
-    "SELECT COUNT(*) FROM $payments_table_name WHERE user_id = %d ORDER BY created_at DESC", 
+$transactions_count = (int) $wpdb->get_var( $wpdb->prepare(
+    "SELECT COUNT(*) FROM $payments_table_name WHERE user_id = %d",
     $current_user_id
 ) );
 
@@ -23,7 +25,7 @@ get_header(); ?>
 <div class="container">
 
     <!-- Sidebar -->
-    <?php include_once 'sidebar.php'; ?>
+    <?php locate_template('panel/sidebar.php', true, false); ?>
     <!-- Main Content -->
     <main class="main-content">
 
@@ -118,9 +120,9 @@ get_header(); ?>
                             هنوز دوره ای شرکت نکردی!!
                         </p>
                         <p>
-                            لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است 
+                            از فهرست دوره‌ها یکی را انتخاب کن تا مسیر یادگیری‌ات از همین‌جا شروع شود.
                         </p>
-                        <a class="btn-primary" href="/">
+                        <a class="btn-primary" href="<?php echo esc_url(get_post_type_archive_link('sfwd-courses') ?: home_url('/')); ?>">
                             مشاهده دوره ها
                         </a>
                     </div>

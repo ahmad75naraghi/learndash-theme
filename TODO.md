@@ -11,6 +11,9 @@
   `window.location.href = '<?= $_GET['redirect_to'] ?? home_url(); ?>'` — باید `esc_url_raw()` + `esc_js()` شود (و باگ double-encode ناشی از `urlencode` در `FalnicAuthHandler::redirect_login_url` هم رفع شود).
 - [ ] **الزام تأیید OTP در ساخت حساب** — `handle_save_user_register_name` (`inc/login.php`) بدون بررسی `fl_otp_verified` با دانستن nonce کاربر می‌سازد.
 - [ ] **اعتبارنامهٔ SMS در سورس** — `inc/sms.php`: username/رمز/bodyId هاردکد → انتقال به wp-config/option.
+- [x] **دکمهٔ «انتخاب تصویر» در تنظیمات قالب** — بازتولید با jsdom روی HTML رندرشدهٔ واقعی: دو مسیر شکست بی‌صدا (early-return اسکریپت و `ReferenceError` در نبود `wp.media`) رفع شد، به‌همراه افزودن اسلایدر ناقص (کپی `innerHTML` به‌جای کل ردیف)، جایگزین ورود دستی نشانی و watchdog صفحه.
+- [x] **لوگوی سفارشی در فوتر بدون استایل** — قواعد `.ee-logo-img` اضافه شد.
+- [x] **لینک‌های سخت‌کد سایدبار پنل** — شش لینک `/panel/…` به `home_url()` تبدیل شد.
 - [ ] **انتقال هاردکدهای دامنه** — همهٔ `https://edu.falnic.com/...` و `/wp-content/themes/edu-falnic/...` در فایل‌ها (فهرست کامل در `TECH_DEBT.md`).
 
 ## ۲. امنیت (Security)
@@ -23,7 +26,7 @@
 
 - [ ] **ریدایرکت اشتباه `panel/certificates.php`** — گارد مهمان به `https://edu.falnic.com/panel/payments.php` می‌رود (باید به صفحهٔ certificates خودش).
 - [ ] **redirect_to های دارای `.php`** — در `panel/my-courses.php`, `panel/payments.php`, `panel/wishlist.php`, `panel/settings.php` مقدار `.../panel/xxx.php` است (باید بدون `.php`).
-- [ ] **`page-panel.php` خالی** — بین هدر/فوتر محتوایی ندارد؛ باید داشبورد را include کند یا ریدایرکت به اولین زیرصفحه.
+- [x] **`page-panel.php` خالی** — کاربر لاگین‌شده را به `/panel/my-courses` ریدایرکت می‌کند؛ همچنین باگ‌های باز نشدن صفحات پنل (نبود `global $wpdb` در داشبورد، include نسبی سایدبار و بارگذاری‌نشدن `panel.css` برای قالب‌های `panel/*`) رفع شد.
 - [x] **`index.php` باکس دیباگ** — با یک قالب بازگشتی واقعی جایگزین شد؛ آرشیو/برگهٔ نوشته‌ها/جستجو هم به `archive.php`/`home.php`/`search.php` منتقل شدند.
 - [ ] **لاگین با OTP برای کاربر موجود → `wp_set_current_user($user->ID)` روی null** در `handle_register_user` (چون `wp_set_password` id برنمی‌گرداند) — تست و اصلاح.
 - [ ] **`falnic_submit_cta`** — hook ثبت شده اما متد `handle_cta_submit` وجود ندارد (در صورت فراخوانی Fatal).

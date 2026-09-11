@@ -42,6 +42,9 @@ wp_reset_postdata();
 
 $ee_articles = array_slice($ee_latest_posts, 0, 3);
 
+/* ۴٫۱) بلاگ ویژه — نوشته‌های چسبان و در ادامه آخرین نوشته‌ها */
+$ee_blog_feature = function_exists('evented_featured_posts') ? evented_featured_posts(4) : array();
+
 /* ۵) اساتید: کاربران دارای نقش group_leader */
 $ee_instructors = get_users(array(
     'role'    => 'group_leader',
@@ -301,6 +304,84 @@ $ee_slider_mode  = $ee_slide_count > 1;
                 </div>
             </div>
         </section>
+
+        <!-- ======= بلاگ ویژه ======= -->
+        <?php if (!empty($ee_blog_feature)) : ?>
+            <?php
+            $ee_bf_hero  = $ee_blog_feature[0];
+            $ee_bf_rest  = array_slice($ee_blog_feature, 1, 3);
+            $ee_bf_url   = get_permalink(get_option('page_for_posts')) ?: home_url('/');
+            $ee_bf_hcat  = get_the_category($ee_bf_hero->ID);
+            $ee_bf_hcat  = (is_array($ee_bf_hcat) && !empty($ee_bf_hcat)) ? $ee_bf_hcat[0]->name : __('مقالات', 'evented-edu');
+            ?>
+            <section class="ee-blog-feat" id="ee-blog">
+                <div class="ee-wrap">
+                    <div class="ee-sec-head">
+                        <div>
+                            <h3 class="ee-sec-title purple"><span class="bar"></span> بلاگ ویژه</h3>
+                            <p class="sec-sub">منتخبی از نوشته‌های تیم آموزشی؛ تازه‌ترین تجربه‌ها و راهنماهای کاربردی</p>
+                        </div>
+                        <a class="lc-more" style="color:#7e22ce;" href="<?php echo esc_url($ee_bf_url); ?>">همهٔ نوشته‌ها <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                    </div>
+
+                    <div class="ee-bf-grid">
+                        <!-- نوشتهٔ شاخص -->
+                        <article class="ee-bf-hero">
+                            <a class="bf-hero-media" href="<?php echo esc_url(get_permalink($ee_bf_hero)); ?>">
+                                <?php if (has_post_thumbnail($ee_bf_hero)) : ?>
+                                    <img src="<?php echo esc_url(get_the_post_thumbnail_url($ee_bf_hero, 'large')); ?>" alt="<?php echo esc_attr(get_the_title($ee_bf_hero)); ?>" loading="lazy">
+                                <?php else : ?>
+                                    <span class="bf-hero-noimg"><span class="material-symbols-outlined ee-ic">auto_stories</span></span>
+                                <?php endif; ?>
+                                <span class="bf-hero-chip"><?php echo esc_html($ee_bf_hcat); ?></span>
+                            </a>
+                            <div class="bf-hero-body">
+                                <span class="bf-hero-badge"><span class="material-symbols-outlined ee-ic">workspace_premium</span> <?php esc_html_e('نوشتهٔ ویژه', 'evented-edu'); ?></span>
+                                <h4><a href="<?php echo esc_url(get_permalink($ee_bf_hero)); ?>"><?php echo esc_html(get_the_title($ee_bf_hero)); ?></a></h4>
+                                <p><?php echo esc_html(wp_trim_words(get_the_excerpt($ee_bf_hero), 26)); ?></p>
+                                <div class="bf-hero-foot">
+                                    <span class="bf-by">
+                                        <span class="material-symbols-outlined ee-ic">person</span>
+                                        <?php echo esc_html(get_the_author_meta('display_name', (int) $ee_bf_hero->post_author)); ?>
+                                    </span>
+                                    <span class="bf-date">
+                                        <span class="material-symbols-outlined ee-ic">calendar_month</span>
+                                        <?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($ee_bf_hero) : get_the_date('', $ee_bf_hero)); ?>
+                                    </span>
+                                    <a class="bf-read" href="<?php echo esc_url(get_permalink($ee_bf_hero)); ?>">مطالعه <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- سایر نوشته‌های ویژه -->
+                        <?php if (!empty($ee_bf_rest)) : ?>
+                            <div class="ee-bf-list">
+                                <?php foreach ($ee_bf_rest as $ee_bf) : ?>
+                                    <?php $ee_bf_cat = get_the_category($ee_bf->ID); ?>
+                                    <a class="ee-bf-row" href="<?php echo esc_url(get_permalink($ee_bf)); ?>">
+                                        <span class="bf-row-media">
+                                            <?php if (has_post_thumbnail($ee_bf)) : ?>
+                                                <img src="<?php echo esc_url(get_the_post_thumbnail_url($ee_bf, 'medium')); ?>" alt="<?php echo esc_attr(get_the_title($ee_bf)); ?>" loading="lazy">
+                                            <?php else : ?>
+                                                <span class="material-symbols-outlined ee-ic">article</span>
+                                            <?php endif; ?>
+                                        </span>
+                                        <span class="bf-row-txt">
+                                            <span class="bf-row-cat"><?php echo esc_html((is_array($ee_bf_cat) && !empty($ee_bf_cat)) ? $ee_bf_cat[0]->name : __('مقالات', 'evented-edu')); ?></span>
+                                            <strong><?php echo esc_html(get_the_title($ee_bf)); ?></strong>
+                                            <span class="bf-row-meta">
+                                                <span class="material-symbols-outlined ee-ic">calendar_month</span>
+                                                <?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($ee_bf) : get_the_date('', $ee_bf)); ?>
+                                            </span>
+                                        </span>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </section>
+        <?php endif; ?>
 
         <!-- ======= مقالات منتخب ======= -->
         <section class="ee-articles" id="ee-articles">

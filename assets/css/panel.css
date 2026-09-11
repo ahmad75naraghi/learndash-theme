@@ -1902,3 +1902,36 @@ h2 {
     padding: 29px 16px 24px 16px;
   }
 }
+/* --- دکمهٔ اصلی حالت‌های خالی (پرداخت‌ها / علاقه‌مندی / گواهینامه‌ها / داشبورد) --- */
+.no-exist-notice .btn-primary {
+    display: inline-block;
+    background-color: #082B4C;
+    color: #fff;
+    padding: 10px 32px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 18px;
+    text-decoration: none;
+    margin-top: 8px;
+    transition: background-color .2s ease;
+}
+
+.no-exist-notice .btn-primary:hover {
+    background-color: #072541;
+}
+
+/* --- ردیف دکمه‌های کارت دوره در «دوره‌های من» --- */
+.card-actions .course-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --- قواعد رمز عبور: حالت نامعتبر --- */
+.password-rules li.invalid {
+    color: #b91c1c;
+}
+
+.password-rules li.invalid::before {
+    color: #b91c1c;
+}

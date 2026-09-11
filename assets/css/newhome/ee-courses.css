@@ -261,6 +261,10 @@
 .ee-404-links { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; }
 .ee-404-links .ee-btn { font-size: .8rem; }
 
+/* بخش پیشنهاد دوره در ۴۰۴ */
+.ee-404-more { margin-top: .5rem; }
+.ee-404-more .ee-w-title { margin-bottom: .8rem; }
+
 /* چاپ ------------------------------------------------------------------ */
 @media print {
     .ee-side, .ee-pager, .ee-404-search, .ee-404-links { display: none !important; }

@@ -192,6 +192,105 @@
 .ee-art-card .art-foot .read { color: var(--ee-tealP); font-weight: 600; display: inline-flex; align-items: center; gap: .2rem; }
 .ee-art-card .art-foot .read:hover { text-decoration: underline; }
 
+/* ---------- بلاگ ویژه ---------- */
+.ee-home-main { min-width: 0; }
+.ee-blog-feat { padding-block: .8rem; }
+.ee-blog-feat .ee-sec-head { flex-wrap: wrap; gap: .5rem; }
+.ee-blog-feat .sec-sub { font-size: .75rem; color: var(--ee-soft); margin-top: .2rem; }
+.ee-blog-feat .lc-more { font-size: .76rem; font-weight: 700; display: inline-flex; align-items: center; gap: .2rem; }
+.ee-blog-feat .lc-more:hover { text-decoration: underline; }
+
+.ee-bf-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 1024px) { .ee-bf-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 1.1rem; } }
+
+/* نوشتهٔ شاخص */
+.ee-bf-hero {
+    background: #fff; border: 1px solid rgb(240 253 250);
+    border-radius: 1.4rem; box-shadow: var(--ee-sh-sm);
+    overflow: hidden; display: flex; flex-direction: column;
+    transition: box-shadow .2s, transform .2s;
+}
+.ee-bf-hero:hover { box-shadow: var(--ee-sh-md); transform: translateY(-2px); }
+
+.bf-hero-media { position: relative; display: block; aspect-ratio: 16 / 10; background: var(--ee-lavL); overflow: hidden; }
+.bf-hero-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+.ee-bf-hero:hover .bf-hero-media img { transform: scale(1.04); }
+.bf-hero-media::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(to top, rgb(15 23 42 / .45), rgb(15 23 42 / 0) 55%);
+}
+.bf-hero-noimg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ee-lavD); }
+.bf-hero-noimg .ee-ic { font-size: 3rem; opacity: .5; }
+.bf-hero-chip {
+    position: absolute; top: .7rem; inset-inline-start: .7rem; z-index: 1;
+    background: rgb(255 255 255 / .94); color: var(--ee-lavD);
+    font-size: .66rem; font-weight: 800; border-radius: 999px; padding: .25rem .7rem;
+    box-shadow: var(--ee-sh-sm);
+}
+
+.bf-hero-body { padding: .9rem 1rem 1.05rem; display: flex; flex-direction: column; gap: .45rem; flex: 1; }
+.bf-hero-badge {
+    align-self: flex-start; display: inline-flex; align-items: center; gap: .3rem;
+    background: var(--ee-lavL); color: var(--ee-lavD); border: 1px solid var(--ee-lavS);
+    font-size: .66rem; font-weight: 800; border-radius: 999px; padding: .22rem .7rem;
+}
+.bf-hero-badge .ee-ic { font-size: .9rem; }
+.ee-bf-hero h4 { font-size: 1.02rem; font-weight: 900; color: #0f172a; line-height: 1.9; margin: 0;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (min-width: 640px) { .ee-bf-hero h4 { font-size: 1.15rem; } }
+.ee-bf-hero h4 a { color: inherit; }
+.ee-bf-hero:hover h4 a { color: var(--ee-lavD); }
+.ee-bf-hero p { font-size: .78rem; color: var(--ee-soft); line-height: 2; margin: 0;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.bf-hero-foot {
+    margin-top: auto; padding-top: .7rem; border-top: 1px dashed #f1f5f9;
+    display: flex; align-items: center; flex-wrap: wrap; gap: .4rem 1rem;
+    font-size: .72rem; color: #94a3b8;
+}
+.bf-hero-foot .bf-by, .bf-hero-foot .bf-date { display: inline-flex; align-items: center; gap: .25rem; }
+.bf-hero-foot .ee-ic { font-size: .95rem; color: var(--ee-lavD); }
+.bf-hero-foot .bf-read {
+    margin-inline-start: auto; display: inline-flex; align-items: center; gap: .25rem;
+    font-size: .74rem; font-weight: 800; color: #fff; background: var(--ee-lavD);
+    border-radius: 999px; padding: .35rem .9rem;
+}
+.bf-hero-foot .bf-read:hover { background: #6b21a8; }
+
+/* ردیف‌های کنار نوشتهٔ شاخص */
+.ee-bf-list { display: flex; flex-direction: column; gap: .7rem; }
+.ee-bf-row {
+    display: flex; align-items: center; gap: .75rem; flex: 1;
+    background: #fff; border: 1px solid rgb(240 253 250);
+    border-radius: 1.1rem; padding: .55rem; box-shadow: var(--ee-sh-sm);
+    transition: box-shadow .2s, transform .2s, border-color .2s;
+}
+.ee-bf-row:hover { box-shadow: var(--ee-sh-md); transform: translateX(-3px); border-color: var(--ee-lavS); }
+.bf-row-media {
+    flex-shrink: 0; width: 6.4rem; height: 5rem; border-radius: .85rem; overflow: hidden;
+    background: var(--ee-lavL); color: var(--ee-lavD);
+    display: flex; align-items: center; justify-content: center;
+}
+.bf-row-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bf-row-media .ee-ic { font-size: 1.6rem; opacity: .55; }
+.bf-row-txt { min-width: 0; display: flex; flex-direction: column; gap: .2rem; }
+.bf-row-cat {
+    align-self: flex-start; font-size: .62rem; font-weight: 800; color: var(--ee-lavD);
+    background: var(--ee-lavL); border-radius: .45rem; padding: .15rem .5rem;
+}
+.ee-bf-row strong {
+    font-size: .84rem; font-weight: 800; color: #0f172a; line-height: 1.85;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.ee-bf-row:hover strong { color: var(--ee-lavD); }
+.bf-row-meta { display: inline-flex; align-items: center; gap: .25rem; font-size: .68rem; color: #94a3b8; }
+.bf-row-meta .ee-ic { font-size: .9rem; }
+
+@media (prefers-reduced-motion: reduce) {
+    .ee-bf-hero, .ee-bf-row, .bf-hero-media img { transition: none !important; }
+}
+@media print { .ee-blog-feat { display: none !important; } }
+
 /* ---------- اساتید ---------- */
 .ee-instructors { background: linear-gradient(to bottom, #fff, rgb(232 245 233 / .3)); border: 1px solid rgb(209 250 229 / .7); border-radius: var(--ee-r-3xl); padding: 1.4rem 1rem; text-align: center; margin-block: 1rem; }
 .ee-instructors .sec-title { margin-bottom: .4rem; }

@@ -28,11 +28,19 @@ function theme_enqueue()
 
         $panel_page = get_page_by_path('panel');
 
+        // برگهٔ «panel» و زیربرگه‌هایش، یا هر برگه‌ای که یکی از قالب‌های
+        // panel/*.php (Template Name: Panel - …) رویش انتخاب شده باشد.
+        $panel_template = (string) get_page_template_slug();
+        $is_panel_view  = (0 === strpos($panel_template, 'panel/'));
+
         if (
-            $panel_page &&
+            $is_panel_view ||
             (
-                $post->ID == $panel_page->ID ||
-                in_array($panel_page->ID, get_post_ancestors($post))
+                $panel_page &&
+                (
+                    $post->ID == $panel_page->ID ||
+                    in_array($panel_page->ID, get_post_ancestors($post))
+                )
             )
         ) {
             wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', [], '1.0.0');

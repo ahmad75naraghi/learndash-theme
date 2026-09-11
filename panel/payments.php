@@ -21,7 +21,7 @@ get_header(); ?>
 <div class="container">
 
     <!-- Sidebar -->
-    <?php include_once 'sidebar.php'; ?>
+    <?php locate_template('panel/sidebar.php', true, false); ?>
     
     <!-- Main Content -->
     <main class="main-content">
@@ -85,9 +85,9 @@ get_header(); ?>
                         هنوز دوره ای شرکت نکردی!!
                     </p>
                     <p>
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است 
-                    </p>
-                    <a class="btn-primary" href="/">
+                            هر پرداختی که انجام دهی، همراه با رسید و کد رهگیری همین‌جا ثبت می‌شود.
+                        </p>
+                    <a class="btn-primary" href="<?php echo esc_url(get_post_type_archive_link('sfwd-courses') ?: home_url('/')); ?>">
                         مشاهده دوره ها
                     </a>
                 </div>

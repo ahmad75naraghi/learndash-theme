@@ -60,12 +60,12 @@
         display: block;
         background: linear-gradient(to left, var(--ee-tealL), #F1F8F6, var(--ee-mint));
         border-bottom: 1px solid rgb(209 250 229 / .6);
-        padding: .4rem .75rem;
+        padding: .5rem .75rem;
         font-size: .78rem;
         color: var(--ee-soft);
     }
-    .ee-topbar-in { display: flex; align-items: center; justify-content: space-between; }
-    .ee-topbar .tb-right { display: flex; align-items: center; gap: 1.25rem; }
+    .ee-topbar-in { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+    .ee-topbar .tb-right { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
     .ee-tb-item { display: inline-flex; align-items: center; gap: .35rem; }
     .ee-tb-item .dot { width: .5rem; height: .5rem; border-radius: 999px; display: inline-block; }
     .ee-tb-links { display: flex; gap: 1rem; }
@@ -73,6 +73,8 @@
     .ee-tb-links a:hover { color: var(--ee-tealP); }
 }
 .ee-topbar .ee-tb-sep { opacity: .5; }
+.ee-topbar .ee-tb-label { font-weight: 600; color: var(--ee-soft); }
+.ee-widget-search form { margin: 0; }
 
 /* ---------- هدر اصلی (چسبان، شیشه‌ای) ---------- */
 .ee-header {
@@ -85,12 +87,17 @@
     border-bottom: 1px solid rgb(209 250 229 / .7);
 }
 .ee-header-in { padding-block: .7rem; }
-.ee-header-row { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
-.ee-logo { display: flex; align-items: center; gap: .6rem; }
-.ee-logo img, .ee-logo .logo-fallback { height: 42px; width: auto; }
+.ee-header > .ee-wrap { padding-block: .8rem; }
+.ee-header-row { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+@media (max-width: 899.98px) { .ee-header-row { gap: .8rem; } }
+.ee-logo { display: flex; align-items: center; gap: .65rem; flex-shrink: 0; }
+.ee-logo img, .ee-logo .logo-fallback { height: 44px; width: auto; }
+/* لوگوی انتخابی وردپرس (سفارشی‌سازی ← هویت سایت) در هدر و فوتر */
+.ee-logo .ee-logo-img { display: block; height: 44px; width: auto; max-width: 12rem; object-fit: contain; }
+.ee-f-logo .ee-logo-img { display: block; height: 40px; width: auto; max-width: 10.5rem; object-fit: contain; }
 .ee-logo .logo-fallback { font-weight: 900; color: var(--ee-tealP); display:flex; align-items:center; font-size:1.15rem; gap:.4rem;}
 .ee-logo .logo-fallback svg { width: 30px; height: 30px; }
-.ee-search { display: none; flex: 0 1 24rem; position: relative; }
+.ee-search { display: none; flex: 1 1 26rem; max-width: 32rem; margin-inline: auto; position: relative; }
 .ee-search input {
     width: 100%;
     background: #fff;
@@ -108,7 +115,7 @@
 .ee-search .s-tune { position: absolute; left: .6rem; top: 50%; transform: translateY(-50%); color: var(--ee-soft); }
 @media (min-width: 900px) { .ee-search { display: block; } }
 
-.ee-h-actions { display: flex; align-items: center; gap: .5rem; }
+.ee-h-actions { display: flex; align-items: center; gap: .65rem; flex-shrink: 0; }
 .ee-btn {
     display: inline-flex; align-items: center; gap: .45rem;
     border-radius: 999px; padding: .5rem 1rem;
@@ -133,14 +140,14 @@
 /* منوی دسکتاپ (قرصی) */
 .ee-nav { display: none; }
 @media (min-width: 900px) {
-    .ee-nav { display: flex; align-items: center; gap: .2rem; padding-top: .55rem; border-top: 1px solid rgb(240 253 250); flex-wrap: wrap; }
-    .ee-nav a { font-size: .82rem; font-weight: 600; padding: .4rem .85rem; border-radius: 999px; color: var(--ee-ink); transition: all .15s; }
+    .ee-nav { display: flex; align-items: center; gap: .55rem; padding-top: .8rem; margin-top: .15rem; border-top: 1px solid rgb(240 253 250); flex-wrap: wrap; }
+    .ee-nav a { font-size: .84rem; font-weight: 600; padding: .5rem 1.1rem; border-radius: 999px; color: var(--ee-ink); transition: all .15s; }
     .ee-nav a.ee-active { background: var(--ee-tealP); color: #fff; }
     .ee-nav a:hover { background: var(--ee-mint); color: var(--ee-tealP); }
 }
 
 /* موبایل: جستجو زیر ردیف اول */
-.ee-search-m { display: block; padding-bottom: .6rem; }
+.ee-search-m { display: block; padding-top: .25rem; padding-bottom: .7rem; }
 @media (min-width: 900px) { .ee-search-m { display: none; } }
 /* ---------- فوتر ---------- */
 .ee-footer { background: #0f172a; color: #cbd5e1; margin-top: 1.6rem; border-top: 1px solid #1e293b; }

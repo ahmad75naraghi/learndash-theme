@@ -22,7 +22,7 @@ get_header(); ?>
 <div class="container">
 
     <!-- Sidebar -->
-    <?php include_once 'sidebar.php'; ?>
+    <?php locate_template('panel/sidebar.php', true, false); ?>
     
     <!-- Main Content -->
     <main class="main-content">
@@ -109,9 +109,9 @@ get_header(); ?>
                             هنوز دوره ای به لیست علاقمندی خود اضافه نکردی!!
                         </p>
                         <p>
-                            لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است 
+                            دوره‌هایی که بعداً می‌خواهی ببینی را با دکمهٔ علاقه‌مندی اینجا نگه دار.
                         </p>
-                        <a class="btn-primary" href="/">
+                        <a class="btn-primary" href="<?php echo esc_url(get_post_type_archive_link('sfwd-courses') ?: home_url('/')); ?>">
                             مشاهده دوره ها
                         </a>
                     </div>

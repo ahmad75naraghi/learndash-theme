@@ -68,7 +68,7 @@ $ee_today = function_exists('evented_wp_date') ? evented_wp_date('Y/m/d') : date
                     <?php echo esc_html('امروز: ' . $ee_today); ?>
                 </span>
                 <span class="ee-tb-sep">|</span>
-                <span class="ee-tb-item"><span class="text-slate-500 font-medium">کانال‌های رسمی:</span></span>
+                <span class="ee-tb-item"><span class="ee-tb-label">کانال‌های رسمی:</span></span>
                 <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:var(--ee-tealP);font-weight:600;"><span class="dot" style="background:#10b981;"></span>بله</a>
                 <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:#b45309;font-weight:600;"><span class="dot" style="background:#f59e0b;"></span>ایتا</a>
                 <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:#7e22ce;font-weight:600;"><span class="dot" style="background:#a855f7;"></span>روبیکا</a>
