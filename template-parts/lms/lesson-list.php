@@ -146,12 +146,15 @@ $ee_render_inner = static function ($item, $is_current) {
 					$ee_unlocked   = !empty($ee_item['is_unlocked']);
 					?>
 					<li class="ee-ln-item<?php echo $ee_is_current ? ' is-current' : ''; ?><?php echo $ee_unlocked ? '' : ' is-locked-item'; ?>">
-						<a class="ee-ln-link<?php echo $ee_unlocked ? '' : ' is-disabled'; ?>"
-							href="<?php echo esc_url($ee_item['permalink']); ?>"
-							<?php echo $ee_is_current ? 'aria-current="page"' : ''; ?>
-							<?php echo $ee_unlocked ? '' : 'aria-disabled="true" tabindex="-1"'; ?>>
-							<?php $ee_render_inner($ee_item, $ee_is_current); ?>
-						</a>
+						<?php if ($ee_unlocked) : ?>
+							<a class="ee-ln-link" href="<?php echo esc_url($ee_item['permalink']); ?>"<?php echo $ee_is_current ? ' aria-current="page"' : ''; ?>>
+								<?php $ee_render_inner($ee_item, $ee_is_current); ?>
+							</a>
+						<?php else : ?>
+							<span class="ee-ln-link is-disabled"<?php echo $ee_is_current ? ' aria-current="page"' : ''; ?> title="<?php esc_attr_e('برای دسترسی به این درس، در دوره ثبت‌نام کنید', 'evented-edu'); ?>">
+								<?php $ee_render_inner($ee_item, $ee_is_current); ?>
+							</span>
+						<?php endif; ?>
 					</li>
 				<?php endforeach; ?>
 
