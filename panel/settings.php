@@ -2,7 +2,7 @@
 /* Template Name: Panel - Account Settings */
 
 if (! is_user_logged_in()) {
-    wp_redirect('https://edu.falnic.com/login?redirect_to=https://edu.falnic.com/panel/settings.php');
+    wp_redirect(add_query_arg('redirect_to', home_url('/panel/settings'), wp_login_url()));
     exit;
 }
 
@@ -10,13 +10,20 @@ $current_user = wp_get_current_user();
 
 // دریافت شماره موبایل (اگر از افزونه دیجیتس استفاده می‌کنید، ممکن است کلید آن digits_phone_no باشد)
 $user_phone = get_user_meta($current_user->ID, 'billing_phone', true);
-$user_email = !str_starts_with($current_user->user_email, "09") ? $current_user->user_email : "sdasd@dfsfd.dfdf";
+
+// ایمیل‌های placeholder تولیدشده هنگام ثبت‌نام با موبایل (با «09…» شروع می‌شوند) را
+// به‌جای مقدار جعلی نمایش نده؛ کاربر باید ایمیل واقعی خود را در همین بخش ثبت کند.
+$user_email     = (string) $current_user->user_email;
+$has_real_email = is_email($user_email) && !str_starts_with($user_email, '09');
+if (!$has_real_email) {
+    $user_email = '';
+}
 
 get_header(); ?>
 <div class="container">
 
     <!-- Sidebar -->
-    <?php include_once 'sidebar.php'; ?>
+    <?php locate_template('panel/sidebar.php', true, false); ?>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -66,7 +73,7 @@ get_header(); ?>
                             <?php endif; ?>
                         </div>
                         <div class="input-wrapper">
-                            <input type="email" name="user_email" class="form-control email-input" value="<?php echo esc_attr($user_email); ?>" dir="ltr" disabled="disabled">
+                            <input type="email" name="user_email" class="form-control email-input" value="<?php echo esc_attr($user_email); ?>" dir="ltr" placeholder="example@domain.com" disabled="disabled">
                             <svg class="icon-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer;">
                                 <path d="M12 20h9"></path>
                                 <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>

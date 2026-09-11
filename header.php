@@ -47,7 +47,7 @@ $current_user_id = get_current_user_id();
                 </span>
                 <a href="/" class="logo">
                     <!-- جایگزین با لوگوی واقعی -->
-                    <img src='https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/Falnic-Logo-1-2.webp' alt="لوگو">
+                    <img src='<?php echo PATH_DIR_URL; ?>/assets/img/front-page/evented-edu-logo.webp' alt="لوگو">
                 </a>
                 <div class="categories-dropdown mob-hidden">
                     <a href="/courses/" >

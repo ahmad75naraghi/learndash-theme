@@ -350,7 +350,7 @@ function replace_gravatar_with_custom_avatar($avatar, $id_or_email, $size, $defa
         }
     }
 
-    return "<img src='https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/single-page/placeholder_avatar_icon.png' alt='" . esc_attr($alt) . "' width='" . esc_attr($size) . "' height='" . esc_attr($size) . "' class='avatar avatar-{$size} photo' />";
+    return "<img src='" . esc_url(get_template_directory_uri() . '/assets/img/single-page/placeholder_avatar_icon.png') . "' alt='" . esc_attr($alt) . "' width='" . esc_attr($size) . "' height='" . esc_attr($size) . "' class='avatar avatar-{$size} photo' />";
 }
 add_filter('get_avatar', 'replace_gravatar_with_custom_avatar', 10, 5);
 function replace_gravatar_url_with_custom_avatar_url($url, $id_or_email, $args)
@@ -375,8 +375,8 @@ function replace_gravatar_url_with_custom_avatar_url($url, $id_or_email, $args)
         }
     }
 
-    // اگر عکس سفارشی نداشت، همان عکس پیش‌فرض که در کدهای قبلی گذاشتید را برگرداند
-    return 'https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/single-page/placeholder_avatar_icon.png';
+    // اگر عکس سفارشی نداشت، همان عکس پیش‌فرض را برگرداند
+    return get_template_directory_uri() . '/assets/img/single-page/placeholder_avatar_icon.png';
 }
 add_filter('get_avatar_url', 'replace_gravatar_url_with_custom_avatar_url', 10, 3);
 

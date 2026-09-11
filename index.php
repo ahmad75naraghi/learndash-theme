@@ -1,35 +1,60 @@
 <?php
-echo '<div style="background: #fff3cd; color: #856404; padding: 20px; margin: 20px; border: 1px solid #ffeeba; border-radius: 5px; direction: ltr; text-align: left; z-index: 9999; position: relative; font-family: monospace;">';
-echo '<h3 style="margin-top:0;">🔍 WordPress Debug Info</h3>';
+/**
+ * قالب بازگشتی (Fallback) — پوستهٔ «evented-edu»
+ *
+ * برای هر نمای بدون قالب اختصاصی: اگر تک‌محتوا باشد کارت محتوا و در غیر این
+ * صورت بدنهٔ مشترک آرشیو (همان که archive/home/search استفاده می‌کنند).
+ *
+ * @package evented-edu
+ */
 
-// ۱. نام فایلی که در حال اجراست
-global $template;
-echo '<strong>Current Template File:</strong> ' . basename($template) . '<hr>';
+defined('ABSPATH') || exit;
 
-// ۲. تشخیص نوع صفحه از نگاه وردپرس
-echo '<strong>WordPress Conditionals (What WP thinks this page is):</strong><br>';
-if ( is_front_page() ) echo '✅ is_front_page()<br>';
-if ( is_home() ) echo '✅ is_home() (Blog Index)<br>';
-if ( is_page() ) echo '✅ is_page() -> Page ID: ' . get_queried_object_id() . '<br>';
-if ( is_single() ) echo '✅ is_single()<br>';
-if ( is_archive() ) echo '✅ is_archive()<br>';
-if ( is_post_type_archive() ) echo '✅ is_post_type_archive()<br>';
-if ( is_tax() ) echo '✅ is_tax() (Taxonomy)<br>';
-if ( is_404() ) echo '✅ is_404() (Not Found - Permalink Issue!)<br>';
-echo '<hr>';
+get_template_part('template-parts/ee', 'head', array('ee_body_class' => 'ee-index'));
 
-// ۳. اطلاعات کوئری (این آبجکت شامل دیتای برگه‌، پست‌تایپ یا دسته‌بندی فعلی است)
-echo '<strong>Queried Object Data:</strong>';
-echo '<pre style="background: #f8f9fa; padding: 10px; border: 1px solid #ddd; max-height: 300px; overflow: auto; font-size: 13px;">';
-print_r( get_queried_object() );
-echo '</pre>';
+if (is_singular()) {
+	get_template_part('template-parts/ee', 'header', array('ee_active' => ''));
+	?>
 
-// ۴. متغیرهای اصلی کوئری
-global $wp_query;
-echo '<strong>Query Vars:</strong>';
-echo '<pre style="background: #f8f9fa; padding: 10px; border: 1px solid #ddd; max-height: 200px; overflow: auto; font-size: 13px;">';
-print_r( $wp_query->query_vars );
-echo '</pre>';
+	<main class="ee-list-main">
+		<div class="ee-wrap ee-list-grid">
 
-echo '</div>';
-?>
+			<?php
+			while (have_posts()) :
+				the_post();
+				?>
+
+				<article <?php post_class('ee-page-card'); ?>>
+					<nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
+						<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
+						<span class="material-symbols-outlined ee-ic">chevron_left</span>
+						<span class="ee-crumb-current"><?php the_title(); ?></span>
+					</nav>
+
+					<h1 class="ee-page-title"><?php the_title(); ?></h1>
+
+					<?php if (has_post_thumbnail()) : ?>
+						<figure class="ee-page-hero"><?php the_post_thumbnail('large', array('decoding' => 'async')); ?></figure>
+					<?php endif; ?>
+
+					<div class="ee-page-body"><?php the_content(); ?></div>
+				</article>
+
+			<?php endwhile; ?>
+
+			<?php get_template_part('template-parts/ee', 'sidebar'); ?>
+
+		</div>
+	</main>
+
+	<?php
+} else {
+	get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'));
+
+	get_template_part('template-parts/ee', 'archive-main', array(
+		'ee_title'    => is_archive() ? (string) get_the_archive_title() : '',
+		'ee_subtitle' => '',
+	));
+}
+
+get_template_part('template-parts/ee', 'footer', array('ee_active' => is_singular() ? '' : 'articles'));

@@ -5,7 +5,7 @@
 
 
 .hero-container {
-    background: url(https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/hero-back.webp);
+    background: url(../img/front-page/hero-back.webp);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -517,7 +517,7 @@
     padding: 0px 26px;
     justify-content: start;
     flex-direction: row-reverse;
-    background-image: url(https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/wave.svg);
+    background-image: url(../img/front-page/wave.svg);
     background-size: 98%;
     background-repeat: no-repeat;
     background-position: center;
@@ -1452,7 +1452,7 @@ div#articles-carousel {
 
     /* .steps-row {
         gap: 0px;
-        background-image: url(https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/steps-row-img.svg);
+        background-image: url(../img/front-page/steps-row-img.svg);
     } */
 
     .step-content {
@@ -1468,7 +1468,7 @@ div#articles-carousel {
 
     .step-top::before {
         content: '';
-        background-image: url(https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/odd.svg);
+        background-image: url(../img/front-page/odd.svg);
         height: 165px;
         width: 165px;
         display: block;
@@ -1481,7 +1481,7 @@ div#articles-carousel {
 
     .step-bottom::before {
         content: '';
-        background-image: url(https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/even.svg);
+        background-image: url(../img/front-page/even.svg);
         height: 165px;
         width: 165px;
         display: block;
@@ -1493,7 +1493,7 @@ div#articles-carousel {
 
     .step-top:last-of-type::before {
         content: '';
-        background-image: url(https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/first-even.svg) !important;
+        background-image: url(../img/front-page/first-even.svg) !important;
         display: block;
         background-size: contain;
         background-repeat: no-repeat;
@@ -1505,7 +1505,7 @@ div#articles-carousel {
 
     .step-top:first-of-type::before {
         content: '';
-        background-image: url(https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/lastodd.svg) !important;
+        background-image: url(../img/front-page/lastodd.svg) !important;
         display: block;
         background-size: contain;
         background-repeat: no-repeat;

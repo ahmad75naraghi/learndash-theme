@@ -1,0 +1,122 @@
+/* تنظیمات قالب evented-edu — صفحهٔ اسلایدرها */
+.evented-settings-wrap { max-width: 1080px; }
+.evented-settings-wrap .title { margin-top: 24px; }
+.evented-settings-wrap .evented-slides-form { margin-top: 8px; }
+/* فیلد پنهان شناسهٔ پیوست — فقط برای JS است */
+.evented-settings-wrap .evented-slide-image-id { display: none; }
+
+.evented-slide-row {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 14px 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+.evented-slide-main {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+.evented-slide-imgbox {
+    position: relative;
+    width: 300px;
+    min-height: 160px;
+    border: 2px dashed #c3c4c7;
+    border-radius: 8px;
+    background: #f6f7f7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.evented-slide-imgbox.empty .evented-slide-image { display: none; }
+.evented-slide-imgbox .evented-slide-image {
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+.evented-slide-imgbox .evented-img-hint { color: #8c8f94; font-size: 12px; }
+.evented-slide-fields { flex: 1; min-width: 280px; }
+.evented-slide-fields p { margin: 0 0 12px; }
+.evented-slide-fields label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 12.5px;
+    color: #1d2327;
+}
+.evented-slide-actions { margin-top: 10px; border-top: 1px solid #f0f0f1; padding-top: 10px; }
+.evented-remove-slide { color: #b32d2e; font-weight: 600; text-decoration: none; }
+.evented-remove-slide:hover { color: #8a2424; }
+
+.evented-slide-imgbox .evented-pick-image { font-weight: 600; }
+
+/* --- دکمه‌های تصویر (انتخاب / پاک کردن) --- */
+.evented-slide-imgbox .evented-img-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 2;
+}
+.evented-slide-imgbox .evented-remove-image {
+    color: #b32d2e;
+    font-size: 12px;
+}
+.evented-slide-imgbox .evented-remove-image:hover,
+.evented-slide-imgbox .evented-remove-image:focus {
+    color: #8a2424;
+}
+.evented-slide-imgbox.empty .evented-remove-image { display: none; }
+
+/* --- فیلدهای هر ردیف --- */
+.evented-slide-fields input.evented-slide-title { font-size: 14px; font-weight: 600; }
+.evented-slide-fields input.evented-slide-badge { font-size: 13px; }
+.evented-slide-fields textarea.evented-slide-desc { font-size: 13px; line-height: 1.7; resize: vertical; }
+.evented-slide-fields input.evented-slide-link { direction: ltr; text-align: left; font-size: 12px; }
+
+/* --- فیلد نشانی تصویر (جایگزین کتابخانهٔ رسانه) --- */
+.evented-slide-fields input.evented-slide-image-url {
+    direction: ltr;
+    text-align: left;
+    font-size: 12px;
+}
+
+/* --- پیام‌های درون‌ردیفی --- */
+.evented-inline-notice {
+    position: relative;
+    margin: 0 0 10px;
+    padding: 8px 12px;
+    border: 1px solid #c3c4c7;
+    border-inline-start-width: 4px;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #1d2327;
+}
+.evented-inline-notice.is-error {
+    border-color: #b32d2e;
+    border-inline-start-color: #d63638;
+    background: #fcf0f1;
+}
+.evented-inline-notice.is-info {
+    border-color: #c3c4c7;
+    border-inline-start-color: #72aee6;
+    background: #f0f6fc;
+}
+.evented-inline-notice-x {
+    float: left;
+    cursor: pointer;
+    color: #787c82;
+    font-size: 15px;
+    line-height: 1;
+}
+.evented-inline-notice-x:hover,
+.evented-inline-notice-x:focus { color: #1d2327; }

@@ -10,43 +10,37 @@ function theme_enqueue()
     // wp_enqueue_script('main-ex', PATH_DIR_URL . '/assets/js/main-ex.js', '', '1.0.0', true);
     wp_localize_script('main', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('notification_nonce')));
 
-    if (is_home() || is_page('home') || is_front_page()) {
+    // صفحهٔ اصلی: پوستهٔ جدید (ee-shell.css + evented-home.css) در functions.php بارگذاری می‌شود؛
+    // is_home() عمداً اینجا نیست چون برگهٔ نوشته‌ها از قالب آرشیو جدید استفاده می‌کند.
+    if (is_page('home') || is_front_page()) {
         wp_enqueue_style('front-page', PATH_DIR_URL . '/assets/css/front-page.css', '', '1.0.0');
         wp_enqueue_script('front-page', PATH_DIR_URL . '/assets/js/front-page.js', '', '1.0.0', true);
         // wp_enqueue_script('front-page-ex', PATH_DIR_URL . '/assets/js/front-page-ex.js', '', '1.0.0', true);
-    } elseif (is_post_type_archive('sfwd-courses') || is_tax('ld_course_category') || is_page('courses')) {
-        wp_enqueue_style('courses-archive-css', PATH_DIR_URL . '/assets/css/archive-courses.css', '', '1.0.0');
-        // wp_enqueue_script(...)
-    } elseif (is_author()) {
-        wp_enqueue_style('author-page', PATH_DIR_URL . '/assets/css/author.css', '', '1.0.0');
-        wp_enqueue_script('author-page-js', PATH_DIR_URL . '/assets/js/author.js', '', '1.0.0', true);
-    } elseif (is_singular('sfwd-courses')) {
-
-        wp_enqueue_style('plyr-polyfilled-css', PATH_DIR_URL . '/assets/css/plyr.css', '', '3.7.8');
-        wp_enqueue_script('plyr-polyfilled-js', PATH_DIR_URL . '/assets/js/plyr.polyfilled.js', '', '3.7.8', true);
-        wp_enqueue_style('courses-page', PATH_DIR_URL . '/assets/css/single-courses.css', '', '1.0.0');
-        wp_enqueue_script('courses-page', PATH_DIR_URL . '/assets/js/single-courses.js', '', '1.0.0', true);
-    } elseif (is_archive() || is_category() || is_tag() || is_page('blog')) {
-        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', '', '1.0.0');
-        wp_enqueue_script('archive-post', PATH_DIR_URL . '/assets/js/archive-post.js', '', '1.0.0', true);
-    } elseif (get_post_type() === 'post') {
-        wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', '', '1.0.0');
-        wp_enqueue_script('single-post', PATH_DIR_URL . '/assets/js/single-post.js', '', '1.0.0', true);
-    } elseif (get_post_type() === 'page') {
-        wp_enqueue_style('archive-product', PATH_DIR_URL . '/assets/css/archive-product.css', '', '1.0.0');
-        wp_enqueue_style('single-page', PATH_DIR_URL . '/assets/css/single-page.css', '', '1.0.0');
     }
+    // بایگانی/دستهٔ دوره، صفحهٔ دوره‌ها، آزمون، اساتید، پروفایل مدرس، برگه و ۴۰۴
+    // همگی با پوستهٔ evented-edu رندر می‌شوند؛ استایل‌های آن‌ها (newhome/ee-courses.css
+    // و newhome/ee-lms.css) در functions.php بارگذاری می‌شوند. فایل‌های قدیمی
+    // archive-courses.css، author.css/js، single-page.css و archive-product.css
+    // دیگر استفاده نمی‌شوند.
     
     if (is_page()) {
         global $post;
 
         $panel_page = get_page_by_path('panel');
 
+        // برگهٔ «panel» و زیربرگه‌هایش، یا هر برگه‌ای که یکی از قالب‌های
+        // panel/*.php (Template Name: Panel - …) رویش انتخاب شده باشد.
+        $panel_template = (string) get_page_template_slug();
+        $is_panel_view  = (0 === strpos($panel_template, 'panel/'));
+
         if (
-            $panel_page &&
+            $is_panel_view ||
             (
-                $post->ID == $panel_page->ID ||
-                in_array($panel_page->ID, get_post_ancestors($post))
+                $panel_page &&
+                (
+                    $post->ID == $panel_page->ID ||
+                    in_array($panel_page->ID, get_post_ancestors($post))
+                )
             )
         ) {
             wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', [], '1.0.0');

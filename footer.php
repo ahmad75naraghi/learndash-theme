@@ -86,7 +86,7 @@
                                 <path d="M11.4196 9.49009L13.8896 10.9701C14.8296 11.5401 14.8296 12.4601 13.8896 13.0301L11.4196 14.5101C10.4196 15.1101 9.59961 14.6501 9.59961 13.4801V10.5101C9.59961 9.3501 10.4196 8.89009 11.4196 9.49009Z" fill="#FAFCFE" />
                             </svg>
                         </a>
-                        <a href="https://www.instagram.com/falnic_iranhp/">
+                        <a href="https://www.instagram.com/evented_iranhp/">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path opacity="0.4" d="M16.19 2H7.81C4.17 2 2 4.17 2 7.81V16.18C2 19.83 4.17 22 7.81 22H16.18C19.82 22 21.99 19.83 21.99 16.19V7.81C22 4.17 19.83 2 16.19 2Z" fill="#FAFCFE" />
                                 <path d="M12.0001 15.8791C14.143 15.8791 15.8801 14.142 15.8801 11.9991C15.8801 9.85628 14.143 8.11914 12.0001 8.11914C9.85725 8.11914 8.12012 9.85628 8.12012 11.9991C8.12012 14.142 9.85725 15.8791 12.0001 15.8791Z" fill="#FAFCFE" />
@@ -101,9 +101,9 @@
                     <!-- ستون اول (راست): درباره برند -->
                     <div class="footer-col footer-brand">
                         <div class="footer-logo-wrapper">
-                            <img src='https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/Falnic-Logo-1-2.webp' alt="لوگو">
+                            <img src='<?php echo PATH_DIR_URL; ?>/assets/img/front-page/evented-edu-logo.webp' alt="لوگو">
                         </div>
-                        <p class="brand-desc">آموزشگاه آنلاین فالنیک، زیرمجموعه شرکت فالنیک، با تکیه بر دهه‌ها تجربه در بازار IT ایران، بستری تخصصی برای رشد مهارت‌های فنی شماست. ما در اینجا پلی هستیم میان دانش تئوری و نیازهای واقعی سازمان‌ها، تا متخصصانی خلاق، کارآزموده و آماده برای ورود به پروژه‌های بزرگ پرورش دهیم.</p>
+                        <p class="brand-desc">آموزشگاه آنلاین evented-edu با تکیه بر دهه‌ها تجربه در بازار IT ایران، بستری تخصصی برای رشد مهارت‌های فنی شماست. ما در اینجا پلی هستیم میان دانش تئوری و نیازهای واقعی سازمان‌ها، تا متخصصانی خلاق، کارآزموده و آماده برای ورود به پروژه‌های بزرگ پرورش دهیم.</p>
                     </div>
 
                     <!-- ستون دوم: راه های ارتباطی -->
@@ -162,10 +162,10 @@
                     <!-- ستون چهارم (چپ): نمادها -->
                     <div class="footer-col footer-namads">
                         <div class="namads-grid">
-                            <img src="https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/samandehi.webp" alt="نماد">
-                            <img src="https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/samandehi.webp" alt="نماد">
-                            <img src="https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/samandehi.webp" alt="نماد">
-                            <img src="https://edu.falnic.com/wp-content/themes/edu-falnic/assets/img/front-page/samandehi.webp" alt="نماد">
+                            <img src="<?php echo PATH_DIR_URL; ?>/assets/img/front-page/samandehi.webp" alt="نماد">
+                            <img src="<?php echo PATH_DIR_URL; ?>/assets/img/front-page/samandehi.webp" alt="نماد">
+                            <img src="<?php echo PATH_DIR_URL; ?>/assets/img/front-page/samandehi.webp" alt="نماد">
+                            <img src="<?php echo PATH_DIR_URL; ?>/assets/img/front-page/samandehi.webp" alt="نماد">
                         </div>
                     </div>
                 </div>

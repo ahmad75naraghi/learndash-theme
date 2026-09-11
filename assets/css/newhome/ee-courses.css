@@ -1,0 +1,276 @@
+/* ==========================================================================
+   ee-courses.css — بایگانی/دستهٔ دوره‌ها، گرید دوره‌ها، اساتید، برگه و ۴۰۴
+   وابسته به توکن‌های --ee-* در newhome/ee-shell.css
+   ========================================================================== */
+
+.ee-list-main { padding: 1.25rem 0 3rem; }
+
+.ee-list-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+}
+@media (min-width: 1024px) { .ee-list-grid { grid-template-columns: minmax(0, 1fr) 20rem; gap: 1.25rem; } }
+
+.ee-list-col { min-width: 0; }
+.ee-list-main .ee-ic { font-size: 1rem; line-height: 1; vertical-align: -.15em; }
+
+/* مسیریابی (مشترک) ------------------------------------------------------ */
+.ee-crumb { display: flex; align-items: center; gap: .25rem; flex-wrap: wrap; font-size: .72rem; color: var(--ee-soft); margin-bottom: .8rem; }
+.ee-crumb a:hover { color: var(--ee-tealP); }
+.ee-crumb .material-symbols-outlined { font-size: 1rem; opacity: .55; }
+.ee-crumb-current { color: #1e293b; font-weight: 700; }
+
+/* سربرگ فهرست ----------------------------------------------------------- */
+.ee-list-head {
+    background: #fff; border: 1px solid rgb(209 250 229 / .9); border-radius: var(--ee-r-3xl);
+    box-shadow: var(--ee-sh-sm); padding: 1rem; margin-bottom: 1rem;
+    display: flex; flex-direction: column; gap: .8rem;
+}
+@media (min-width: 768px) { .ee-list-head { flex-direction: row; align-items: center; padding: 1.2rem; } }
+
+.ee-lh-media { flex-shrink: 0; margin: 0; border-radius: 1rem; overflow: hidden; background: var(--ee-tealL); }
+.ee-lh-media img { display: block; width: 10rem; height: 7rem; object-fit: cover; }
+@media (min-width: 768px) { .ee-lh-media img { width: 12rem; height: 8rem; } }
+
+.ee-lh-txt { min-width: 0; flex: 1; }
+.ee-lh-title { font-size: 1.3rem; font-weight: 900; color: #0f172a; line-height: 1.9; margin: 0 0 .35rem; }
+@media (min-width: 640px) { .ee-lh-title { font-size: 1.6rem; } }
+.ee-lh-desc { font-size: .82rem; line-height: 2; color: var(--ee-soft); margin: 0 0 .5rem; }
+.ee-lh-desc p { margin: 0 0 .4rem; }
+.ee-lh-count {
+    display: inline-flex; align-items: center; gap: .3rem; font-size: .72rem; font-weight: 700;
+    color: var(--ee-tealP); background: var(--ee-tealL); border-radius: 999px; padding: .25rem .7rem;
+}
+
+/* چیپ‌ها ----------------------------------------------------------------- */
+.ee-chips { display: flex; flex-wrap: wrap; gap: .45rem; margin-bottom: 1rem; }
+
+/* گرید کارت دوره -------------------------------------------------------- */
+.ee-cgrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: .9rem; }
+@media (min-width: 560px) { .ee-cgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .ee-cgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.ee-ccard {
+    background: #fff; border: 1px solid rgb(209 250 229 / .9); border-radius: 1.1rem;
+    box-shadow: var(--ee-sh-sm); overflow: hidden; display: flex; flex-direction: column;
+    transition: transform .18s, box-shadow .18s, border-color .18s;
+}
+.ee-ccard:hover { transform: translateY(-3px); box-shadow: var(--ee-sh-md); border-color: var(--ee-teal); }
+
+.ee-ccard-media { position: relative; display: block; aspect-ratio: 16 / 10; background: var(--ee-tealL); overflow: hidden; }
+.ee-ccard-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+.ee-ccard:hover .ee-ccard-media img { transform: scale(1.04); }
+.ee-ccard-noimg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ee-tealP); }
+.ee-ccard-noimg .ee-ic { font-size: 2.4rem; opacity: .55; }
+
+.ee-ccard-cat {
+    position: absolute; top: .55rem; right: .55rem; font-size: .65rem; font-weight: 800;
+    background: rgb(255 255 255 / .95); color: var(--ee-tealP); border-radius: 999px; padding: .2rem .6rem;
+    box-shadow: var(--ee-sh-sm);
+}
+.ee-ccard-price {
+    position: absolute; bottom: .55rem; left: .55rem; font-size: .78rem; font-weight: 900;
+    background: rgb(15 23 42 / .82); color: #fff; border-radius: 999px; padding: .25rem .65rem;
+    backdrop-filter: blur(4px);
+}
+.ee-ccard-price small { font-size: .62rem; font-weight: 700; opacity: .85; }
+.ee-ccard-price.is-free { background: var(--ee-mintDk); }
+
+.ee-ccard-body { padding: .75rem .8rem .85rem; display: flex; flex-direction: column; gap: .5rem; flex: 1; }
+.ee-ccard-title { margin: 0; font-size: .88rem; font-weight: 800; line-height: 1.9;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ee-ccard-title a { color: #0f172a; text-decoration: none; }
+.ee-ccard:hover .ee-ccard-title a { color: var(--ee-tealP); }
+
+.ee-ccard-meta { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .3rem .7rem; font-size: .68rem; color: var(--ee-soft); }
+.ee-ccard-meta li { display: inline-flex; align-items: center; gap: .2rem; }
+.ee-ccard-meta .ee-ic { font-size: .88rem; color: var(--ee-tealP); }
+
+.ee-ccard-foot {
+    margin-top: auto; padding-top: .55rem; border-top: 1px dashed #f1f5f9;
+    display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+}
+.ee-ccard-by { display: inline-flex; align-items: center; gap: .25rem; font-size: .7rem; color: var(--ee-soft); min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ee-ccard-by .ee-ic { font-size: .9rem; color: var(--ee-tealP); }
+.ee-ccard-cta { display: inline-flex; align-items: center; gap: .2rem; font-size: .7rem; font-weight: 800; color: var(--ee-tealP); white-space: nowrap; }
+.ee-ccard:hover .ee-ccard-cta { text-decoration: underline; }
+.ee-ccard-badge { font-size: .64rem; font-weight: 800; border-radius: 999px; padding: .18rem .55rem; white-space: nowrap; }
+.ee-ccard-badge.is-joined { background: var(--ee-mint); color: var(--ee-mintDk); }
+
+/* صفحه‌بندی ------------------------------------------------------------- */
+.ee-pager { display: flex; flex-wrap: wrap; justify-content: center; gap: .35rem; margin-top: 1.4rem; }
+.ee-page-num {
+    min-width: 2.1rem; height: 2.1rem; display: inline-flex; align-items: center; justify-content: center;
+    font-size: .78rem; font-weight: 700; color: #475569; background: #fff;
+    border: 1px solid var(--ee-line); border-radius: .7rem; text-decoration: none; transition: all .15s;
+}
+.ee-page-num:hover { border-color: var(--ee-teal); color: var(--ee-tealP); background: var(--ee-mint); }
+.ee-page-num.current { background: var(--ee-tealP); border-color: var(--ee-tealP); color: #fff; }
+.ee-page-num .ee-ic { font-size: 1.05rem; }
+
+/* سوالات متداول دسته ---------------------------------------------------- */
+.ee-list-faqs { margin-top: 1.6rem; background: #fff; border: 1px solid #eef2f6; border-radius: 1.1rem; padding: 1rem; }
+.ee-faqs { display: grid; gap: .6rem; }
+.ee-faq { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: .8rem; padding: .7rem .8rem; }
+.ee-faq h4 { display: flex; align-items: center; gap: .35rem; font-size: .83rem; font-weight: 800; color: #0f172a; margin: 0 0 .3rem; }
+.ee-faq h4 .ee-ic { color: var(--ee-tealP); }
+.ee-faq p { font-size: .8rem; line-height: 2; color: var(--ee-soft); margin: 0; }
+
+/* گرید دسته‌ها ---------------------------------------------------------- */
+.ee-catgrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: .8rem; }
+@media (min-width: 560px) { .ee-catgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .ee-catgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.ee-catcard {
+    display: flex; align-items: center; gap: .7rem; background: #fff;
+    border: 1px solid rgb(209 250 229 / .9); border-radius: 1.1rem; padding: .6rem;
+    box-shadow: var(--ee-sh-sm); text-decoration: none; transition: all .18s;
+}
+.ee-catcard:hover { transform: translateY(-2px); border-color: var(--ee-teal); box-shadow: var(--ee-sh-md); }
+.ee-catcard-media {
+    flex-shrink: 0; width: 4.2rem; height: 4.2rem; border-radius: .9rem; overflow: hidden;
+    background: var(--ee-tealL); color: var(--ee-tealP); display: flex; align-items: center; justify-content: center;
+}
+.ee-catcard-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ee-catcard-media .ee-ic { font-size: 1.6rem; }
+.ee-catcard-txt { min-width: 0; }
+.ee-catcard-name { display: block; font-size: .85rem; font-weight: 800; color: #0f172a; line-height: 1.8; }
+.ee-catcard:hover .ee-catcard-name { color: var(--ee-tealP); }
+.ee-catcard-count { display: block; font-size: .68rem; color: var(--ee-tealP); font-weight: 700; }
+
+/* سایدبار: فهرست دسته‌ها ------------------------------------------------ */
+.ee-cats { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .25rem; }
+.ee-cats a {
+    display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+    font-size: .78rem; font-weight: 600; color: #475569; text-decoration: none;
+    padding: .45rem .6rem; border-radius: .7rem; transition: all .15s;
+}
+.ee-cats a:hover { background: var(--ee-mint); color: var(--ee-tealP); }
+.ee-cats b { font-size: .68rem; font-weight: 800; color: var(--ee-tealP); background: var(--ee-tealL); border-radius: 999px; padding: .1rem .45rem; }
+.ee-cats li.is-active a { background: var(--ee-tealP); color: #fff; }
+.ee-cats li.is-active b { background: rgb(255 255 255 / .2); color: #fff; }
+
+/* پروفایل مدرس ---------------------------------------------------------- */
+.ee-instructor-card {
+    display: flex; flex-direction: column; gap: .9rem; background: #fff;
+    border: 1px solid rgb(209 250 229 / .9); border-radius: var(--ee-r-3xl);
+    box-shadow: var(--ee-sh-sm); padding: 1rem; margin-bottom: 1rem;
+}
+@media (min-width: 768px) { .ee-instructor-card { flex-direction: row; align-items: center; padding: 1.3rem; } }
+
+.ee-ic-avatar {
+    flex-shrink: 0; width: 6.5rem; height: 6.5rem; border-radius: 999px; overflow: hidden;
+    background: var(--ee-tealL); color: var(--ee-tealP); display: flex; align-items: center; justify-content: center;
+    border: 3px solid #fff; box-shadow: var(--ee-sh-sm);
+}
+.ee-ic-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ee-ic-avatar .ee-ic { font-size: 2.6rem; }
+
+.ee-ic-body { min-width: 0; flex: 1; }
+.ee-ic-name { font-size: 1.35rem; font-weight: 900; color: #0f172a; margin: 0 0 .3rem; }
+.ee-ic-bio { font-size: .82rem; line-height: 2; color: var(--ee-soft); margin: 0 0 .5rem; }
+.ee-ic-social { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ee-social-dot {
+    width: 2rem; height: 2rem; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center;
+    background: var(--ee-mint); color: var(--ee-tealP); border: 1px solid rgb(209 250 229); transition: all .15s;
+}
+.ee-social-dot:hover { background: var(--ee-tealP); color: #fff; transform: translateY(-2px); }
+.ee-social-dot .ee-ic { font-size: 1.05rem; }
+
+.ee-stats { list-style: none; margin: 0 0 1.1rem; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; }
+.ee-stats li {
+    background: #fff; border: 1px solid rgb(209 250 229 / .9); border-radius: 1rem;
+    padding: .7rem .5rem; text-align: center; box-shadow: var(--ee-sh-sm);
+}
+.ee-stats .ee-ic { font-size: 1.15rem; color: var(--ee-tealP); }
+.ee-stats b { display: block; font-size: 1.05rem; font-weight: 900; color: #0f172a; margin: .15rem 0; }
+.ee-stats span:last-child { font-size: .68rem; color: var(--ee-soft); }
+
+.ee-about { background: #fff; border: 1px solid #eef2f6; border-radius: 1.1rem; padding: 1rem; margin-bottom: 1.1rem; }
+.ee-about-txt { font-size: .85rem; line-height: 2.1; color: #475569; }
+.ee-about-txt p { margin: 0 0 .6rem; }
+
+.ee-author-courses, .ee-author-posts { margin-bottom: 1.2rem; }
+.ee-author-courses .ee-w-title, .ee-author-posts .ee-w-title { margin-bottom: .7rem; }
+
+/* گرید اساتید ----------------------------------------------------------- */
+.ee-igrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: .8rem; }
+@media (min-width: 560px) { .ee-igrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.ee-icard {
+    background: #fff; border: 1px solid rgb(209 250 229 / .9); border-radius: 1.1rem;
+    box-shadow: var(--ee-sh-sm); padding: .8rem; display: flex; flex-direction: column; gap: .55rem;
+    transition: all .18s;
+}
+.ee-icard:hover { transform: translateY(-2px); border-color: var(--ee-teal); box-shadow: var(--ee-sh-md); }
+.ee-icard-top { display: flex; align-items: center; gap: .7rem; text-decoration: none; }
+.ee-icard-avatar {
+    flex-shrink: 0; width: 3.4rem; height: 3.4rem; border-radius: 999px; overflow: hidden;
+    background: var(--ee-tealL); color: var(--ee-tealP); display: flex; align-items: center; justify-content: center;
+}
+.ee-icard-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ee-icard-avatar .ee-ic { font-size: 1.5rem; }
+.ee-icard-txt { min-width: 0; }
+.ee-icard-name { display: block; font-size: .88rem; font-weight: 800; color: #0f172a; line-height: 1.8; }
+.ee-icard:hover .ee-icard-name { color: var(--ee-tealP); }
+.ee-icard-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; font-size: .68rem; color: var(--ee-soft); }
+.ee-icard-rate { display: inline-flex; align-items: center; gap: .15rem; color: #b45309; font-weight: 700; }
+.ee-icard-rate .ee-ic { font-size: .85rem; color: var(--ee-amberA); }
+.ee-icard-bio { font-size: .76rem; line-height: 1.95; color: var(--ee-soft); margin: 0; }
+.ee-icard-foot { margin-top: auto; padding-top: .5rem; border-top: 1px dashed #f1f5f9; display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.ee-icard-students { display: inline-flex; align-items: center; gap: .25rem; font-size: .68rem; color: var(--ee-soft); }
+.ee-icard-students .ee-ic { font-size: .9rem; color: var(--ee-tealP); }
+.ee-icard-link { display: inline-flex; align-items: center; gap: .2rem; font-size: .7rem; font-weight: 800; color: var(--ee-tealP); text-decoration: none; }
+.ee-icard-link:hover { text-decoration: underline; }
+
+/* برگهٔ عمومی ----------------------------------------------------------- */
+.ee-page-card {
+    background: #fff; border: 1px solid rgb(209 250 229 / .9); border-radius: var(--ee-r-3xl);
+    box-shadow: var(--ee-sh-sm); padding: 1rem;
+}
+@media (min-width: 640px) { .ee-page-card { padding: 1.4rem; } }
+.ee-page-title { font-size: 1.4rem; font-weight: 900; color: #0f172a; line-height: 1.9; margin: 0 0 .8rem; }
+@media (min-width: 640px) { .ee-page-title { font-size: 1.7rem; } }
+.ee-page-hero { margin: 0 0 1rem; border-radius: 1rem; overflow: hidden; border: 1px solid #f1f5f9; }
+.ee-page-hero img { display: block; width: 100%; height: auto; }
+.ee-page-body { font-size: .9rem; line-height: 2.15; color: #334155; text-align: justify; }
+.ee-page-body img { max-width: 100%; height: auto; border-radius: .8rem; }
+.ee-page-body a { color: var(--ee-tealP); }
+.ee-page-body h2, .ee-page-body h3 { color: #0f172a; line-height: 1.9; margin: 1.2rem 0 .5rem; }
+.ee-page-body ul, .ee-page-body ol { padding-inline-start: 1.2rem; }
+.ee-page-links { display: flex; gap: .4rem; margin-top: 1rem; }
+.ee-page-links a, .ee-page-links span { font-size: .78rem; font-weight: 700; color: var(--ee-tealP); background: var(--ee-mint); border-radius: .6rem; padding: .25rem .6rem; }
+.ee-page-comments { margin-top: 1.6rem; padding-top: 1.2rem; border-top: 1px solid #f1f5f9; }
+
+/* ۴۰۴ ------------------------------------------------------------------- */
+.ee-404 {
+    background: #fff; border: 1px solid rgb(209 250 229 / .9); border-radius: var(--ee-r-3xl);
+    box-shadow: var(--ee-sh-sm); padding: 2rem 1.2rem; text-align: center; margin-bottom: 1.4rem;
+}
+.ee-404-code {
+    display: block; font-size: 3.4rem; font-weight: 900; line-height: 1;
+    background: linear-gradient(to left, var(--ee-tealP), var(--ee-teal));
+    -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: .4rem;
+}
+.ee-404-title { font-size: 1.25rem; font-weight: 900; color: #0f172a; margin: 0 0 .5rem; }
+.ee-404-text { font-size: .84rem; line-height: 2; color: var(--ee-soft); max-width: 34rem; margin: 0 auto 1.1rem; }
+.ee-404-search { max-width: 26rem; margin: 0 auto 1rem; }
+.ee-404-links { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; }
+.ee-404-links .ee-btn { font-size: .8rem; }
+
+/* بخش پیشنهاد دوره در ۴۰۴ */
+.ee-404-more { margin-top: .5rem; }
+.ee-404-more .ee-w-title { margin-bottom: .8rem; }
+
+/* چاپ ------------------------------------------------------------------ */
+@media print {
+    .ee-side, .ee-pager, .ee-404-search, .ee-404-links { display: none !important; }
+    .ee-list-grid { display: block; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ee-list-main *, .ee-list-main *::before, .ee-list-main *::after { transition: none !important; animation: none !important; }
+}

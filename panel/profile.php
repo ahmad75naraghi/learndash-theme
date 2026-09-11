@@ -1,14 +1,22 @@
 <?php
 /* Template Name: Panel - Profile */
+
+if (! is_user_logged_in()) {
+    // ریدایرکت به صفحه لاگین
+    wp_redirect(add_query_arg('redirect_to', home_url('/panel/profile'), wp_login_url()));
+    exit;
+}
+
 $user_id = get_current_user_id();
+// استایل/اسکریپت جلالی برای این صفحهٔ پنل (JS آن برای همهٔ زیرصفحه‌های panel خودکار است)
 wp_enqueue_style('jalalidatepicker-css', PATH_DIR_URL . '/assets/css/jalalidatepicker.min.css', [], '1.0.0');
 wp_enqueue_script('jalalidatepicker-js', PATH_DIR_URL . '/assets/js/jalalidatepicker.min.js', ['jquery'], '1.0.0', true);
-get_header(); 
+get_header();
 ?>
 <div class="container">
 
     <!-- Sidebar -->
-    <?php include_once 'sidebar.php'; ?>
+    <?php locate_template('panel/sidebar.php', true, false); ?>
     
     <!-- Main Content -->
      <main class="main-content">

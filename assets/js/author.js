@@ -49,15 +49,17 @@ jQuery(document).ready(function ($) {
         articlescarousel.trigger('prev.owl.carousel');
     });
 
+    // امتیازدهی به استاد (فعلاً فقط UI؛ ارسال به سرور در TODO ثبت شده)
+    var selectedRating = 0;
+
     $('.rating-stars .stars svg').on('click', function () {
-        selectedRating = $(this).data('val');
+        selectedRating = parseInt($(this).data('val'), 10) || 0;
 
-        $('.rating-stars .stars svg').removeClass('active');
-
-        $('.rating-stars .stars svg').each(function (index) {
-            if (index < selectedRating) {
-                $(this).addClass('active');
-            }
+        // در چیدمان RTL ترتیب DOM با ترتیب دید یکی نیست؛ پس به‌جای شمارهٔ index
+        // همهٔ ستاره‌هایی که مقدارشان کوچک‌تر/مساوی امتیاز انتخاب‌شده است فعال می‌شوند.
+        $('.rating-stars .stars svg').each(function () {
+            var starVal = parseInt($(this).data('val'), 10) || 0;
+            $(this).toggleClass('active', starVal <= selectedRating && starVal > 0);
         });
     });
 });

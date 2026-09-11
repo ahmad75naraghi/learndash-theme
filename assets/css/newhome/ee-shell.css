@@ -1,0 +1,249 @@
+/* =========================================================
+   evented-edu — پوستهٔ مشترک (design shell)
+   توکن‌های طراحی + ریست + هدر/ناوبری + فوتر + نوار موبایل + ویجت‌های سایدبار
+   این فایل در همهٔ قالب‌های «ee-*» بارگذاری می‌شود:
+   صفحهٔ اصلی (evented-home.css)، تک‌نوشته (single-post.css) و آرشیو (archive-post.css).
+   بخش‌های اختصاصی صفحهٔ اصلی از این فایل جدا شده‌اند؛ لطفاً هم‌زمان ویرایش کنید.
+   ========================================================= */
+/* =========================================================
+   evented-edu — صفحهٔ اصلی (بازطراحی pastel مطابق الگوی شمیم)
+   فقط برای front-page استفاده می‌شود؛ با کلاس‌های ee- پیشوندگذاری
+   ========================================================= */
+
+.ee-home {
+    --ee-mint: #E8F5E9;
+    --ee-mintMd: #A5D6A7;
+    --ee-mintDk: #2E7D32;
+    --ee-tealL: #E0F2F1;
+    --ee-teal: #80CBC4;
+    --ee-tealP: #00897B;
+    --ee-peachL: #FFF3E0;
+    --ee-peachMd: #FFE0B2;
+    --ee-peachDk: #E65100;
+    --ee-amber: #FFF8E1;
+    --ee-amberA: #FFA726;
+    --ee-lavL: #F3E8FF;
+    --ee-lavS: #D8B4FE;
+    --ee-lavD: #7E22CE;
+    --ee-roseL: #FCE7F3;
+    --ee-rose: #F472B6;
+    --ee-bg: #F8FAF9;
+    --ee-ink: #334155;
+    --ee-soft: #64748B;
+    --ee-line: #E2E8F0;
+    --ee-sh-sm: 0 2px 8px -1px rgba(0,137,123,.08), 0 1px 4px -1px rgba(0,0,0,.04);
+    --ee-sh-md: 0 8px 20px -3px rgba(0,137,123,.1), 0 4px 10px -2px rgba(0,0,0,.03);
+    --ee-r-2xl: 1rem;
+    --ee-r-3xl: 1.5rem;
+
+    font-family: "Vazirmatn", "دانا", "evented-edu-font", Tahoma, sans-serif;
+    background: var(--ee-bg);
+    color: var(--ee-ink);
+    line-height: 1.7;
+    overflow-x: hidden;
+}
+.ee-home *, .ee-home *::before, .ee-home *::after { box-sizing: border-box; }
+.ee-home a { text-decoration: none; color: inherit; }
+.ee-home img { max-width: 100%; display: block; }
+.ee-wrap { max-width: 80rem; margin-inline: auto; padding-inline: 1.25rem; }
+.ee-ic { display: inline-flex; align-items: center; justify-content: center; }
+
+/* فونت: اول وزیرمتن از گوگل‌فونت؛ در نبود آن دانای محلی */
+.ee-home { font-family: "Vazirmatn", "دانا", Tahoma, sans-serif; }
+
+/* ---------- نوار ابزار بالای هدر ---------- */
+.ee-topbar {
+    display: none;
+}
+@media (min-width: 768px) {
+    .ee-topbar {
+        display: block;
+        background: linear-gradient(to left, var(--ee-tealL), #F1F8F6, var(--ee-mint));
+        border-bottom: 1px solid rgb(209 250 229 / .6);
+        padding: .5rem .75rem;
+        font-size: .78rem;
+        color: var(--ee-soft);
+    }
+    .ee-topbar-in { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+    .ee-topbar .tb-right { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+    .ee-tb-item { display: inline-flex; align-items: center; gap: .35rem; }
+    .ee-tb-item .dot { width: .5rem; height: .5rem; border-radius: 999px; display: inline-block; }
+    .ee-tb-links { display: flex; gap: 1rem; }
+    .ee-tb-links a { transition: color .15s; }
+    .ee-tb-links a:hover { color: var(--ee-tealP); }
+}
+.ee-topbar .ee-tb-sep { opacity: .5; }
+.ee-topbar .ee-tb-label { font-weight: 600; color: var(--ee-soft); }
+.ee-widget-search form { margin: 0; }
+
+/* ---------- هدر اصلی (چسبان، شیشه‌ای) ---------- */
+.ee-header {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: rgba(255,255,255,.86);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgb(209 250 229 / .7);
+}
+.ee-header-in { padding-block: .7rem; }
+.ee-header > .ee-wrap { padding-block: .8rem; }
+.ee-header-row { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+@media (max-width: 899.98px) { .ee-header-row { gap: .8rem; } }
+.ee-logo { display: flex; align-items: center; gap: .65rem; flex-shrink: 0; }
+.ee-logo img, .ee-logo .logo-fallback { height: 44px; width: auto; }
+/* لوگوی انتخابی وردپرس (سفارشی‌سازی ← هویت سایت) در هدر و فوتر */
+.ee-logo .ee-logo-img { display: block; height: 44px; width: auto; max-width: 12rem; object-fit: contain; }
+.ee-f-logo .ee-logo-img { display: block; height: 40px; width: auto; max-width: 10.5rem; object-fit: contain; }
+.ee-logo .logo-fallback { font-weight: 900; color: var(--ee-tealP); display:flex; align-items:center; font-size:1.15rem; gap:.4rem;}
+.ee-logo .logo-fallback svg { width: 30px; height: 30px; }
+.ee-search { display: none; flex: 1 1 26rem; max-width: 32rem; margin-inline: auto; position: relative; }
+.ee-search input {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--ee-line);
+    border-radius: 999px;
+    padding: .55rem 2.4rem .55rem 2.2rem;
+    font-family: inherit;
+    font-size: .82rem;
+    color: var(--ee-ink);
+    outline: none;
+    transition: all .15s;
+}
+.ee-search input:focus { border-color: var(--ee-teal); box-shadow: 0 0 0 3px var(--ee-tealL); }
+.ee-search .s-ic { position: absolute; right: .9rem; top: 50%; transform: translateY(-50%); color: var(--ee-tealP); pointer-events: none; }
+.ee-search .s-tune { position: absolute; left: .6rem; top: 50%; transform: translateY(-50%); color: var(--ee-soft); }
+@media (min-width: 900px) { .ee-search { display: block; } }
+
+.ee-h-actions { display: flex; align-items: center; gap: .65rem; flex-shrink: 0; }
+.ee-btn {
+    display: inline-flex; align-items: center; gap: .45rem;
+    border-radius: 999px; padding: .5rem 1rem;
+    font-size: .8rem; font-weight: 700;
+    border: 1px solid transparent;
+    cursor: pointer; transition: all .15s; background: none; font-family: inherit;
+    white-space: nowrap;
+}
+.ee-btn-ghost { background: var(--ee-mint); color: var(--ee-tealP); border-color: rgb(209 250 229); }
+.ee-btn-ghost:hover { background: rgb(209 250 229); }
+.ee-btn-primary { background: var(--ee-tealP); color: #fff; }
+.ee-btn-primary:hover { background: #00796b; }
+.ee-btn-soft { background: #fff; color: var(--ee-soft); border-color: var(--ee-line); width: 2.4rem; height: 2.4rem; padding: 0; justify-content: center; border-radius: 999px; position: relative; }
+.ee-hamb { display: inline-flex; width: 2.4rem; height: 2.4rem; border-radius: 999px; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--ee-line); color: var(--ee-ink); }
+
+/* هَمبرگر فقط موبایل */
+.ee-hamb { display: none; }
+@media (max-width: 899.98px) {
+    .ee-hamb { display: inline-flex; }
+}
+
+/* منوی دسکتاپ (قرصی) */
+.ee-nav { display: none; }
+@media (min-width: 900px) {
+    .ee-nav { display: flex; align-items: center; gap: .55rem; padding-top: .8rem; margin-top: .15rem; border-top: 1px solid rgb(240 253 250); flex-wrap: wrap; }
+    .ee-nav a { font-size: .84rem; font-weight: 600; padding: .5rem 1.1rem; border-radius: 999px; color: var(--ee-ink); transition: all .15s; }
+    .ee-nav a.ee-active { background: var(--ee-tealP); color: #fff; }
+    .ee-nav a:hover { background: var(--ee-mint); color: var(--ee-tealP); }
+}
+
+/* موبایل: جستجو زیر ردیف اول */
+.ee-search-m { display: block; padding-top: .25rem; padding-bottom: .7rem; }
+@media (min-width: 900px) { .ee-search-m { display: none; } }
+/* ---------- فوتر ---------- */
+.ee-footer { background: #0f172a; color: #cbd5e1; margin-top: 1.6rem; border-top: 1px solid #1e293b; }
+.ee-footer .ee-fwrap { padding: 2rem .25rem 1.6rem; }
+.ee-fgrid { display: grid; grid-template-columns: 1fr; gap: 1.6rem; }
+@media (min-width: 768px) { .ee-fgrid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .ee-fgrid { grid-template-columns: repeat(4, 1fr); } }
+.ee-footer h4 { color: #fff; font-size: .92rem; margin-bottom: .8rem; padding-bottom: .45rem; border-bottom: 1px solid #1e293b; }
+.ee-footer ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .55rem; font-size: .8rem; }
+.ee-footer ul a:hover { color: #34d399; }
+.ee-footer .about p { font-size: .78rem; color: #94a3b8; line-height: 1.9; }
+.ee-f-logo { background: rgb(255 255 255 / .95); border-radius: 1rem; padding: .35rem .7rem; display: inline-flex; margin-bottom: .9rem; }
+.ee-f-logo .logo-fallback { color: var(--ee-tealP); font-weight: 900; display:flex; gap:.4rem; align-items:center; font-size:1rem;}
+.ee-footer .ee-license { display: inline-flex; align-items: center; gap: .5rem; font-size: .75rem; color: #34d399; margin-top: .9rem; }
+.ee-license .pulse { width: .55rem; height: .55rem; border-radius: 999px; background: #10b981; animation: eePulse 2s infinite; }
+@keyframes eePulse { 0%,100% {opacity: 1;} 50% {opacity: .35;} }
+.ee-fchan { display: flex; flex-direction: column; gap: .55rem; }
+.ee-fchan a { display: flex; align-items: center; justify-content: space-between; background: rgb(30 41 59 / .7); border: 1px solid rgb(51 65 85 / .6); padding: .5rem .8rem; border-radius: .9rem; font-size: .78rem; transition: all .15s; }
+.ee-fchan a:hover { background: #1e293b; }
+.ee-fchan .cn { display: flex; align-items: center; gap: .55rem; }
+.ee-fchan .cn .dot { width: .55rem; height: .55rem; border-radius: 999px; }
+.ee-fchan .id { font-size: .7rem; direction: ltr; font-family: monospace; }
+.ee-fchan .id em { color: #6ee7b7; font-style: normal; }
+.ee-fmeta { background: rgb(30 41 59 / .4); border: 1px solid rgb(51 65 85 / .6); border-radius: 1rem; padding: .7rem .9rem; display: flex; flex-direction: column; gap: .4rem; font-size: .75rem; margin-top: .7rem; }
+.ee-fmeta div { display: flex; justify-content: space-between; }
+.ee-fmeta .mk { color: #94a3b8; }
+.ee-fmeta .mv { direction: ltr; font-family: monospace; text-align: left; }
+.ee-fbottom { border-top: 1px solid #1e293b; padding: 1rem .25rem; text-align: center; font-size: .72rem; color: #64748b; }
+
+/* ---------- نوار پایین موبایل ---------- */
+.ee-mnav { position: fixed; bottom: 0; inset-inline: 0; z-index: 70; background: rgb(255 255 255 / .95); backdrop-filter: blur(10px); border-top: 1px solid var(--ee-line); display: flex; justify-content: space-around; padding: .45rem .5rem calc(.45rem + env(safe-area-inset-bottom)); }
+.ee-mnav a { display: flex; flex-direction: column; align-items: center; gap: .15rem; font-size: .62rem; font-weight: 700; color: #94a3b8; }
+.ee-mnav a.ee-active, .ee-mnav a:hover { color: var(--ee-tealP); }
+.ee-mnav a i { font-size: 1.35rem; font-style: normal; line-height: 1.2; }
+@media (min-width: 768px) { .ee-mnav { display: none; } }
+.ee-body-pad { padding-bottom: 3.8rem; }
+@media (min-width: 768px) { .ee-body-pad { padding-bottom: 0; } }
+
+/* انیمیشن ورود */
+@keyframes eeFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.ee-fade { animation: eeFadeUp .5s ease both; }
+
+/* خطا/خالی (هیچ دوره/مقاله‌ای نبود) */
+.ee-empty { background: #fff; border: 1px dashed var(--ee-line); border-radius: 1.2rem; padding: 1.4rem; text-align: center; font-size: .85rem; color: var(--ee-soft); }
+
+/* ---------- چیپ‌های فیلتر (مشترک: فیلتر دوره‌ها در خانه، دسته‌بندی در آرشیو) ---------- */
+.ee-chip-btn { flex-shrink: 0; padding: .4rem 1rem; border-radius: 999px; font-size: .75rem; font-weight: 700; background: #fff; color: #475569; border: 1px solid var(--ee-line); cursor: pointer; transition: all .15s; font-family: inherit; }
+.ee-chip-btn:hover, .ee-chip-btn.ee-on { background: var(--ee-mint); color: var(--ee-tealP); }
+.ee-chip-btn.ee-on { background: var(--ee-tealP); color: #fff; border-color: var(--ee-tealP); }
+
+/* ---------- ویجت‌های سایدبار (مشترک تک‌نوشته و آرشیو) ---------- */
+.ee-side { display: flex; flex-direction: column; gap: .9rem; }
+.ee-widget { background: #fff; border: 1px solid rgb(209 250 229 / .8); border-radius: var(--ee-r-3xl); box-shadow: var(--ee-sh-sm); padding: .9rem; }
+.ee-w-title { display: flex; align-items: center; gap: .45rem; font-size: .86rem; font-weight: 800; color: #1e293b; padding-bottom: .6rem; border-bottom: 1px solid #f1f5f9; margin-bottom: .55rem; }
+.ee-w-title .material-symbols-outlined { color: var(--ee-tealP); font-size: 1.1rem; }
+.ee-mini-list { display: flex; flex-direction: column; gap: .5rem; }
+.ee-mini { display: flex; align-items: center; justify-content: space-between; gap: .7rem; padding: .5rem; border-radius: 1rem; background: #f8fafc; border: 1px solid transparent; transition: all .15s; }
+.ee-mini:hover { background: var(--ee-mint); border-color: rgb(209 250 229); }
+.ee-mini-txt { flex: 1; min-width: 0; text-align: right; }
+.ee-mini h4 { font-size: .76rem; font-weight: 700; color: var(--ee-ink); line-height: 1.7; margin: 0; transition: color .15s;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ee-mini:hover h4 { color: var(--ee-tealP); }
+.ee-mini-date { display: block; font-size: .66rem; color: var(--ee-tealP); font-weight: 600; margin-top: .2rem; }
+.ee-mini-th { width: 4rem; height: 3rem; border-radius: .8rem; object-fit: cover; flex-shrink: 0; background: var(--ee-tealL); }
+.ee-mini-noimg { display: inline-flex; align-items: center; justify-content: center; color: var(--ee-tealP); }
+.ee-mini-noimg .material-symbols-outlined { font-size: 1.3rem; }
+.ee-empty-inline { font-size: .78rem; color: var(--ee-soft); text-align: center; padding: .5rem 0; }
+
+/* ---------- جستجوی درون‌خطی ---------- */
+.ee-search-inline { display: flex; align-items: stretch; border: 1px solid var(--ee-line); border-radius: .85rem; overflow: hidden; background: #fff; }
+.ee-search-inline input { flex: 1; min-width: 0; border: 0; outline: none; padding: .55rem .7rem; font-family: inherit; font-size: .8rem; color: var(--ee-ink); background: transparent; }
+.ee-search-inline button { border: 0; background: #0f172a; color: #fff; width: 2.6rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s; }
+.ee-search-inline button:hover { background: var(--ee-tealP); }
+.ee-search-inline button .material-symbols-outlined { font-size: 1.1rem; }
+
+/* ---------- اشتراک‌گذاری ---------- */
+.ee-share-block { margin-top: .8rem; padding-top: .65rem; border-top: 1px dashed #f1f5f9; text-align: center; }
+.ee-share-label { display: block; font-size: .72rem; color: var(--ee-soft); font-weight: 600; margin-bottom: .45rem; }
+.ee-share-row { display: flex; align-items: center; justify-content: center; gap: .4rem; flex-wrap: wrap; }
+.ee-share-btn { width: 1.9rem; height: 1.9rem; border-radius: 999px; color: #fff; display: inline-flex; align-items: center; justify-content: center;
+    font-size: .74rem; font-weight: 800; border: 0; cursor: pointer; box-shadow: var(--ee-sh-sm); transition: transform .15s; font-family: inherit; }
+.ee-share-btn:hover { transform: scale(1.08); }
+.ee-share-copy { background: #475569; }
+.ee-share-copy .material-symbols-outlined { font-size: 1rem; }
+.ee-share-toast { position: fixed; bottom: 5rem; inset-inline: 0; margin-inline: auto; width: max-content; max-width: 90%;
+    background: #0f172a; color: #fff; font-size: .78rem; padding: .6rem 1.1rem; border-radius: 999px; z-index: 90;
+    box-shadow: var(--ee-sh-md); opacity: 0; transform: translateY(6px); transition: all .2s; pointer-events: none; }
+.ee-share-toast.is-on { opacity: 1; transform: none; }
+
+/* ---------- ما را دنبال کنید ---------- */
+.ee-follow { text-align: center; padding: .3rem 0; }
+.ee-follow p { font-size: .74rem; color: #475569; font-weight: 700; margin-bottom: .5rem; }
+.ee-follow-row { display: flex; align-items: center; justify-content: center; gap: .45rem; }
+.ee-follow-dot { width: 1.7rem; height: 1.7rem; border-radius: 999px; color: #fff; display: inline-flex; align-items: center; justify-content: center;
+    font-size: .66rem; font-weight: 800; transition: transform .15s; }
+.ee-follow-dot:hover { transform: scale(1.08); }
+
+/* ---------- چیپ لینک‌دار (آرشیو) ---------- */
+.ee-chip-btn .ee-chip-count { display: inline-block; margin-inline-start: .3rem; font-size: .62rem; opacity: .75; }
