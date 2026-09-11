@@ -166,8 +166,21 @@ if ('' === $ee_resume_url && !empty($ee_steps)) {
 		<?php else : ?>
 			<div class="ee-payment">
 				<?php
+				/*
+				 * learndash_payment_buttons() در بعضی نسخه‌ها خروجی را echo و در بعضی
+				 * نسخه‌ها return می‌کند؛ هر دو حالت پوشش داده می‌شود. (خروجی توسط خود
+				 * لرن‌دش escape شده است.)
+				 */
 				if (function_exists('learndash_payment_buttons')) {
-					echo wp_kses_post(learndash_payment_buttons(get_post($ee_course_id)));
+					ob_start();
+					$ee_payment_return = learndash_payment_buttons(get_post($ee_course_id));
+					$ee_payment_html   = (string) ob_get_clean();
+
+					if ('' === trim($ee_payment_html) && is_string($ee_payment_return)) {
+						$ee_payment_html = $ee_payment_return;
+					}
+
+					echo $ee_payment_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی لرن‌دش.
 				}
 				?>
 			</div>
