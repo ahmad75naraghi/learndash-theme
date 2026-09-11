@@ -43,19 +43,21 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 ├── single.php                    تک‌نوشته (پوستهٔ ee-*؛ مقاله + سایدبار + دیدگاه)
 ├── archive.php / home.php / search.php   آرشیو نوشته‌ها، برگهٔ نوشته‌ها، نتایج جستجو
 ├── comments.php                  فهرست دیدگاه‌ها + فرم دیدگاه (فارسی)
-├── template-parts/               ee-head · ee-header · ee-footer · ee-sidebar · ee-archive-main · lms/*
+├── template-parts/               ee-head · ee-header · ee-footer · ee-sidebar · ee-archive-main · lms/* (enroll-card، curriculum، course-sidebar، lesson-list، course-grid، category-grid، courses-sidebar)
 ├── single-sfwd-courses.php       صفحهٔ دوره (پوستهٔ ee-*: سرفصل‌ها، آکاردئون‌ها، نظرات، سایدبار ثبت‌نام)
 ├── single-sfwd-lessons.php       صفحهٔ درس (کلیپ/پادکست/متن، آزمون، تکمیل درس، فهرست درس‌ها)
-├── taxonomy-ld_course_category.php  آرشیو دسته/دوره
-├── archive-sfwd-courses.php      شیم: فقط get_template_part از قالب دسته
+├── single-sfwd-quizzes.php       صفحهٔ آزمون (فکت‌های آزمون + بدنهٔ لرن‌دش + فهرست درس‌ها)
+├── taxonomy-ld_course_category.php  آرشیو دستهٔ دوره (سربرگ دسته + گرید دوره‌ها + سوالات متداول)
+├── archive-sfwd-courses.php      بایگانی همهٔ دوره‌ها (پوستهٔ ee-*)
 ├── author.php                    پروفایل مدرس  |  template-instructors.php  لیست اساتید
 ├── page-login.php                صفحهٔ ورود/OTP (HTML مستقل، بدون wp_head)
-├── page-panel.php / page.php / page-courses.php / page-courses-cat.php / 404.php
+├── page-panel.php                ریدایرکت به داشبورد پنل (طراحی مستقل)
+├── page.php / page-courses.php / page-courses-cat.php / 404.php   برگهٔ عمومی · فهرست دوره‌ها · دسته‌بندی‌ها · ۴۰۴ (همه با پوستهٔ ee-*)
 ├── index.php                     قالب بازگشتی عمومی (fallback) برای انواع پست بدون قالب اختصاصی
 ├── assets/
 │   ├── assets_functions.php      منطق enqueue همهٔ CSS/JS
-│   ├── css/  front-page · single-courses (بازنشسته) · archive-courses · single-post · archive-post · author · panel · vendorها
-│   ├── css/newhome/  ee-shell (پوستهٔ مشترک) · evented-home (صفحهٔ اصلی) · ee-lms (دوره و درس)
+│   ├── css/  front-page · single-courses (بازنشسته) · archive-courses (بازنشسته) · single-post · archive-post · author (بازنشسته) · panel · vendorها
+│   ├── css/newhome/  ee-shell (پوستهٔ مشترک) · evented-home (صفحهٔ اصلی) · ee-lms (دوره، درس و آزمون) · ee-courses (فهرست‌ها، اساتید، برگه و ۴۰۴)
 │   ├── js/   main · front-page · single-courses (بازنشسته) · author · panel + vendorها
 │   ├── js/newhome/evented-home.js  منوی موبایل · اسلایدر هیرو · کپی لینک اشتراک
 │   ├── js/newhome/ee-lms.js        آکاردئون · گروه درس‌ها · دیدگاه/امتیاز · تکمیل درس · علاقه‌مندی
@@ -81,9 +83,12 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 | مسیر | قالب | نکته |
 |---|---|---|
 | `/` | `front-page.php` | لندینگ |
-| `/courses/` و `/courses/<cat>/` | `taxonomy-ld_course_category.php` (+ شیم archive) | آرشیو/دسته دوره |
+| آرشیو نوع دوره (is_post_type_archive) | `archive-sfwd-courses.php` | فهرست همهٔ دوره‌ها |
+| `/ld_course_category/<slug>/` | `taxonomy-ld_course_category.php` | آرشیو دستهٔ دوره + سوالات متداول دسته |
 | `/courses/<slug>/` | `single-sfwd-courses.php` | صفحهٔ دوره |
 | `/lessons/<slug>/` | `single-sfwd-lessons.php` | صفحهٔ درس (کلیپ/پادکست/متن + فهرست درس‌ها) |
+| آزمون (`sfwd-quizzes`) | `single-sfwd-quizzes.php` | صفحهٔ آزمون (فکت‌ها + بدنهٔ لرن‌دش) |
+| برگهٔ «دوره‌ها» | `page-courses.php` | گرید همهٔ دوره‌ها با صفحه‌بندی |
 | `/<post-slug>/` | `single.php` | تک‌نوشته (مقاله + سایدبار + دیدگاه) |
 | برگهٔ «نوشته‌ها» (is_home) | `home.php` | آرشیو همهٔ نوشته‌ها |
 | `/category/<cat>/` و `/tag/<tag>/` | `archive.php` | آرشیو دسته/برچسب با چیپ فیلتر |

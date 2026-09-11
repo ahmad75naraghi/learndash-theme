@@ -229,8 +229,17 @@ flowchart TD
     SING["is_singular sfwd-courses"] --> SC["single-sfwd-courses.php"]
     SLESS["is_singular sfwd-lessons"] --> SL["single-sfwd-lessons.php"]
     ARCH["is_post_type_archive sfwd-courses"] --> AX["archive-sfwd-courses.php"]
-    AX -->|get_template_part| TAX["taxonomy-ld_course_category.php"]
-    TAXT["is_tax ld_course_category"] --> TAX
+    TAXT["is_tax ld_course_category"] --> TAX["taxonomy-ld_course_category.php"]
+    QUIZ["is_singular sfwd-quizzes"] --> SQ["single-sfwd-quizzes.php"]
+    PGC["page slug = courses"] --> PGCourses["page-courses.php"]
+    PGCC["page slug = courses-cat"] --> PGCats["page-courses-cat.php"]
+    TINSTR["Template Name: اساتید"] --> TI["template-instructors.php"]
+    NF["is_404"] --> E404["404.php"]
+    AX --> CG["template-parts/lms/course-grid.php"]
+    TAX --> CG
+    PGCourses --> CG
+    PGCats --> CATG["template-parts/lms/category-grid.php"]
+    SQ --> LMSQ["template-parts/lms/*"]
     POST["is_singular post"] --> SP["single.php"]
     BLOG["is_home (برگهٔ نوشته‌ها)"] --> HM["home.php"]
     PARCH["is_category / is_tag / is_date"] --> AR["archive.php"]
@@ -251,9 +260,11 @@ flowchart TD
 
 ### ۵.۱ پوستهٔ مشترک «ee-*» (template-parts)
 
-قالب‌های صفحهٔ اصلی، تک‌نوشته، آرشیو/برگهٔ نوشته‌ها، جستجو، تک‌دوره و تک‌درس سند HTML کامل
-را خودشان چاپ می‌کنند (`get_header()`/`get_footer()` قدیمی را صدا نمی‌زنند) و از قطعه‌های
-مشترک زیر استفاده می‌کنند:
+قالب‌های صفحهٔ اصلی، تک‌نوشته، آرشیو/برگهٔ نوشته‌ها، جستجو، تک‌دوره، تک‌درس، تک‌آزمون،
+بایگانی/دستهٔ دوره، برگهٔ دوره‌ها/دسته‌ها، پروفایل مدرس، فهرست اساتید، برگهٔ عمومی، fallback
+و ۴۰۴ سند HTML کامل را خودشان چاپ می‌کنند (`get_header()`/`get_footer()` قدیمی را صدا نمی‌زنند)
+و از قطعه‌های مشترک زیر استفاده می‌کنند. تنها استثناء `page-login.php`، `page-panel.php` و
+قالب‌های `panel/*` هستند که طراحی مستقل خودشان را دارند (`evented_is_standalone_page()`).
 
 | قطعه | نقش |
 | --- | --- |
@@ -266,6 +277,9 @@ flowchart TD
 | `template-parts/lms/enroll-card.php` | کارت ثبت‌نام/پیشرفت: قیمت، نوار پیشرفت، فکت‌ها، منابع دوره، دکمهٔ شروع/ادامه، علاقه‌مندی، `learndash_payment_buttons()`. آرگومان‌ها: `ee_course_id`, `ee_steps`, `ee_pricing`, `ee_progress`. |
 | `template-parts/lms/course-sidebar.php` | سایدبار صفحهٔ دوره: کارت ثبت‌نام + جستجو + اشتراک‌گذاری + سایر دوره‌ها + آخرین دوره‌ها + دنبال‌کردن. |
 | `template-parts/lms/lesson-list.php` | سایدبار صفحهٔ درس: نوار پیشرفت، فهرست درس‌ها گروه‌بندی‌شده بر اساس فصل (جمع‌شونده + «باز کردن همه») و لینک بازگشت به دوره. آرگومان‌ها: `ee_steps`, `ee_course_id`, `ee_current_id`, `ee_progress`. |
+| `template-parts/lms/course-grid.php` | گرید کارت دوره‌ها (بایگانی، دسته، برگهٔ دوره‌ها، پروفایل مدرس، ۴۰۴). آرگومان‌ها: `ee_posts`, `ee_empty`. |
+| `template-parts/lms/category-grid.php` | گرید کارت دسته‌های دوره با تصویر `ld_cat_image_id`. آرگومان: `ee_terms`. |
+| `template-parts/lms/courses-sidebar.php` | سایدبار صفحات فهرست: جستجو، دسته‌ها (با `is-active` برای دستهٔ جاری)، آخرین دوره‌ها، اشتراک‌گذاری، کانال‌ها. آرگومان: `ee_current_term`. |
 
 هلپرهای این پوسته در `inc/template_helpers.php` هستند: `evented_is_ee_view()`،
 `evented_current_url()`، `evented_gregorian_to_jalali()`/`evented_format_jalali()` (تبدیل شمسی
@@ -314,14 +328,9 @@ flowchart TD
     START["theme_enqueue: style.css + owl + main.js"] --> C1{"is_page('home') یا is_front_page?"}
     C1 -- yes --> FP["front-page.css + js (خانهٔ قدیمی)"]
     C1 -- no --> C2{"archive/tax courses?"}
-    C2 -- yes --> AC["archive-courses.css"]
-    C2 -- no --> C3{"is_author?"}
-    C3 -- yes --> AU["author.css + author.js"]
-    C3 -- no --> C4{"is_singular course یا lesson?"}
-    C4 -- yes --> CS["— (بدون asset؛ قالب جدید از ee-lms استفاده می‌کند)"]
-    C4 -- no --> C7{"page?"}
-    C7 -- yes --> SGP["single-page.css + archive-product.css MISSING"]
-    C7 -- no --> END["+ panel assets if is page under 'panel'"]
+    C2 -- no --> C7{"is_page?"}
+    C7 -- yes --> PANEL["+ panel assets اگر برگه زیر 'panel' باشد"]
+    C7 -- no --> END["— (سایر assetهای فهرست‌ها در functions.php بارگذاری می‌شوند)"]
 
     START2["functions.php @priority 20"] --> EE{"evented_is_ee_view()?"}
     EE -- no --> SKIP["—"]
@@ -330,9 +339,11 @@ flowchart TD
     B1 -- yes --> EEH["evented-home.css"]
     B1 -- no --> B2{"is_singular post?"}
     B2 -- yes --> SPC["single-post.css"]
-    B2 -- no --> B4{"is_singular sfwd-courses یا sfwd-lessons?"}
-    B4 -- yes --> LMSC["ee-lms.css + ee-lms.js + localize eeLms.ajax_url"]
-    B4 -- no --> B3{"is_home / is_archive / is_search?"}
+    B2 -- no --> B4{"is_singular sfwd-courses، sfwd-lessons یا sfwd-quizzes?"}
+    B4 -- yes --> LMSC["ee-lms.css + ee-lms.js + localize eeLms.ajax_url (+ ee-courses.css برای آزمون)"]
+    B4 -- no --> B5{"بایگانی/دستهٔ دوره، is_author، is_404 یا is_page?"}
+    B5 -- yes --> CCSS["ee-courses.css"]
+    B5 -- no --> B3{"is_home / is_archive / is_search?"}
     B3 -- yes --> APC["archive-post.css"]
 ```
 
@@ -344,11 +355,21 @@ flowchart TD
 - `evented-home.css` فقط بخش‌های اختصاصی صفحهٔ اصلی را دارد (hero/quick/courses/steps/articles/instructors)؛
   بخش مشترک به `ee-shell.css` منتقل شده و هیچ سلکتور مشترکی بین دو فایل نیست.
 - `is_home()` دیگر در شاخهٔ `front-page.css` نیست؛ برگهٔ نوشته‌ها از قالب آرشیو جدید استفاده می‌کند.
-- **دوره/درس**: `evented_is_ee_view()` شامل `is_singular(array('sfwd-courses','sfwd-lessons'))` شد؛
+- **لوگو**: `template-parts/ee-header.php` و `ee-footer.php` لوگو را با `evented_logo_html()` چاپ
+  می‌کنند؛ منبع آن `get_theme_mod('custom_logo')` است (پشتیبانی `custom-logo` در
+  `inc/theme_options.php` ثبت شده) و در نبود لوگو نام سایت جایگزین می‌شود.
+- **اسلایدر هیرو**: فقط از `evented_get_home_slides()` (تنظیمات قالب) ساخته می‌شود؛ در حالت خالی
+  هیرو کلاس `is-no-slider` می‌گیرد و اسلایدر/تصویر رندر نمی‌شود (`evented-home.js` هم بدون
+  `#eeSlider` هیچ کاری نمی‌کند).
+- **دوره/درس/آزمون**: `evented_is_ee_view()` همهٔ نماها جز برگه‌های مستقل را پوشش می‌دهد؛
   `functions.php` فایل‌های `assets/css/newhome/ee-lms.css` + `assets/js/newhome/ee-lms.js` را
   بارگذاری می‌کند و `eeLms.ajax_url` را لوکال می‌کند. شاخهٔ قدیمی `is_singular('sfwd-courses')`
   در `assets/assets_functions.php` (Plyr + `single-courses.css/js`) خالی شد تا طراحی جدید
   دوبار استایل نگیرد؛ `single-courses.*` و `plyr.*` دیگر در هیچ صفحه‌ای بارگذاری نمی‌شوند.
+- **شاخه‌های حذف‌شدهٔ `assets/assets_functions.php`**: `archive-courses.css` (بایگانی/دستهٔ دوره)،
+  `author.css`/`author.js` (پروفایل مدرس) و `single-page.css`/`archive-product.css` (برگه‌ها) —
+  دو فایل آخر در مخزن وجود ندارند و پیش از این در همهٔ برگه‌ها ۴۰۴ می‌شدند. جای آن‌ها
+  `ee-courses.css` بارگذاری می‌شود.
 - `ee-lms.js` بدون jQuery است و سه قرارداد AJAX موجود را مصرف می‌کند: `submit_course_review`،
   `custom_mark_lesson_complete` (پاسخ = خروجی `learndash_course_progress`؛ نوارهای پیشرفت و
   شمارندهٔ درس‌ها بدون رفرش به‌روز می‌شوند) و `toggle_course_wishlist`.

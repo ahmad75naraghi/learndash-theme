@@ -10,33 +10,53 @@
 defined('ABSPATH') || exit;
 
 /**
+ * آیا برگهٔ جاری یکی از برگه‌های مستقل (ورود / پنل کاربری) است؟
+ *
+ * این برگه‌ها طراحی جداگانهٔ خودشان را دارند:
+ *  - page-login.php : قالب اسلاگی که HTML کامل صفحهٔ ورود را چاپ می‌کند؛
+ *  - page-panel.php : قالب اسلاگی که کاربر را به داشبورد هدایت می‌کند؛
+ *  - panel/*.php    : قالب‌های پنل کاربری با هدر/فوتر قدیمی و panel.css.
+ *
+ * برای این برگه‌ها هیچ‌چیز از پوستهٔ ee-* بارگذاری نمی‌شود.
+ *
+ * @return bool
+ */
+function evented_is_standalone_page()
+{
+	if (!is_page()) {
+		return false;
+	}
+
+	$template = (string) get_page_template_slug();
+
+	/* قالب‌های پنل کاربری (Template Name: Panel - …) و قالب‌های اسلاگی مستقل */
+	if ('' !== $template) {
+		if (0 === strpos($template, 'panel/') || in_array($template, array('page-login.php', 'page-panel.php'), true)) {
+			return true;
+		}
+	}
+
+	/* page-login.php / page-panel.php هدر «Template Name» ندارند و با اسلاگ انتخاب می‌شوند */
+	$ee_page = get_queried_object();
+
+	return $ee_page instanceof WP_Post && in_array((string) $ee_page->post_name, array('login', 'panel'), true);
+}
+
+/**
  * آیا صفحهٔ جاری از طراحی جدید «evented-edu» (کلاس‌های ee-*) استفاده می‌کند؟
  *
- * برای بارگذاری پوستهٔ مشترک (ee-shell.css) استفاده می‌شود.
+ * همهٔ نماهای عمومی سایت با پوستهٔ جدید رندر می‌شوند؛ تنها استثنا دو برگهٔ
+ * مستقل بالا هستند. برای بارگذاری پوستهٔ مشترک (ee-shell.css) استفاده می‌شود.
  *
  * @return bool
  */
 function evented_is_ee_view()
 {
-	if (is_front_page()) {
-		return true;
+	if (is_admin()) {
+		return false;
 	}
 
-	if (is_singular('post') || is_home() || is_search()) {
-		return true;
-	}
-
-	// آرشیوهای خودِ نوشته‌ها (دسته، برچسب، بایگانی زمانی)
-	if (is_category() || is_tag() || is_date()) {
-		return true;
-	}
-
-	// تک‌دوره و تک‌درس (LearnDash) — قالب‌های evented-edu
-	if (is_singular(array('sfwd-courses', 'sfwd-lessons'))) {
-		return true;
-	}
-
-	return false;
+	return !evented_is_standalone_page();
 }
 
 /**
@@ -816,7 +836,8 @@ function evented_adjacent_steps($course_id, $step_id)
 
 	$index = null;
 	foreach ($steps as $i => $step) {
-		$step_post = isset($step['post']) ? $step['post'] : $step;
+		/* learndash_get_course_steps() ممکن است آرایه (با کلید post) یا خود WP_Post برگرداند */
+		$step_post = is_array($step) ? (isset($step['post']) ? $step['post'] : null) : $step;
 		if ($step_post instanceof WP_Post && (int) $step_post->ID === $step_id) {
 			$index = $i;
 			break;
@@ -831,7 +852,9 @@ function evented_adjacent_steps($course_id, $step_id)
 		if (!isset($steps[$i])) {
 			return null;
 		}
-		$step_post = isset($steps[$i]['post']) ? $steps[$i]['post'] : $steps[$i];
+		$step      = $steps[$i];
+		$step_post = is_array($step) ? (isset($step['post']) ? $step['post'] : null) : $step;
+
 		return $step_post instanceof WP_Post ? $step_post : null;
 	};
 
@@ -933,4 +956,315 @@ function evented_step_state($step, $active = false)
 	}
 
 	return array('class' => 'is-open', 'label' => __('در دسترس', 'evented-edu'));
+}
+
+/**
+ * مارک‌آپ لوگو: لوگوی انتخاب‌شده در «سفارشی‌سازی › هویت سایت» وردپرس،
+ * و در نبود آن نام سایت (تا هدر/فوتر هیچ‌وقت خالی نمانند).
+ *
+ * @param string $context فقط برای فیلتر (header|footer).
+ * @return string HTML امن.
+ */
+function evented_logo_html($context = 'header')
+{
+	$site_name = (string) get_bloginfo('name');
+	$logo_id   = function_exists('get_theme_mod') ? (int) get_theme_mod('custom_logo') : 0;
+	$html      = '';
+
+	if ($logo_id && wp_get_attachment_image_url($logo_id, 'full')) {
+		$html = (string) wp_get_attachment_image($logo_id, 'full', false, array(
+			'class'    => 'ee-logo-img',
+			'alt'      => $site_name ? $site_name : __('لوگوی سایت', 'evented-edu'),
+			'loading'  => 'header' === $context ? 'eager' : 'lazy',
+			'decoding' => 'async',
+		));
+	}
+
+	if ('' === $html) {
+		$html = '<span class="logo-fallback"><span class="material-symbols-outlined ee-ic">school</span> '
+			. esc_html($site_name ? $site_name : 'evented-edu') . '</span>';
+	}
+
+	/**
+	 * مارک‌آپ لوگو را قابل بازنویسی می‌کند.
+	 *
+	 * @param string $html    مارک‌آپ لوگو.
+	 * @param string $context محل استفاده (header|footer).
+	 */
+	return (string) apply_filters('evented_logo_html', $html, $context);
+}
+
+/* =========================================================================
+ * بخش LMS — کارت دوره، بایگانی دوره‌ها، اساتید و آزمون
+ * ========================================================================= */
+
+/**
+ * دادهٔ یک کارت دوره (برای گرید دوره‌ها در بایگانی/دسته/مدرس/برگه‌ها).
+ *
+ * @param int|WP_Post $course دوره.
+ * @return array
+ */
+function evented_course_card_data($course)
+{
+	$course = $course instanceof WP_Post ? $course : get_post($course);
+	if (!$course instanceof WP_Post) {
+		return array();
+	}
+
+	$id    = (int) $course->ID;
+	$terms = get_the_terms($id, 'ld_course_category');
+	$term  = (!is_wp_error($terms) && !empty($terms)) ? $terms[0] : null;
+
+	$pricing = function_exists('evented_course_pricing') ? evented_course_pricing($id) : array('is_free' => true, 'price' => '', 'has_access' => false);
+
+	$lesson_count = 0;
+	if (function_exists('learndash_get_course_lessons_list')) {
+		$lessons      = learndash_get_course_lessons_list($id, get_current_user_id());
+		$lesson_count = is_array($lessons) ? count($lessons) : 0;
+	}
+
+	return array(
+		'id'           => $id,
+		'url'          => (string) get_permalink($id),
+		'title'        => get_the_title($id),
+		'thumb'        => has_post_thumbnail($id) ? (string) get_the_post_thumbnail_url($id, 'medium_large') : '',
+		'cat_name'     => $term instanceof WP_Term ? (string) $term->name : '',
+		'cat_url'      => $term instanceof WP_Term ? (string) get_term_link($term) : '',
+		'date'         => function_exists('evented_post_date') ? evented_post_date($id) : get_the_date('', $id),
+		'level'        => (string) get_post_meta($id, '_course_level', true),
+		'duration'     => (string) get_post_meta($id, '_total_duration', true),
+		'lesson_count' => $lesson_count,
+		'views'        => function_exists('evented_get_post_views') ? evented_get_post_views($id) : 0,
+		'is_free'      => !empty($pricing['is_free']),
+		'price'        => isset($pricing['price']) ? $pricing['price'] : '',
+		'has_access'   => !empty($pricing['has_access']),
+		'instructor'   => (string) get_the_author_meta('display_name', (int) $course->post_author),
+	);
+}
+
+/**
+ * کوئری دوره‌ها با مقدارهای پیش‌فرض (بدون شمارش کل، بدون sticky).
+ *
+ * @param array $args آرگومان‌های WP_Query.
+ * @return WP_Query
+ */
+function evented_courses_query($args = array())
+{
+	$paged = max(1, (int) get_query_var('paged'), (int) get_query_var('page'));
+
+	$defaults = array(
+		'post_type'           => 'sfwd-courses',
+		'post_status'         => 'publish',
+		'posts_per_page'      => 12,
+		'paged'               => $paged,
+		'ignore_sticky_posts' => true,
+	);
+
+	return new WP_Query(array_merge($defaults, (array) $args));
+}
+
+/**
+ * صفحه‌بندی با paginate_links (RTL و کلاس‌های ee-*).
+ *
+ * @param WP_Query $query کوئری جاری.
+ * @return string
+ */
+function evented_pagination($query)
+{
+	if (!$query instanceof WP_Query) {
+		return '';
+	}
+
+	$total = (int) $query->max_num_pages;
+	if ($total < 2) {
+		return '';
+	}
+
+	$current = max(1, (int) get_query_var('paged'), (int) get_query_var('page'));
+
+	$links = paginate_links(array(
+		'total'     => $total,
+		'current'   => $current,
+		'type'      => 'array',
+		'prev_text' => '<span class="material-symbols-outlined ee-ic">chevron_right</span>',
+		'next_text' => '<span class="material-symbols-outlined ee-ic">chevron_left</span>',
+	));
+
+	if (empty($links)) {
+		return '';
+	}
+
+	$out = '<nav class="ee-pager" aria-label="' . esc_attr__('صفحه‌بندی', 'evented-edu') . '">';
+	foreach ($links as $link) {
+		$out .= str_replace('page-numbers', 'ee-page-num', (string) $link);
+	}
+	$out .= '</nav>';
+
+	return $out;
+}
+
+/**
+ * تصویر یک دستهٔ دوره (کلید `ld_cat_image_id` در term-meta).
+ *
+ * @param int $term_id شناسهٔ دسته.
+ * @param string $size سایز تصویر.
+ * @return string
+ */
+function evented_term_image($term_id, $size = 'medium_large')
+{
+	$image_id = (int) get_term_meta((int) $term_id, 'ld_cat_image_id', true);
+	if (!$image_id) {
+		return '';
+	}
+
+	$url = wp_get_attachment_image_url($image_id, $size);
+	return $url ? (string) $url : '';
+}
+
+/**
+ * دادهٔ یک مدرس (کاربر با نقش group_leader).
+ *
+ * @param int|WP_User $user کاربر.
+ * @return array
+ */
+function evented_instructor_data($user)
+{
+	$user_id = is_object($user) ? (int) $user->ID : (int) $user;
+	if (!$user_id) {
+		return array();
+	}
+
+	$course_count = function_exists('count_user_posts') ? (int) count_user_posts($user_id, 'sfwd-courses') : 0;
+
+	/* تعداد دانشجویان یکتا در همهٔ دوره‌های این مدرس */
+	$students = 0;
+	if (function_exists('learndash_get_users_for_course')) {
+		$course_ids = get_posts(array(
+			'post_type'      => 'sfwd-courses',
+			'author'         => $user_id,
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+		));
+
+		if (!empty($course_ids)) {
+			$unique = array();
+			foreach ($course_ids as $course_id) {
+				$user_query = learndash_get_users_for_course((int) $course_id, array(), false);
+				if ($user_query instanceof WP_User_Query) {
+					foreach ((array) $user_query->get_results() as $student) {
+						$student_id             = is_object($student) ? (int) $student->ID : (int) $student;
+						$unique[$student_id]    = true;
+					}
+				}
+			}
+			$students = count($unique);
+		}
+	}
+
+	return array(
+		'id'           => $user_id,
+		'name'         => (string) get_the_author_meta('display_name', $user_id),
+		'bio'          => (string) get_the_author_meta('description', $user_id),
+		'about'        => (string) get_the_author_meta('about_teacher', $user_id),
+		'avatar'       => function_exists('get_avatar_url') ? (string) get_avatar_url($user_id, array('size' => 160)) : '',
+		'url'          => (string) get_author_posts_url($user_id),
+		'course_count' => $course_count,
+		'students'     => $students,
+		'rating'       => (string) get_user_meta($user_id, 'instructor_rating_average', true),
+		'social'       => array(
+			'youtube'   => (string) get_user_meta($user_id, 'youtube', true),
+			'linkedin'  => (string) get_user_meta($user_id, 'linkedin', true),
+			'instagram' => (string) get_user_meta($user_id, 'instagram', true),
+			'facebook'  => (string) get_user_meta($user_id, 'facebook', true),
+		),
+	);
+}
+
+/**
+ * فهرست اساتید (نقش group_leader) با صفحه‌بندی.
+ *
+ * @param array $args {per_page, paged, orderby, order}.
+ * @return array {items: array, total: int, pages: int, current: int}
+ */
+function evented_instructors($args = array())
+{
+	$args = wp_parse_args($args, array(
+		'per_page' => 8,
+		'paged'    => 1,
+		'orderby'  => 'display_name',
+		'order'    => 'ASC',
+	));
+
+	if (!class_exists('WP_User_Query')) {
+		return array('items' => array(), 'total' => 0, 'pages' => 0, 'current' => 1);
+	}
+
+	$per_page = max(1, (int) $args['per_page']);
+	$paged    = max(1, (int) $args['paged']);
+
+	$query = new WP_User_Query(array(
+		'role'    => 'group_leader',
+		'number'  => $per_page,
+		'offset'  => ($paged - 1) * $per_page,
+		'orderby' => $args['orderby'],
+		'order'   => $args['order'],
+		'count_total' => true,
+	));
+
+	$total = (int) $query->get_total();
+	$items = array();
+	foreach ((array) $query->get_results() as $user) {
+		$data = evented_instructor_data($user);
+		if (!empty($data)) {
+			$items[] = $data;
+		}
+	}
+
+	return array(
+		'items'   => $items,
+		'total'   => $total,
+		'pages'   => (int) ceil($total / $per_page),
+		'current' => $paged,
+	);
+}
+
+/**
+ * دادهٔ یک آزمون لرن‌دش (محدودیت زمانی، تعداد دفعات، درصد قبولی، گواهینامه).
+ *
+ * @param int $quiz_id شناسهٔ آزمون.
+ * @return array
+ */
+function evented_quiz_data($quiz_id)
+{
+	$quiz_id = (int) $quiz_id;
+	$settings = get_post_meta($quiz_id, '_sfwd-quiz', true);
+	$settings = is_array($settings) ? $settings : array();
+
+	$get = static function ($key) use ($settings, $quiz_id) {
+		$value = null;
+		if (function_exists('learndash_get_setting')) {
+			$value = learndash_get_setting($quiz_id, $key);
+		}
+		if (null === $value || '' === $value) {
+			$full  = 'sfwd-quiz_' . $key;
+			$value = isset($settings[$full]) ? $settings[$full] : '';
+		}
+		return $value;
+	};
+
+	$question_count = 0;
+	if (function_exists('learndash_get_quiz_questions')) {
+		$questions      = learndash_get_quiz_questions($quiz_id, array(), true);
+		$question_count = is_array($questions) ? count($questions) : (int) $questions;
+	}
+
+	return array(
+		'time_limit'   => (int) $get('quiz_pro_time_limit'),
+		'attempts'     => (int) $get('quiz_pro_limit_times'),
+		'passing'      => (int) $get('quiz_pro_passing_percentage'),
+		'certificate'  => (int) $get('quiz_pro_certificate'),
+		'questions'    => $question_count,
+		'course_id'    => function_exists('learndash_get_course_id') ? (int) learndash_get_course_id($quiz_id) : 0,
+	);
 }

@@ -22,18 +22,6 @@ if (is_wp_error($ee_cats)) {
     $ee_cats = array();
 }
 
-/* ۲) بنر شاخص: جدیدترین دورهٔ دارای تصویر شاخص */
-$ee_featured_q = new WP_Query(array(
-    'post_type'           => 'sfwd-courses',
-    'posts_per_page'      => 1,
-    'meta_key'            => '_thumbnail_id',
-    'orderby'             => 'date',
-    'order'               => 'DESC',
-    'no_found_rows'       => true,
-));
-$ee_featured = $ee_featured_q->have_posts() ? $ee_featured_q->posts[0] : null;
-wp_reset_postdata();
-
 /* ۳) دوره‌های «پیشنهادی» (آخرین دوره‌ها برای شبکهٔ کارت‌ها) */
 $ee_courses_q = new WP_Query(array(
     'post_type'      => 'sfwd-courses',
@@ -65,41 +53,25 @@ $ee_instructors = get_users(array(
 $ee_course_count = wp_count_posts('sfwd-courses');
 $ee_course_count = isset($ee_course_count->publish) ? (int) $ee_course_count->publish : 0;
 
-/* ۷) اسلایدر هیرو — از تنظیمات قالب (تصویر/عنوان/توضیح/لینک)؛
-   اگر اسلایدی تنظیم نشده باشد، یک بنر پیش‌فرض از آخرین دورهٔ ویژه ساخته می‌شود. */
+/* ۷) اسلایدر هیرو — فقط اسلایدهایی که در «تنظیمات قالب» پیشخوان ثبت شده‌اند.
+   اگر اسلایدی تنظیم نشده باشد، بنر هیرو نمایش داده نمی‌شود (بدون محتوای جایگزین). */
 $ee_feature_slides = array();
 
 $ee_saved_slides = function_exists('evented_get_home_slides') ? evented_get_home_slides() : array();
 
-if (!empty($ee_saved_slides)) {
-    foreach ($ee_saved_slides as $s) {
-        // اول سایز میانه (large) پیوست؛ اگر نبود همان URL ذخیره‌شده
-        $slide_img = wp_get_attachment_image_url(absint($s['id']), 'large');
-        if (!$slide_img) {
-            $slide_img = $s['image'];
-        }
-        $ee_feature_slides[] = array(
-            'img'       => $slide_img,
-            'badge'     => !empty($s['badge']) ? $s['badge'] : '',
-            'title'     => !empty($s['title']) ? $s['title'] : 'دوره‌های تخصصی فناوری اطلاعات',
-            'desc'      => $s['desc'],
-            'link'      => $s['link'],
-            'link_text' => 'مشاهده و شروع',
-        );
-    }
-} else {
-    // حالت پیش‌فرض: آخرین دورهٔ دارای تصویر شاخص
-    $ee_fallback_img = get_the_post_thumbnail_url($ee_featured ? $ee_featured->ID : 0, 'large');
-    if (!$ee_fallback_img) {
-        $ee_fallback_img = PATH_DIR_URL . '/assets/img/front-page/evented-edu-hero.png';
+foreach ($ee_saved_slides as $s) {
+    // اول سایز میانه (large) پیوست؛ اگر نبود همان URL ذخیره‌شده
+    $slide_img = wp_get_attachment_image_url(absint($s['id']), 'large');
+    if (!$slide_img) {
+        $slide_img = $s['image'];
     }
     $ee_feature_slides[] = array(
-        'img'       => $ee_fallback_img,
-        'badge'     => 'دورهٔ ویژه',
-        'title'     => $ee_featured ? get_the_title($ee_featured) : 'متخصص شدن در دنیای IT',
-        'desc'      => 'دوره‌های کاربردی شبکه، سرور، امنیت و مجازی‌سازی با اساتید خبره — مسیر یادگیری تا بازار کار.',
-        'link'      => $ee_featured ? get_permalink($ee_featured) : '',
-        'link_text' => 'مشاهده دوره',
+        'img'       => $slide_img,
+        'badge'     => !empty($s['badge']) ? $s['badge'] : '',
+        'title'     => !empty($s['title']) ? $s['title'] : 'دوره‌های تخصصی فناوری اطلاعات',
+        'desc'      => $s['desc'],
+        'link'      => $s['link'],
+        'link_text' => 'مشاهده و شروع',
     );
 }
 
@@ -115,7 +87,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
     <main class="ee-home-main">
 
         <!-- ======= هیرو: اسلایدر بنر + آخرین مقالات ======= -->
-        <section class="ee-hero">
+        <section class="ee-hero<?php echo empty($ee_feature_slides) ? ' is-no-slider' : ''; ?>">
             <div class="ee-wrap ee-hero-grid">
 
                 <div class="ee-hero-feat ee-fade">

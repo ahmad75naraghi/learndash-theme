@@ -1,45 +1,64 @@
 <?php
 /**
- * قالب نمایش برگه‌های تکی (Pages)
+ * برگهٔ عمومی (page) — پوستهٔ «evented-edu»
+ *
+ * کارت سفید برگه (عنوان، تصویر شاخص، محتوا) + سایدبار ویجت‌ها.
+ *
+ * @package evented-edu
  */
-get_header(); // فراخوانی هدر
-?>
 
-<main class="page-main-container">
-    <div class="container"> <!-- کلاس container برای محدود کردن عرض محتوا (اختیاری) -->
-        
-        <?php
-        // شروع حلقه وردپرس برای دریافت اطلاعات برگه
-        if ( have_posts() ) :
-            while ( have_posts() ) : the_post(); 
-        ?>
+defined('ABSPATH') || exit;
 
-            <article id="page-<?php the_ID(); ?>" <?php post_class('single-page-article'); ?>>
+get_template_part('template-parts/ee', 'head', array('ee_body_class' => 'ee-page'));
+get_template_part('template-parts/ee', 'header', array('ee_active' => ''));
 
-                <!-- محتوای اصلی برگه (متن، عکس و کدهایی که در ویرایشگر وردپرس وارد کردید) -->
-                <div class="page-content">
-                    <?php 
-                        // فراخوانی محتوای برگه
-                        the_content(); 
-                        
-                        // اگر در برگه از صفحه‌بندی (تگ Nextpage) استفاده شده باشد
-                        wp_link_pages( array(
-                            'before' => '<div class="page-links">' . esc_html__( 'صفحات:', 'evented-edu' ),
-                            'after'  => '</div>',
-                        ) );
-                    ?>
-                </div>
+while (have_posts()) :
+	the_post();
+	?>
 
-            </article>
+	<main class="ee-list-main">
+		<div class="ee-wrap ee-list-grid">
 
-        <?php
-            endwhile; // پایان حلقه
-        endif; 
-        ?>
+			<article <?php post_class('ee-page-card'); ?>>
 
-    </div>
-</main>
+				<nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
+					<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
+					<span class="material-symbols-outlined ee-ic">chevron_left</span>
+					<span class="ee-crumb-current"><?php the_title(); ?></span>
+				</nav>
 
-<?php
-get_footer(); // فراخوانی فوتر
-?>
+				<h1 class="ee-page-title"><?php the_title(); ?></h1>
+
+				<?php if (has_post_thumbnail()) : ?>
+					<figure class="ee-page-hero">
+						<?php the_post_thumbnail('large', array('loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'async')); ?>
+					</figure>
+				<?php endif; ?>
+
+				<div class="ee-page-body">
+					<?php
+					the_content();
+
+					wp_link_pages(array(
+						'before' => '<div class="ee-page-links">',
+						'after'  => '</div>',
+					));
+					?>
+				</div>
+
+				<?php if (comments_open() || get_comments_number()) : ?>
+					<div class="ee-page-comments">
+						<?php comments_template(); ?>
+					</div>
+				<?php endif; ?>
+
+			</article>
+
+			<?php get_template_part('template-parts/ee', 'sidebar'); ?>
+
+		</div>
+	</main>
+
+<?php endwhile; ?>
+
+<?php get_template_part('template-parts/ee', 'footer', array('ee_active' => '')); ?>

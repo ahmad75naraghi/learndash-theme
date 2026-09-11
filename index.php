@@ -1,89 +1,60 @@
 <?php
 /**
- * قالب بازگشتی (Fallback) استاندارد.
+ * قالب بازگشتی (Fallback) — پوستهٔ «evented-edu»
  *
- * این فایل برای هر صفحه‌ای استفاده می‌شود که قالب اختصاصی ندارد
- * (مثل بایگانی پست‌ها، تکی درس/آزمون لرن‌دش و…).
- * توجه: اگر صفحهٔ اصلی از front-page.php استفاده می‌کند، این قالب اجرا نمی‌شود.
+ * برای هر نمای بدون قالب اختصاصی: اگر تک‌محتوا باشد کارت محتوا و در غیر این
+ * صورت بدنهٔ مشترک آرشیو (همان که archive/home/search استفاده می‌کنند).
+ *
+ * @package evented-edu
  */
 
 defined('ABSPATH') || exit;
 
-get_header();
-?>
+get_template_part('template-parts/ee', 'head', array('ee_body_class' => 'ee-index'));
 
-<main class="page-main container" style="padding: 40px 0;">
-	<?php if (have_posts()) : ?>
+if (is_singular()) {
+	get_template_part('template-parts/ee', 'header', array('ee_active' => ''));
+	?>
 
-		<?php if (is_home() && !is_front_page()) : ?>
-			<header class="page-header">
-				<h1 class="page-title"><?php single_post_title(); ?></h1>
-			</header>
-		<?php elseif (is_archive()) : ?>
-			<header class="page-header">
-				<h1 class="page-title"><?php the_archive_title(); ?></h1>
-				<?php the_archive_description('<div class="archive-description">', '</div>'); ?>
-			</header>
-		<?php elseif (is_search()) : ?>
-			<header class="page-header">
-				<h1 class="page-title">
-					<?php
-					/* translators: %s: search query */
-					printf(esc_html__('نتایج جستجو برای: %s', 'evented-edu'), '<span>' . get_search_query() . '</span>');
-					?>
-				</h1>
-			</header>
-		<?php endif; ?>
+	<main class="ee-list-main">
+		<div class="ee-wrap ee-list-grid">
 
-		<?php
-		// حلقهٔ اصلی
-		while (have_posts()) :
-			the_post();
-			?>
-			<article id="post-<?php the_ID(); ?>" <?php post_class('entry'); ?>>
-				<h2 class="entry-title">
-					<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-				</h2>
-
-				<div class="entry-meta" style="color:#666; font-size:14px; margin:8px 0;">
-					<?php
-					printf(
-						esc_html__('انتشار: %s', 'evented-edu'),
-						esc_html(get_the_date())
-					);
-					?>
-				</div>
-
-				<div class="entry-content">
-					<?php the_excerpt(); ?>
-				</div>
-
-				<p>
-					<a class="btn-primary" href="<?php the_permalink(); ?>">
-						<?php esc_html_e('ادامه مطلب', 'evented-edu'); ?>
-					</a>
-				</p>
-			</article>
-			<hr style="border:none; border-top:1px solid #eee; margin:24px 0;">
-		<?php endwhile; ?>
-
-		<nav class="pagination" aria-label="<?php esc_attr_e('صفحه‌بندی', 'evented-edu'); ?>">
 			<?php
-			echo paginate_links(array(
-				'prev_text' => '→',
-				'next_text' => '←',
-			));
-			?>
-		</nav>
+			while (have_posts()) :
+				the_post();
+				?>
 
-	<?php else : ?>
-		<section class="no-results">
-			<h2><?php esc_html_e('موردی یافت نشد', 'evented-edu'); ?></h2>
-			<p><?php esc_html_e('لطفاً عبارت دیگری را جستجو کنید.', 'evented-edu'); ?></p>
-			<?php get_search_form(); ?>
-		</section>
-	<?php endif; ?>
-</main>
+				<article <?php post_class('ee-page-card'); ?>>
+					<nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
+						<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
+						<span class="material-symbols-outlined ee-ic">chevron_left</span>
+						<span class="ee-crumb-current"><?php the_title(); ?></span>
+					</nav>
 
-<?php
-get_footer();
+					<h1 class="ee-page-title"><?php the_title(); ?></h1>
+
+					<?php if (has_post_thumbnail()) : ?>
+						<figure class="ee-page-hero"><?php the_post_thumbnail('large', array('decoding' => 'async')); ?></figure>
+					<?php endif; ?>
+
+					<div class="ee-page-body"><?php the_content(); ?></div>
+				</article>
+
+			<?php endwhile; ?>
+
+			<?php get_template_part('template-parts/ee', 'sidebar'); ?>
+
+		</div>
+	</main>
+
+	<?php
+} else {
+	get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'));
+
+	get_template_part('template-parts/ee', 'archive-main', array(
+		'ee_title'    => is_archive() ? (string) get_the_archive_title() : '',
+		'ee_subtitle' => '',
+	));
+}
+
+get_template_part('template-parts/ee', 'footer', array('ee_active' => is_singular() ? '' : 'articles'));

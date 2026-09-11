@@ -57,7 +57,7 @@ $ee_channel_id = (string) apply_filters('evented_channel_id', 'channel-id');
             <div class="ee-fgrid">
                 <div class="about">
                     <div class="ee-f-logo">
-                        <img src="<?php echo esc_url(PATH_DIR_URL . '/assets/img/front-page/evented-edu-logo.webp'); ?>" alt="<?php echo esc_attr(get_bloginfo('name')); ?>" style="height:38px;width:auto;">
+                        <?php echo function_exists('evented_logo_html') ? evented_logo_html('footer') : esc_html(get_bloginfo('name')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- مارک‌آپ امن درون هلپر ساخته می‌شود. ?>
                     </div>
                     <p>مرجع تخصصی آموزش‌های آنلاین فناوری اطلاعات؛ شبکه، سرور، امنیت، مجازی‌سازی و CRM با همراهی برترین اساتید کشور.</p>
                     <div class="ee-license"><span class="pulse"></span> دارای مجوز رسمی برگزاری دوره‌های آموزش فناوری</div>

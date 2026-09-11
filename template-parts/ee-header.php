@@ -89,8 +89,8 @@ $ee_today = function_exists('evented_wp_date') ? evented_wp_date('Y/m/d') : date
             <div class="ee-header-row">
                 <div class="ee-hamb ee-ic" id="eeHamb" aria-label="منو"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
 
-                <a class="ee-logo" href="<?php echo esc_url($ee_url_home); ?>">
-                    <img src="<?php echo esc_url(PATH_DIR_URL . '/assets/img/front-page/evented-edu-logo.webp'); ?>" alt="<?php echo esc_attr(get_bloginfo('name')); ?>">
+                <a class="ee-logo" href="<?php echo esc_url($ee_url_home); ?>" rel="home">
+                    <?php echo function_exists('evented_logo_html') ? evented_logo_html('header') : esc_html(get_bloginfo('name')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- مارک‌آپ امن درون هلپر ساخته می‌شود. ?>
                 </a>
 
                 <form class="ee-search" role="search" method="get" action="<?php echo esc_url($ee_url_home); ?>">

@@ -10,6 +10,11 @@
 
 /* ستون بنر (شامل اسلایدر + کنترل‌ها) */
 .ee-hero-feat { display: flex; flex-direction: column; gap: .6rem; min-width: 0; }
+
+/* اگر در «تنظیمات قالب» اسلایدی ثبت نشده باشد، بنر هیرو رندر نمی‌شود
+   و ستون «آخرین مقالات» تمام‌عرض می‌شود. */
+.ee-hero.is-no-slider .ee-hero-feat { display: none; }
+@media (min-width: 1024px) { .ee-hero.is-no-slider .ee-hero-grid { grid-template-columns: 1fr; } }
 .ee-hero-feat > .ee-slider,
 .ee-hero-feat > .ee-feature { flex: 1 1 auto; }
 

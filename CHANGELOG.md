@@ -19,6 +19,25 @@
 
 ### Added
 
+- **قالب صفحهٔ آزمون (`single-sfwd-quizzes.php`)**: عنوان + نوار اطلاعات (تاریخ شمسی، ساعت، بازدید) + نوار وضعیت/مسیریابی «خانه › دوره › آزمون»، کارت فکت‌های آزمون (تعداد سوال، محدودیت زمانی، تعداد دفعات مجاز، درصد قبولی، گواهینامه)، بدنهٔ آزمون از شورت‌کد لرن‌دش (`[ld_quiz]` و در صورت نبود آن `[learndash_quiz]` و در نهایت `the_content()`)، اعلان ورود برای کاربر مهمان، دکمهٔ بازگشت به دوره و سایدبار (فهرست درس‌های دوره + کارت ثبت‌نام + سایر دوره‌ها).
+- **سایر صفحات با پوستهٔ جدید**: `archive-sfwd-courses.php` (بایگانی همهٔ دوره‌ها — قبلاً فقط یک shim به taxonomy بود)، `taxonomy-ld_course_category.php` (سربرگ دسته با تصویر/توضیح کوتاه، چیپ زیردسته‌ها، گرید دوره‌ها، صفحه‌بندی، سوالات متداول دسته)، `page-courses.php` (برگهٔ دوره‌ها — قبلاً فقط عنوان‌ها را چاپ می‌کرد)، `page-courses-cat.php` (گرید دسته‌بندی‌ها)، `author.php` (پروفایل مدرس: آواتار، بیو، شبکه‌های اجتماعی، آمار دوره/دانشجو/امتیاز، دوره‌ها و مقالات)، `template-instructors.php` (فهرست اساتید `group_leader` با صفحه‌بندی)، `page.php` (برگهٔ عمومی: کارت + سایدبار ویجت‌ها)، `index.php` (fallback: تک‌محتوا یا بدنهٔ مشترک آرشیو) و `404.php` (پیام، جستجو، لینک‌ها و پیشنهاد دوره).
+- **پارت‌های مشترک LMS**: `template-parts/lms/course-grid.php` (کارت دوره: تصویر، دسته، قیمت، تعداد جلسه، مدت، سطح، مدرس، وضعیت ثبت‌نام)، `template-parts/lms/category-grid.php` (کارت دسته با تصویر `ld_cat_image_id` و شمار دوره‌ها) و `template-parts/lms/courses-sidebar.php` (جستجو، دسته‌ها با علامت دستهٔ جاری، آخرین دوره‌ها، اشتراک‌گذاری، کانال‌ها).
+- **استایل فهرست‌ها**: `assets/css/newhome/ee-courses.css` (گرید دوره/دسته/اساتید، سربرگ فهرست، چیپ‌ها، صفحه‌بندی، سوالات متداول، پروفایل مدرس، کارت برگه، ۴۰۴، چاپ و `prefers-reduced-motion`).
+- **هلپرهای جدید در `inc/template_helpers.php`**: `evented_logo_html()`، `evented_course_card_data()`، `evented_courses_query()`، `evented_pagination()`، `evented_term_image()`، `evented_instructor_data()`، `evented_instructors()`، `evented_quiz_data()` و `evented_is_standalone_page()`.
+
+### Changed
+
+- **لوگوی هدر و فوتر از تنظیمات وردپرس**: تصویر ثابت `evented-edu-logo.webp` حذف شد؛ `evented_logo_html()` از `get_theme_mod('custom_logo')` + `wp_get_attachment_image()` استفاده می‌کند (پشتیبانی `custom-logo` در `inc/theme_options.php` ثبت شد) و در نبود لوگو، نام سایت نمایش داده می‌شود. فیلتر `evented_logo_html` برای بازنویسی مارک‌آپ وجود دارد.
+- **اسلایدر هیرو فقط از تنظیمات قالب**: شاخهٔ `else` در `front-page.php` (ساخت اسلاید از «آخرین دورهٔ ویژه» یا تصویر پیش‌فرض) حذف شد؛ اگر در تنظیمات اسلایدی نباشد هیرو تک‌ستونی و بدون اسلایدر رندر می‌شود (`.ee-hero.is-no-slider`) و یک کوئری اضافهٔ `WP_Query` هم از صفحهٔ اصلی حذف شد.
+- **پوشش `evented_is_ee_view()`**: حالا همهٔ نماهای عمومی (آزمون، بایگانی/دستهٔ دوره، برگه‌ها، اساتید، ۴۰۴) پوستهٔ جدید را می‌گیرند؛ تنها استثنا برگه‌های مستقل هستند (`page-login.php`، `page-panel.php` و قالب‌های `panel/*`) که با `evented_is_standalone_page()` تشخیص داده می‌شوند.
+- **Enqueue**: شاخهٔ LMS شامل `sfwd-quizzes` شد و برای نمای فهرست‌ها `ee-courses.css` بارگذاری می‌شود. شاخه‌های مردهٔ `assets/assets_functions.php` حذف شدند (`archive-courses.css`، `author.css`/`author.js`، `single-page.css` و `archive-product.css` — دو فایل آخر اصلاً وجود نداشتند و ۴۰۴ می‌شدند).
+
+### Fixed
+
+- **خطای مرگبار PHP 8 در `evented_adjacent_steps()`**: `isset($step['post'])` روی شیء `WP_Post` (خروجی ممکن `learndash_get_course_steps()`) باعث `Cannot use object of type WP_Post as array` می‌شد؛ دسترسی به شکل type-safe بازنویسی شد (این خطا با اجرای واقعی قالب‌ها روی PHP 8.3 کشف و رفع شد).
+
+### Added (پیشین — تک‌درس و تک‌دوره)
+
 - **قالب تک‌درس (`single-sfwd-lessons.php`) بر پایهٔ الگوی صفحهٔ درس «شمیم»**: عنوان درس، نوار اطلاعات (تاریخ شمسی، ساعت، دیدگاه، بازدید، مدت)، نوار وضعیت + مسیریابی «دوره › درس»، آکاردئون‌های **کلیپ/پادکست/متن** (با فایل‌های پیوست)، دکمهٔ بزرگ **آزمون**، دکمهٔ «علامت‌گذاری به‌عنوان تکمیل‌شده» (AJAX + به‌روزرسانی درجا) و ناوبری قبلی/بعدی. درس قفل‌شده به‌جای رسانه جعبهٔ ثبت‌نام نشان می‌دهد.
   - `template-parts/lms/lesson-list.php` — سایدبار فهرست درس‌ها: نوار پیشرفت، گروه‌بندی بر اساس فصل با دکمهٔ «باز کردن همه»، نشانهٔ وضعیت هر درس (تکمیل/جاری/قفل/پیش‌نمایش)، مدت، تعداد آزمون و لینک بازگشت به دوره.
   - `inc/template_helpers.php` — `evented_lesson_media()` (ویدیو/پوستر/پادکست/پیوست)، `evented_lesson_quizzes()`، `evented_adjacent_steps()` و `evented_step_state()`.

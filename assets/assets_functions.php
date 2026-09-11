@@ -16,21 +16,12 @@ function theme_enqueue()
         wp_enqueue_style('front-page', PATH_DIR_URL . '/assets/css/front-page.css', '', '1.0.0');
         wp_enqueue_script('front-page', PATH_DIR_URL . '/assets/js/front-page.js', '', '1.0.0', true);
         // wp_enqueue_script('front-page-ex', PATH_DIR_URL . '/assets/js/front-page-ex.js', '', '1.0.0', true);
-    } elseif (is_post_type_archive('sfwd-courses') || is_tax('ld_course_category') || is_page('courses')) {
-        wp_enqueue_style('courses-archive-css', PATH_DIR_URL . '/assets/css/archive-courses.css', '', '1.0.0');
-        // wp_enqueue_script(...)
-    } elseif (is_author()) {
-        wp_enqueue_style('author-page', PATH_DIR_URL . '/assets/css/author.css', '', '1.0.0');
-        wp_enqueue_script('author-page-js', PATH_DIR_URL . '/assets/js/author.js', '', '1.0.0', true);
-    } elseif (is_singular('sfwd-courses') || is_singular('sfwd-lessons')) {
-        // قالب دوره/درس بازطراحی شده (evented-edu): استایل و اسکریپت آن در functions.php
-        // بارگذاری می‌شود (newhome/ee-lms.css + newhome/ee-lms.js). پخش‌کنندهٔ plyr و
-        // single-courses.css/js دیگر استفاده نمی‌شوند (ویدیو با <video controls> پخش می‌شود).
-
-    } elseif (get_post_type() === 'page') {
-        wp_enqueue_style('archive-product', PATH_DIR_URL . '/assets/css/archive-product.css', '', '1.0.0');
-        wp_enqueue_style('single-page', PATH_DIR_URL . '/assets/css/single-page.css', '', '1.0.0');
     }
+    // بایگانی/دستهٔ دوره، صفحهٔ دوره‌ها، آزمون، اساتید، پروفایل مدرس، برگه و ۴۰۴
+    // همگی با پوستهٔ evented-edu رندر می‌شوند؛ استایل‌های آن‌ها (newhome/ee-courses.css
+    // و newhome/ee-lms.css) در functions.php بارگذاری می‌شوند. فایل‌های قدیمی
+    // archive-courses.css، author.css/js، single-page.css و archive-product.css
+    // دیگر استفاده نمی‌شوند.
     
     if (is_page()) {
         global $post;

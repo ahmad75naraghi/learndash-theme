@@ -14,6 +14,17 @@ add_filter('upload_mimes', 'add_custom_mime_types');
 
 add_theme_support('post-thumbnails');
 
+/*
+ * لوگوی سایت از «سفارشی‌سازی › هویت سایت» وردپرس خوانده می‌شود
+ * (هدر و فوتر پوستهٔ ee-* با evented_logo_html() چاپ می‌کنند).
+ */
+add_theme_support('custom-logo', array(
+	'height'      => 96,
+	'width'       => 320,
+	'flex-height' => true,
+	'flex-width'  => true,
+));
+
 /**
  * هدایت کاربران مشترک به صفحه پنل پس از ورود
  */
