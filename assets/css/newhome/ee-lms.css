@@ -1,0 +1,546 @@
+/* ==========================================================================
+   ee-lms.css — پوستهٔ دوره و درس (evented-edu)
+   الگو: صفحهٔ دوره و صفحهٔ درس (کارت سفید + سایدبار، سرفصل‌ها، آکاردئون‌ها،
+   پخش‌کننده، فهرست درس‌ها با نشانهٔ پیشرفت).
+   وابسته به توکن‌های --ee-* در newhome/ee-shell.css
+   ========================================================================== */
+
+.ee-lms-main { padding: 1.25rem 0 3rem; }
+
+.ee-lms-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+@media (min-width: 1024px) {
+    .ee-lms-grid { grid-template-columns: minmax(0, 1fr) 21rem; gap: 1.25rem; }
+    .ee-lms-grid.is-lesson { grid-template-columns: minmax(0, 1fr) 23rem; }
+}
+
+/* آیکون‌های مشترک ------------------------------------------------------- */
+.ee-lms-main .ee-ic { font-size: 1rem; line-height: 1; vertical-align: -0.15em; }
+.ee-lms-main .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20; }
+
+/* ========================================================================
+   کارت دوره
+   ======================================================================== */
+.ee-course-card {
+    background: #fff;
+    border: 1px solid rgb(209 250 229 / .9);
+    border-radius: var(--ee-r-3xl);
+    box-shadow: var(--ee-sh-sm);
+    padding: 1rem;
+}
+
+@media (min-width: 640px) { .ee-course-card { padding: 1.35rem; } }
+@media (min-width: 1024px) { .ee-course-card { padding: 1.75rem; } }
+
+.ee-crumb {
+    display: flex; align-items: center; gap: .25rem; flex-wrap: wrap;
+    font-size: .72rem; color: var(--ee-soft); margin-bottom: .9rem;
+}
+.ee-crumb a:hover { color: var(--ee-tealP); }
+.ee-crumb .material-symbols-outlined { font-size: 1rem; opacity: .55; }
+.ee-crumb-current { color: #1e293b; font-weight: 700; }
+
+.ee-course-title {
+    font-size: 1.35rem; font-weight: 900; color: #0f172a; line-height: 1.9;
+    margin: 0 0 .5rem; text-align: center;
+}
+@media (min-width: 640px) { .ee-course-title { font-size: 1.6rem; } }
+@media (min-width: 1024px) { .ee-course-title { text-align: right; font-size: 1.75rem; } }
+
+.ee-course-subtitle {
+    font-size: .85rem; color: var(--ee-soft); line-height: 1.9; margin: 0 0 1rem;
+    text-align: center;
+}
+@media (min-width: 1024px) { .ee-course-subtitle { text-align: right; } }
+
+.ee-course-hero {
+    margin: 0 0 .9rem; border-radius: 1rem; overflow: hidden;
+    border: 1px solid #f1f5f9; background: var(--ee-tealL);
+}
+.ee-course-hero img { display: block; width: 100%; height: auto; max-height: 34.5rem; object-fit: cover; }
+
+/* نوار اطلاعات ---------------------------------------------------------- */
+.ee-course-meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .9rem;
+    font-size: .72rem; color: var(--ee-soft); padding: .65rem 0;
+    border-bottom: 1px solid #f1f5f9; margin-bottom: .7rem;
+}
+@media (min-width: 640px) { .ee-course-meta { font-size: .78rem; } }
+
+.ee-meta-item { display: inline-flex; align-items: center; gap: .25rem; color: inherit; }
+a.ee-meta-item:hover { color: var(--ee-tealP); }
+.ee-meta-item .ee-ic { color: var(--ee-tealP); font-size: .95rem; }
+.ee-meta-views { margin-inline-start: auto; }
+.ee-meta-sep { width: 1px; height: .75rem; background: #e2e8f0; display: none; }
+@media (min-width: 640px) { .ee-meta-sep { display: inline-block; } }
+
+/* وضعیت پیشرفت ---------------------------------------------------------- */
+.ee-course-status {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: .5rem; font-size: .72rem; color: var(--ee-soft); margin-bottom: 1.1rem;
+}
+.ee-cs-item { display: inline-flex; align-items: center; gap: .25rem; }
+.ee-cs-badge {
+    font-weight: 800; font-size: .7rem; letter-spacing: .02em;
+    background: var(--ee-mint); color: var(--ee-tealP);
+    border: 1px solid rgb(209 250 229); border-radius: 999px; padding: .25rem .7rem;
+}
+.ee-cs-badge.is-done { background: var(--ee-tealP); color: #fff; border-color: var(--ee-tealP); }
+.ee-cs-badge.is-new { background: var(--ee-amber); color: #b45309; border-color: var(--ee-peachMd); }
+
+/* ========================================================================
+   سرفصل‌ها (curriculum)
+   ======================================================================== */
+.ee-curriculum { margin-bottom: 1.6rem; }
+
+.ee-cur-head {
+    display: flex; align-items: center; justify-content: space-between; gap: .6rem;
+    margin-bottom: .7rem;
+}
+.ee-cur-head h2 {
+    font-size: 1rem; font-weight: 800; color: #0f172a; margin: 0;
+    display: inline-flex; align-items: center; gap: .35rem;
+}
+.ee-cur-head h2 .ee-ic { color: var(--ee-tealP); }
+
+.ee-cur-count {
+    font-size: .7rem; font-weight: 800; color: var(--ee-tealP); background: var(--ee-tealL);
+    border-radius: 999px; padding: .2rem .7rem; white-space: nowrap;
+}
+
+.ee-cur-list { display: flex; flex-direction: column; gap: .45rem; }
+
+.ee-cur-section {
+    display: flex; align-items: center; gap: .35rem; margin-top: .45rem;
+    font-size: .76rem; font-weight: 800; color: #065f46; background: var(--ee-mint);
+    border: 1px solid rgb(209 250 229); border-radius: .75rem; padding: .45rem .7rem;
+}
+.ee-cur-section:first-child { margin-top: 0; }
+.ee-cur-section .ee-ic { font-size: 1.05rem; color: var(--ee-tealP); }
+
+.ee-cur-item {
+    display: flex; align-items: center; gap: .6rem; background: #fff;
+    border: 1px solid rgb(209 250 229 / .9); border-radius: .75rem;
+    padding: .6rem .75rem; text-decoration: none;
+    transition: background .15s, border-color .15s, transform .15s;
+}
+a.ee-cur-item:hover { background: #f0fdf9; border-color: var(--ee-teal); transform: translateY(-1px); }
+.ee-cur-item.is-done { border-color: var(--ee-teal); background: #f6fffb; }
+.ee-cur-item.is-sample { border-style: dashed; border-color: var(--ee-amberA); }
+.ee-cur-item.is-locked { border-style: dashed; border-color: #e2e8f0; background: #fcfdfe; }
+
+.ee-cur-num {
+    flex-shrink: 0; width: 1.5rem; height: 1.5rem; border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .66rem; font-weight: 800; background: var(--ee-tealL); color: var(--ee-tealP);
+}
+.ee-cur-item.is-done .ee-cur-num { background: var(--ee-tealP); color: #fff; }
+.ee-cur-item.is-locked .ee-cur-num { background: #f1f5f9; color: #94a3b8; }
+
+.ee-cur-title {
+    flex: 1; min-width: 0; font-size: .78rem; font-weight: 700; color: #1e293b; line-height: 1.85;
+}
+@media (min-width: 640px) { .ee-cur-title { font-size: .84rem; } }
+a.ee-cur-item:hover .ee-cur-title { color: var(--ee-tealP); }
+
+.ee-cur-side { display: flex; align-items: center; gap: .5rem; flex-shrink: 0; }
+.ee-cur-dur, .ee-cur-quiz {
+    display: inline-flex; align-items: center; gap: .2rem; font-style: normal;
+    font-size: .66rem; font-weight: 700; color: var(--ee-soft);
+}
+.ee-cur-quiz { color: var(--ee-tealP); }
+.ee-cur-dur .ee-ic, .ee-cur-quiz .ee-ic { font-size: .9rem; color: var(--ee-tealP); }
+.ee-cur-sample {
+    font-style: normal; font-size: .62rem; font-weight: 800; color: #b45309;
+    background: var(--ee-amber); border-radius: 999px; padding: .1rem .5rem;
+}
+.ee-cur-dot { display: inline-flex; align-items: center; justify-content: center; color: var(--ee-teal); }
+.ee-cur-dot .ee-ic { font-size: 1.2rem; }
+.ee-cur-item.is-done .ee-cur-dot { color: var(--ee-tealP); }
+.ee-cur-lock { display: inline-flex; align-items: center; color: #94a3b8; }
+.ee-cur-lock:hover { color: var(--ee-tealP); }
+
+/* ========================================================================
+   آکاردئون (مشترک دوره و درس)
+   ======================================================================== */
+.ee-acc {
+    border: 1px solid #e2e8f0; border-radius: .9rem; overflow: hidden;
+    background: #fff; margin-bottom: .7rem;
+}
+.ee-acc-head {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+    background: #f8fafc; border: 0; border-bottom: 1px solid #eef2f6;
+    padding: .7rem .9rem; cursor: pointer; text-align: right;
+    font-family: inherit; font-size: .85rem; font-weight: 800; color: #1e293b; transition: background .15s;
+}
+.ee-acc-head:hover { background: #f1f5f9; }
+.ee-acc-ic { color: var(--ee-tealP); font-size: 1.25rem; transition: transform .2s; }
+.ee-acc.is-open .ee-acc-ic { transform: rotate(180deg); }
+.ee-acc-body { display: none; padding: .9rem; }
+.ee-acc.is-open .ee-acc-body { display: block; animation: eeFade .22s ease both; }
+
+@keyframes eeFade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+.ee-course-body, .ee-lesson-body { font-size: .88rem; line-height: 2.1; color: #334155; }
+.ee-course-body img, .ee-lesson-body img { max-width: 100%; height: auto; border-radius: .8rem; }
+.ee-course-body a, .ee-lesson-body a { color: var(--ee-tealP); }
+
+.ee-post-tags { display: flex; align-items: center; flex-wrap: wrap; gap: .4rem; margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid #f1f5f9; }
+.ee-tags-label { font-size: .72rem; color: var(--ee-soft); display: inline-flex; align-items: center; gap: .25rem; }
+.ee-post-tags a {
+    font-size: .72rem; background: var(--ee-mint); color: #065f46; border: 1px solid rgb(209 250 229);
+    border-radius: 999px; padding: .2rem .7rem; text-decoration: none;
+}
+.ee-post-tags a:hover { background: var(--ee-tealP); color: #fff; }
+
+/* دستاوردها / سوالات ---------------------------------------------------- */
+.ee-outcomes { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+@media (min-width: 768px) { .ee-outcomes { grid-template-columns: 1fr 1fr; } }
+.ee-outcomes li {
+    display: flex; align-items: flex-start; gap: .4rem; font-size: .82rem; line-height: 1.9;
+    color: #334155; background: #f8fafc; border: 1px solid #f1f5f9; border-radius: .75rem; padding: .55rem .7rem;
+}
+.ee-outcomes .ee-ic { color: var(--ee-tealP); flex-shrink: 0; margin-top: .25rem; }
+
+.ee-faqs { display: grid; gap: .6rem; }
+.ee-faq { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: .8rem; padding: .7rem .8rem; }
+.ee-faq h4 { display: flex; align-items: center; gap: .35rem; font-size: .83rem; font-weight: 800; color: #0f172a; margin: 0 0 .3rem; }
+.ee-faq h4 .ee-ic { color: var(--ee-tealP); }
+.ee-faq p { font-size: .8rem; line-height: 2; color: var(--ee-soft); margin: 0; }
+
+/* وبینار ---------------------------------------------------------------- */
+.ee-webinar-info { list-style: none; margin: 0 0 .8rem; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem .9rem; font-size: .8rem; color: #334155; }
+.ee-webinar-info li { display: inline-flex; align-items: center; gap: .3rem; }
+.ee-webinar-info .ee-ic { color: var(--ee-tealP); }
+.ee-webinar-map { border-radius: .9rem; overflow: hidden; border: 1px solid #f1f5f9; aspect-ratio: 16 / 9; }
+.ee-webinar-map iframe { width: 100%; height: 100%; border: 0; display: block; }
+.ee-webinar-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
+.ee-webinar-actions .ee-btn-ghost { font-size: .75rem; }
+
+/* مدرس ------------------------------------------------------------------ */
+.ee-author-box {
+    display: flex; align-items: center; gap: .8rem; margin-top: 1.4rem;
+    background: linear-gradient(to left, var(--ee-tealL), #f8fafc);
+    border: 1px solid rgb(209 250 229); border-radius: 1rem; padding: .85rem;
+}
+.ee-ab-av img { border-radius: 999px; display: block; }
+.ee-ab-txt h3 { font-size: .9rem; font-weight: 800; color: #0f172a; margin: 0 0 .2rem; }
+.ee-ab-txt p { font-size: .75rem; color: var(--ee-soft); line-height: 1.9; margin: 0; }
+.ee-ab-link { display: inline-flex; align-items: center; gap: .2rem; font-size: .72rem; font-weight: 700; color: var(--ee-tealP); margin-top: .3rem; }
+.ee-ab-link:hover { text-decoration: underline; }
+
+/* ========================================================================
+   نظرات و امتیاز دوره
+   ======================================================================== */
+.ee-reviews { margin-top: 1.6rem; padding-top: 1.2rem; border-top: 1px solid #f1f5f9; }
+.ee-w-title { display: flex; align-items: center; gap: .35rem; font-size: 1rem; font-weight: 800; color: #0f172a; margin: 0 0 .9rem; }
+.ee-w-title .ee-ic { color: var(--ee-tealP); }
+
+.ee-comment-list { list-style: none; margin: 0 0 1.2rem; padding: 0; }
+.ee-comment-list .comment { margin-bottom: .7rem; }
+.ee-comment-list .comment-body { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 1rem; padding: .8rem; }
+.ee-comment-list .comment-author { display: flex; align-items: center; gap: .5rem; font-size: .8rem; font-weight: 700; color: #1e293b; }
+.ee-comment-list .comment-author img { border-radius: 999px; }
+.ee-comment-list .comment-meta { display: flex; align-items: center; gap: .5rem; font-size: .68rem; color: var(--ee-soft); margin: .25rem 0 .45rem; }
+.ee-comment-list .comment-content { font-size: .8rem; line-height: 2; color: #475569; }
+.ee-comment-list .comment-content p { margin: 0; }
+
+.ee-stars { display: inline-flex; align-items: center; gap: .05rem; }
+.ee-stars .ee-ic { font-size: .9rem; color: #cbd5e1; }
+.ee-stars .ee-ic.is-on { color: var(--ee-amberA); font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20; }
+
+.ee-review-form textarea {
+    width: 100%; font-family: inherit; font-size: .82rem; line-height: 2; color: #334155;
+    border: 1px solid var(--ee-line); border-radius: .8rem; padding: .6rem .75rem; background: #fff;
+    resize: vertical; outline: none;
+}
+.ee-review-form textarea:focus { border-color: var(--ee-teal); box-shadow: 0 0 0 3px var(--ee-tealL); }
+
+.ee-review-stars { display: flex; align-items: center; gap: .15rem; margin-bottom: .5rem; }
+.ee-review-label { font-size: .75rem; color: var(--ee-soft); font-weight: 700; margin-inline-end: .35rem; }
+.ee-star-btn {
+    background: none; border: 0; padding: 0; cursor: pointer; line-height: 0;
+}
+.ee-star-btn .ee-ic { font-size: 1.3rem; color: #cbd5e1; transition: color .12s; }
+.ee-star-btn:hover .ee-ic, .ee-star-btn.is-on .ee-ic {
+    color: var(--ee-amberA); font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+}
+
+.ee-review-actions { display: flex; align-items: center; gap: .6rem; margin-top: .6rem; flex-wrap: wrap; }
+.ee-comment-submit {
+    display: inline-flex; align-items: center; gap: .35rem; font-family: inherit;
+    font-size: .78rem; font-weight: 800; color: #fff; background: var(--ee-tealP);
+    border: 0; border-radius: 999px; padding: .55rem 1.1rem; cursor: pointer; transition: background .15s;
+}
+.ee-comment-submit:hover { background: #00796b; }
+.ee-comment-submit[disabled] { opacity: .6; cursor: progress; }
+.ee-review-msg, .ee-mark-msg { font-size: .72rem; color: var(--ee-tealP); }
+.ee-review-msg.is-error, .ee-mark-msg.is-error { color: #b91c1c; }
+.ee-review-login { font-size: .8rem; color: var(--ee-soft); }
+.ee-review-login a { color: var(--ee-tealP); font-weight: 700; }
+
+/* ========================================================================
+   کارت ثبت‌نام (enroll) + فکت‌ها + علاقه‌مندی
+   ======================================================================== */
+.ee-enroll { display: flex; flex-direction: column; gap: .8rem; }
+
+.ee-enroll-price { display: flex; align-items: baseline; gap: .3rem; justify-content: center; }
+.ee-price-amount { font-size: 1.7rem; font-weight: 900; color: #0f172a; letter-spacing: -.02em; }
+.ee-price-unit { font-size: .75rem; color: var(--ee-soft); font-weight: 700; }
+.ee-price-free { font-size: 1.4rem; font-weight: 900; color: var(--ee-tealP); }
+
+.ee-progress-top { display: flex; align-items: center; justify-content: space-between; font-size: .7rem; color: var(--ee-soft); margin-bottom: .3rem; }
+.ee-progress-num { font-weight: 800; color: var(--ee-tealP); }
+.ee-progress-track { height: .45rem; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+.ee-progress-fill { display: block; height: 100%; background: linear-gradient(to left, var(--ee-tealP), var(--ee-teal)); border-radius: 999px; transition: width .3s; }
+.ee-progress-meta { font-size: .68rem; color: var(--ee-soft); margin-top: .3rem; text-align: center; }
+
+.ee-facts { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+.ee-facts li { display: flex; align-items: center; gap: .4rem; font-size: .74rem; color: #475569; }
+.ee-facts .ee-ic { color: var(--ee-tealP); font-size: .95rem; }
+.ee-fact-k { color: var(--ee-soft); font-weight: 600; }
+.ee-facts b { color: #1e293b; font-weight: 800; margin-inline-start: auto; }
+
+.ee-enroll-cta { width: 100%; justify-content: center; font-size: .85rem; font-weight: 800; }
+
+.ee-materials { border-top: 1px dashed #f1f5f9; padding-top: .6rem; }
+.ee-materials-list { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.ee-materials-list a {
+    display: flex; align-items: center; gap: .35rem; font-size: .73rem; color: #475569;
+    background: #f8fafc; border: 1px solid #f1f5f9; border-radius: .6rem; padding: .4rem .55rem; text-decoration: none;
+}
+.ee-materials-list a:hover { color: var(--ee-tealP); border-color: var(--ee-teal); }
+.ee-materials-list .ee-ic { color: var(--ee-tealP); font-size: .95rem; }
+
+.ee-wishlist {
+    display: flex; align-items: center; justify-content: center; gap: .35rem; width: 100%;
+    font-family: inherit; font-size: .75rem; font-weight: 700; cursor: pointer;
+    background: #fff; color: var(--ee-soft); border: 1px dashed var(--ee-line);
+    border-radius: 999px; padding: .5rem; transition: all .15s;
+}
+.ee-wishlist:hover { color: #be123c; border-color: var(--ee-rose); background: var(--ee-roseL); }
+.ee-wishlist.is-on { color: #be123c; border-style: solid; border-color: var(--ee-rose); background: var(--ee-roseL); }
+.ee-wishlist.is-on .ee-ic { font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20; }
+
+.ee-payment { border-top: 1px dashed #f1f5f9; padding-top: .7rem; }
+.ee-payment .learndash_payment_buttons, .ee-payment form { margin: 0; }
+
+/* نوار خرید موبایل ------------------------------------------------------ */
+.ee-buybar {
+    position: fixed; inset-inline: 0; bottom: calc(3.4rem + env(safe-area-inset-bottom)); z-index: 60;
+    display: flex; align-items: center; justify-content: space-between; gap: .7rem;
+    background: rgb(255 255 255 / .97); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--ee-line); box-shadow: 0 -4px 16px -6px rgb(0 0 0 / .15);
+    padding: .55rem .9rem;
+}
+@media (min-width: 1024px) { .ee-buybar { display: none; } }
+.ee-buybar-price { font-size: 1rem; font-weight: 900; color: #0f172a; }
+.ee-buybar-price small { font-size: .68rem; color: var(--ee-soft); font-weight: 700; }
+.ee-buybar-btn {
+    font-size: .8rem; font-weight: 800; color: #fff; background: var(--ee-tealP);
+    border-radius: 999px; padding: .55rem 1.1rem; text-decoration: none;
+}
+
+/* ========================================================================
+   صفحهٔ درس
+   ======================================================================== */
+.ee-lesson-main { min-width: 0; }
+
+.ee-lesson-title { font-size: 1.3rem; font-weight: 900; color: #0f172a; line-height: 1.9; margin: 0 0 .5rem; }
+@media (min-width: 640px) { .ee-lesson-title { font-size: 1.55rem; } }
+@media (min-width: 1024px) { .ee-lesson-title { font-size: 1.75rem; } }
+
+.ee-lesson-meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .7rem;
+    font-size: .72rem; color: var(--ee-soft); padding-bottom: .55rem;
+    border-bottom: 1px solid #eef2f6; margin-bottom: .7rem;
+}
+
+.ee-lesson-ribbon { display: flex; flex-wrap: wrap; align-items: stretch; gap: .35rem; margin-bottom: 1rem; }
+.ee-lr-state {
+    display: inline-flex; align-items: center; font-size: .68rem; font-weight: 800; letter-spacing: .02em;
+    color: #fff; background: var(--ee-tealP); border-radius: .55rem .55rem 0 0; padding: .25rem .65rem;
+}
+.ee-lr-state.is-complete { background: var(--ee-mintDk); }
+.ee-lr-state.is-locked { background: #64748b; }
+.ee-lr-state.is-sample { background: var(--ee-amberA); }
+.ee-lr-crumb {
+    flex: 1; display: flex; align-items: center; gap: .3rem; flex-wrap: wrap;
+    font-size: .7rem; color: var(--ee-soft); background: #f8fafc;
+    border: 1px solid #eef2f6; border-radius: 0 0 .55rem .55rem; padding: .35rem .65rem;
+}
+.ee-lr-crumb a:hover { color: var(--ee-tealP); }
+.ee-lr-crumb .ee-ic { font-size: .95rem; opacity: .55; }
+.ee-lr-current { color: #1e293b; font-weight: 700; }
+
+/* درس قفل‌شده */
+.ee-locked {
+    text-align: center; background: #f8fafc; border: 1px dashed var(--ee-line);
+    border-radius: 1rem; padding: 1.6rem 1rem; margin-bottom: 1rem;
+}
+.ee-locked .ee-ic { font-size: 2rem; color: var(--ee-soft); }
+.ee-locked h2 { font-size: 1rem; font-weight: 800; color: #0f172a; margin: .4rem 0 .3rem; }
+.ee-locked p { font-size: .8rem; color: var(--ee-soft); margin: 0 0 .8rem; }
+.ee-btn-solid {
+    display: inline-flex; align-items: center; gap: .35rem; font-size: .8rem; font-weight: 800;
+    color: #fff; background: var(--ee-tealP); border-radius: 999px; padding: .55rem 1.2rem; text-decoration: none;
+}
+.ee-btn-solid:hover { background: #00796b; }
+
+/* پخش‌کننده ------------------------------------------------------------- */
+.ee-player { position: relative; background: #0b1220; border-radius: .9rem; overflow: hidden; aspect-ratio: 16 / 9; }
+.ee-player .ee-video, .ee-player .ee-embed { width: 100%; height: 100%; display: block; border: 0; }
+
+.ee-player-actions { display: flex; justify-content: center; margin-top: .7rem; }
+.ee-player-actions .ee-btn { font-size: .8rem; font-weight: 800; }
+
+.ee-audio-row { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.ee-audio-row .ee-ic { color: var(--ee-tealP); }
+.ee-audio-row .ee-audio { flex: 1; min-width: 14rem; }
+.ee-dl {
+    font-size: .72rem; font-weight: 700; color: var(--ee-tealP);
+    border: 1px solid rgb(209 250 229); background: var(--ee-mint);
+    border-radius: 999px; padding: .3rem .8rem; text-decoration: none;
+}
+.ee-dl:hover { background: var(--ee-tealP); color: #fff; }
+
+/* فایل‌های پیوست */
+.ee-files { margin-top: 1rem; padding-top: .8rem; border-top: 1px dashed #eef2f6; }
+.ee-files-label { display: flex; align-items: center; gap: .3rem; font-size: .75rem; font-weight: 700; color: var(--ee-soft); margin-bottom: .45rem; }
+.ee-file {
+    display: inline-flex; align-items: center; gap: .35rem; font-size: .75rem; color: #475569;
+    background: #f8fafc; border: 1px solid #f1f5f9; border-radius: .7rem;
+    padding: .45rem .7rem; margin-inline-end: .4rem; margin-bottom: .4rem; text-decoration: none;
+}
+.ee-file:hover { color: var(--ee-tealP); border-color: var(--ee-teal); }
+.ee-file .ee-ic { color: var(--ee-tealP); }
+
+/* آزمون ----------------------------------------------------------------- */
+.ee-quiz-cta { display: grid; gap: .5rem; margin: .9rem 0; }
+.ee-quiz-btn {
+    display: flex; align-items: center; justify-content: center; gap: .4rem;
+    font-size: .95rem; font-weight: 900; color: #fff; background: var(--ee-tealP);
+    border-radius: .8rem; padding: .8rem; text-decoration: none; transition: background .15s;
+}
+.ee-quiz-btn:hover { background: #00796b; }
+.ee-quiz-btn .ee-ic { font-size: 1.2rem; }
+
+/* ثبت تکمیل درس --------------------------------------------------------- */
+.ee-mark { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin: .4rem 0 1rem; }
+.ee-mark-btn {
+    display: inline-flex; align-items: center; gap: .4rem; font-family: inherit;
+    font-size: .8rem; font-weight: 800; cursor: pointer;
+    color: var(--ee-tealP); background: var(--ee-mint); border: 1px solid rgb(209 250 229);
+    border-radius: 999px; padding: .55rem 1.1rem; transition: all .15s;
+}
+.ee-mark-btn:hover { background: rgb(209 250 229); }
+.ee-mark-btn.is-done { background: var(--ee-mintDk); border-color: var(--ee-mintDk); color: #fff; cursor: default; }
+.ee-mark-btn.is-done:hover { background: var(--ee-mintDk); }
+.ee-mark-btn[disabled] { opacity: .65; cursor: progress; }
+
+/* ناوبری گام‌ها */
+.ee-step-nav { display: flex; align-items: stretch; justify-content: space-between; gap: .6rem; padding-top: 1rem; border-top: 1px solid #eef2f6; margin-top: .5rem; }
+.ee-step-btn {
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: .35rem;
+    font-size: .72rem; color: var(--ee-tealP); text-decoration: none;
+    background: #f8fafc; border: 1px solid #eef2f6; border-radius: .8rem; padding: .55rem .7rem;
+    transition: all .15s;
+}
+.ee-step-btn:hover { background: var(--ee-mint); border-color: rgb(209 250 229); }
+.ee-step-btn.is-next { justify-content: flex-start; }
+.ee-step-btn.is-prev, .ee-step-btn.is-back { justify-content: flex-end; }
+.ee-step-btn.is-empty { visibility: hidden; }
+.ee-step-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ========================================================================
+   فهرست درس‌ها در سایدبار درس
+   ======================================================================== */
+.ee-ln {
+    background: #fff; border: 1px solid rgb(209 250 229 / .9); border-radius: 1rem;
+    box-shadow: var(--ee-sh-sm); padding: .8rem;
+}
+@media (min-width: 1024px) { .ee-side-lesson { position: sticky; top: 1rem; } }
+
+.ee-ln-head { display: flex; align-items: center; gap: .45rem; padding-bottom: .55rem; border-bottom: 1px solid #f1f5f9; }
+.ee-ln-home { display: inline-flex; align-items: center; gap: .25rem; font-size: .72rem; font-weight: 700; color: #475569; text-decoration: none; }
+.ee-ln-home:hover { color: var(--ee-tealP); }
+.ee-ln-home .ee-ic { font-size: .95rem; color: var(--ee-tealP); }
+.ee-ln-expand {
+    margin-inline-start: auto; font-family: inherit; font-size: .65rem; font-weight: 800; cursor: pointer;
+    color: var(--ee-tealP); background: #fff; border: 1px solid rgb(209 250 229);
+    border-radius: 999px; padding: .2rem .6rem; transition: all .15s;
+}
+.ee-ln-expand:hover { background: var(--ee-mint); }
+.ee-ln-dot { width: .55rem; height: .55rem; border-radius: 999px; background: var(--ee-mintDk); flex-shrink: 0; }
+
+.ee-ln-progress { display: flex; align-items: center; gap: .5rem; padding: .55rem 0; border-bottom: 1px solid #f1f5f9; }
+.ee-ln-bar { flex: 1; height: .35rem; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+.ee-ln-bar span { display: block; height: 100%; background: linear-gradient(to left, var(--ee-tealP), var(--ee-teal)); border-radius: 999px; transition: width .35s; }
+.ee-ln-count { font-size: .65rem; color: var(--ee-soft); font-weight: 700; white-space: nowrap; }
+
+.ee-ln-list { padding: .45rem 0; max-height: 34rem; overflow-y: auto; }
+.ee-ln-group { border-bottom: 1px solid #f8fafc; }
+.ee-ln-group:last-child { border-bottom: 0; }
+.ee-ln-group-head {
+    width: 100%; display: flex; align-items: center; gap: .4rem; background: none; border: 0;
+    padding: .45rem .2rem; cursor: pointer; text-align: right;
+    font-family: inherit; font-size: .78rem; font-weight: 800; color: #0f172a;
+}
+.ee-ln-group-head .ee-ic { margin-inline-start: .2rem; color: var(--ee-tealP); font-size: 1.1rem; transition: transform .2s; }
+.ee-ln-group.is-open .ee-ln-group-head .ee-ic { transform: rotate(180deg); }
+.ee-ln-group-count {
+    margin-inline-start: auto; font-size: .62rem; font-weight: 800; color: var(--ee-tealP);
+    background: var(--ee-tealL); border-radius: 999px; padding: .05rem .45rem;
+}
+.ee-ln-items { list-style: none; margin: 0; padding: 0; display: none; flex-direction: column; gap: .1rem; }
+.ee-ln-group.is-open .ee-ln-items { display: flex; }
+.ee-ln-items.is-flat { display: flex; }
+
+.ee-ln-link { display: flex; align-items: flex-start; gap: .45rem; padding: .4rem .35rem; border-radius: .6rem; text-decoration: none; transition: background .15s; }
+.ee-ln-link:hover { background: #f0fdf9; }
+.ee-ln-link.is-disabled { cursor: default; opacity: .6; }
+.ee-ln-link.is-disabled:hover { background: none; }
+.ee-ln-item.is-current .ee-ln-link { background: rgb(232 245 233 / .7); }
+
+.ee-ln-ic {
+    flex-shrink: 0; width: 1.15rem; height: 1.15rem; margin-top: .2rem; border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1.5px solid #cbd5e1; color: transparent; font-size: .8rem;
+}
+.ee-ln-ic.is-complete { background: var(--ee-mintDk); border-color: var(--ee-mintDk); color: #fff; }
+.ee-ln-ic.is-active { border-color: var(--ee-tealP); box-shadow: 0 0 0 3px var(--ee-tealL); }
+.ee-ln-ic.is-locked { color: #94a3b8; }
+.ee-ln-ic.is-sample { border-color: var(--ee-amberA); }
+
+.ee-ln-txt { min-width: 0; }
+.ee-ln-title { display: block; font-size: .78rem; font-weight: 700; color: #334155; line-height: 1.85; }
+.ee-ln-item.is-current .ee-ln-title { color: var(--ee-mintDk); }
+.ee-ln-link:hover .ee-ln-title { color: var(--ee-tealP); }
+.ee-ln-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; font-size: .66rem; color: var(--ee-tealP); margin-top: .1rem; }
+.ee-ln-meta .ee-ic { font-size: .8rem; }
+.ee-ln-sample { color: #b45309; background: var(--ee-amber); border-radius: 999px; padding: .05rem .4rem; font-weight: 700; }
+
+.ee-ln-back {
+    display: flex; align-items: center; gap: .35rem; margin-top: .5rem;
+    padding-top: .55rem; border-top: 1px solid #f1f5f9;
+    font-size: .74rem; font-weight: 700; color: var(--ee-tealP); text-decoration: none;
+}
+.ee-ln-back:hover { text-decoration: underline; }
+.ee-ln-back-txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* چاپ ------------------------------------------------------------------ */
+@media print {
+    .ee-side, .ee-buybar, .ee-step-nav, .ee-mark, .ee-review-form { display: none !important; }
+    .ee-lms-grid { display: block; }
+    .ee-acc-body { display: block !important; }
+}
+
+/* حرکت کمتر ------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .ee-lms-main *, .ee-lms-main *::before, .ee-lms-main *::after { transition: none !important; animation: none !important; }
+}

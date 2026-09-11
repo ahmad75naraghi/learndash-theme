@@ -13,6 +13,7 @@ require_once get_stylesheet_directory() . '/inc/includes.php';
  *   - صفحهٔ اصلی (front-page.php)          → ee-shell.css + evented-home.css
  *   - تک‌نوشته (single.php)                 → ee-shell.css + single-post.css
  *   - آرشیو/برگهٔ نوشته‌ها/جستجو            → ee-shell.css + archive-post.css
+ *   - تک‌دوره/تک‌درس (single-sfwd-*.php)    → ee-shell.css + newhome/ee-lms.css
  */
 add_action('wp_enqueue_scripts', function () {
     if (!function_exists('evented_is_ee_view') || !evented_is_ee_view()) {
@@ -35,6 +36,11 @@ add_action('wp_enqueue_scripts', function () {
         wp_enqueue_style('ee-home', PATH_DIR_URL . '/assets/css/newhome/evented-home.css', array('ee-shell'), '1.1.0');
     } elseif (is_singular('post')) {
         wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.0.0');
+    } elseif (is_singular(array('sfwd-courses', 'sfwd-lessons'))) {
+        // دوره و درس: استایل + رفتارها (آکاردئون، دیدگاه، تکمیل درس، علاقه‌مندی)
+        wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.0.0');
+        wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.0.0', true);
+        wp_localize_script('ee-lms', 'eeLms', array('ajax_url' => admin_url('admin-ajax.php')));
     } elseif (is_home() || is_archive() || is_search()) {
         wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.0.0');
     }

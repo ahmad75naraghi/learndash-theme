@@ -24,7 +24,7 @@
 | CMS | وردپرس (نسخهٔ ۶+، به‌روز) | فارسی، RTL |
 | LMS | **LearnDash** (نسخهٔ 3.6+) | پست‌تایپ `sfwd-courses`، درس، سکشن، گواهینامه، پرداخت |
 | زبان/سمت‌سرور | PHP 8.x (سازگار با 7.4) | استفاده از `str_starts_with()` و `??` |
-| فرانت‌اند | jQuery + Owl Carousel + Plyr | اسکریپت‌های دستی در `assets/js` |
+| فرانت‌اند | jQuery + Owl Carousel (صفحهٔ اصلی/پنل) + Vanilla JS برای پوستهٔ `ee-*` | اسکریپت‌های دستی در `assets/js`؛ Plyr دیگر بارگذاری نمی‌شود |
 | فونت | «دانا» (`assets/fonts/evented-edu-font.woff2`) | `@font-face` در `style.css` |
 | پیامک OTP | SOAP پنل پیامک (payamak-panel) | `inc/sms.php` — ⚠️ اعتبارنامه هاردکد |
 | پیام‌رسان | ربات بله — تابع `evented_send_otp_with_bale()` | قالب یک wrapper محافظت‌شده دارد؛ ارسال واقعی به mu-plugin/افزونه (هم‌نام یا legacy با نام `falnic_send_otp_with_bale`) واگذار می‌شود |
@@ -43,8 +43,9 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 ├── single.php                    تک‌نوشته (پوستهٔ ee-*؛ مقاله + سایدبار + دیدگاه)
 ├── archive.php / home.php / search.php   آرشیو نوشته‌ها، برگهٔ نوشته‌ها، نتایج جستجو
 ├── comments.php                  فهرست دیدگاه‌ها + فرم دیدگاه (فارسی)
-├── template-parts/               ee-head · ee-header · ee-footer · ee-sidebar · ee-archive-main
-├── single-sfwd-courses.php       صفحهٔ تکی دوره (سرفصل/ویدیو/خرید/نظر/گواهینامه)
+├── template-parts/               ee-head · ee-header · ee-footer · ee-sidebar · ee-archive-main · lms/*
+├── single-sfwd-courses.php       صفحهٔ دوره (پوستهٔ ee-*: سرفصل‌ها، آکاردئون‌ها، نظرات، سایدبار ثبت‌نام)
+├── single-sfwd-lessons.php       صفحهٔ درس (کلیپ/پادکست/متن، آزمون، تکمیل درس، فهرست درس‌ها)
 ├── taxonomy-ld_course_category.php  آرشیو دسته/دوره
 ├── archive-sfwd-courses.php      شیم: فقط get_template_part از قالب دسته
 ├── author.php                    پروفایل مدرس  |  template-instructors.php  لیست اساتید
@@ -53,15 +54,16 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 ├── index.php                     قالب بازگشتی عمومی (fallback) برای انواع پست بدون قالب اختصاصی
 ├── assets/
 │   ├── assets_functions.php      منطق enqueue همهٔ CSS/JS
-│   ├── css/  front-page · single-courses · archive-courses · single-post · archive-post · author · panel · vendorها
-│   ├── css/newhome/  ee-shell (پوستهٔ مشترک) · evented-home (صفحهٔ اصلی)
-│   ├── js/   main · front-page · single-courses · author · panel + vendorها
+│   ├── css/  front-page · single-courses (بازنشسته) · archive-courses · single-post · archive-post · author · panel · vendorها
+│   ├── css/newhome/  ee-shell (پوستهٔ مشترک) · evented-home (صفحهٔ اصلی) · ee-lms (دوره و درس)
+│   ├── js/   main · front-page · single-courses (بازنشسته) · author · panel + vendorها
 │   ├── js/newhome/evented-home.js  منوی موبایل · اسلایدر هیرو · کپی لینک اشتراک
+│   ├── js/newhome/ee-lms.js        آکاردئون · گروه درس‌ها · دیدگاه/امتیاز · تکمیل درس · علاقه‌مندی
 │   ├── fonts/evented-edu-font.woff2   فونت «دانا»
 │   └── img/  front-page (۲۳) · single-page (۸) · panel (۲)
 ├── inc/
 │   ├── includes.php              فقط require کردن ماژول‌های پایین
-│   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها)
+│   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها) + هلپرهای LMS
 │   ├── login.php                 کلاس FalnicAuthHandler (OTP/ورود) + captcha_verify
 │   ├── sms.php                   send_pattern_sms (SOAP)
 │   ├── meta_functions.php        متاباکس دوره/دسته/کاربر + فیلتر آواتار
@@ -81,6 +83,7 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 | `/` | `front-page.php` | لندینگ |
 | `/courses/` و `/courses/<cat>/` | `taxonomy-ld_course_category.php` (+ شیم archive) | آرشیو/دسته دوره |
 | `/courses/<slug>/` | `single-sfwd-courses.php` | صفحهٔ دوره |
+| `/lessons/<slug>/` | `single-sfwd-lessons.php` | صفحهٔ درس (کلیپ/پادکست/متن + فهرست درس‌ها) |
 | `/<post-slug>/` | `single.php` | تک‌نوشته (مقاله + سایدبار + دیدگاه) |
 | برگهٔ «نوشته‌ها» (is_home) | `home.php` | آرشیو همهٔ نوشته‌ها |
 | `/category/<cat>/` و `/tag/<tag>/` | `archive.php` | آرشیو دسته/برچسب با چیپ فیلتر |

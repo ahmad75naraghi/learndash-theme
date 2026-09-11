@@ -22,12 +22,11 @@ function theme_enqueue()
     } elseif (is_author()) {
         wp_enqueue_style('author-page', PATH_DIR_URL . '/assets/css/author.css', '', '1.0.0');
         wp_enqueue_script('author-page-js', PATH_DIR_URL . '/assets/js/author.js', '', '1.0.0', true);
-    } elseif (is_singular('sfwd-courses')) {
+    } elseif (is_singular('sfwd-courses') || is_singular('sfwd-lessons')) {
+        // قالب دوره/درس بازطراحی شده (evented-edu): استایل و اسکریپت آن در functions.php
+        // بارگذاری می‌شود (newhome/ee-lms.css + newhome/ee-lms.js). پخش‌کنندهٔ plyr و
+        // single-courses.css/js دیگر استفاده نمی‌شوند (ویدیو با <video controls> پخش می‌شود).
 
-        wp_enqueue_style('plyr-polyfilled-css', PATH_DIR_URL . '/assets/css/plyr.css', '', '3.7.8');
-        wp_enqueue_script('plyr-polyfilled-js', PATH_DIR_URL . '/assets/js/plyr.polyfilled.js', '', '3.7.8', true);
-        wp_enqueue_style('courses-page', PATH_DIR_URL . '/assets/css/single-courses.css', '', '1.0.0');
-        wp_enqueue_script('courses-page', PATH_DIR_URL . '/assets/js/single-courses.js', '', '1.0.0', true);
     } elseif (get_post_type() === 'page') {
         wp_enqueue_style('archive-product', PATH_DIR_URL . '/assets/css/archive-product.css', '', '1.0.0');
         wp_enqueue_style('single-page', PATH_DIR_URL . '/assets/css/single-page.css', '', '1.0.0');

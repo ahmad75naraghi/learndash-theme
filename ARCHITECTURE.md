@@ -107,9 +107,12 @@ CREATE TABLE IF NOT EXISTS {wp}_evented_transactions (
 | `price_type` مقادیر | `open/free` → «رایگان»؛ بقیه → قیمت‌دار |
 | `_learndash_course_grid_duration` (ثانیه) | مدت هر درس (کلید افزونهٔ Course Grid) |
 | `learndash_get_setting(id,'sample_lesson')` | `on` = درس پیش‌نمایش (قفل ندارد) |
-| `learndash_get_setting(id,'lesson_video_url')` | ویدیوی درس |
+| `learndash_get_setting(id,'lesson_video_url')` | ویدیوی درس (با fallback به `_sfwd-lessons['sfwd-lessons_lesson_video_url']`) |
+| `_lesson_audio` / `_lesson_audio_url` / `sfwd-lessons_lesson_audio_url` | پادکست درس (هرکدام پر باشد؛ چند مقدار = چند فایل) |
+| `_lesson_attachments` (آرایهٔ آیدی پیوست) | فایل‌های قابل دانلود درس |
 | `learndash_get_setting(id,'certificate')` | گواهینامهٔ دوره |
 | `learndash_30_get_course_sections(id)` | سکشن‌ها (فصل‌ها) |
+| `_sfwd-course_progress` (user-meta) | درس‌های تکمیل‌شدهٔ کاربر (خوانده‌شده یک‌جا در `evented_course_steps`) |
 
 ### ۳.۵ Term-Meta دسته (`ld_course_category`)
 
@@ -224,6 +227,7 @@ flowchart LR
 flowchart TD
     FRONT["is_front_page"] --> F["front-page.php"]
     SING["is_singular sfwd-courses"] --> SC["single-sfwd-courses.php"]
+    SLESS["is_singular sfwd-lessons"] --> SL["single-sfwd-lessons.php"]
     ARCH["is_post_type_archive sfwd-courses"] --> AX["archive-sfwd-courses.php"]
     AX -->|get_template_part| TAX["taxonomy-ld_course_category.php"]
     TAXT["is_tax ld_course_category"] --> TAX
@@ -236,6 +240,8 @@ flowchart TD
     SE --> AM
     AM --> SB["template-parts/ee-sidebar.php"]
     SP --> SB
+    SC --> LMS["template-parts/lms/*"]
+    SL --> LMS
     AUTH["is_author"] --> AU["author.php"]
     LOGIN["page slug = login"] --> PL["page-login.php"]
     PANEL["page slug = panel or child"] --> PP["page-panel.php + panel templates"]
@@ -245,8 +251,9 @@ flowchart TD
 
 ### ۵.۱ پوستهٔ مشترک «ee-*» (template-parts)
 
-قالب‌های صفحهٔ اصلی، تک‌نوشته، آرشیو/برگهٔ نوشته‌ها و جستجو سند HTML کامل را خودشان چاپ
-می‌کنند (`get_header()`/`get_footer()` قدیمی را صدا نمی‌زنند) و از قطعه‌های مشترک زیر استفاده می‌کنند:
+قالب‌های صفحهٔ اصلی، تک‌نوشته، آرشیو/برگهٔ نوشته‌ها، جستجو، تک‌دوره و تک‌درس سند HTML کامل
+را خودشان چاپ می‌کنند (`get_header()`/`get_footer()` قدیمی را صدا نمی‌زنند) و از قطعه‌های
+مشترک زیر استفاده می‌کنند:
 
 | قطعه | نقش |
 | --- | --- |
@@ -255,6 +262,10 @@ flowchart TD
 | `template-parts/ee-footer.php` | فوتر + نوار پایین موبایل + `wp_footer()` و بستن سند. |
 | `template-parts/ee-sidebar.php` | ویجت‌های سایدبار نوشته‌ها: جستجو، اشتراک‌گذاری، آخرین مطالب، ویژه‌ها، پربازدید، دوره‌ها، دنبال‌کردن کانال‌ها. |
 | `template-parts/ee-archive-main.php` | سربرگ بایگانی + چیپ دسته‌بندی + شبکهٔ کارت‌ها + صفحه‌بندی (مشترک بین archive/home/search). |
+| `template-parts/lms/curriculum.php` | سرفصل‌های دوره: سربرگ فصل‌ها + ردیف هر درس (شماره، عنوان، مدت، آزمون، پیش‌نمایش، قفل، وضعیت تکمیل). آرگومان‌ها: `ee_steps`, `ee_course_id`. |
+| `template-parts/lms/enroll-card.php` | کارت ثبت‌نام/پیشرفت: قیمت، نوار پیشرفت، فکت‌ها، منابع دوره، دکمهٔ شروع/ادامه، علاقه‌مندی، `learndash_payment_buttons()`. آرگومان‌ها: `ee_course_id`, `ee_steps`, `ee_pricing`, `ee_progress`. |
+| `template-parts/lms/course-sidebar.php` | سایدبار صفحهٔ دوره: کارت ثبت‌نام + جستجو + اشتراک‌گذاری + سایر دوره‌ها + آخرین دوره‌ها + دنبال‌کردن. |
+| `template-parts/lms/lesson-list.php` | سایدبار صفحهٔ درس: نوار پیشرفت، فهرست درس‌ها گروه‌بندی‌شده بر اساس فصل (جمع‌شونده + «باز کردن همه») و لینک بازگشت به دوره. آرگومان‌ها: `ee_steps`, `ee_course_id`, `ee_current_id`, `ee_progress`. |
 
 هلپرهای این پوسته در `inc/template_helpers.php` هستند: `evented_is_ee_view()`،
 `evented_current_url()`، `evented_gregorian_to_jalali()`/`evented_format_jalali()` (تبدیل شمسی
@@ -264,9 +275,37 @@ flowchart TD
 `evented_related_posts()`. دیدگاه‌ها از `comments.php` قالب با لیبل‌های فارسی و
 `comment_form()` استایل‌خورده نمایش داده می‌شوند.
 
-- **قوانین فعلی صفحهٔ دوره**: درس باز است اگر `sfwd_lms_has_access()` **یا** `sample_lesson === 'on'`؛ دکمه‌های «بعدی/تکمیل» بین `$unlocked_lessons` با شمارندهٔ «درس/پیش‌نمایش X از Y»؛ آخرین درس بدون دسترسی → کلیک روی `#start_course`.
-- **سایدبار دوره**: کاربر دارای دسترسی → `learndash_course_progress` + دکمهٔ شروع/ادامه/مرور (و `learndash_course_get_resume_step_url`)؛ بدون دسترسی → قیمت + `learndash_payment_buttons()` (یا لینک ورود وقتی `price_type !== 'closed'`).
-- **نظرات دوره**: همیشه فعال است (`$is_reviews_enabled = true;` در پایان شرط‌ها)؛ فقط کامنت‌های تاییدشده نمایش داده می‌شوند.
+### ۵.۲ صفحهٔ دوره و درس (LMS)
+
+`single-sfwd-courses.php` و `single-sfwd-lessons.php` هر دو از پوستهٔ مشترک `ee-*` استفاده
+می‌کنند و دادهٔ مشترک را یک‌بار محاسبه و با `get_template_part($slug, $name, $args)` به قطعه‌ها
+می‌دهند (بدون کوئری تکراری).
+
+**قوانین دسترسی و وضعیت**
+
+- درس باز است اگر `sfwd_lms_has_access($course_id)` **یا** `learndash_get_setting($lesson,'sample_lesson') === 'on'`؛ در `evented_course_steps()` به‌صورت `is_unlocked` خروجی داده می‌شود.
+- وضعیت هر گام با `evented_step_state()` تعیین می‌شود: `is-complete` (تکمیل‌شده) ← `is-active` (گام جاری) ← `is-locked` (بدون دسترسی) ← `is-sample` (پیش‌نمایش رایگان) ← `is-open`.
+- درس‌های تکمیل‌شده از `user_meta['_sfwd-course_progress'][$course_id]['lessons']` یک‌جا خوانده می‌شوند (یک کوئری به‌جای N کوئری).
+- صفحهٔ درس، دورهٔ مادر را با `learndash_course_get_course_by_step_id()` و در غیاب آن `learndash_get_course_id()` پیدا می‌کند؛ درس قفل‌شده به‌جای رسانه، جعبهٔ «ثبت‌نام در دوره» نشان می‌دهد.
+- نظرات دوره: فقط کامنت‌های تاییدشده (`status=approve`) + فرم امتیاز ستاره‌ای برای کاربر وارد‌شده؛ دیدگاه جدید با `comment_approved=0` و متای `review_rating` ثبت می‌شود.
+- سایدبار دوره: کاربر دارای دسترسی → `learndash_course_progress` + دکمهٔ شروع/ادامه (`learndash_course_get_resume_step_url`)؛ بدون دسترسی → قیمت + `learndash_payment_buttons()` (یا لینک ورود وقتی `price_type === 'closed'` نباشد).
+
+**تصمیم‌های پرفورمنس**
+
+| مورد | نسخهٔ قدیمی | نسخهٔ فعلی |
+| --- | --- | --- |
+| ویدیوی درس‌ها در صفحهٔ دوره | برای هر درس `wp_oembed_get()` + یک مودال در DOM (N درخواست شبکه + N مودال) | حذف؛ ردیف سرفصل به صفحهٔ درس لینک می‌شود |
+| پخش‌کننده | Plyr (polyfill ~۲۰۰KB) روی همهٔ درس‌ها | `evented_media_player()`: فایل مستقیم → `<video>/<audio preload="none">`، در غیر این صورت `<iframe loading="lazy">`؛ بدون oEmbed |
+| دادهٔ درس‌ها | چند بار حلقه روی `learndash_get_course_lessons_list()` | `evented_course_steps()` با کش `static` در همان درخواست |
+| دوره‌های مرتبط/آخرین | کوئری داخل قالب | `evented_related_courses()` / `evented_latest_courses()` با `no_found_rows` و `ignore_sticky_posts` |
+
+**هلپرهای LMS در `inc/template_helpers.php`**
+
+`evented_format_duration()`، `evented_course_steps()` (id/title/permalink/duration/is_sample/
+is_unlocked/is_completed/section_id/section_title/quizzes/index)، `evented_course_progress()`،
+`evented_course_pricing()` (price_type/price/is_free/has_access)، `evented_lesson_media()`
+(ویدیو/پوستر/صوت/پیوست‌ها)، `evented_lesson_quizzes()`، `evented_adjacent_steps()` (قبلی/بعدی)،
+`evented_step_state()`، `evented_related_courses()` و `evented_latest_courses()`.
 
 ## ۶. بارگذاری Assets (Enqueue)
 
@@ -278,8 +317,8 @@ flowchart TD
     C2 -- yes --> AC["archive-courses.css"]
     C2 -- no --> C3{"is_author?"}
     C3 -- yes --> AU["author.css + author.js"]
-    C3 -- no --> C4{"is_singular course?"}
-    C4 -- yes --> CS["plyr + single-courses.css + js"]
+    C3 -- no --> C4{"is_singular course یا lesson?"}
+    C4 -- yes --> CS["— (بدون asset؛ قالب جدید از ee-lms استفاده می‌کند)"]
     C4 -- no --> C7{"page?"}
     C7 -- yes --> SGP["single-page.css + archive-product.css MISSING"]
     C7 -- no --> END["+ panel assets if is page under 'panel'"]
@@ -291,7 +330,9 @@ flowchart TD
     B1 -- yes --> EEH["evented-home.css"]
     B1 -- no --> B2{"is_singular post?"}
     B2 -- yes --> SPC["single-post.css"]
-    B2 -- no --> B3{"is_home / is_archive / is_search?"}
+    B2 -- no --> B4{"is_singular sfwd-courses یا sfwd-lessons?"}
+    B4 -- yes --> LMSC["ee-lms.css + ee-lms.js + localize eeLms.ajax_url"]
+    B4 -- no --> B3{"is_home / is_archive / is_search?"}
     B3 -- yes --> APC["archive-post.css"]
 ```
 
@@ -303,9 +344,17 @@ flowchart TD
 - `evented-home.css` فقط بخش‌های اختصاصی صفحهٔ اصلی را دارد (hero/quick/courses/steps/articles/instructors)؛
   بخش مشترک به `ee-shell.css` منتقل شده و هیچ سلکتور مشترکی بین دو فایل نیست.
 - `is_home()` دیگر در شاخهٔ `front-page.css` نیست؛ برگهٔ نوشته‌ها از قالب آرشیو جدید استفاده می‌کند.
+- **دوره/درس**: `evented_is_ee_view()` شامل `is_singular(array('sfwd-courses','sfwd-lessons'))` شد؛
+  `functions.php` فایل‌های `assets/css/newhome/ee-lms.css` + `assets/js/newhome/ee-lms.js` را
+  بارگذاری می‌کند و `eeLms.ajax_url` را لوکال می‌کند. شاخهٔ قدیمی `is_singular('sfwd-courses')`
+  در `assets/assets_functions.php` (Plyr + `single-courses.css/js`) خالی شد تا طراحی جدید
+  دوبار استایل نگیرد؛ `single-courses.*` و `plyr.*` دیگر در هیچ صفحه‌ای بارگذاری نمی‌شوند.
+- `ee-lms.js` بدون jQuery است و سه قرارداد AJAX موجود را مصرف می‌کند: `submit_course_review`،
+  `custom_mark_lesson_complete` (پاسخ = خروجی `learndash_course_progress`؛ نوارهای پیشرفت و
+  شمارندهٔ درس‌ها بدون رفرش به‌روز می‌شوند) و `toggle_course_wishlist`.
 - `main.js` لوکال‌سازی: `ajax_object = {ajax_url, nonce}` — nonce مربوط به `notification_nonce` است و استفاده نمی‌شود؛ اسکریپت‌های واقعی nonce را از `data-nonce` می‌خوانند.
 - پنل: `panel.css` + `jalalidatepicker.min.js` + `panel.js` وقتی برگه، خودِ `panel` یا زیرمجموعهٔ آن باشد.
-- کتابخانه‌ها: Owl Carousel (سراسری)، Plyr (فقط single دوره)، Jalali Date Picker (پنل)، PhotoSwipe (enqueue نشده — بدون استفاده)، Font Awesome (یک آیکن در `author.php` بدون لودر!).
+- کتابخانه‌ها: Owl Carousel (سراسری)، Plyr (دیگر enqueue نمی‌شود)، Jalali Date Picker (پنل)، PhotoSwipe (enqueue نشده — بدون استفاده)، Font Awesome (یک آیکن در `author.php` بدون لودر!).
 
 ## ۷. قراردادهای AJAX (Inventory)
 

@@ -31,6 +31,11 @@ function evented_is_ee_view()
 		return true;
 	}
 
+	// تک‌دوره و تک‌درس (LearnDash) — قالب‌های evented-edu
+	if (is_singular(array('sfwd-courses', 'sfwd-lessons'))) {
+		return true;
+	}
+
 	return false;
 }
 
@@ -466,4 +471,466 @@ function evented_related_posts($post_id, $per_page = 3)
 	wp_reset_postdata();
 
 	return is_array($posts) ? $posts : array();
+}
+
+/* =========================================================
+   هلپرهای لرن‌دش (صفحهٔ دوره و درس) — پوستهٔ ee-*
+   ========================================================= */
+
+/**
+ * قالب‌بندی مدت‌زمان برحسب ثانیه به متن فارسی.
+ *
+ * @param int $seconds ثانیه.
+ * @return string
+ */
+function evented_format_duration($seconds)
+{
+	$seconds = (int) $seconds;
+	if ($seconds <= 0) {
+		return '';
+	}
+
+	$minutes = (int) floor($seconds / 60);
+	$hours   = (int) floor($minutes / 60);
+	$mins    = $minutes % 60;
+
+	if ($hours > 0) {
+		/* translators: 1: ساعت 2: دقیقه */
+		return sprintf(__('%1$s:%2$s ساعت', 'evented-edu'), $hours, str_pad((string) $mins, 2, '0', STR_PAD_LEFT));
+	}
+
+	/* translators: %d: دقیقه */
+	return sprintf(_n('%d دقیقه', '%d دقیقه', $minutes, 'evented-edu'), $minutes);
+}
+
+/**
+ * فهرست گام‌های دوره (درس‌ها + فصل‌ها) — یک‌بار محاسبه و کش در همان درخواست.
+ *
+ * خروجی هر آیتم:
+ *   id, title, permalink, duration, duration_text, is_sample, is_unlocked,
+ *   is_completed, section_id, section_title, quizzes, index
+ *
+ * @param int $course_id شناسهٔ دوره.
+ * @return array
+ */
+function evented_course_steps($course_id)
+{
+	$course_id = (int) $course_id;
+	static $cache = array();
+
+	if (isset($cache[$course_id])) {
+		return $cache[$course_id];
+	}
+
+	$steps = array();
+
+	if (!function_exists('learndash_get_course_lessons_list')) {
+		$cache[$course_id] = $steps;
+		return $steps;
+	}
+
+	$user_id    = get_current_user_id();
+	$has_access = function_exists('sfwd_lms_has_access') ? (bool) sfwd_lms_has_access($course_id, $user_id) : false;
+	$lessons    = learndash_get_course_lessons_list($course_id, $user_id);
+
+	if (empty($lessons) || !is_array($lessons)) {
+		$cache[$course_id] = $steps;
+		return $steps;
+	}
+
+	$sections = function_exists('learndash_30_get_course_sections') ? (array) learndash_30_get_course_sections($course_id) : array();
+
+	/* درس‌های تکمیل‌شدهٔ کاربر (یک کوئری به‌جای N کوئری) */
+	$completed_ids = array();
+	if ($user_id) {
+		$progress_meta = get_user_meta($user_id, '_sfwd-course_progress', true);
+		if (is_array($progress_meta) && isset($progress_meta[$course_id]['lessons']) && is_array($progress_meta[$course_id]['lessons'])) {
+			$completed_ids = array_keys(array_filter($progress_meta[$course_id]['lessons']));
+			$completed_ids = array_map('intval', $completed_ids);
+		}
+	}
+
+	$current_section_id    = 0;
+	$current_section_title = '';
+
+	foreach ($lessons as $index => $lesson) {
+		$lesson_post = isset($lesson['post']) ? $lesson['post'] : null;
+		if (!$lesson_post instanceof WP_Post) {
+			continue;
+		}
+
+		$lesson_id = (int) $lesson_post->ID;
+
+		/* شروع فصل جدید؟ */
+		if (isset($sections[$lesson_id])) {
+			$section_value = (int) $sections[$lesson_id];
+			if ($section_value && 'sfwd-topic' === get_post_type($section_value)) {
+				$current_section_id    = $section_value;
+				$current_section_title = get_the_title($section_value);
+			} else {
+				$current_section_id    = 0;
+				$current_section_title = '';
+			}
+		}
+
+		$duration = (int) get_post_meta($lesson_id, '_learndash_course_grid_duration', true);
+		$is_sample = (function_exists('learndash_get_setting') && learndash_get_setting($lesson_id, 'sample_lesson') === 'on');
+
+		/* تعداد آزمون‌های متصل به درس */
+		$quiz_count = 0;
+		if (function_exists('learndash_get_lesson_quiz_list')) {
+			$lesson_quizzes = learndash_get_lesson_quiz_list($lesson_id, $user_id);
+			$quiz_count     = is_array($lesson_quizzes) ? count($lesson_quizzes) : 0;
+		}
+
+		$steps[] = array(
+			'id'            => $lesson_id,
+			'title'         => get_the_title($lesson_id),
+			'permalink'     => function_exists('learndash_course_get_step_permalink')
+				? (string) learndash_course_get_step_permalink($lesson_id, $course_id)
+				: (string) get_permalink($lesson_id),
+			'duration'      => $duration,
+			'duration_text' => evented_format_duration($duration),
+			'is_sample'     => (bool) $is_sample,
+			'is_unlocked'   => $has_access || $is_sample,
+			'is_completed'  => in_array($lesson_id, $completed_ids, true),
+			'section_id'    => $current_section_id,
+			'section_title' => $current_section_title,
+			'quizzes'       => $quiz_count,
+			'index'         => count($steps),
+		);
+	}
+
+	$cache[$course_id] = $steps;
+	return $steps;
+}
+
+/**
+ * درصد پیشرفت کاربر در دوره + تعداد گام‌های تکمیل‌شده.
+ *
+ * @param int $course_id شناسهٔ دوره.
+ * @param int $user_id   شناسهٔ کاربر (۰ = کاربر جاری).
+ * @return array {percentage, completed, total}
+ */
+function evented_course_progress($course_id, $user_id = 0)
+{
+	$course_id = (int) $course_id;
+	$user_id   = $user_id ? (int) $user_id : get_current_user_id();
+
+	$out = array(
+		'percentage' => 0,
+		'completed'  => 0,
+		'total'      => 0,
+	);
+
+	if (!$user_id || !function_exists('learndash_course_progress')) {
+		return $out;
+	}
+
+	$progress = learndash_course_progress(array(
+		'user_id'   => $user_id,
+		'course_id' => $course_id,
+		'array'     => true,
+	));
+
+	if (is_array($progress)) {
+		$out['percentage'] = isset($progress['percentage']) ? (int) $progress['percentage'] : 0;
+		$out['completed']  = isset($progress['completed']) ? (int) $progress['completed'] : 0;
+		$out['total']      = isset($progress['total']) ? (int) $progress['total'] : 0;
+	}
+
+	return $out;
+}
+
+/**
+ * وضعیت قیمت/دسترسی دوره برای نمایش در کارت ثبت‌نام.
+ *
+ * @param int $course_id شناسهٔ دوره.
+ * @return array {price_type, price, price_html, has_access}
+ */
+function evented_course_pricing($course_id)
+{
+	$course_id = (int) $course_id;
+	$settings  = get_post_meta($course_id, '_sfwd-courses', true);
+	$settings  = is_array($settings) ? $settings : array();
+
+	$price_type = isset($settings['sfwd-courses_course_price_type']) ? $settings['sfwd-courses_course_price_type'] : 'open';
+	$price      = isset($settings['sfwd-courses_course_price']) ? $settings['sfwd-courses_course_price'] : '';
+	$user_id    = get_current_user_id();
+
+	return array(
+		'price_type' => $price_type,
+		'price'      => $price,
+		'is_free'    => ('free' === $price_type || '' === $price || null === $price),
+		'has_access' => function_exists('sfwd_lms_has_access') ? (bool) sfwd_lms_has_access($course_id, $user_id) : false,
+	);
+}
+
+/**
+ * سایر دوره‌ها (هم‌دسته) برای سایدبار دوره.
+ *
+ * @param int $course_id شناسهٔ دورهٔ جاری.
+ * @param int $limit     تعداد.
+ * @return WP_Post[]
+ */
+function evented_related_courses($course_id, $limit = 8)
+{
+	$course_id = (int) $course_id;
+	$terms     = function_exists('wp_get_post_terms') ? wp_get_post_terms($course_id, 'ld_course_category', array('fields' => 'ids')) : array();
+
+	$args = array(
+		'post_type'           => 'sfwd-courses',
+		'posts_per_page'      => (int) $limit,
+		'post__not_in'        => array($course_id),
+		'no_found_rows'       => true,
+		'ignore_sticky_posts' => true,
+		'orderby'             => 'date',
+		'order'               => 'DESC',
+	);
+
+	if (!is_wp_error($terms) && !empty($terms)) {
+		$args['tax_query'] = array(
+			array(
+				'taxonomy' => 'ld_course_category',
+				'field'    => 'term_id',
+				'terms'    => $terms,
+			),
+		);
+	}
+
+	$query = new WP_Query($args);
+	$posts = $query->posts;
+	wp_reset_postdata();
+
+	return is_array($posts) ? $posts : array();
+}
+
+/**
+ * آخرین دوره‌ها برای سایدبار.
+ *
+ * @param int $limit تعداد.
+ * @return WP_Post[]
+ */
+function evented_latest_courses($limit = 6)
+{
+	$query = new WP_Query(array(
+		'post_type'           => 'sfwd-courses',
+		'posts_per_page'      => (int) $limit,
+		'no_found_rows'       => true,
+		'ignore_sticky_posts' => true,
+	));
+
+	$posts = $query->posts;
+	wp_reset_postdata();
+
+	return is_array($posts) ? $posts : array();
+}
+
+/**
+ * مارک‌آپ پخش‌کنندهٔ ویدیو/صوت بدون oEmbed اضافی (پرفورمنس).
+ *
+ * فایل مستقیم → <video>/<audio> با preload="none"؛
+ * در غیر این صورت iframe با loading="lazy".
+ *
+ * @param string $url    آدرس رسانه.
+ * @param string $poster تصویر پوستر (اختیاری).
+ * @return string HTML امن.
+ */
+function evented_media_player($url, $poster = '')
+{
+	$url = trim((string) $url);
+	if ('' === $url) {
+		return '';
+	}
+
+	if (preg_match('/\.(mp4|webm|ogg|ogv|m4v)(\?|#|$)/i', $url)) {
+		return sprintf(
+			'<video class="ee-video" controls preload="none" playsinline%s src="%s"></video>',
+			$poster ? ' poster="' . esc_url($poster) . '"' : '',
+			esc_url($url)
+		);
+	}
+
+	if (preg_match('/\.(mp3|m4a|wav|aac)(\?|#|$)/i', $url)) {
+		return sprintf('<audio class="ee-audio" controls preload="none" src="%s"></audio>', esc_url($url));
+	}
+
+	return sprintf(
+		'<iframe class="ee-embed" src="%s" loading="lazy" title="%s" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>',
+		esc_url($url),
+		esc_attr__('پخش‌کنندهٔ ویدیو', 'evented-edu')
+	);
+}
+
+/**
+ * یافتن آزمون(های) متصل به یک درس.
+ *
+ * @param int $lesson_id شناسهٔ درس.
+ * @return WP_Post[]
+ */
+function evented_lesson_quizzes($lesson_id)
+{
+	$lesson_id = (int) $lesson_id;
+
+	if (!function_exists('learndash_get_lesson_quiz_list')) {
+		return array();
+	}
+
+	$quizzes = learndash_get_lesson_quiz_list($lesson_id, get_current_user_id());
+	if (!is_array($quizzes)) {
+		return array();
+	}
+
+	$out = array();
+	foreach ($quizzes as $quiz) {
+		$quiz_post = isset($quiz['post']) ? $quiz['post'] : $quiz;
+		if ($quiz_post instanceof WP_Post) {
+			$out[] = $quiz_post;
+		}
+	}
+
+	return $out;
+}
+
+/**
+ * گام قبلی/بعدی یک درس در میان گام‌های دوره.
+ *
+ * @param int $course_id شناسهٔ دوره.
+ * @param int $step_id   شناسهٔ گام جاری.
+ * @return array {prev: WP_Post|null, next: WP_Post|null}
+ */
+function evented_adjacent_steps($course_id, $step_id)
+{
+	$course_id = (int) $course_id;
+	$step_id   = (int) $step_id;
+	$out       = array('prev' => null, 'next' => null);
+
+	if (!function_exists('learndash_get_course_steps')) {
+		return $out;
+	}
+
+	$steps = learndash_get_course_steps($course_id);
+	if (empty($steps) || !is_array($steps)) {
+		return $out;
+	}
+
+	$index = null;
+	foreach ($steps as $i => $step) {
+		$step_post = isset($step['post']) ? $step['post'] : $step;
+		if ($step_post instanceof WP_Post && (int) $step_post->ID === $step_id) {
+			$index = $i;
+			break;
+		}
+	}
+
+	if (null === $index) {
+		return $out;
+	}
+
+	$pick = static function ($i) use ($steps) {
+		if (!isset($steps[$i])) {
+			return null;
+		}
+		$step_post = isset($steps[$i]['post']) ? $steps[$i]['post'] : $steps[$i];
+		return $step_post instanceof WP_Post ? $step_post : null;
+	};
+
+	$out['prev'] = $pick($index - 1);
+	$out['next'] = $pick($index + 1);
+
+	return $out;
+}
+
+/**
+ * رسانه‌های یک درس: ویدیو، صوت و فایل‌های پیوست.
+ *
+ * کلیدهای LearnDash و متاهای سفارشی قالب هر دو پشتیبانی می‌شوند؛
+ * اگر هیچ‌کدام تنظیم نشده باشند آرایهٔ خالی برمی‌گردد و قالب آن بخش را چاپ نمی‌کند.
+ *
+ * @param int $lesson_id شناسهٔ درس.
+ * @return array {video: string, poster: string, audio: array<int,string>, files: array<int,array>}
+ */
+function evented_lesson_media($lesson_id)
+{
+	$lesson_id = (int) $lesson_id;
+	$settings  = get_post_meta($lesson_id, '_sfwd-lessons', true);
+	$settings  = is_array($settings) ? $settings : array();
+
+	$video = '';
+	if (function_exists('learndash_get_setting')) {
+		$video = (string) learndash_get_setting($lesson_id, 'lesson_video_url');
+	}
+	if ('' === $video && isset($settings['sfwd-lessons_lesson_video_url'])) {
+		$video = (string) $settings['sfwd-lessons_lesson_video_url'];
+	}
+
+	$audio = array();
+	$audio_raw = array(
+		get_post_meta($lesson_id, '_lesson_audio', true),
+		get_post_meta($lesson_id, '_lesson_audio_url', true),
+		isset($settings['sfwd-lessons_lesson_audio_url']) ? $settings['sfwd-lessons_lesson_audio_url'] : '',
+	);
+	foreach ($audio_raw as $candidate) {
+		$candidate = trim((string) $candidate);
+		if ('' !== $candidate && !in_array($candidate, $audio, true)) {
+			$audio[] = $candidate;
+		}
+	}
+
+	$files = array();
+	$attachments = get_post_meta($lesson_id, '_lesson_attachments', true);
+	if (is_array($attachments)) {
+		foreach ($attachments as $attachment_id) {
+			$attachment_id = (int) $attachment_id;
+			if (!$attachment_id) {
+				continue;
+			}
+			$file_url = wp_get_attachment_url($attachment_id);
+			if ($file_url) {
+				$files[] = array(
+					'url'   => (string) $file_url,
+					'title' => get_the_title($attachment_id),
+				);
+			}
+		}
+	}
+
+	return array(
+		'video'  => $video,
+		'poster' => has_post_thumbnail($lesson_id) ? (string) get_the_post_thumbnail_url($lesson_id, 'large') : '',
+		'audio'  => $audio,
+		'files'  => $files,
+	);
+}
+
+/**
+ * برچسب وضعیت یک گام (برای نوار وضعیت صفحهٔ درس).
+ *
+ * @param array $step   یک آیتم از خروجی evented_course_steps().
+ * @param bool  $active آیا گام جاری است؟
+ * @return array {class: string, label: string}
+ */
+function evented_step_state($step, $active = false)
+{
+	if (!is_array($step)) {
+		return array('class' => 'is-locked', 'label' => __('قفل شده', 'evented-edu'));
+	}
+
+	if (!empty($step['is_completed'])) {
+		return array('class' => 'is-complete', 'label' => __('تکمیل شده', 'evented-edu'));
+	}
+
+	if ($active) {
+		return array('class' => 'is-active', 'label' => __('در حال مشاهده', 'evented-edu'));
+	}
+
+	if (empty($step['is_unlocked'])) {
+		return array('class' => 'is-locked', 'label' => __('قفل شده', 'evented-edu'));
+	}
+
+	if (!empty($step['is_sample'])) {
+		return array('class' => 'is-sample', 'label' => __('نمونهٔ رایگان', 'evented-edu'));
+	}
+
+	return array('class' => 'is-open', 'label' => __('در دسترس', 'evented-edu'));
 }

@@ -31,7 +31,7 @@
 - [ ] **`author.js`** — `selectedRating` بدون `var/let/const` (متغیر سراسری)؛ لوپ index روی ستاره‌ها در RTL ترتیب را اشتباه active می‌کند.
 - [ ] **settings.php نمایش ایمیل جعلی** — اگر ایمیل با `09` شروع شود، مقدار نمایشی `sdasd@dfsfd.dfd` نشان داده می‌شود (باید ایمیل واقعی یا حالت «تنظیم نشده»).
 - [ ] **toast موفقیت بی‌قیدوشرط در صفحهٔ لاگین** — بعد از `falnic_reset_password`/`falnic_register_user` بدون بررسی پاسخ سرور پیام موفقیت می‌آید.
-- [ ] **دوره‌های مرتبط بدون فیلتر دسته** — `tax_query` در `single-sfwd-courses.php` کامنت است؛ فعال شود یا حذف.
+- [x] **دوره‌های مرتبط بدون فیلتر دسته** — در قالب جدید دوره از `evented_related_courses()` استفاده می‌شود: `tax_query` روی `ld_course_category` فعال است و اگر دوره دسته نداشت، به آخرین دوره‌ها برمی‌گردد.
 
 ## ۴. Asset های مفقود / خالی (404 / بی‌اثر)
 
@@ -49,7 +49,7 @@
 | `assets/fonts/DanaVF.ttf` | مفقود (برای captcha) | افزودن یا حذف captcha |
 | فونت FontAwesome | لودر نیست (آیکن fa-facebook در author.php) | حذف آیکن یا لود واقعی |
 
-> توجه: `plyr.css` سالم است (~۳۲KB) و مشکل ندارد.
+> توجه: `plyr.css`/`plyr.polyfilled.js` سالم‌اند اما از زمان بازطراحی صفحهٔ دوره/درس دیگر enqueue نمی‌شوند (ویدیو با `<video controls>` پخش می‌شود)؛ پس از تأیید بصری می‌توان حذفشان کرد. همین‌طور `assets/css/single-courses.css` (~۳۸KB) و `assets/js/single-courses.js` (۳۰۹ خط) که فقط به قالب قدیمی دوره تعلق داشتند.
 
 ## ۵. کد مرده / غیرفعال (Dead Code)
 
@@ -58,6 +58,8 @@
 - [ ] PhotoSwipe (`assets/js/photoswipe.min.js` و CSS) — استفاده نمی‌شود.
 - [ ] کامنت‌های اسکریپت/استایل `*-ex` (main-ex/front-page-ex) در `assets_functions.php`.
 - [ ] `Untitled-1.json` در ریشه (schema.org خارج از قالب).
+- [ ] `assets/css/single-courses.css` + `assets/js/single-courses.js` — با قالب جدید دوره/درس بلااستفاده شدند؛ پس از QA حذف شوند.
+- [ ] کلیدهای پادکست درس (`_lesson_audio`/`_lesson_audio_url`/`sfwd-lessons_lesson_audio_url`) و پیوست‌ها (`_lesson_attachments`) بر اساس کلیدهای سفارشی این قالب حدس زده شده‌اند؛ باید با دادهٔ واقعی سایت بررسی و در صورت نیاز متاباکس رسمی اضافه شود.
 - [ ] اسکریپت particle canvas کامنت‌شده در `front-page.php`.
 - [ ] متغیر/کلاس بلااستفاده (مثل `FalnicAuthHandler::$crm_guids`) در login.php.
 
