@@ -22,7 +22,7 @@ defined('ABSPATH') || exit;
 
 /* نسخهٔ ساختار کش — با تغییر ساختار آرایه‌ها این عدد را بالا ببرید تا کش قدیمی نادیده گرفته شود. */
 if (!defined('EVENTED_NAV_CACHE_VER')) {
-	define('EVENTED_NAV_CACHE_VER', '3');
+	define('EVENTED_NAV_CACHE_VER', '4');
 }
 
 /**
@@ -155,6 +155,29 @@ function evented_nav_post_type_children($post_type)
 }
 
 /**
+ * آدرس دستی یک بخش از «تنظیمات قالب → نشانی بخش‌ها» (nav_url_{key}).
+ * مقدار می‌تواند نسبی (/lib/) یا کامل باشد؛ خالی = تشخیص خودکار.
+ *
+ * @param string $key کلید بخش.
+ * @return string
+ */
+function evented_nav_manual_url($key)
+{
+	$v = function_exists('evented_opt') ? (string) evented_opt('nav_url_' . $key, '') : '';
+	$v = trim($v);
+	if ('' === $v) {
+		return '';
+	}
+	if (0 === strpos($v, '/')) {
+		return (string) home_url($v);
+	}
+	if (!preg_match('#^https?://#i', $v)) {
+		return (string) home_url('/' . trim($v, '/') . '/');
+	}
+	return $v;
+}
+
+/**
  * آدرس یک برگه با امتحان چند اسلاگ؛ در نبود برگه، مسیر پیش‌فرض.
  *
  * @param string[] $slugs    اسلاگ‌های احتمالی برگه.
@@ -165,6 +188,10 @@ function evented_nav_page_url($slugs, $fallback)
 {
 	foreach ((array) $slugs as $slug) {
 		$page = get_page_by_path($slug);
+		if (!$page instanceof WP_Post) {
+			/* اسلاگ‌های فارسی: هم شکل خام و هم درصدی‌شده امتحان می‌شود */
+			$page = get_page_by_path(rawurlencode($slug));
+		}
 		if ($page instanceof WP_Post && 'publish' === $page->post_status) {
 			return array('url' => (string) get_permalink($page), 'page_id' => (int) $page->ID);
 		}
@@ -187,21 +214,29 @@ function evented_nav_build_cpt_item($key, $title, $icon, $page_slugs)
 {
 	$post_type = evented_nav_find_post_type($key);
 	$children  = array();
-	$url       = '';
+	$url       = evented_nav_manual_url($key);
 	$page_id   = 0;
 
 	if ('' !== $post_type) {
+		$children = evented_nav_post_type_children($post_type);
+	}
+
+	/* اولویت: آدرس دستی → برگهٔ هم‌نام (shamiim.ir بخش‌ها را با برگه می‌سازد) → بایگانی پست‌تایپ → مسیر پیش‌فرض */
+	if ('' === $url) {
+		$resolved = evented_nav_page_url($page_slugs, '');
+		if ($resolved['page_id']) {
+			$url     = $resolved['url'];
+			$page_id = $resolved['page_id'];
+		}
+	}
+	if ('' === $url && '' !== $post_type) {
 		$archive = get_post_type_archive_link($post_type);
 		if ($archive) {
 			$url = (string) $archive;
 		}
-		$children = evented_nav_post_type_children($post_type);
 	}
-
 	if ('' === $url) {
-		$resolved = evented_nav_page_url($page_slugs, $page_slugs[0]);
-		$url      = $resolved['url'];
-		$page_id  = $resolved['page_id'];
+		$url = (string) home_url('/' . trim($page_slugs[0], '/') . '/');
 	}
 
 	return array(
@@ -232,9 +267,12 @@ function evented_nav_build_items()
 
 	/* مقالات → برگهٔ نوشته‌ها + دسته‌بندی‌های وبلاگ */
 	$posts_page = (int) get_option('page_for_posts');
-	$blog_url   = $posts_page ? (string) get_permalink($posts_page) : '';
+	$blog_url   = evented_nav_manual_url('articles');
 	if ('' === $blog_url) {
-		$resolved = evented_nav_page_url(array('blog', 'articles', 'maghalat'), 'blog');
+		$blog_url = $posts_page ? (string) get_permalink($posts_page) : '';
+	}
+	if ('' === $blog_url) {
+		$resolved = evented_nav_page_url(array('blogs', 'blog', 'articles', 'maghalat'), 'blogs');
 		$blog_url = $resolved['url'];
 	}
 	$items[] = array(
@@ -242,30 +280,40 @@ function evented_nav_build_items()
 		'post_type' => 'post', 'page_id' => $posts_page, 'children' => evented_nav_term_children('category'),
 	);
 
-	$items[] = evented_nav_build_cpt_item('library', 'کتابخانه', 'local_library', array('library', 'books', 'ketabkhaneh'));
-	$items[] = evented_nav_build_cpt_item('gallery', 'گالری', 'photo_library', array('gallery', 'galleries'));
-	$items[] = evented_nav_build_cpt_item('video', 'ویدیو', 'smart_display', array('video', 'videos'));
-	$items[] = evented_nav_build_cpt_item('downloads', 'دانلودها', 'download_for_offline', array('downloads', 'download'));
+	/* اسلاگ‌های واقعی shamiim.ir در اولویت، سپس اسلاگ‌های رایج */
+	$items[] = evented_nav_build_cpt_item('library', 'کتابخانه', 'local_library', array('lib', 'library', 'کتابخانه', 'books', 'ketabkhaneh'));
+	$items[] = evented_nav_build_cpt_item('gallery', 'گالری', 'photo_library', array('gallery', 'گالری-مناسبتی', 'گالری-موضوعی', 'galleries'));
+	$items[] = evented_nav_build_cpt_item('video', 'ویدیو', 'smart_display', array('videos', 'video'));
+	$items[] = evented_nav_build_cpt_item('downloads', 'دانلودها', 'download_for_offline', array('download', 'downloads'));
 
-	/* دوره‌ها → بایگانی لرن‌دش (یا برگهٔ courses) + دسته‌های دوره */
-	$courses = evented_nav_build_cpt_item('courses', 'دوره‌ها', 'school', array('courses', 'course'));
-	if (post_type_exists('sfwd-courses')) {
-		$courses['children'] = evented_nav_term_children('ld_course_category');
+	/* دوره‌ها → بایگانی لرن‌دش /courses/ + دسته‌های دوره */
+	$courses_url = evented_nav_manual_url('courses');
+	if ('' === $courses_url && post_type_exists('sfwd-courses')) {
+		$courses_url = (string) get_post_type_archive_link('sfwd-courses');
 	}
-	$items[] = $courses;
+	if ('' === $courses_url) {
+		$resolved    = evented_nav_page_url(array('courses', 'all-courses-2', 'all-courses'), 'courses');
+		$courses_url = $resolved['url'];
+	}
+	$items[] = array(
+		'key' => 'courses', 'title' => 'دوره‌ها', 'url' => $courses_url, 'icon' => 'school',
+		'post_type' => post_type_exists('sfwd-courses') ? 'sfwd-courses' : '', 'page_id' => 0,
+		'children' => post_type_exists('sfwd-courses') ? evented_nav_term_children('ld_course_category') : array(),
+	);
 
-	$items[] = evented_nav_build_cpt_item('podcast', 'پادکست', 'podcasts', array('podcast', 'podcasts'));
+	$items[] = evented_nav_build_cpt_item('podcast', 'پادکست', 'podcasts', array('podcast', 'player', 'podcasts'));
 
 	/* برگه‌های ثابت */
 	$static = array(
-		array('ramadan',  'ویژه رمضان',   'nights_stay',    array('ramadan', 'ramazan', 'ramadan-special', 'vije-ramezan')),
-		array('contests', 'مسابقات',      'emoji_events',   array('contests', 'contest', 'competitions', 'competition', 'mosabeghat')),
-		array('about',    'معرفی سایت',   'info',           array('about', 'about-us', 'introduction', 'moarefi')),
+		array('ramadan',  'ویژه رمضان',   'nights_stay',    array('ویژه-رمضان', 'ramezan', 'ramadan', 'ramazan', 'ramadan-special')),
+		array('contests', 'مسابقات',      'emoji_events',   array('match', 'competitions', 'contests', 'contest', 'competition')),
+		array('about',    'معرفی سایت',   'info',           array('درباره-ما', 'about-2', 'about', 'about-us', 'introduction')),
 		array('contact',  'ارتباط با ما', 'support_agent',  array('contact', 'contact-us', 'ertebat', 'tamas')),
 	);
 	foreach ($static as $row) {
 		list($key, $title, $icon, $slugs) = $row;
-		$resolved = evented_nav_page_url($slugs, $slugs[0]);
+		$manual   = evented_nav_manual_url($key);
+		$resolved = $manual ? array('url' => $manual, 'page_id' => 0) : evented_nav_page_url($slugs, $slugs[0]);
 		$items[]  = array(
 			'key' => $key, 'title' => $title, 'url' => $resolved['url'], 'icon' => $icon,
 			'post_type' => '', 'page_id' => $resolved['page_id'], 'children' => array(),

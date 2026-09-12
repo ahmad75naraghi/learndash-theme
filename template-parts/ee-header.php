@@ -25,6 +25,15 @@ $ee_url_home    = (string) home_url('/');
 $ee_url_courses = function_exists('evented_nav_url') ? evented_nav_url('courses') : home_url('/courses/');
 $ee_url_contact = function_exists('evented_nav_url') ? evented_nav_url('contact') : home_url('/contact/');
 $ee_url_account = is_user_logged_in() ? home_url('/panel') : home_url('/login');
+/* لینک کانال‌ها از تنظیمات (آدرس مستقیم یا شناسهٔ مشترک)؛ در نبود هر دو → صفحهٔ تماس */
+$ee_channels    = function_exists('evented_channel_links') ? (array) evented_channel_links() : (array) apply_filters('evented_channel_links', array());
+$ee_chan_url    = static function ($key) use ($ee_channels, $ee_url_contact) {
+	foreach ($ee_channels as $c) { if (isset($c['key'], $c['url']) && $c['key'] === $key && '' !== $c['url']) { return (string) $c['url']; } }
+	return $ee_url_contact;
+};
+$ee_url_bale    = $ee_chan_url('bale');
+$ee_url_eitaa   = $ee_chan_url('eitaa');
+$ee_url_rubika  = $ee_chan_url('rubika');
 
 /* تاریخ امروز (در صورت فعال بودن افزونهٔ شمسی‌ساز، خودکار جلالی است) */
 $ee_today = function_exists('evented_today_label') ? evented_today_label() : date_i18n('Y/m/d');
@@ -45,9 +54,9 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                 <?php if (!empty($ee_channels)) : foreach ($ee_channels as $ee_ch) : ?>
                     <a class="ee-tb-item" href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="color:<?php echo esc_attr($ee_ch['color']); ?>;font-weight:600;"><span class="dot" style="background:<?php echo esc_attr($ee_ch['color']); ?>;"></span><?php echo esc_html($ee_ch['label']); ?></a>
                 <?php endforeach; else : ?>
-                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:var(--ee-tealP);font-weight:600;"><span class="dot" style="background:#10b981;"></span>بله</a>
-                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:#b45309;font-weight:600;"><span class="dot" style="background:#f59e0b;"></span>ایتا</a>
-                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:#7e22ce;font-weight:600;"><span class="dot" style="background:#a855f7;"></span>روبیکا</a>
+                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_bale); ?>" style="color:var(--ee-tealP);font-weight:600;"><span class="dot" style="background:#10b981;"></span>بله</a>
+                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_eitaa); ?>" style="color:#b45309;font-weight:600;"><span class="dot" style="background:#f59e0b;"></span>ایتا</a>
+                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_rubika); ?>" style="color:#7e22ce;font-weight:600;"><span class="dot" style="background:#a855f7;"></span>روبیکا</a>
                 <?php endif; ?>
             </div>
             <div class="ee-tb-links">

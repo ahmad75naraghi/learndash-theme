@@ -146,7 +146,7 @@ function evented_pwa_serve_manifest()
 		'theme_color'      => evented_pwa_color('pwa_theme_color', '#00897B'),
 		'icons'            => evented_pwa_icons(),
 		'shortcuts'        => array(
-			array('name' => 'دوره‌ها', 'url' => home_url('/courses/?utm_source=pwa'), 'icons' => array(array('src' => PATH_DIR_URL . '/assets/pwa/icon-192.png', 'sizes' => '192x192'))),
+			array('name' => 'دوره‌ها', 'url' => add_query_arg('utm_source', 'pwa', function_exists('evented_nav_url') ? evented_nav_url('courses') : home_url('/courses/')), 'icons' => array(array('src' => PATH_DIR_URL . '/assets/pwa/icon-192.png', 'sizes' => '192x192'))),
 			array('name' => 'پنل کاربری', 'url' => home_url('/panel/?utm_source=pwa'), 'icons' => array(array('src' => PATH_DIR_URL . '/assets/pwa/icon-192.png', 'sizes' => '192x192'))),
 		),
 	);

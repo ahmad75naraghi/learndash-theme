@@ -26,8 +26,11 @@ $ee_articles_url    = $ee_nav('articles');
 $ee_url_about       = $ee_nav('about');
 $ee_url_contact     = $ee_nav('contact');
 $ee_url_account     = is_user_logged_in() ? home_url('/panel') : home_url('/login');
-$ee_instr_page      = get_page_by_path('instructors');
-$ee_url_instructors = $ee_instr_page instanceof WP_Post ? (string) get_permalink($ee_instr_page) : home_url('/#ee-instructors');
+$ee_url_instructors = function_exists('evented_nav_manual_url') ? evented_nav_manual_url('instructors') : '';
+if ('' === $ee_url_instructors) {
+	$ee_instr_page      = get_page_by_path('instructors');
+	$ee_url_instructors = $ee_instr_page instanceof WP_Post ? (string) get_permalink($ee_instr_page) : home_url('/#ee-instructors');
+}
 
 /* دسته‌های دوره برای ستون «دوره‌های تخصصی» (از کش منو) */
 $ee_course_item = function_exists('evented_nav_item') ? evented_nav_item('courses') : null;
