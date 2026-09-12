@@ -101,12 +101,59 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                     if ($ee_has_sub) { $ee_cls[] = 'has-sub'; }
                     if ($ee_active === $ee_it['key']) { $ee_cls[] = 'ee-active'; }
                     ?>
-                    <div class="<?php echo esc_attr(implode(' ', $ee_cls)); ?>">
-                        <a href="<?php echo esc_url($ee_it['url']); ?>"<?php echo $ee_active === $ee_it['key'] ? ' class="ee-active" aria-current="page"' : ''; ?>>
+                    <?php
+                    $ee_mega = array();
+                    if ('courses' === $ee_it['key'] && function_exists('evented_nav_course_mega')) {
+                        $ee_mega = evented_nav_course_mega();
+                    }
+                    if (!empty($ee_mega)) { $ee_cls[] = 'has-mega'; }
+                    ?>
+                    <div class="<?php echo esc_attr(implode(' ', $ee_cls)); ?>"<?php echo !empty($ee_mega) ? ' data-ee-mega' : ''; ?>>
+                        <a href="<?php echo esc_url($ee_it['url']); ?>"<?php echo $ee_active === $ee_it['key'] ? ' class="ee-active" aria-current="page"' : ''; ?><?php echo !empty($ee_mega) ? ' aria-haspopup="true" aria-expanded="false"' : ''; ?>>
                             <?php echo esc_html($ee_it['title']); ?>
-                            <?php if ($ee_has_sub) : ?><svg class="ee-ic ee-caret" focusable="false" aria-hidden="true"><use href="#i-expand_more"></use></svg><?php endif; ?>
+                            <?php if ($ee_has_sub || !empty($ee_mega)) : ?><svg class="ee-ic ee-caret" focusable="false" aria-hidden="true"><use href="#i-expand_more"></use></svg><?php endif; ?>
                         </a>
-                        <?php if ($ee_has_sub) : ?>
+                        <?php if (!empty($ee_mega)) : ?>
+                            <div class="ee-mega" role="region" aria-label="دسته‌بندی دوره‌ها">
+                                <div class="ee-mega-in">
+                                    <div class="ee-mega-tabs" role="tablist" aria-orientation="vertical">
+                                        <?php foreach ($ee_mega as $ee_mi => $ee_mt) : ?>
+                                            <button type="button" class="ee-mega-tab<?php echo 0 === $ee_mi ? ' is-on' : ''; ?>" role="tab" id="eeMegaTab-<?php echo (int) $ee_mt['id']; ?>" aria-controls="eeMegaPanel-<?php echo (int) $ee_mt['id']; ?>" aria-selected="<?php echo 0 === $ee_mi ? 'true' : 'false'; ?>" tabindex="<?php echo 0 === $ee_mi ? '0' : '-1'; ?>" data-url="<?php echo esc_url($ee_mt['url']); ?>">
+                                                <span class="ee-mega-tab-name"><?php echo esc_html($ee_mt['name']); ?></span>
+                                                <span class="ee-mega-tab-n"><?php echo esc_html(number_format_i18n((int) $ee_mt['count'])); ?> دوره</span>
+                                                <svg class="ee-ic ee-mega-tab-arrow" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
+                                            </button>
+                                        <?php endforeach; ?>
+                                        <a class="ee-mega-all" href="<?php echo esc_url($ee_it['url']); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg> همهٔ دوره‌ها</a>
+                                    </div>
+                                    <div class="ee-mega-panels">
+                                        <?php foreach ($ee_mega as $ee_mi => $ee_mt) : ?>
+                                            <div class="ee-mega-panel<?php echo 0 === $ee_mi ? ' is-on' : ''; ?>" role="tabpanel" id="eeMegaPanel-<?php echo (int) $ee_mt['id']; ?>" aria-labelledby="eeMegaTab-<?php echo (int) $ee_mt['id']; ?>"<?php echo 0 === $ee_mi ? '' : ' hidden'; ?>>
+                                                <div class="ee-mega-grid">
+                                                    <?php foreach ($ee_mt['courses'] as $ee_mc) : ?>
+                                                        <a class="ee-mega-card" href="<?php echo esc_url($ee_mc['url']); ?>">
+                                                            <span class="ee-mega-thumb">
+                                                                <?php if ($ee_mc['thumb']) : ?>
+                                                                    <img src="<?php echo esc_url($ee_mc['thumb']); ?>" alt="" loading="lazy" decoding="async">
+                                                                <?php else : ?>
+                                                                    <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg>
+                                                                <?php endif; ?>
+                                                            </span>
+                                                            <span class="ee-mega-title"><?php echo esc_html($ee_mc['title']); ?></span>
+                                                            <span class="ee-mega-meta">
+                                                                <?php if ($ee_mc['author']) : ?><span class="ee-mega-author"><?php echo esc_html($ee_mc['author']); ?></span><?php endif; ?>
+                                                                <span class="ee-mega-price<?php echo $ee_mc['free'] ? ' is-free' : ''; ?>"><?php echo esc_html($ee_mc['price']); ?></span>
+                                                            </span>
+                                                        </a>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                                <a class="ee-mega-more" href="<?php echo esc_url($ee_mt['url']); ?>">همهٔ دوره‌های <?php echo esc_html($ee_mt['name']); ?> <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php elseif ($ee_has_sub) : ?>
                             <div class="ee-sub" role="menu">
                                 <?php foreach ($ee_it['children'] as $ee_sub) : ?>
                                     <a role="menuitem" href="<?php echo esc_url($ee_sub['url']); ?>">

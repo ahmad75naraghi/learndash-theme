@@ -119,8 +119,69 @@
         });
     }
 
+    /* ---------- مگامنوی «دوره‌ها» در هدر ---------- */
+    document.querySelectorAll('[data-ee-mega]').forEach(function (item) {
+        var trigger = item.querySelector(':scope > a');
+        var mega    = item.querySelector('.ee-mega');
+        if (!trigger || !mega) { return; }
+        var tabs   = Array.prototype.slice.call(mega.querySelectorAll('.ee-mega-tab'));
+        var panels = Array.prototype.slice.call(mega.querySelectorAll('.ee-mega-panel'));
+        var hoverTimer = null, closeTimer = null;
+
+        function activate(tab) {
+            tabs.forEach(function (t) {
+                var on = t === tab;
+                t.classList.toggle('is-on', on);
+                t.setAttribute('aria-selected', on ? 'true' : 'false');
+                t.setAttribute('tabindex', on ? '0' : '-1');
+            });
+            var id = tab.getAttribute('aria-controls');
+            panels.forEach(function (p) { p.hidden = p.id !== id; });
+        }
+        function open()  { window.clearTimeout(closeTimer); item.classList.add('is-open'); trigger.setAttribute('aria-expanded', 'true'); }
+        function close() { item.classList.remove('is-open'); trigger.setAttribute('aria-expanded', 'false'); }
+
+        tabs.forEach(function (tab, i) {
+            // هاور با تأخیر کوتاه (جلوگیری از پرش هنگام عبور ماوس)
+            tab.addEventListener('mouseenter', function () { window.clearTimeout(hoverTimer); hoverTimer = window.setTimeout(function () { activate(tab); }, 90); });
+            tab.addEventListener('mouseleave', function () { window.clearTimeout(hoverTimer); });
+            tab.addEventListener('click', function () {
+                if (tab.classList.contains('is-on')) { var u = tab.getAttribute('data-url'); if (u) { window.location.href = u; } return; } // کلیک دوباره → صفحهٔ دسته
+                activate(tab);
+            });
+            tab.addEventListener('focus', function () { activate(tab); });
+            tab.addEventListener('keydown', function (e) {
+                var n = null;
+                if (e.key === 'ArrowDown') { n = tabs[(i + 1) % tabs.length]; }
+                if (e.key === 'ArrowUp')   { n = tabs[(i - 1 + tabs.length) % tabs.length]; }
+                if (e.key === 'Home') { n = tabs[0]; }
+                if (e.key === 'End')  { n = tabs[tabs.length - 1]; }
+                if (e.key === 'Enter') { var u = tab.getAttribute('data-url'); if (u) { window.location.href = u; } }
+                if (n) { e.preventDefault(); n.focus(); }
+            });
+        });
+
+        // باز/بسته با هاور (پشتیبانی CSS دارد) + کیبورد/لمس
+        item.addEventListener('mouseenter', open);
+        item.addEventListener('mouseleave', function () { closeTimer = window.setTimeout(close, 120); });
+        trigger.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); open(); var on = tabs.filter(function (t) { return t.classList.contains('is-on'); })[0] || tabs[0]; if (on) { on.focus(); } }
+        });
+        // روی دستگاه لمسی: اولین تپ منو را باز می‌کند، دومین تپ به صفحهٔ دوره‌ها می‌رود
+        trigger.addEventListener('touchend', function (e) {
+            if (!item.classList.contains('is-open') && window.matchMedia('(min-width: 900px)').matches) { e.preventDefault(); open(); }
+        }, { passive: false });
+        mega.addEventListener('keydown', function (e) { if (e.key === 'Escape') { close(); trigger.focus(); } });
+        document.addEventListener('click', function (e) { if (!item.contains(e.target)) { close(); } });
+        document.addEventListener('focusin', function (e) { if (!item.contains(e.target)) { close(); } });
+
+        // تب اول همیشه فعال شروع می‌شود
+        if (tabs[0]) { activate(tabs.filter(function (t) { return t.classList.contains('is-on'); })[0] || tabs[0]); }
+    });
+
     /* ---------- تب‌ها (مقالات و دوره‌های صفحهٔ اصلی) ---------- */
     document.querySelectorAll('[role="tablist"]').forEach(function (tabsWrap) {
+        if (tabsWrap.closest('.ee-mega')) { return; }
         var tabBtns = tabsWrap.querySelectorAll('[role="tab"]');
         if (!tabBtns.length) { return; }
         var panels = [];

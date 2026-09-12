@@ -347,14 +347,72 @@ function evented_nav_flush_cache($tabs_too = true)
 	}
 }
 
-/* انتشار/ویرایش/حذف دوره → تب‌های دورهٔ صفحهٔ اصلی تازه شود. */
-add_action('save_post_sfwd-courses', function () { delete_transient('evented_home_course_tabs'); });
+/* انتشار/ویرایش/حذف دوره → تب‌های دورهٔ صفحهٔ اصلی و مگامنو تازه شود. */
+function evented_flush_course_caches() {
+	delete_transient('evented_home_course_tabs');
+	delete_transient('evented_nav_course_mega');
+}
+add_action('save_post_sfwd-courses', 'evented_flush_course_caches');
 add_action('deleted_post', function ($post_id) {
-	if ('sfwd-courses' === get_post_type($post_id)) { delete_transient('evented_home_course_tabs'); }
+	if ('sfwd-courses' === get_post_type($post_id)) { evented_flush_course_caches(); }
 });
 add_action('set_object_terms', function ($object_id) {
-	if ('sfwd-courses' === get_post_type($object_id)) { delete_transient('evented_home_course_tabs'); }
+	if ('sfwd-courses' === get_post_type($object_id)) { evented_flush_course_caches(); }
 });
+
+/**
+ * دادهٔ مگامنوی «دوره‌ها»: هر دستهٔ دوره یک تب با حداکثر ۴ دوره (کش ۱۲ ساعته).
+ *
+ * @return array<int,array{id:int,name:string,url:string,count:int,courses:array}>
+ */
+function evented_nav_course_mega()
+{
+	if (!post_type_exists('sfwd-courses') || !taxonomy_exists('ld_course_category')) {
+		return array();
+	}
+	$cached = get_transient('evented_nav_course_mega');
+	if (is_array($cached)) {
+		return $cached;
+	}
+	$terms = get_terms(array('taxonomy' => 'ld_course_category', 'hide_empty' => true, 'number' => 8, 'orderby' => 'count', 'order' => 'DESC', 'parent' => 0));
+	$tabs  = array();
+	if (!is_wp_error($terms)) {
+		foreach ($terms as $term) {
+			$link = get_term_link($term);
+			if (is_wp_error($link)) {
+				continue;
+			}
+			$q = new WP_Query(array(
+				'post_type' => 'sfwd-courses', 'posts_per_page' => 4, 'no_found_rows' => true, 'ignore_sticky_posts' => true,
+				'tax_query' => array(array('taxonomy' => 'ld_course_category', 'field' => 'term_id', 'terms' => (int) $term->term_id)),
+			));
+			$courses = array();
+			foreach ($q->posts as $c) {
+				$meta   = get_post_meta($c->ID, '_sfwd-courses', true);
+				$ptype  = isset($meta['sfwd-courses_course_price_type']) ? $meta['sfwd-courses_course_price_type'] : '';
+				$amount = isset($meta['sfwd-courses_course_price']) ? $meta['sfwd-courses_course_price'] : '';
+				$free   = ('free' === $ptype || '' === (string) $amount);
+				$author = get_userdata((int) $c->post_author);
+				$courses[] = array(
+					'id'     => (int) $c->ID,
+					'title'  => (string) get_the_title($c),
+					'url'    => (string) get_permalink($c),
+					'thumb'  => (string) get_the_post_thumbnail_url($c->ID, 'medium'),
+					'author' => $author ? (string) $author->display_name : '',
+					'price'  => $free ? 'رایگان' : number_format((float) $amount) . ' تومان',
+					'free'   => $free,
+				);
+			}
+			wp_reset_postdata();
+			if (empty($courses)) {
+				continue;
+			}
+			$tabs[] = array('id' => (int) $term->term_id, 'name' => (string) $term->name, 'url' => (string) $link, 'count' => (int) $term->count, 'courses' => $courses);
+		}
+	}
+	set_transient('evented_nav_course_mega', $tabs, 12 * HOUR_IN_SECONDS);
+	return $tabs;
+}
 
 /* ---------- ابطال کش: هر تغییری که ساختار منو را عوض کند ---------- */
 add_action('created_term', 'evented_nav_flush_cache');
