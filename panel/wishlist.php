@@ -52,7 +52,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                         
                         $course_thumbnail = get_the_post_thumbnail_url( $course_id, 'medium' );
                         if ( ! $course_thumbnail ) {
-                            $course_thumbnail = 'https://via.placeholder.com/300x200?text=No+Image';
+                            $course_thumbnail = PATH_DIR_URL . '/assets/img/course-placeholder.svg';
                         }
 
                         $meta = get_post_meta( $course_id, '_sfwd-courses', true );

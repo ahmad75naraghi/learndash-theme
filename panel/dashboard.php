@@ -66,7 +66,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                         // دریافت تصویر شاخص
                         $course_thumbnail = get_the_post_thumbnail_url( $course_id, 'medium' );
                         if ( ! $course_thumbnail ) {
-                            $course_thumbnail = 'https://via.placeholder.com/300x200?text=No+Image'; // مسیر تصویر جایگزین در صورت نداشتن تصویر شاخص
+                            $course_thumbnail = PATH_DIR_URL . '/assets/img/course-placeholder.svg'; // مسیر تصویر جایگزین در صورت نداشتن تصویر شاخص
                         }
 
                         // دریافت وضعیت و قیمت دوره لرن‌دش

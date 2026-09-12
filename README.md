@@ -24,9 +24,9 @@
 | CMS | وردپرس (نسخهٔ ۶+، به‌روز) | فارسی، RTL |
 | LMS | **LearnDash** (نسخهٔ 3.6+) | پست‌تایپ `sfwd-courses`، درس، سکشن، گواهینامه، پرداخت |
 | زبان/سمت‌سرور | PHP 8.x (سازگار با 7.4) | استفاده از `str_starts_with()` و `??` |
-| فرانت‌اند | jQuery + Owl Carousel (صفحهٔ اصلی/پنل) + Vanilla JS برای پوستهٔ `ee-*` | اسکریپت‌های دستی در `assets/js`؛ Plyr دیگر بارگذاری نمی‌شود |
-| فونت | «دانا» (`assets/fonts/evented-edu-font.woff2`) | `@font-face` در `style.css` |
-| پیامک OTP | SOAP پنل پیامک (payamak-panel) | `inc/sms.php` — ⚠️ اعتبارنامه هاردکد |
+| فرانت‌اند | فقط Vanilla JS (بدون jQuery/Owl/Plyr) | همهٔ اسکریپت‌ها در `assets/js/newhome/`؛ فقط `jalalidatepicker` (محلی) به‌عنوان vendor |
+| فونت/آیکن | **Vazirmatn متغیر** (`assets/fonts/Vazirmatn-Variable.woff2`, OFL) + «دانا» به‌عنوان fallback؛ آیکن‌ها اسپرایت SVG محلی (`assets/icons/ee-icons.svg`, Material Symbols) | `assets/css/newhome/ee-fonts.css` — **هیچ درخواست خارجی** (`inc/no_external.php` بقیه را هم مسدود می‌کند) |
+| پیامک OTP/اعلان | SOAP پنل پیامک (payamak-panel) | `inc/sms.php` — اعتبارنامه از **تنظیمات قالب → پیامک** یا ثابت‌های `EVENTED_SMS_*` |
 | پیام‌رسان | ربات بله — تابع `evented_send_otp_with_bale()` | قالب یک wrapper محافظت‌شده دارد؛ ارسال واقعی به mu-plugin/افزونه (هم‌نام یا legacy با نام `falnic_send_otp_with_bale`) واگذار می‌شود |
 | پایگاه‌دادهٔ تراکنش | جدول سفارشی `{wp}_evented_transactions` | ⚠️ سازندهٔ جدول در این قالب نیست؛ نصب‌های قدیمی باید جدول را تغییر نام دهند (migration) |
 | تست | ندارد (در این مرحله) | بخش ۷ را ببینید |
@@ -38,7 +38,6 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 ├── style.css / functions.php     هدر قالب + بوت‌استرپ (PATH_DIR* + require ها)
 ├── README.md / ARCHITECTURE.md / CHANGELOG.md / CONTRIBUTING.md / AI.md
 ├── ROADMAP.md / TODO.md / TECH_DEBT.md
-├── header.php / footer.php       هدر/فوتر + action-bar موبایل + منوی کشویی
 ├── front-page.php                صفحهٔ اصلی (بخش‌های داینامیک/استاتیک — رجوع: ARCHITECTURE §5)
 ├── single.php                    تک‌نوشته (پوستهٔ ee-*؛ مقاله + سایدبار + دیدگاه)
 ├── archive.php / home.php / search.php   آرشیو نوشته‌ها، برگهٔ نوشته‌ها، نتایج جستجو
@@ -51,31 +50,40 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 ├── archive-sfwd-courses.php      بایگانی همهٔ دوره‌ها (پوستهٔ ee-*)
 ├── author.php                    پروفایل مدرس  |  template-instructors.php  لیست اساتید
 ├── page-login.php                صفحهٔ ورود/OTP (HTML مستقل، بدون wp_head)
-├── page-panel.php                ریدایرکت به داشبورد پنل (طراحی مستقل)
+├── page-panel.php                برگهٔ /panel → پیشخوان پنل (روی پوستهٔ ee-*)
 ├── page.php / page-courses.php / page-courses-cat.php / 404.php   برگهٔ عمومی · فهرست دوره‌ها · دسته‌بندی‌ها · ۴۰۴ (همه با پوستهٔ ee-*)
 ├── index.php                     قالب بازگشتی عمومی (fallback) برای انواع پست بدون قالب اختصاصی
 ├── assets/
-│   ├── assets_functions.php      منطق enqueue همهٔ CSS/JS
-│   ├── css/  front-page · single-courses (بازنشسته) · archive-courses (بازنشسته) · single-post · archive-post · author (بازنشسته) · panel · vendorها
-│   ├── css/newhome/  ee-shell (پوستهٔ مشترک) · evented-home (صفحهٔ اصلی) · ee-lms (دوره، درس و آزمون) · ee-courses (فهرست‌ها، اساتید، برگه و ۴۰۴)
-│   ├── js/   main · front-page · single-courses (بازنشسته) · author · panel + vendorها
+│   ├── assets_functions.php      enqueue دارایی‌های پنل کاربری (بقیه در functions.php)
+│   ├── css/  single-post · archive-post · panel (محتوای پنل) · jalalidatepicker
+│   ├── css/newhome/  ee-fonts (فونت/آیکن محلی) · ee-shell (پوستهٔ مشترک) · evented-home · ee-lms · ee-courses (+ نوار فیلتر) · ee-panel · ee-live-search · ee-notify
 │   ├── js/newhome/evented-home.js  کشوی منوی موبایل · زیرمنوها · جستجوی موبایل · تب‌های مقالات · اسلایدر هیرو · کپی لینک
 │   ├── js/newhome/ee-lms.js        آکاردئون · گروه درس‌ها · دیدگاه/امتیاز · تکمیل درس · علاقه‌مندی
-│   ├── fonts/evented-edu-font.woff2   فونت «دانا»
+│   ├── js/newhome/ee-live-search.js  جستجوی زندهٔ هدر  |  ee-notify.js  زنگولهٔ اعلان‌ها  |  ee-panel.js  رفتارهای پنل
+│   ├── icons/ee-icons.svg        اسپرایت SVG آیکن‌ها (با `ee_icon('name')` استفاده می‌شود)
+│   ├── fonts/  Vazirmatn-Variable.woff2 · evented-edu-font.woff2 (دانا)
 │   └── img/  front-page (۲۳) · single-page (۸) · panel (۲)
 ├── inc/
 │   ├── includes.php              فقط require کردن ماژول‌های پایین
+│   ├── icons.php                 ee_icon() + تزریق اسپرایت SVG در body
+│   ├── seo.php                   title-tag، متا/OG/Twitter، JSON-LD (Organization/WebSite/Course/Article/Breadcrumb/Collection)؛ با Yoast/RankMath خاموش می‌شود
+│   ├── no_external.php           حذف اموجی/oEmbed/dns-prefetch و هر استایل/اسکریپت خارجی
+│   ├── theme_options_store.php   اسکیمای تنظیمات قالب + evented_opt() + لینک شبکه‌ها/کانال‌ها
+│   ├── live_search.php           REST جستجوی زنده (/evented/v1/search)
+│   ├── course_filters.php        فیلتر/مرتب‌سازی سمت‌سرور آرشیو دوره‌ها (level/price/status/instructor/orderby)
+│   ├── notifications.php         اعلان‌ها: جدول {wp}_evented_notifications، REST، رویدادها، پیامک اختیاری
 │   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها) + هلپرهای LMS
 │   ├── navigation.php            منوی استاتیک هدر/فوتر/کشوی موبایل (کش هفتگی) + فیلتر بخش جستجو + تب‌های مقالات خانه
 │   ├── login.php                 کلاس FalnicAuthHandler (OTP/ورود) + captcha_verify
 │   ├── sms.php                   send_pattern_sms (SOAP)
 │   ├── meta_functions.php        متاباکس دوره/دسته/کاربر + فیلتر آواتار
 │   ├── theme_options.php         MIME ها، گارد subscriber، is_current_path()
-│   ├── theme_settings.php        مدیر اسلایدر هیرو در پیشخوان (آپشن evented_home_slides)
+│   ├── theme_settings.php        صفحهٔ «تنظیمات قالب» تب‌دار: اسلایدر، عمومی/تماس، شبکه‌ها، متن‌های خانه، پیامک، سئو، اعلان‌ها
 │   ├── ajax_functions.php        ۵ اکشن AJAX (نظر/تکمیل درس/علاقه‌مندی/پروفایل/تنظیمات)
-│   └── captcha.php               کپچای GD (⚠️ متصل نیست + فونتش مفقود)
+│   └── ajax_functions.php
+├── template-parts/panel/         shell-open.php / shell-close.php (سایدبار پنل + مودال خروج روی هدر/فوتر ee-*)
 └── panel/                        تمپلیت‌های پنل (Template Name: Panel - …)
-    ├── sidebar.php و dashboard.php و my-courses.php و certificates.php
+    ├── dashboard.php و my-courses.php و certificates.php
     └── wishlist.php و payments.php و profile.php و settings.php
 ```
 
@@ -159,18 +167,28 @@ wp-content/themes/<theme-folder>/
 - فیلتر جستجوی هدر (`?post_type=`) از همین آیتم‌ها ساخته می‌شود؛ حالت «همه‌جا» فقط همین پست‌تایپ‌ها + برگه‌ها را می‌گردد.
 - ورود مدیران: `/wp-admin` و `wp-login.php?admin=1` به فرم استاندارد وردپرس می‌روند؛ `/login` مخصوص کاربران (موبایل + OTP) است.
 
-## ۶. پیکربندی (متغیرهای محیطی)
+## ۶. پیکربندی
 
-پروژه از `wp-config.php` هیچ ثابتی نمی‌خواند؛ این مقادیر «شکسته» در کد هاردکد شده‌اند و **باید** پیش از استقرار به ثابت/تنظیم منتقل شوند (در `TECH_DEBT.md` ثبت شده‌اند):
+همهٔ تنظیمات از **نمایش → تنظیمات قالب** خوانده می‌شوند (آپشن `evented_theme_options`، دسترسی با `evented_opt('key')`):
 
-| متغیر پیشنهادی (wp-config) | محل فعلی | توضیح |
-|---|---|---|
-| `FALNIC_SMS_USERNAME` / `FALNIC_SMS_PASSWORD` / `FALNIC_SMS_BODY_ID` | `inc/sms.php` | اعتبارنامهٔ پنل پیامک (فعلاً `iranhp`/… در سورس!) |
-| `FALNIC_BALE_HANDLER` | `inc/login.php` | نام تابع ارسال به بله |
-| `FALNIC_SITE_URL` | تمام قالب‌ها | دامنهٔ اصلی برای ریدایرکت‌ها |
-| `FALNIC_CAPTCHA_FONT` | `inc/captcha.php` | مسیر فونت TTF کپچا |
+| تب | کلیدهای مهم |
+|---|---|
+| عمومی/تماس | `site_tagline_fa`, `license_text`, `phone`, `phone_hours`, `email`, `address`, `copyright`, `terms_url` |
+| شبکه‌ها | `channel_id` (ایتا/بله/روبیکا/سروش) یا URL کامل هرکدام، `telegram_url`, `instagram_url`, `youtube_url`, `linkedin_url` |
+| صفحهٔ اصلی | عنوان/زیرعنوان بخش‌ها، `tabs_count`, `tabs_per` |
+| پیامک | `sms_username`, `sms_password`, `sms_body_id`, `sms_notify_body_id`, `otp_ttl`, `otp_rate` |
+| سئو | `seo_enabled`, `seo_home_title`, `seo_home_desc`, `seo_default_img`, `org_name`, `org_logo` |
+| اعلان‌ها | `notify_enabled`, `notify_new_lesson`, `notify_comment`, `notify_sms`, `notify_keep_days` + فرم «ارسال اعلان دستی» |
 
-همچنین آدرس تصاویر استاتیک قالب بهتر است از `PATH_DIR_URL` (تعریف‌شده در `functions.php`) پیروی کنند.
+برای محیط‌های حساس می‌توان اعتبارنامهٔ پیامک را در `wp-config.php` گذاشت؛ ثابت‌ها بر تنظیمات اولویت دارند:
+
+```php
+define('EVENTED_SMS_USERNAME', '…');
+define('EVENTED_SMS_PASSWORD', '…');
+define('EVENTED_SMS_BODY_ID', 12345);
+```
+
+**سیاست «بدون درخواست خارجی»:** فونت‌ها، آیکن‌ها و همهٔ اسکریپت‌ها محلی‌اند و `inc/no_external.php` هر استایل/اسکریپت ثبت‌شده از دامنهٔ دیگر را روی فرانت‌اند حذف می‌کند (استثنا با فیلتر `evented_allowed_external_hosts`).
 
 ## ۷. تست‌ها
 
