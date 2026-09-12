@@ -162,6 +162,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 							<div class="ee-ac-foot">
 								<span class="ee-ac-date"><?php echo esc_html($ee_p_date); ?></span>
 								<span class="ee-ac-stats">
+									<?php echo function_exists('evented_rating_badge_html') ? evented_rating_badge_html($ee_id) : ''; // phpcs:ignore ?>
 									<span title="<?php esc_attr_e('زمان مطالعه', 'evented-edu'); ?>">
 										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg>
 										<?php echo esc_html(number_format_i18n($ee_p_read)); ?>

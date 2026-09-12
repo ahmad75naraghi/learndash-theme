@@ -430,7 +430,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                             <p><?php echo esc_html(wp_trim_words(get_the_excerpt($a), 16)); ?></p>
                         </div>
                         <div class="art-foot">
-                            <span><?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($a) : get_the_date('', $a)); ?></span>
+                            <span><?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($a) : get_the_date('', $a)); ?> <?php echo function_exists('evented_rating_badge_html') ? evented_rating_badge_html($a->ID) : ''; // phpcs:ignore ?></span>
                             <a class="read" href="<?php echo esc_url(get_permalink($a)); ?>">مطالعه کامل <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                         </div>
                     </article>

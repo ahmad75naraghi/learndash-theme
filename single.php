@@ -89,6 +89,10 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                         ?>
                     </span>
 
+                    <?php if (function_exists('evented_course_rating') && evented_course_rating(get_the_ID())['count'] > 0) : $ee_r = evented_course_rating(get_the_ID()); ?>
+                        <a class="ee-meta-item ee-meta-rating" href="#ee-comments" title="<?php esc_attr_e('امتیاز خوانندگان', 'evented-edu'); ?>"><?php echo evented_rating_stars_html($ee_r['avg']); // phpcs:ignore ?><b><?php echo esc_html(number_format_i18n($ee_r['avg'], 1)); ?></b><span>(<?php echo esc_html(number_format_i18n($ee_r['count'])); ?>)</span></a>
+                    <?php endif; ?>
+
                     <a class="ee-meta-item" href="#ee-comments" title="<?php esc_attr_e('دیدگاه‌ها', 'evented-edu'); ?>">
                         <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg>
                         <?php

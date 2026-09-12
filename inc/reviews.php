@@ -16,6 +16,16 @@
 
 defined('ABSPATH') || exit;
 
+/**
+ * نوع‌های پستی که امتیاز می‌گیرند (دوره‌ها + نوشته‌های بلاگ).
+ *
+ * @return string[]
+ */
+function evented_rating_post_types()
+{
+	return (array) apply_filters('evented_rating_post_types', array('sfwd-courses', 'post'));
+}
+
 /* ------------------------------------------------------------------ */
 /* محاسبه و کش                                                          */
 /* ------------------------------------------------------------------ */
@@ -92,7 +102,7 @@ function evented_rating_on_comment_change($comment)
 		return;
 	}
 	$post_id = (int) $comment->comment_post_ID;
-	if ('sfwd-courses' !== get_post_type($post_id)) {
+	if (!in_array(get_post_type($post_id), evented_rating_post_types(), true)) {
 		return;
 	}
 	evented_rating_recalc($post_id);
@@ -125,7 +135,7 @@ add_action('admin_init', static function () {
 	if (get_option('evented_rating_backfilled')) {
 		return;
 	}
-	$ids = get_posts(array('post_type' => 'sfwd-courses', 'post_status' => 'any', 'fields' => 'ids', 'posts_per_page' => 200, 'meta_query' => array(array('key' => '_course_rating_count', 'compare' => 'NOT EXISTS')))); // phpcs:ignore WordPress.DB.SlowDBQuery
+	$ids = get_posts(array('post_type' => evented_rating_post_types(), 'post_status' => 'any', 'fields' => 'ids', 'posts_per_page' => 200, 'meta_query' => array(array('key' => '_course_rating_count', 'compare' => 'NOT EXISTS')))); // phpcs:ignore WordPress.DB.SlowDBQuery
 	foreach ($ids as $id) {
 		evented_rating_recalc($id);
 	}
@@ -262,7 +272,7 @@ function evented_rating_schema_parts($course_id)
  * (الف) وقتی سئوی داخلی قالب فعال است: گرهٔ Course را تکمیل کن.
  */
 add_filter('evented_seo_jsonld', static function ($graph) {
-	if (!is_singular('sfwd-courses') || !is_array($graph)) {
+	if (!is_singular(evented_rating_post_types()) || !is_array($graph)) {
 		return $graph;
 	}
 	$parts = evented_rating_schema_parts(get_queried_object_id());
@@ -270,11 +280,21 @@ add_filter('evented_seo_jsonld', static function ($graph) {
 		return $graph;
 	}
 	foreach ($graph as $k => $node) {
-		if (isset($node['@type']) && 'Course' === $node['@type']) {
+		if (isset($node['@type']) && in_array($node['@type'], array('Course', 'Article', 'BlogPosting', 'NewsArticle'), true)) {
 			$graph[$k] = array_merge($node, $parts);
 		}
 	}
 	return $graph;
+});
+
+/**
+ * (ب-۲) یوست برای نوشته‌ها خودش گرهٔ Article می‌سازد → فقط امتیاز به همان گره اضافه می‌شود.
+ */
+add_filter('wpseo_schema_article', static function ($data) {
+	if (!is_singular('post') || !is_array($data)) {
+		return $data;
+	}
+	return array_merge($data, evented_rating_schema_parts(get_queried_object_id()));
 });
 
 /**
@@ -355,3 +375,112 @@ add_filter('evented_review_before_insert', static function ($comment_data, $cour
 	}
 	return $comment_data;
 }, 10, 3);
+
+/* ------------------------------------------------------------------ */
+/* بلاگ: امتیاز در فرم استاندارد دیدگاه وردپرس                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * آیا این نوشته امتیاز می‌گیرد؟ (نوشتهٔ بلاگ؛ دوره‌ها فرم AJAX خودشان را دارند)
+ */
+function evented_rating_form_enabled($post_id = 0)
+{
+	$post_id = $post_id ? (int) $post_id : get_the_ID();
+	return 'post' === get_post_type($post_id) && (bool) apply_filters('evented_rating_form_enabled', true, $post_id);
+}
+
+/**
+ * انتخاب‌گر ستاره‌ای بالای textarea فرم دیدگاه (فقط برای دیدگاه اصلی، نه پاسخ).
+ */
+add_filter('comment_form_field_comment', static function ($field) {
+	if (!evented_rating_form_enabled()) {
+		return $field;
+	}
+	$picker  = '<fieldset class="ee-rate-pick" data-ee-rate-pick>';
+	$picker .= '<legend>امتیاز شما به این مطلب <small>(اختیاری)</small></legend>';
+	$picker .= '<div class="ee-rate-stars" role="radiogroup">';
+	for ($i = 1; $i <= 5; $i++) {
+		$picker .= '<label class="ee-rate-star" title="' . esc_attr(sprintf('%s از ۵', number_format_i18n($i))) . '"><input type="radio" name="ee_rating" value="' . $i . '"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg><span class="screen-reader-text">' . esc_html(number_format_i18n($i)) . '</span></label>';
+	}
+	$picker .= '</div><span class="ee-rate-txt" aria-live="polite"></span></fieldset>';
+	return $picker . $field;
+});
+
+/**
+ * ذخیرهٔ امتیاز همراه دیدگاه (فقط دیدگاه سطح اول؛ هر کاربر/ایمیل یک امتیاز).
+ */
+add_action('comment_post', static function ($comment_id, $approved, $data) {
+	if (empty($_POST['ee_rating']) || !empty($data['comment_parent'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		return;
+	}
+	$rating  = (int) $_POST['ee_rating']; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$post_id = (int) $data['comment_post_ID'];
+	if ($rating < 1 || $rating > 5 || !evented_rating_form_enabled($post_id)) {
+		return;
+	}
+	// امتیاز قبلی همین کاربر/ایمیل روی همین نوشته → امتیاز جدید نادیده گرفته می‌شود (دیدگاه ثبت می‌ماند).
+	$args = array('post_id' => $post_id, 'parent' => 0, 'status' => 'all', 'meta_key' => 'review_rating', 'comment__not_in' => array($comment_id), 'number' => 1); // phpcs:ignore WordPress.DB.SlowDBQuery
+	if (!empty($data['user_id'])) {
+		$args['user_id'] = (int) $data['user_id'];
+	} else {
+		$args['author_email'] = (string) $data['comment_author_email'];
+	}
+	if (get_comments($args)) {
+		return;
+	}
+	add_comment_meta($comment_id, 'review_rating', $rating, true);
+}, 10, 3);
+
+/**
+ * نمایش ستاره‌های هر دیدگاه در فهرست استاندارد (wp_list_comments).
+ */
+add_filter('comment_text', static function ($text, $comment = null) {
+	if (!$comment instanceof WP_Comment || is_admin() || is_feed()) {
+		return $text;
+	}
+	$rating = (int) get_comment_meta($comment->comment_ID, 'review_rating', true);
+	if ($rating < 1 || $rating > 5) {
+		return $text;
+	}
+	return '<div class="ee-cmt-rating">' . evented_rating_stars_html($rating) . '</div>' . $text;
+}, 10, 2);
+
+/**
+ * حذف/ویرایش امتیاز از ستون دیدگاه‌های پیشخوان (نمایش ستاره در ستون دیدگاه).
+ */
+add_filter('comment_row_actions', static function ($actions, $comment) {
+	$rating = (int) get_comment_meta($comment->comment_ID, 'review_rating', true);
+	if ($rating > 0) {
+		$actions = array('ee_rating' => '<span style="color:#f59e0b">' . str_repeat('★', $rating) . str_repeat('☆', 5 - $rating) . '</span>') + $actions;
+	}
+	return $actions;
+}, 10, 2);
+
+/**
+ * مرتب‌سازی «بالاترین امتیاز» برای بایگانی نوشته‌ها: ?orderby=rating
+ */
+add_action('pre_get_posts', static function ($q) {
+	if (is_admin() || !$q->is_main_query() || 'rating' !== (string) $q->get('orderby')) {
+		return;
+	}
+	if (!($q->is_home() || $q->is_category() || $q->is_tag() || $q->is_author() || $q->is_post_type_archive('sfwd-courses') || $q->is_tax('ld_course_category'))) {
+		return;
+	}
+	$q->set('meta_query', array( // phpcs:ignore WordPress.DB.SlowDBQuery
+		'ee_rating' => array('key' => '_course_rating_avg', 'type' => 'DECIMAL(4,2)', 'compare' => 'EXISTS'),
+		'ee_rcount' => array('key' => '_course_rating_count', 'type' => 'NUMERIC', 'compare' => 'EXISTS'),
+	));
+	$q->set('orderby', array('ee_rating' => 'DESC', 'ee_rcount' => 'DESC', 'date' => 'DESC'));
+});
+
+/**
+ * استایل/اسکریپت انتخاب‌گر ستاره (فقط جایی که فرم دیدگاه نوشته هست).
+ */
+add_action('wp_enqueue_scripts', static function () {
+	if (is_singular('post') || is_singular('sfwd-courses') || is_home() || is_archive() || is_front_page() || is_search()) {
+		wp_enqueue_style('ee-rating', PATH_DIR_URL . '/assets/css/newhome/ee-rating.css', array('ee-shell'), '1.0.0');
+	}
+	if (is_singular('post') && (comments_open() || get_comments_number())) {
+		wp_enqueue_script('ee-rating', PATH_DIR_URL . '/assets/js/newhome/ee-rating.js', array(), '1.0.0', true);
+	}
+}, 26);

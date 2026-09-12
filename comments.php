@@ -16,6 +16,11 @@ if (post_password_required()) {
 ?>
 <div id="comments" class="ee-comments-wrap">
 
+	<?php if (function_exists('evented_rating_summary_html') && function_exists('evented_rating_form_enabled') && evented_rating_form_enabled() && evented_course_rating(get_the_ID())['count'] > 0) : ?>
+		<h3 class="ee-w-title ee-comments-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg><?php esc_html_e('امتیاز خوانندگان', 'evented-edu'); ?></h3>
+		<?php echo evented_rating_summary_html(get_the_ID()); // phpcs:ignore ?>
+	<?php endif; ?>
+
 	<?php if (have_comments()) : ?>
 		<h3 class="ee-w-title ee-comments-title">
 			<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg>

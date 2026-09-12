@@ -1,0 +1,46 @@
+/* ===== امتیاز و نظرات (inc/reviews.php) — دوره‌ها و نوشته‌ها ===== */
+/* ===== نشان امتیاز روی کارت‌ها (inc/reviews.php) ===== */
+.ee-rating-badge { display: inline-flex; align-items: center; gap: .15rem; font-size: .72rem; color: var(--ee-ink); white-space: nowrap; }
+.ee-rating-badge .ee-ic { color: var(--ee-amberA); font-size: .95rem; }
+.ee-rating-badge b { font-weight: 800; }
+.ee-rating-badge small { color: var(--ee-soft); font-size: .66rem; }
+.cc-instructor .ee-rating-badge { margin-inline-start: auto; }
+.ee-ccard-rating .ee-ic { color: var(--ee-amberA) !important; }
+/* ===== امتیاز دوره (inc/reviews.php) ===== */
+.ee-meta-rating { gap: .35rem !important; }
+.ee-meta-rating b { color: var(--ee-ink); font-weight: 800; }
+.ee-meta-rating span { color: var(--ee-soft); }
+.ee-stars .ee-ic.is-half { color: var(--ee-amberA); }
+.ee-stars-lg .ee-ic { font-size: 1.25rem; }
+.ee-rating-sum { display: grid; grid-template-columns: auto 1fr; gap: 1.2rem 1.6rem; align-items: center; background: linear-gradient(135deg, var(--ee-amber), #fff); border: 1px solid #fde68a; border-radius: 1rem; padding: 1rem 1.2rem; margin: 0 0 1.2rem; }
+.ee-rating-sum.is-empty { display: flex; gap: .5rem; color: var(--ee-soft); font-size: .85rem; }
+.ee-rating-sum.is-empty .ee-ic { color: var(--ee-amberA); font-size: 1.3rem; }
+.ee-rating-big { display: flex; flex-direction: column; align-items: center; gap: .2rem; min-width: 7rem; }
+.ee-rating-big strong { font-size: 2.6rem; line-height: 1; color: var(--ee-ink); font-weight: 900; }
+.ee-rating-big span { font-size: .72rem; color: var(--ee-soft); }
+.ee-rating-dist { list-style: none; margin: 0; padding: 0; display: grid; gap: .3rem; }
+.ee-rating-dist li { display: grid; grid-template-columns: 2.6rem 1fr 2rem; align-items: center; gap: .5rem; font-size: .72rem; color: var(--ee-soft); }
+.ee-rating-dist .lbl { display: inline-flex; align-items: center; gap: .15rem; }
+.ee-rating-dist .lbl .ee-ic { color: var(--ee-amberA); font-size: .85rem; }
+.ee-rating-dist .bar { height: .5rem; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+.ee-rating-dist .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--ee-amberA), #fbbf24); border-radius: 999px; }
+.ee-rating-dist .num { text-align: left; direction: ltr; font-weight: 700; }
+@media (max-width: 479.98px) { .ee-rating-sum { grid-template-columns: 1fr; justify-items: center; } .ee-rating-dist { width: 100%; } }
+
+/* ===== انتخاب‌گر ستاره در فرم دیدگاه نوشته ===== */
+.ee-rate-pick { border: 1px dashed #fde68a; background: var(--ee-amber, #FFF8E1); border-radius: 1rem; padding: .7rem .9rem; margin: 0 0 .9rem; display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+.ee-rate-pick legend { float: right; font-size: .78rem; font-weight: 700; color: var(--ee-ink); padding: 0; margin-inline-end: .4rem; }
+.ee-rate-pick legend small { color: var(--ee-soft); font-weight: 400; }
+.ee-rate-stars { display: inline-flex; flex-direction: row-reverse; gap: .1rem; }
+.ee-rate-star { cursor: pointer; margin: 0; }
+.ee-rate-star input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.ee-rate-star .ee-ic { font-size: 1.6rem; color: #cbd5e1; transition: transform .15s, color .15s; }
+.ee-rate-star:hover .ee-ic, .ee-rate-star:hover ~ .ee-rate-star .ee-ic,
+.ee-rate-stars.has-value .ee-rate-star.is-on .ee-ic { color: var(--ee-amberA, #FFA726); }
+.ee-rate-star:hover .ee-ic { transform: scale(1.15); }
+.ee-rate-star input:focus-visible + .ee-ic { outline: 2px solid var(--ee-tealP); outline-offset: 2px; border-radius: 4px; }
+.ee-rate-txt { font-size: .74rem; color: var(--ee-tealP); font-weight: 700; min-width: 5rem; }
+.ee-cmt-rating { margin: 0 0 .35rem; }
+.ee-cmt-rating .ee-stars .ee-ic { font-size: .85rem; }
+.ee-post-meta .ee-meta-rating b { color: var(--ee-ink); }
+.ee-ac-stats .ee-rating-badge, .art-foot .ee-rating-badge { margin-inline-end: .5rem; }

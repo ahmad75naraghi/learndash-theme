@@ -71,7 +71,7 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 │   ├── theme_options_store.php   اسکیمای تنظیمات قالب + evented_opt() + لینک شبکه‌ها/کانال‌ها
 │   ├── live_search.php           REST جستجوی زنده (/evented/v1/search)
 │   ├── course_filters.php        فیلتر/مرتب‌سازی سمت‌سرور آرشیو دوره‌ها (level/price/status/instructor/orderby)
-│   ├── reviews.php               امتیاز واقعی دوره‌ها (کش متا، ستاره‌ها، AggregateRating/Review، سازگار با Yoast)
+│   ├── reviews.php               امتیاز واقعی دوره‌ها و نوشته‌ها (کش متا، ستاره‌ها، AggregateRating/Review، سازگار با Yoast)
 │   ├── resume.php                ادامهٔ یادگیری: آخرین درس، چیپ هدر، کارت پنل، یادآور کاربران غیرفعال (کرون)
 │   ├── pwa.php                   PWA: manifest، سرویس‌ورکر (/ee-sw.js)، صفحهٔ آفلاین، دکمهٔ نصب
 │   ├── notifications.php         اعلان‌ها: جدول {wp}_evented_notifications، REST، رویدادها، پیامک اختیاری

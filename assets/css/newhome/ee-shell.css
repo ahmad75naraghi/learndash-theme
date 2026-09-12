@@ -307,11 +307,3 @@
 
 /* ---------- چیپ لینک‌دار (آرشیو) ---------- */
 .ee-chip-btn .ee-chip-count { display: inline-block; margin-inline-start: .3rem; font-size: .62rem; opacity: .75; }
-
-/* ===== نشان امتیاز روی کارت‌ها (inc/reviews.php) ===== */
-.ee-rating-badge { display: inline-flex; align-items: center; gap: .15rem; font-size: .72rem; color: var(--ee-ink); white-space: nowrap; }
-.ee-rating-badge .ee-ic { color: var(--ee-amberA); font-size: .95rem; }
-.ee-rating-badge b { font-weight: 800; }
-.ee-rating-badge small { color: var(--ee-soft); font-size: .66rem; }
-.cc-instructor .ee-rating-badge { margin-inline-start: auto; }
-.ee-ccard-rating .ee-ic { color: var(--ee-amberA) !important; }
