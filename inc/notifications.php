@@ -484,3 +484,8 @@ add_action('admin_post_evented_notify_broadcast', static function () {
 	wp_safe_redirect(add_query_arg(array('page' => 'evented-theme-settings', 'tab' => 'notify', 'ee_msg' => 'sent', 'n' => $n), admin_url('themes.php')));
 	exit;
 });
+
+/**
+ * بازسازی قوانین بازنویسی (Permalink) هنگام فعال‌سازی قالب — تا آدرس نوشته‌ها/صفحه‌ها بلافاصله درست کار کند.
+ */
+add_action('after_switch_theme', 'flush_rewrite_rules', 20);
