@@ -23,3 +23,4 @@ $ee_body_class = isset($args['ee_body_class']) ? (string) $args['ee_body_class']
     <?php wp_head(); ?>
 </head>
 <body <?php body_class(trim('ee-home ee-body-pad ' . $ee_body_class)); ?>>
+<?php wp_body_open(); ?>

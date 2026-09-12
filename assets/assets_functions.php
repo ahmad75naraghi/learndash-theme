@@ -1,54 +1,59 @@
 <?php
-function theme_enqueue()
+/**
+ * بارگذاری دارایی‌های پنل کاربری
+ *
+ * پوستهٔ ee-* (همهٔ نماهای عمومی) استایل/اسکریپت خودش را در functions.php بارگذاری می‌کند.
+ * پنل کاربری هم روی همان پوسته سوار است و فقط استایل/اسکریپت اختصاصی خود را اضافه می‌کند.
+ * هیچ وابستگی به jQuery، style.css قدیمی یا کتابخانه‌های خارجی وجود ندارد.
+ *
+ * @package evented-edu
+ */
+
+defined('ABSPATH') || exit;
+
+/**
+ * آیا نمای جاری یکی از صفحه‌های پنل کاربری است؟
+ */
+function evented_is_panel_view()
 {
-    wp_enqueue_style('theme-style', PATH_DIR_URL . '/style.css', '', '1.0.0');
-
-    wp_enqueue_style('owl.carousel', PATH_DIR_URL . '/assets/css/owl.carousel.min.css');
-    wp_enqueue_script('owl.carousel', PATH_DIR_URL . '/assets/js/owl.carousel.min.js', ['jquery'], '', true);
-
-    wp_enqueue_script('main', PATH_DIR_URL . '/assets/js/main.js', ['jquery'], '1.0.0', true);
-    // wp_enqueue_script('main-ex', PATH_DIR_URL . '/assets/js/main-ex.js', '', '1.0.0', true);
-    wp_localize_script('main', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('notification_nonce')));
-
-    // صفحهٔ اصلی: پوستهٔ جدید (ee-shell.css + evented-home.css) در functions.php بارگذاری می‌شود؛
-    // is_home() عمداً اینجا نیست چون برگهٔ نوشته‌ها از قالب آرشیو جدید استفاده می‌کند.
-    if (is_page('home') || is_front_page()) {
-        wp_enqueue_style('front-page', PATH_DIR_URL . '/assets/css/front-page.css', '', '1.0.0');
-        wp_enqueue_script('front-page', PATH_DIR_URL . '/assets/js/front-page.js', '', '1.0.0', true);
-        // wp_enqueue_script('front-page-ex', PATH_DIR_URL . '/assets/js/front-page-ex.js', '', '1.0.0', true);
+    if (!is_page()) {
+        return false;
     }
-    // بایگانی/دستهٔ دوره، صفحهٔ دوره‌ها، آزمون، اساتید، پروفایل مدرس، برگه و ۴۰۴
-    // همگی با پوستهٔ evented-edu رندر می‌شوند؛ استایل‌های آن‌ها (newhome/ee-courses.css
-    // و newhome/ee-lms.css) در functions.php بارگذاری می‌شوند. فایل‌های قدیمی
-    // archive-courses.css، author.css/js، single-page.css و archive-product.css
-    // دیگر استفاده نمی‌شوند.
-    
-    if (is_page()) {
-        global $post;
 
-        $panel_page = get_page_by_path('panel');
-
-        // برگهٔ «panel» و زیربرگه‌هایش، یا هر برگه‌ای که یکی از قالب‌های
-        // panel/*.php (Template Name: Panel - …) رویش انتخاب شده باشد.
-        $panel_template = (string) get_page_template_slug();
-        $is_panel_view  = (0 === strpos($panel_template, 'panel/'));
-
-        if (
-            $is_panel_view ||
-            (
-                $panel_page &&
-                (
-                    $post->ID == $panel_page->ID ||
-                    in_array($panel_page->ID, get_post_ancestors($post))
-                )
-            )
-        ) {
-            wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', [], '1.0.0');
-
-            wp_enqueue_script('jalaliDatePicker', PATH_DIR_URL . '/assets/js/jalalidatepicker.min.js', ['jquery'], '1.0.0', true);
-            wp_enqueue_script('panel-js', PATH_DIR_URL . '/assets/js/panel.js', ['jquery'], '1.0.0', true);
-        }
+    $template = (string) get_page_template_slug();
+    if (0 === strpos($template, 'panel/')) {
+        return true;
     }
+
+    $post = get_queried_object();
+    if (!$post instanceof WP_Post) {
+        return false;
+    }
+
+    $panel_page = get_page_by_path('panel');
+
+    return $panel_page instanceof WP_Post
+        && ((int) $post->ID === (int) $panel_page->ID || in_array((int) $panel_page->ID, array_map('intval', get_post_ancestors($post)), true));
 }
 
-add_action('wp_enqueue_scripts', 'theme_enqueue');
+function theme_enqueue()
+{
+    if (!evented_is_panel_view()) {
+        return;
+    }
+
+    wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.0.0');
+    wp_enqueue_style('ee-panel', PATH_DIR_URL . '/assets/css/newhome/ee-panel.css', array('ee-shell'), '1.0.0');
+    wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', array('ee-panel'), '2.0.0');
+
+    wp_enqueue_style('jalalidatepicker-css', PATH_DIR_URL . '/assets/css/jalalidatepicker.min.css', array(), '1.0.0');
+    wp_enqueue_script('jalalidatepicker-js', PATH_DIR_URL . '/assets/js/jalalidatepicker.min.js', array(), '1.0.0', true);
+    wp_add_inline_script('jalalidatepicker-js', 'window.jalaliDatepicker && jalaliDatepicker.startWatch({ persianDigits: true, showTodayBtn: true, showEmptyBtn: true, hasSecond: false });');
+
+    wp_enqueue_script('ee-panel', PATH_DIR_URL . '/assets/js/newhome/ee-panel.js', array(), '1.0.0', true);
+    wp_localize_script('ee-panel', 'eePanel', array(
+        'ajax_url'       => admin_url('admin-ajax.php'),
+        'wishlist_nonce' => wp_create_nonce('wishlist_nonce'),
+    ));
+}
+add_action('wp_enqueue_scripts', 'theme_enqueue', 25);

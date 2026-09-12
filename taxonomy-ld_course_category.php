@@ -59,7 +59,7 @@ $ee_total  = isset($wp_query->found_posts) ? (int) $wp_query->found_posts : coun
 				<div class="ee-lh-txt">
 					<nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
 						<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
-						<span class="material-symbols-outlined ee-ic">chevron_left</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
 						<span class="ee-crumb-current"><?php echo esc_html($ee_title); ?></span>
 					</nav>
 
@@ -70,7 +70,7 @@ $ee_total  = isset($wp_query->found_posts) ? (int) $wp_query->found_posts : coun
 					<?php endif; ?>
 
 					<span class="ee-lh-count">
-						<span class="material-symbols-outlined ee-ic">inventory_2</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-inventory_2"></use></svg>
 						<?php
 						/* translators: %s: تعداد دوره */
 						echo esc_html(sprintf(_n('%s دوره در این دسته', '%s دوره در این دسته', $ee_total, 'evented-edu'), number_format_i18n($ee_total)));
@@ -95,6 +95,8 @@ $ee_total  = isset($wp_query->found_posts) ? (int) $wp_query->found_posts : coun
 			<?php endif; ?>
 
 			<!-- گرید دوره‌ها -->
+			<?php if (function_exists('evented_course_filter_bar')) { evented_course_filter_bar($ee_total); } ?>
+
 			<?php
 			get_template_part('template-parts/lms/course', 'grid', array(
 				'ee_posts' => $ee_posts,
@@ -107,12 +109,12 @@ $ee_total  = isset($wp_query->found_posts) ? (int) $wp_query->found_posts : coun
 			<!-- سوالات متداول دسته -->
 			<?php if (!empty($ee_faqs)) : ?>
 				<section class="ee-list-faqs">
-					<h2 class="ee-w-title"><span class="material-symbols-outlined ee-ic">help</span> <?php esc_html_e('سوالات متداول', 'evented-edu'); ?></h2>
+					<h2 class="ee-w-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-help"></use></svg> <?php esc_html_e('سوالات متداول', 'evented-edu'); ?></h2>
 					<div class="ee-faqs">
 						<?php foreach ($ee_faqs as $ee_faq) : ?>
 							<?php if (empty($ee_faq['question'])) : continue; endif; ?>
 							<div class="ee-faq">
-								<h4><span class="material-symbols-outlined ee-ic">help</span> <?php echo esc_html($ee_faq['question']); ?></h4>
+								<h4><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-help"></use></svg> <?php echo esc_html($ee_faq['question']); ?></h4>
 								<p><?php echo esc_html(isset($ee_faq['answer']) ? $ee_faq['answer'] : ''); ?></p>
 							</div>
 						<?php endforeach; ?>

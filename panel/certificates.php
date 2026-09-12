@@ -3,7 +3,7 @@
 
 if (! is_user_logged_in()) {
     // ریدایرکت به صفحه لاگین
-    wp_redirect(add_query_arg('redirect_to', home_url('/panel/certificates'), wp_login_url()));
+    wp_safe_redirect(add_query_arg('redirect_to', rawurlencode(home_url('/panel/certificates')), home_url('/login')));
     exit;
 }
 
@@ -25,6 +25,7 @@ if ( !empty($enrolled_courses) ) {
             
             $user_certificates[] = array(
                 'course_id' => $course_id,
+                'type'      => 'course',
                 'title'     => get_the_title($course_id),
                 'author'    => get_the_author_meta('display_name', $author_id),
                 'link'      => $cert_link,
@@ -33,14 +34,38 @@ if ( !empty($enrolled_courses) ) {
     }
 }
 
-get_header(); ?>
-<div class="container">
+/* گواهینامه‌های آزمون‌ها (Quiz certificates) — از سوابق آزمون کاربر در لرن‌دش */
+if ( function_exists('learndash_get_certificate_link') ) {
+    $quiz_attempts = get_user_meta( $current_user_id, '_sfwd-quizzes', true );
+    $seen_quiz     = array();
+    if ( is_array($quiz_attempts) ) {
+        // آخرین تلاش هر آزمون اول بررسی شود
+        usort( $quiz_attempts, function ($a, $b) { return (int) ($b['time'] ?? 0) <=> (int) ($a['time'] ?? 0); } );
+        foreach ( $quiz_attempts as $attempt ) {
+            $quiz_id = isset($attempt['quiz']) ? (int) $attempt['quiz'] : 0;
+            if ( ! $quiz_id || isset($seen_quiz[$quiz_id]) ) { continue; }
+            if ( empty($attempt['pass']) ) { continue; }
+            $cert_post = function_exists('learndash_get_setting') ? (int) learndash_get_setting( $quiz_id, 'certificate' ) : 0;
+            if ( ! $cert_post ) { continue; }
+            $cert = learndash_get_certificate_link( $quiz_id, $current_user_id );
+            if ( empty($cert) ) { continue; }
+            $seen_quiz[$quiz_id] = true;
+            $course_id = isset($attempt['course']) ? (int) $attempt['course'] : ( function_exists('learndash_get_course_id') ? (int) learndash_get_course_id($quiz_id) : 0 );
+            $user_certificates[] = array(
+                'course_id' => $course_id,
+                'quiz_id'   => $quiz_id,
+                'type'      => 'quiz',
+                'title'     => get_the_title($quiz_id),
+                'author'    => $course_id ? get_the_title($course_id) : get_the_author_meta( 'display_name', (int) get_post_field('post_author', $quiz_id) ),
+                'link'      => $cert,
+                'date'      => ! empty($attempt['time']) ? (int) $attempt['time'] : 0,
+                'score'     => isset($attempt['percentage']) ? (float) $attempt['percentage'] : null,
+            );
+        }
+    }
+}
 
-    <!-- Sidebar -->
-    <?php locate_template('panel/sidebar.php', true, false); ?>
-    
-    <!-- Main Content -->
-    <main class="main-content">
+get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'certificates', 'ee_panel_title' => 'گواهینامه‌ها')); ?>
         <div>
 
             <h2 class="section-title">گواهینامه ها</h2>
@@ -59,8 +84,16 @@ get_header(); ?>
                             </div>
                             <div class="card-content">
                                 <div>
+                                    <span class="ee-cert-type <?php echo 'quiz' === $cert['type'] ? 'is-quiz' : 'is-course'; ?>"><?php echo 'quiz' === $cert['type'] ? 'گواهی آزمون' : 'گواهی دوره'; ?></span>
                                     <div class="card-title"><?php echo esc_html( $cert['title'] ); ?></div>
-                                    <div class="card-subtitle"><?php echo esc_html( $cert['author'] ); ?></div>
+                                    <div class="card-subtitle"><?php echo esc_html( $cert['author'] ); ?>
+                                        <?php if ( 'quiz' === $cert['type'] && ! empty($cert['date']) ) : ?>
+                                            · <?php echo esc_html( function_exists('evented_format_jalali') ? evented_format_jalali( $cert['date'], 'j F Y' ) : date_i18n( 'Y/m/d', $cert['date'] ) ); ?>
+                                        <?php endif; ?>
+                                        <?php if ( 'quiz' === $cert['type'] && null !== $cert['score'] ) : ?>
+                                            · نمره <?php echo esc_html( round( $cert['score'] ) ); ?>٪
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                                 <div class="card-actions">
                                     <!-- تغییر button به a برای لینک شدن به فایل گواهینامه (معمولا PDF) -->
@@ -98,7 +131,6 @@ get_header(); ?>
 
             </div>
         </div>
-    </main>
-</div>
+    
 
-<?php get_footer(); ?>
+<?php get_template_part('template-parts/panel/shell', 'close'); ?>

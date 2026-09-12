@@ -19,7 +19,7 @@
 /* مسیریابی (مشترک) ------------------------------------------------------ */
 .ee-crumb { display: flex; align-items: center; gap: .25rem; flex-wrap: wrap; font-size: .72rem; color: var(--ee-soft); margin-bottom: .8rem; }
 .ee-crumb a:hover { color: var(--ee-tealP); }
-.ee-crumb .material-symbols-outlined { font-size: 1rem; opacity: .55; }
+.ee-crumb svg.ee-ic { font-size: 1rem; opacity: .55; }
 .ee-crumb-current { color: #1e293b; font-weight: 700; }
 
 /* سربرگ فهرست ----------------------------------------------------------- */
@@ -274,3 +274,25 @@
 @media (prefers-reduced-motion: reduce) {
     .ee-list-main *, .ee-list-main *::before, .ee-list-main *::after { transition: none !important; animation: none !important; }
 }
+
+/* ---------- نوار فیلتر/مرتب‌سازی دوره‌ها (inc/course_filters.php) ---------- */
+.ee-cf { background: #fff; border: 1px solid var(--ee-line); border-radius: 1rem; padding: .7rem .8rem; margin-bottom: 1rem; box-shadow: var(--ee-sh-sm); }
+.ee-cf-row { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.ee-cf-lead { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem; font-weight: 800; color: #0f172a; margin-inline-end: .3rem; }
+.ee-cf-lead svg.ee-ic { color: var(--ee-tealP); font-size: 1.15rem; }
+.ee-cf-lead b { color: var(--ee-tealP); font-weight: 800; }
+.ee-cf-field { position: relative; display: inline-flex; align-items: center; gap: .3rem; background: var(--ee-bg); border: 1px solid var(--ee-line); border-radius: 999px; padding: .3rem .55rem .3rem .4rem; transition: border-color .15s, background .15s; }
+.ee-cf-field:hover { border-color: var(--ee-teal); }
+.ee-cf-field.is-set { background: var(--ee-mint); border-color: rgb(167 243 208); }
+.ee-cf-field > svg.ee-ic { color: var(--ee-tealP); font-size: 1rem; }
+.ee-cf-field select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; font-family: inherit; font-size: .76rem; font-weight: 700; color: var(--ee-ink); outline: none; cursor: pointer; padding: 0 0 0 1.1rem; max-width: 11rem; text-overflow: ellipsis; }
+.ee-cf-field select:focus-visible { outline: 2px solid var(--ee-teal); border-radius: .4rem; }
+.ee-cf-caret { position: absolute; left: .45rem; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 1rem; color: var(--ee-soft); }
+.ee-cf-apply { padding: .38rem .9rem; font-size: .76rem; border-radius: 999px; }
+.ee-cf-reset { display: inline-flex; align-items: center; gap: .2rem; font-size: .74rem; font-weight: 700; color: #be123c; padding: .35rem .6rem; border-radius: 999px; }
+.ee-cf-reset:hover { background: #fff1f2; }
+.ee-cf-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; padding-top: .6rem; border-top: 1px dashed var(--ee-line); }
+.ee-cf-chip { display: inline-flex; align-items: center; gap: .25rem; font-size: .7rem; font-weight: 700; color: var(--ee-tealP); background: var(--ee-mint); border-radius: 999px; padding: .2rem .6rem; }
+.ee-cf-chip svg.ee-ic { font-size: .9rem; }
+.ee-cf-chip:hover { background: rgb(209 250 229); }
+@media (max-width: 640px) { .ee-cf-field { flex: 1 1 calc(50% - .25rem); } .ee-cf-field select { max-width: none; flex: 1; } .ee-cf-apply { flex: 1 1 100%; justify-content: center; } }

@@ -31,7 +31,7 @@ while (have_posts()) :
 					<div class="ee-lh-txt">
 						<nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
 							<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
-							<span class="material-symbols-outlined ee-ic">chevron_left</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
 							<span class="ee-crumb-current"><?php the_title(); ?></span>
 						</nav>
 
@@ -42,7 +42,7 @@ while (have_posts()) :
 						<?php endif; ?>
 
 						<span class="ee-lh-count">
-							<span class="material-symbols-outlined ee-ic">groups</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-groups"></use></svg>
 							<?php
 							/* translators: %s: تعداد مدرس */
 							echo esc_html(sprintf(_n('%s مدرس', '%s مدرس', (int) $ee_list['total'], 'evented-edu'), number_format_i18n((int) $ee_list['total'])));
@@ -60,7 +60,7 @@ while (have_posts()) :
 										<?php if (!empty($ee_instructor['avatar'])) : ?>
 											<img src="<?php echo esc_url($ee_instructor['avatar']); ?>" alt="<?php echo esc_attr($ee_instructor['name']); ?>" loading="lazy" width="88" height="88">
 										<?php else : ?>
-											<span class="material-symbols-outlined ee-ic">person</span>
+											<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg>
 										<?php endif; ?>
 									</span>
 									<span class="ee-icard-txt">
@@ -71,7 +71,7 @@ while (have_posts()) :
 											echo esc_html(sprintf(__('%s دوره', 'evented-edu'), number_format_i18n((int) $ee_instructor['course_count'])));
 											?>
 											<?php if ('' !== $ee_instructor['rating']) : ?>
-												<span class="ee-icard-rate"><span class="material-symbols-outlined ee-ic">star</span><?php echo esc_html($ee_instructor['rating']); ?></span>
+												<span class="ee-icard-rate"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg><?php echo esc_html($ee_instructor['rating']); ?></span>
 											<?php endif; ?>
 										</span>
 									</span>
@@ -83,13 +83,13 @@ while (have_posts()) :
 
 								<div class="ee-icard-foot">
 									<span class="ee-icard-students">
-										<span class="material-symbols-outlined ee-ic">groups</span>
+										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-groups"></use></svg>
 										<?php echo esc_html(number_format_i18n((int) $ee_instructor['students'])); ?>
 										<?php esc_html_e('دانشجو', 'evented-edu'); ?>
 									</span>
 									<a class="ee-icard-link" href="<?php echo esc_url($ee_instructor['url']); ?>">
 										<?php esc_html_e('پروفایل', 'evented-edu'); ?>
-										<span class="material-symbols-outlined ee-ic">arrow_back</span>
+										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
 									</a>
 								</div>
 							</article>

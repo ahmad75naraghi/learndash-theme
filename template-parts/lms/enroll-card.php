@@ -135,8 +135,8 @@ if ('' === $ee_resume_url && !empty($ee_steps)) {
 		</div>
 
 		<?php if ('' !== $ee_resume_url) : ?>
-			<a class="ee-btn-primary ee-enroll-cta" href="<?php echo esc_url($ee_resume_url); ?>">
-				<span class="material-symbols-outlined ee-ic">play_circle</span>
+			<a class="ee-btn ee-btn-primary ee-enroll-cta" href="<?php echo esc_url($ee_resume_url); ?>">
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-play_circle"></use></svg>
 				<?php
 				if (0 === $ee_percentage) {
 					esc_html_e('شروع یادگیری', 'evented-edu');
@@ -150,8 +150,8 @@ if ('' === $ee_resume_url && !empty($ee_steps)) {
 		<?php endif; ?>
 
 		<?php if ('' !== $ee_cert_link) : ?>
-			<a class="ee-btn-ghost ee-enroll-cta" href="<?php echo esc_url($ee_cert_link); ?>" target="_blank" rel="noopener">
-				<span class="material-symbols-outlined ee-ic">workspace_premium</span>
+			<a class="ee-btn ee-btn-ghost ee-enroll-cta" href="<?php echo esc_url($ee_cert_link); ?>" target="_blank" rel="noopener">
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-workspace_premium"></use></svg>
 				<?php esc_html_e('دریافت گواهینامه', 'evented-edu'); ?>
 			</a>
 		<?php endif; ?>
@@ -159,8 +159,8 @@ if ('' === $ee_resume_url && !empty($ee_steps)) {
 	<?php else : ?>
 
 		<?php if (!is_user_logged_in() && 'closed' !== $ee_pricing['price_type']) : ?>
-			<a class="ee-btn-primary ee-enroll-cta" href="<?php echo esc_url(home_url('/login?redirect_to=' . rawurlencode((string) get_permalink($ee_course_id)))); ?>">
-				<span class="material-symbols-outlined ee-ic">login</span>
+			<a class="ee-btn ee-btn-primary ee-enroll-cta" href="<?php echo esc_url(home_url('/login?redirect_to=' . rawurlencode((string) get_permalink($ee_course_id)))); ?>">
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-login"></use></svg>
 				<?php esc_html_e('برای ثبت‌نام وارد شوید', 'evented-edu'); ?>
 			</a>
 		<?php else : ?>
@@ -195,47 +195,47 @@ if ('' === $ee_resume_url && !empty($ee_steps)) {
 		data-nonce="<?php echo esc_attr(wp_create_nonce('wishlist_nonce')); ?>"
 		data-logged-in="<?php echo is_user_logged_in() ? '1' : '0'; ?>"
 		data-login-url="<?php echo esc_url(home_url('/login')); ?>">
-		<span class="material-symbols-outlined ee-ic"><?php echo $ee_is_favorite ? 'favorite' : 'favorite_border'; ?></span>
+		<?php echo ee_icon($ee_is_favorite ? 'favorite' : 'favorite_border'); // phpcs:ignore ?>
 		<span class="ee-wishlist-text"><?php echo $ee_is_favorite ? esc_html__('در علاقه‌مندی‌ها', 'evented-edu') : esc_html__('افزودن به علاقه‌مندی‌ها', 'evented-edu'); ?></span>
 	</button>
 
 	<!-- مشخصات دوره -->
 	<ul class="ee-facts">
 		<li>
-			<span class="material-symbols-outlined ee-ic">play_lesson</span>
+			<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-play_lesson"></use></svg>
 			<span class="ee-fact-k"><?php esc_html_e('تعداد جلسه', 'evented-edu'); ?></span>
 			<strong><?php echo esc_html(number_format_i18n($ee_lesson_count)); ?></strong>
 		</li>
 		<?php if ($ee_section_count > 0) : ?>
 			<li>
-				<span class="material-symbols-outlined ee-ic">segment</span>
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-segment"></use></svg>
 				<span class="ee-fact-k"><?php esc_html_e('فصل', 'evented-edu'); ?></span>
 				<strong><?php echo esc_html(number_format_i18n($ee_section_count)); ?></strong>
 			</li>
 		<?php endif; ?>
 		<?php if ('' !== $ee_duration) : ?>
 			<li>
-				<span class="material-symbols-outlined ee-ic">schedule</span>
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg>
 				<span class="ee-fact-k"><?php esc_html_e('مدت دوره', 'evented-edu'); ?></span>
 				<strong><?php echo esc_html($ee_duration); ?></strong>
 			</li>
 		<?php endif; ?>
 		<?php if ('' !== $ee_level) : ?>
 			<li>
-				<span class="material-symbols-outlined ee-ic">signal_cellular_alt</span>
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-signal_cellular_alt"></use></svg>
 				<span class="ee-fact-k"><?php esc_html_e('سطح', 'evented-edu'); ?></span>
 				<strong><?php echo esc_html($ee_level); ?></strong>
 			</li>
 		<?php endif; ?>
 		<?php if ('' !== $ee_status) : ?>
 			<li>
-				<span class="material-symbols-outlined ee-ic">event_available</span>
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-event_available"></use></svg>
 				<span class="ee-fact-k"><?php esc_html_e('وضعیت', 'evented-edu'); ?></span>
 				<strong><?php echo esc_html($ee_status); ?></strong>
 			</li>
 		<?php endif; ?>
 		<li>
-			<span class="material-symbols-outlined ee-ic">visibility</span>
+			<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg>
 			<span class="ee-fact-k"><?php esc_html_e('بازدید', 'evented-edu'); ?></span>
 			<strong><?php echo esc_html(number_format_i18n(function_exists('evented_get_post_views') ? evented_get_post_views($ee_course_id) : 0)); ?></strong>
 		</li>

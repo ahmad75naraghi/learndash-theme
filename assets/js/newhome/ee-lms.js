@@ -13,6 +13,13 @@
 (function () {
     'use strict';
 
+
+    /* تعویض آیکن SVG اسپرایت (جایگزین متن فونت آیکن) */
+    function setIcon(el, name) {
+        if (!el) { return; }
+        var use = el.querySelector ? el.querySelector('use') : null;
+        if (use) { use.setAttribute('href', '#i-' + name); } else { el.textContent = name; }
+    }
     /* ---------- ابزارها ---------- */
     function cfg() {
         if (window.eeLms && window.eeLms.ajax_url) { return window.eeLms.ajax_url; }
@@ -202,7 +209,7 @@
                         var label = button.querySelector('[data-mark-label]');
                         if (label) { label.textContent = 'تکمیل شد'; }
                         var icon = button.querySelector('.ee-ic');
-                        if (icon) { icon.textContent = 'task_alt'; }
+                        if (icon) { setIcon(icon, 'task_alt'); }
                         applyProgress(res.data);
                         msg(box, 'این درس تکمیل شد.', false);
                     } else {
@@ -242,7 +249,7 @@
                     var on = (status === 'added') || (!status && !button.classList.contains('is-on'));
                     button.classList.toggle('is-on', on);
                     if (label) { label.textContent = on ? 'در علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'; }
-                    if (icon) { icon.textContent = on ? 'favorite' : 'favorite_border'; }
+                    if (icon) { setIcon(icon, on ? 'favorite' : 'favorite_border'); }
                 }).catch(function () {
                     /* خطای شبکه: وضعیت تغییری نمی‌کند */
                 }).then(function () {

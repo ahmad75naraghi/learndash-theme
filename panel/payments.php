@@ -2,7 +2,7 @@
 /* Template Name: Panel - Payments */
 
 if ( ! is_user_logged_in() ) {
-    wp_redirect(add_query_arg('redirect_to', home_url('/panel/payments'), wp_login_url()));
+    wp_safe_redirect(add_query_arg('redirect_to', rawurlencode(home_url('/panel/payments')), home_url('/login')));
     exit;
 }
 
@@ -11,20 +11,15 @@ $current_user_id = get_current_user_id();
 // دریافت تراکنش‌های کاربر از جدول اختصاصی
 global $wpdb;
 $table_name = $wpdb->prefix . 'evented_transactions';
-$transactions = $wpdb->get_results( $wpdb->prepare(
-    "SELECT * FROM $table_name WHERE user_id = %d ORDER BY created_at DESC", 
-    $current_user_id
-) );
+$transactions = array();
+if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) ) === $table_name ) {
+    $transactions = $wpdb->get_results( $wpdb->prepare(
+        "SELECT * FROM $table_name WHERE user_id = %d ORDER BY created_at DESC",
+        $current_user_id
+    ) );
+}
 
-get_header(); ?>
-
-<div class="container">
-
-    <!-- Sidebar -->
-    <?php locate_template('panel/sidebar.php', true, false); ?>
-    
-    <!-- Main Content -->
-    <main class="main-content">
+get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'payments', 'ee_panel_title' => 'تراکنش‌ها')); ?>
         <div class="transaction-content">
             <h2 class="section-title">تراکنش ها</h2>
 
@@ -133,41 +128,6 @@ get_header(); ?>
                 </div>
             </div>
         </div>
-    </main>
-</div>
-
-<!-- اسکریپت کنترل مُدال و انتقال داده‌ها -->
-<script>
-jQuery(document).ready(function($) {
     
-    // باز کردن مُدال و تزریق اطلاعات فاکتور
-    $('.btn-receipt.active').on('click', function() {
-        var btn = $(this);
-        
-        // خواندن دیتا اتریبیوت‌ها از دکمه کلیک شده
-        $('#modal-course').text(btn.data('course'));
-        $('#modal-price').text(btn.data('price'));
-        $('#modal-date').text(btn.data('date'));
-        $('#modal-time').text(btn.data('time'));
-        $('#modal-track').text(btn.data('track'));
-        
-        // نمایش پاپ‌آپ (فرض بر این است که CSS شما overlay را position: fixed کرده است)
-        $('.overlay').css("display","flex");
-    });
 
-    // بستن مُدال با دکمه ضربدر
-    $('.btn-close').on('click', function() {
-        $('.overlay').fadeOut(200);
-    });
-
-    // بستن مُدال در صورت کلیک روی فضای خالی بک‌گراند
-    $('.overlay').on('click', function(e) {
-        if ($(e.target).hasClass('overlay')) {
-            $(this).fadeOut(200);
-        }
-    });
-
-});
-</script>
-
-<?php get_footer(); ?>
+<?php get_template_part('template-parts/panel/shell', 'close'); ?>

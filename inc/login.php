@@ -23,6 +23,29 @@ class EventedAuthHandler
         add_action('wp_ajax_nopriv_evented_login_user',                     [$this, 'handle_login_user']);
         add_filter( 'login_url',                                           [$this, 'redirect_login_url'], 10, 3 );
         add_filter( 'logout_redirect',                                     [$this, 'custom_logout_redirect_to_home'], 10, 3 );
+
+        /*
+         * محافظ فرم استاندارد: اگر افزونه/کد دیگری wp-login.php را به /login هدایت کند،
+         * مدیر هرگز نمی‌تواند وارد پیشخوان شود. اینجا هر ریدایرکتِ از wp-login.php به
+         * صفحهٔ ورود سفارشی خنثی می‌شود (ریدایرکت‌های خود وردپرس بعد از ورود موفق دست نمی‌خورد).
+         */
+        add_filter( 'wp_redirect', [ $this, 'protect_wp_login_form' ], 999, 2 );
+    }
+
+    public function protect_wp_login_form( $location, $status ) {
+        $pagenow = isset( $GLOBALS['pagenow'] ) ? (string) $GLOBALS['pagenow'] : '';
+        $uri     = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+        $on_wp_login = ( 'wp-login.php' === $pagenow ) || ( false !== strpos( $uri, 'wp-login.php' ) );
+        if ( ! $on_wp_login ) {
+            return $location;
+        }
+        $target_path = (string) wp_parse_url( (string) $location, PHP_URL_PATH );
+        $custom_path = (string) wp_parse_url( home_url( '/login/' ), PHP_URL_PATH );
+        if ( '' !== $target_path && rtrim( $target_path, '/' ) === rtrim( $custom_path, '/' ) ) {
+            // به‌جای رفتن به /login، همین فرم استاندارد نمایش داده شود
+            return false;
+        }
+        return $location;
     }
 
 
@@ -45,7 +68,7 @@ class EventedAuthHandler
         }
 
         // انقضای کد (۱۰ دقیقه)
-        if ((time() - (int) $_SESSION['evented_otp_time']) > 10 * MINUTE_IN_SECONDS) {
+        if ((time() - (int) $_SESSION['evented_otp_time']) > max(2, (int) (function_exists('evented_opt') ? evented_opt('otp_ttl', 10) : 10)) * MINUTE_IN_SECONDS) {
             unset($_SESSION['evented_otp'], $_SESSION['evented_otp_time'], $_SESSION['evented_mobile'], $_SESSION['evented_otp_purpose']);
             wp_send_json_error([
                 'message' => 'کد تایید منقضی شده است. لطفاً دوباره درخواست دهید.'
@@ -259,7 +282,7 @@ class EventedAuthHandler
 
         evented_send_otp_with_bale($mobile, $otp);
 
-        set_transient('otp_limit_' . $mobile, true, 60);
+        set_transient('otp_limit_' . $mobile, true, max(30, (int) (function_exists('evented_opt') ? evented_opt('otp_rate', 60) : 60)));
 
         wp_send_json_success([
             'message' => 'کد تایید ارسال شد.',
@@ -302,7 +325,7 @@ class EventedAuthHandler
             $sms = send_pattern_sms($mobile, (string)$otp);
             if ($sms) {
                 evented_send_otp_with_bale($mobile, $otp);
-                set_transient('otp_limit_' . $mobile, true, 60);
+                set_transient('otp_limit_' . $mobile, true, max(30, (int) (function_exists('evented_opt') ? evented_opt('otp_rate', 60) : 60)));
                 wp_send_json_success(['message' => 'کد تایید ارسال شد.', 'status' => 'register']);
             }
         }
@@ -401,6 +424,35 @@ class EventedAuthHandler
         ]);
     }
 
+
+    /**
+     * آیا برای این درخواست باید صفحهٔ ورود سفارشی (/login) استفاده شود؟
+     */
+    private function should_use_custom_login( $redirect, $force_reauth ) {
+        if ( $force_reauth || is_admin() ) {
+            return false;
+        }
+
+        $pagenow = isset( $GLOBALS['pagenow'] ) ? (string) $GLOBALS['pagenow'] : '';
+        $uri     = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+        if ( 'wp-login.php' === $pagenow || false !== strpos( $uri, 'wp-login.php' ) || false !== strpos( $uri, '/wp-admin' ) ) {
+            return false;
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( isset( $_GET['admin'] ) || isset( $_GET['interim-login'] ) ) {
+            return false;
+        }
+
+        if ( ! empty( $redirect ) ) {
+            $path = (string) wp_parse_url( $redirect, PHP_URL_PATH );
+            if ( false !== strpos( $path, '/wp-admin' ) || false !== strpos( $path, 'wp-login.php' ) ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     private function is_rate_limited($mobile)
     {
@@ -526,6 +578,15 @@ class EventedAuthHandler
     }
 
     public function redirect_login_url( $login_url, $redirect, $force_reauth ) {
+        /*
+         * فقط لینک‌های «ورود» در فرانت‌اند به /login (ورود با موبایل) تغییر می‌کنند.
+         * هر جا پای پیشخوان/فرم استاندارد وردپرس در میان باشد، آدرس اصلی wp-login.php
+         * دست‌نخورده برمی‌گردد تا مدیر بتواند با نام کاربری و رمز وارد wp-admin شود.
+         */
+        if ( ! $this->should_use_custom_login( $redirect, $force_reauth ) ) {
+            return $login_url;
+        }
+
         // آدرس صفحه لاگین خودت
         $custom_login_url = home_url( '/login/' );
         

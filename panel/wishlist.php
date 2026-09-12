@@ -2,7 +2,7 @@
 /* Template Name: Panel - Wishlist */
 
 if ( ! is_user_logged_in() ) {
-    wp_redirect(add_query_arg('redirect_to', home_url('/panel/wishlist'), wp_login_url()));
+    wp_safe_redirect(add_query_arg('redirect_to', rawurlencode(home_url('/panel/wishlist')), home_url('/login')));
     exit;
 }
 
@@ -18,14 +18,7 @@ $wishlist_courses = array_filter( array_map( 'intval', $wishlist_courses ) );
 // تولید Nonce برای امنیت درخواست‌های ایجکس
 $wishlist_nonce = wp_create_nonce( 'wishlist_nonce' );
 
-get_header(); ?>
-<div class="container">
-
-    <!-- Sidebar -->
-    <?php locate_template('panel/sidebar.php', true, false); ?>
-    
-    <!-- Main Content -->
-    <main class="main-content">
+get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'wishlist', 'ee_panel_title' => 'علاقه‌مندی‌ها')); ?>
         <!-- Search Bar -->
         <div class="search-bar">
             <input type="text" id="wishlist-search" placeholder="جستجو دوره ها">
@@ -59,7 +52,7 @@ get_header(); ?>
                         
                         $course_thumbnail = get_the_post_thumbnail_url( $course_id, 'medium' );
                         if ( ! $course_thumbnail ) {
-                            $course_thumbnail = 'https://via.placeholder.com/300x200?text=No+Image';
+                            $course_thumbnail = PATH_DIR_URL . '/assets/img/course-placeholder.svg';
                         }
 
                         $meta = get_post_meta( $course_id, '_sfwd-courses', true );
@@ -118,71 +111,6 @@ get_header(); ?>
                 <?php endif; ?>
             </div>
         </div>
-    </main>
-</div>
-
-<!-- کدهای جاوااسکریپت مخصوص این صفحه -->
-<script>
-jQuery(document).ready(function($) {
     
-    // دریافت Nonce تولید شده در PHP و آدرس ایجکس
-    var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
-    var securityNonce = '<?php echo esc_js($wishlist_nonce); ?>';
 
-    // 1. هندل کردن دکمه حذف
-    $('.remove-from-wishlist').on('click', function(e) {
-        e.preventDefault();
-        
-        var button = $(this);
-        var courseId = button.data('course-id');
-        var card = button.closest('.course-card');
-
-        card.css('opacity', '0.5');
-
-        $.ajax({
-            url: ajaxUrl,
-            type: 'POST',
-            data: {
-                action: 'toggle_course_wishlist',
-                course_id: courseId,
-                security: securityNonce // ارسال توکن امنیتی هماهنگ با فانکشن شما
-            },
-            success: function(response) {
-                // بررسی وضعیت بازگشتی از سمت فانکشن شما
-                if (response.success && response.data.status === 'removed') {
-                    card.fadeOut(300, function() {
-                        $(this).remove();
-                        if ($('.wishlist-item').length === 0) {
-                            location.reload(); 
-                        }
-                    });
-                } else {
-                    alert('خطایی در حذف دوره رخ داد.');
-                    card.css('opacity', '1');
-                }
-            },
-            error: function() {
-                alert('خطای ارتباط با سرور.');
-                card.css('opacity', '1');
-            }
-        });
-    });
-
-    // 2. سرچ زنده در لیست علاقه‌مندی‌ها
-    $('#wishlist-search').on('input', function() {
-        var searchTerm = $(this).val().toLowerCase();
-        
-        $('.wishlist-item').each(function() {
-            var title = $(this).data('title').toLowerCase();
-            if (title.indexOf(searchTerm) > -1) {
-                $(this).show();
-            } else {
-                $(this).hide();
-            }
-        });
-    });
-
-});
-</script>
-
-<?php get_footer(); ?>
+<?php get_template_part('template-parts/panel/shell', 'close'); ?>

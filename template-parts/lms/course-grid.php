@@ -29,7 +29,7 @@ if (empty($ee_posts)) {
 				<?php if (!empty($ee_card['thumb'])) : ?>
 					<img src="<?php echo esc_url($ee_card['thumb']); ?>" alt="<?php echo esc_attr($ee_card['title']); ?>" loading="lazy" decoding="async">
 				<?php else : ?>
-					<span class="ee-ccard-noimg"><span class="material-symbols-outlined ee-ic">school</span></span>
+					<span class="ee-ccard-noimg"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg></span>
 				<?php endif; ?>
 
 				<?php if (!empty($ee_card['cat_name'])) : ?>
@@ -52,8 +52,11 @@ if (empty($ee_posts)) {
 				</h3>
 
 				<ul class="ee-ccard-meta">
+					<?php if (function_exists('evented_rating_badge_html') && '' !== ($ee_rb = evented_rating_badge_html($ee_card['id']))) : ?>
+						<li class="ee-ccard-rating"><?php echo $ee_rb; // phpcs:ignore ?></li>
+					<?php endif; ?>
 					<?php if (!empty($ee_card['lesson_count'])) : ?>
-						<li><span class="material-symbols-outlined ee-ic">menu_book</span>
+						<li><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-menu_book"></use></svg>
 							<?php
 							/* translators: %s: تعداد جلسه */
 							echo esc_html(sprintf(__('%s جلسه', 'evented-edu'), number_format_i18n($ee_card['lesson_count'])));
@@ -61,16 +64,16 @@ if (empty($ee_posts)) {
 						</li>
 					<?php endif; ?>
 					<?php if (!empty($ee_card['duration'])) : ?>
-						<li><span class="material-symbols-outlined ee-ic">timer</span><?php echo esc_html($ee_card['duration']); ?></li>
+						<li><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-timer"></use></svg><?php echo esc_html($ee_card['duration']); ?></li>
 					<?php endif; ?>
 					<?php if (!empty($ee_card['level'])) : ?>
-						<li><span class="material-symbols-outlined ee-ic">signal_cellular_alt</span><?php echo esc_html($ee_card['level']); ?></li>
+						<li><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-signal_cellular_alt"></use></svg><?php echo esc_html($ee_card['level']); ?></li>
 					<?php endif; ?>
 				</ul>
 
 				<div class="ee-ccard-foot">
 					<span class="ee-ccard-by">
-						<span class="material-symbols-outlined ee-ic">person</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg>
 						<?php echo esc_html($ee_card['instructor'] ? $ee_card['instructor'] : __('evented-edu', 'evented-edu')); ?>
 					</span>
 					<?php if (!empty($ee_card['has_access'])) : ?>
@@ -78,7 +81,7 @@ if (empty($ee_posts)) {
 					<?php else : ?>
 						<span class="ee-ccard-cta">
 							<?php esc_html_e('مشاهده دوره', 'evented-edu'); ?>
-							<span class="material-symbols-outlined ee-ic">arrow_back</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
 						</span>
 					<?php endif; ?>
 				</div>

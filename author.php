@@ -63,14 +63,14 @@ $ee_social_icons = array(
 					<?php if (!empty($ee_data['avatar'])) : ?>
 						<img src="<?php echo esc_url($ee_data['avatar']); ?>" alt="<?php echo esc_attr($ee_data['name']); ?>" width="120" height="120">
 					<?php else : ?>
-						<span class="material-symbols-outlined ee-ic">person</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg>
 					<?php endif; ?>
 				</span>
 
 				<div class="ee-ic-body">
 					<nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
 						<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
-						<span class="material-symbols-outlined ee-ic">chevron_left</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
 						<span class="ee-crumb-current"><?php echo esc_html($ee_data['name']); ?></span>
 					</nav>
 
@@ -96,7 +96,7 @@ $ee_social_icons = array(
 							<?php foreach ($ee_data['social'] as $ee_key => $ee_social_url) : ?>
 								<?php if ('' === trim((string) $ee_social_url)) : continue; endif; ?>
 								<a class="ee-social-dot" href="<?php echo esc_url($ee_social_url); ?>" target="_blank" rel="noopener nofollow" title="<?php echo esc_attr($ee_key); ?>">
-									<span class="material-symbols-outlined ee-ic"><?php echo esc_html(isset($ee_social_icons[$ee_key]) ? $ee_social_icons[$ee_key] : 'link'); ?></span>
+									<?php echo ee_icon(isset($ee_social_icons[$ee_key]) ? $ee_social_icons[$ee_key] : 'link'); // phpcs:ignore ?>
 								</a>
 							<?php endforeach; ?>
 						</div>
@@ -107,17 +107,17 @@ $ee_social_icons = array(
 			<!-- آمار -->
 			<ul class="ee-stats">
 				<li>
-					<span class="material-symbols-outlined ee-ic">menu_book</span>
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-menu_book"></use></svg>
 					<b><?php echo esc_html(number_format_i18n((int) $ee_data['course_count'])); ?></b>
 					<span><?php esc_html_e('دوره', 'evented-edu'); ?></span>
 				</li>
 				<li>
-					<span class="material-symbols-outlined ee-ic">groups</span>
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-groups"></use></svg>
 					<b><?php echo esc_html(number_format_i18n((int) $ee_data['students'])); ?></b>
 					<span><?php esc_html_e('دانشجو', 'evented-edu'); ?></span>
 				</li>
 				<li>
-					<span class="material-symbols-outlined ee-ic">star</span>
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg>
 					<b><?php echo esc_html('' !== $ee_data['rating'] ? $ee_data['rating'] : __('—', 'evented-edu')); ?></b>
 					<span><?php esc_html_e('امتیاز', 'evented-edu'); ?></span>
 				</li>
@@ -126,14 +126,14 @@ $ee_social_icons = array(
 			<!-- دربارهٔ مدرس -->
 			<?php if (!empty($ee_data['about'])) : ?>
 				<section class="ee-about">
-					<h2 class="ee-w-title"><span class="material-symbols-outlined ee-ic">badge</span> <?php esc_html_e('دربارهٔ مدرس', 'evented-edu'); ?></h2>
+					<h2 class="ee-w-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-badge"></use></svg> <?php esc_html_e('دربارهٔ مدرس', 'evented-edu'); ?></h2>
 					<div class="ee-about-txt"><?php echo wp_kses_post(wpautop($ee_data['about'])); ?></div>
 				</section>
 			<?php endif; ?>
 
 			<!-- دوره‌ها -->
 			<section class="ee-author-courses">
-				<h2 class="ee-w-title"><span class="material-symbols-outlined ee-ic">school</span> <?php esc_html_e('دوره‌های این مدرس', 'evented-edu'); ?></h2>
+				<h2 class="ee-w-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg> <?php esc_html_e('دوره‌های این مدرس', 'evented-edu'); ?></h2>
 				<?php
 				get_template_part('template-parts/lms/course', 'grid', array(
 					'ee_posts' => $ee_courses,
@@ -146,7 +146,7 @@ $ee_social_icons = array(
 			<!-- مقالات -->
 			<?php if (!empty($ee_articles)) : ?>
 				<section class="ee-author-posts">
-					<h2 class="ee-w-title"><span class="material-symbols-outlined ee-ic">auto_stories</span> <?php esc_html_e('مقالات این مدرس', 'evented-edu'); ?></h2>
+					<h2 class="ee-w-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-auto_stories"></use></svg> <?php esc_html_e('مقالات این مدرس', 'evented-edu'); ?></h2>
 					<div class="ee-mini-list">
 						<?php foreach ($ee_articles as $ee_article) : ?>
 							<a class="ee-mini" href="<?php echo esc_url(get_permalink($ee_article)); ?>">
@@ -157,7 +157,7 @@ $ee_social_icons = array(
 								<?php if (has_post_thumbnail($ee_article)) : ?>
 									<img class="ee-mini-th" src="<?php echo esc_url(get_the_post_thumbnail_url($ee_article, 'thumbnail')); ?>" alt="<?php echo esc_attr(get_the_title($ee_article)); ?>" loading="lazy">
 								<?php else : ?>
-									<span class="ee-mini-th ee-mini-noimg ee-ic"><span class="material-symbols-outlined">article</span></span>
+									<span class="ee-mini-th ee-mini-noimg ee-ic"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-article"></use></svg></span>
 								<?php endif; ?>
 							</a>
 						<?php endforeach; ?>

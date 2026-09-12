@@ -3,23 +3,12 @@
 
 if (! is_user_logged_in()) {
     // ریدایرکت به صفحه لاگین
-    wp_redirect(add_query_arg('redirect_to', home_url('/panel/profile'), wp_login_url()));
+    wp_safe_redirect(add_query_arg('redirect_to', rawurlencode(home_url('/panel/profile')), home_url('/login')));
     exit;
 }
 
 $user_id = get_current_user_id();
-// استایل/اسکریپت جلالی برای این صفحهٔ پنل (JS آن برای همهٔ زیرصفحه‌های panel خودکار است)
-wp_enqueue_style('jalalidatepicker-css', PATH_DIR_URL . '/assets/css/jalalidatepicker.min.css', [], '1.0.0');
-wp_enqueue_script('jalalidatepicker-js', PATH_DIR_URL . '/assets/js/jalalidatepicker.min.js', ['jquery'], '1.0.0', true);
-get_header();
-?>
-<div class="container">
-
-    <!-- Sidebar -->
-    <?php locate_template('panel/sidebar.php', true, false); ?>
-    
-    <!-- Main Content -->
-     <main class="main-content">
+get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'profile', 'ee_panel_title' => 'پروفایل')); ?>
         <div class="profile-panel">
             <h2 class="section-title">اطلاعات پروفایل و گواهینامه</h2>
             
@@ -30,20 +19,20 @@ get_header();
                 <div class="form-grid">
                     <div class="form-group">
                         <label>نام (فارسی)</label>
-                        <input type="text" name="first_name_fa" class="form-control" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_fa', true)); ?>" placeholder="نام خود را به فارسی وارد کنید">
+                        <input type="text" name="first_name_fa" class="form-control" data-ee-script="fa" inputmode="text" lang="fa" pattern="[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\u200c]*" title="فقط حروف فارسی/عربی" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_fa', true)); ?>" placeholder="نام خود را به فارسی وارد کنید">
                     </div>
                     <div class="form-group">
                         <label>نام خانوادگی (فارسی)</label>
-                        <input type="text" name="last_name_fa" class="form-control" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_fa', true)); ?>" placeholder="نام خانوادگی خود را به فارسی وارد کنید">
+                        <input type="text" name="last_name_fa" class="form-control" data-ee-script="fa" inputmode="text" lang="fa" pattern="[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\u200c]*" title="فقط حروف فارسی/عربی" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_fa', true)); ?>" placeholder="نام خانوادگی خود را به فارسی وارد کنید">
                     </div>
                     
                     <div class="form-group">
                         <label>نام (انگلیسی)</label>
-                        <input type="text" name="first_name_en" class="form-control" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_en', true)); ?>" placeholder="نام خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
+                        <input type="text" name="first_name_en" class="form-control" data-ee-script="en" lang="en" pattern="[A-Za-z\s\.\-']*" title="فقط حروف انگلیسی" autocapitalize="words" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_en', true)); ?>" placeholder="نام خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
                     </div>
                     <div class="form-group">
                         <label>نام خانوادگی (انگلیسی)</label>
-                        <input type="text" name="last_name_en" class="form-control" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_en', true)); ?>" placeholder="نام خانوادگی خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
+                        <input type="text" name="last_name_en" class="form-control" data-ee-script="en" lang="en" pattern="[A-Za-z\s\.\-']*" title="فقط حروف انگلیسی" autocapitalize="words" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_en', true)); ?>" placeholder="نام خانوادگی خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
                     </div>
 
                     <div class="form-group">
@@ -75,36 +64,5 @@ get_header();
             </form>
             <div id="form-msg" style="margin-top:15px; text-align:center; font-weight:bold;"></div>
         </div>
-        <script>
-            jQuery(document).ready(function($) {
-                $('#profile-form').on('submit', function(e) {
-                    e.preventDefault();
-                    
-                    var formData = $(this).serialize();
-                    var btn = $('.btn-submit');
-                    
-                    btn.text('در حال ذخیره...').prop('disabled', true);
-
-                    $.ajax({
-                        url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                        type: 'POST',
-                        data: formData + '&action=save_user_profile&security=' + $('#profile_nonce').val(),
-                        success: function(response) {
-                            if(response.success) {
-                                $('#form-msg').text(response.data).css('color', 'green');
-                            } else {
-                                $('#form-msg').text('خطایی رخ داد!').css('color', 'red');
-                            }
-                        },
-                        complete: function() {
-                            btn.text('ذخیره اطلاعات').prop('disabled', false);
-                            setTimeout(function(){ $('#form-msg').fadeOut(); }, 3000);
-                        }
-                    });
-                });
-            });
-            
-        </script>
-    </main>
-</div>
-<?php get_footer(); ?>
+        
+<?php get_template_part('template-parts/panel/shell', 'close'); ?>

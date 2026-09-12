@@ -47,10 +47,10 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                 <!-- مسیریابی -->
                 <nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
                     <a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
-                    <span class="material-symbols-outlined ee-ic">chevron_left</span>
+                    <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
                     <?php if ($ee_cat_first instanceof WP_Term) : ?>
                         <a href="<?php echo esc_url(get_term_link($ee_cat_first)); ?>"><?php echo esc_html($ee_cat_first->name); ?></a>
-                        <span class="material-symbols-outlined ee-ic">chevron_left</span>
+                        <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
                     <?php endif; ?>
                     <span class="ee-crumb-current"><?php the_title(); ?></span>
                 </nav>
@@ -69,28 +69,32 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                 <div class="ee-post-meta">
                     <?php if ($ee_cat_first instanceof WP_Term) : ?>
                         <a class="ee-meta-cat" href="<?php echo esc_url(get_term_link($ee_cat_first)); ?>">
-                            <span class="material-symbols-outlined ee-ic">sell</span><?php echo esc_html($ee_cat_first->name); ?>
+                            <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-sell"></use></svg><?php echo esc_html($ee_cat_first->name); ?>
                         </a>
                     <?php endif; ?>
 
                     <span class="ee-meta-item" title="<?php esc_attr_e('تاریخ انتشار', 'evented-edu'); ?>">
-                        <span class="material-symbols-outlined ee-ic">calendar_month</span><?php echo esc_html($ee_date); ?>
+                        <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg><?php echo esc_html($ee_date); ?>
                     </span>
 
                     <span class="ee-meta-item" title="<?php esc_attr_e('ساعت انتشار', 'evented-edu'); ?>">
-                        <span class="material-symbols-outlined ee-ic">schedule</span><?php echo esc_html($ee_time); ?>
+                        <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg><?php echo esc_html($ee_time); ?>
                     </span>
 
                     <span class="ee-meta-item" title="<?php esc_attr_e('زمان مطالعه', 'evented-edu'); ?>">
-                        <span class="material-symbols-outlined ee-ic">menu_book</span>
+                        <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-menu_book"></use></svg>
                         <?php
                         /* translators: %s: تعداد دقیقه */
                         echo esc_html(sprintf(_n('%s دقیقه مطالعه', '%s دقیقه مطالعه', $ee_reading, 'evented-edu'), number_format_i18n($ee_reading)));
                         ?>
                     </span>
 
+                    <?php if (function_exists('evented_course_rating') && evented_course_rating(get_the_ID())['count'] > 0) : $ee_r = evented_course_rating(get_the_ID()); ?>
+                        <a class="ee-meta-item ee-meta-rating" href="#ee-comments" title="<?php esc_attr_e('امتیاز خوانندگان', 'evented-edu'); ?>"><?php echo evented_rating_stars_html($ee_r['avg']); // phpcs:ignore ?><b><?php echo esc_html(number_format_i18n($ee_r['avg'], 1)); ?></b><span>(<?php echo esc_html(number_format_i18n($ee_r['count'])); ?>)</span></a>
+                    <?php endif; ?>
+
                     <a class="ee-meta-item" href="#ee-comments" title="<?php esc_attr_e('دیدگاه‌ها', 'evented-edu'); ?>">
-                        <span class="material-symbols-outlined ee-ic">forum</span>
+                        <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg>
                         <?php
                         if ($ee_comments > 0) {
                             /* translators: %s: تعداد دیدگاه */
@@ -102,7 +106,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                     </a>
 
                     <span class="ee-meta-item ee-meta-views" title="<?php esc_attr_e('تعداد بازدید', 'evented-edu'); ?>">
-                        <span class="material-symbols-outlined ee-ic">visibility</span>
+                        <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg>
                         <?php
                         /* translators: %s: تعداد بازدید */
                         echo esc_html(sprintf(__('تعداد بازدید %s نفر', 'evented-edu'), number_format_i18n($ee_views)));
@@ -119,7 +123,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                     </span>
                     <a class="ee-al-link" href="<?php echo esc_url(get_author_posts_url($ee_author_id)); ?>">
                         <?php esc_html_e('همهٔ نوشته‌ها', 'evented-edu'); ?>
-                        <span class="material-symbols-outlined ee-ic">arrow_back</span>
+                        <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
                     </a>
                 </div>
 
@@ -139,7 +143,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                 <?php if (!empty($ee_tags)) : ?>
                     <div class="ee-post-tags">
                         <span class="ee-tags-label">
-                            <span class="material-symbols-outlined ee-ic">tag</span>
+                            <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-tag"></use></svg>
                             <?php esc_html_e('برچسب‌ها:', 'evented-edu'); ?>
                         </span>
                         <?php foreach ($ee_tags as $ee_tag) : ?>
@@ -159,7 +163,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                                 </a>
                             <?php endforeach; ?>
                             <button type="button" class="ee-share-btn ee-share-copy" data-copy="<?php echo esc_attr(get_permalink($ee_post_id)); ?>" title="<?php esc_attr_e('کپی لینک', 'evented-edu'); ?>">
-                                <span class="material-symbols-outlined ee-ic">link</span>
+                                <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-link"></use></svg>
                             </button>
                         </div>
                     </div>
@@ -174,7 +178,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                     <div class="ee-pn">
                         <?php if ($ee_prev instanceof WP_Post) : ?>
                             <a href="<?php echo esc_url(get_permalink($ee_prev)); ?>">
-                                <span class="material-symbols-outlined ee-ic">arrow_forward</span>
+                                <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_forward"></use></svg>
                                 <span>
                                     <em><?php esc_html_e('نوشتهٔ پیشین', 'evented-edu'); ?></em>
                                     <strong><?php echo esc_html(get_the_title($ee_prev)); ?></strong>
@@ -189,7 +193,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                                     <em><?php esc_html_e('نوشتهٔ پسین', 'evented-edu'); ?></em>
                                     <strong><?php echo esc_html(get_the_title($ee_next)); ?></strong>
                                 </span>
-                                <span class="material-symbols-outlined ee-ic">arrow_back</span>
+                                <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
                             </a>
                         <?php endif; ?>
                     </div>
@@ -203,7 +207,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                         <p><?php echo esc_html(get_the_author_meta('description') ? get_the_author_meta('description') : __('نویسندهٔ پایگاه آموزش evented-edu', 'evented-edu')); ?></p>
                         <a class="ee-ab-link" href="<?php echo esc_url(get_author_posts_url($ee_author_id)); ?>">
                             <?php esc_html_e('مشاهدهٔ پروفایل و نوشته‌ها', 'evented-edu'); ?>
-                            <span class="material-symbols-outlined ee-ic">arrow_back</span>
+                            <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
                         </a>
                     </div>
                 </div>
@@ -212,7 +216,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                 <?php if (!empty($ee_related)) : ?>
                     <section class="ee-related">
                         <h3 class="ee-w-title ee-related-title">
-                            <span class="material-symbols-outlined ee-ic">auto_awesome</span>
+                            <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-auto_awesome"></use></svg>
                             <?php esc_html_e('نوشته‌های مرتبط', 'evented-edu'); ?>
                         </h3>
                         <div class="ee-related-grid">
@@ -222,7 +226,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                                         <?php if (has_post_thumbnail($ee_rp)) : ?>
                                             <img src="<?php echo esc_url(get_the_post_thumbnail_url($ee_rp, 'medium')); ?>" alt="<?php echo esc_attr(get_the_title($ee_rp)); ?>" loading="lazy">
                                         <?php else : ?>
-                                            <span class="material-symbols-outlined ee-ic">article</span>
+                                            <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-article"></use></svg>
                                         <?php endif; ?>
                                     </span>
                                     <span class="ee-rc-txt">

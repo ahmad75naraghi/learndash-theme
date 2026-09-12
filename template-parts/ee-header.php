@@ -2,81 +2,58 @@
 /**
  * هدر مشترک طراحی «evented-edu» (نسخهٔ pastel)
  *
- * این فایل از front-page.php استخراج شده تا صفحهٔ اصلی، تک‌نوشته و
- * آرشیو نوشته‌ها یک هدر واحد داشته باشند (بدون تکرار مارک‌آپ).
+ * منوی اصلی استاتیک است و آیتم‌ها/زیرمنوها از `evented_nav_items()` (کش یک‌هفته‌ای)
+ * خوانده می‌شوند. جستجوی هدر یک فیلتر «بخش» دارد (مقالات، دوره‌ها، کتابخانه، …).
+ * روی موبایل، منو به‌صورت کشوی کناری (off-canvas) با آکاردئون زیرمنو باز می‌شود.
  *
- * آرگومان‌های اختیاری (از طریق get_template_part):
- *   ee_active  — کلید آیتم فعال منو: home|courses|articles|instructors|contact
+ * آرگومان‌های اختیاری (get_template_part):
+ *   ee_active — کلید آیتم فعال منو؛ اگر داده نشود خودکار تشخیص داده می‌شود.
  *
  * @package evented-edu
  */
 
 defined('ABSPATH') || exit;
 
-$ee_active = isset($args['ee_active']) ? $args['ee_active'] : '';
+$ee_active = isset($args['ee_active']) ? (string) $args['ee_active'] : '';
+if ('' === $ee_active && function_exists('evented_nav_current_key')) {
+	$ee_active = evented_nav_current_key();
+}
 
-/* در صفحهٔ اصلی، لینک‌های منو به لنگرهای همان صفحه می‌روند؛ در سایر صفحات به آدرس کامل */
-$ee_on_front = is_front_page();
+$ee_items = function_exists('evented_nav_items') ? evented_nav_items() : array();
 
-/**
- * ساخت آدرس لنگر/صفحهٔ مقصد برای آیتم‌های ناوبری.
- *
- * @param string $anchor   شناسهٔ بخش در صفحهٔ اصلی (بدون #).
- * @param string $page     مسیر برگهٔ واقعی (در صورت وجود) — مثلاً 'courses'.
- * @return string
- */
-$ee_nav_url = static function ($anchor, $page = '') use ($ee_on_front) {
-	if ($ee_on_front) {
-		return '#' . $anchor;
-	}
-
-	if ('' !== $page) {
-		$ee_page = get_page_by_path($page);
-		if ($ee_page instanceof WP_Post) {
-			return (string) get_permalink($ee_page);
-		}
-	}
-
-	return home_url('/#' . $anchor);
-};
-
-/* «مقالات» به برگهٔ نوشته‌ها می‌رود (اگر تنظیم شده باشد) */
-$ee_posts_page_id = (int) get_option('page_for_posts');
-$ee_articles_url  = $ee_on_front
-	? '#ee-articles'
-	: ($ee_posts_page_id ? (string) get_permalink($ee_posts_page_id) : home_url('/#ee-articles'));
-
-$ee_url_home        = (string) home_url('/');
-$ee_url_courses     = $ee_nav_url('ee-courses', 'courses');
-$ee_url_instructors = $ee_nav_url('ee-instructors', 'instructors');
-$ee_url_contact     = $ee_on_front ? '#ee-contact' : home_url('/#ee-contact');
-
-/** کلاس فعال بودن آیتم منو. */
-$ee_is_active = static function ($key) use ($ee_active) {
-	return $ee_active === $key ? ' class="ee-active"' : '';
-};
+$ee_url_home    = (string) home_url('/');
+$ee_url_courses = function_exists('evented_nav_url') ? evented_nav_url('courses') : home_url('/courses/');
+$ee_url_contact = function_exists('evented_nav_url') ? evented_nav_url('contact') : home_url('/contact/');
+$ee_url_account = is_user_logged_in() ? home_url('/panel') : home_url('/login');
 
 /* تاریخ امروز (در صورت فعال بودن افزونهٔ شمسی‌ساز، خودکار جلالی است) */
-$ee_today = function_exists('evented_wp_date') ? evented_wp_date('Y/m/d') : date('Y/m/d');
+$ee_today = function_exists('evented_today_label') ? evented_today_label() : date_i18n('Y/m/d');
+
+/* پیام‌رسان‌ها (فیلتر evented_channel_links در template_helpers) */
+$ee_channels = function_exists('evented_channel_links') ? (array) evented_channel_links() : array();
 ?>
     <!-- ======= نوار ابزار بالایی (فقط دسکتاپ) ======= -->
     <div class="ee-topbar">
         <div class="ee-wrap ee-topbar-in">
             <div class="tb-right">
                 <span class="ee-tb-item">
-                    <span class="material-symbols-outlined ee-ic" style="color:var(--ee-tealP);font-size:1rem;">calendar_month</span>
+                    <svg class="ee-ic" aria-hidden="true" focusable="false" style="color:var(--ee-tealP);font-size:1rem;"><use href="#i-calendar_month"></use></svg>
                     <?php echo esc_html('امروز: ' . $ee_today); ?>
                 </span>
                 <span class="ee-tb-sep">|</span>
                 <span class="ee-tb-item"><span class="ee-tb-label">کانال‌های رسمی:</span></span>
-                <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:var(--ee-tealP);font-weight:600;"><span class="dot" style="background:#10b981;"></span>بله</a>
-                <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:#b45309;font-weight:600;"><span class="dot" style="background:#f59e0b;"></span>ایتا</a>
-                <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:#7e22ce;font-weight:600;"><span class="dot" style="background:#a855f7;"></span>روبیکا</a>
+                <?php if (!empty($ee_channels)) : foreach ($ee_channels as $ee_ch) : ?>
+                    <a class="ee-tb-item" href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="color:<?php echo esc_attr($ee_ch['color']); ?>;font-weight:600;"><span class="dot" style="background:<?php echo esc_attr($ee_ch['color']); ?>;"></span><?php echo esc_html($ee_ch['label']); ?></a>
+                <?php endforeach; else : ?>
+                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:var(--ee-tealP);font-weight:600;"><span class="dot" style="background:#10b981;"></span>بله</a>
+                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:#b45309;font-weight:600;"><span class="dot" style="background:#f59e0b;"></span>ایتا</a>
+                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_contact); ?>" style="color:#7e22ce;font-weight:600;"><span class="dot" style="background:#a855f7;"></span>روبیکا</a>
+                <?php endif; ?>
             </div>
             <div class="ee-tb-links">
                 <a href="<?php echo esc_url($ee_url_courses); ?>">راهنمای دوره‌ها</a>
                 <span class="ee-tb-sep">|</span>
-                <a href="<?php echo esc_url($ee_url_courses); ?>">گواهی پایان دوره</a>
+                <a href="<?php echo esc_url(is_user_logged_in() ? home_url('/panel/certificates') : home_url('/login')); ?>">گواهی پایان دوره</a>
                 <span class="ee-tb-sep">|</span>
                 <a href="<?php echo esc_url($ee_url_contact); ?>">پشتیبانی آنلاین</a>
             </div>
@@ -87,43 +64,179 @@ $ee_today = function_exists('evented_wp_date') ? evented_wp_date('Y/m/d') : date
     <header class="ee-header">
         <div class="ee-wrap">
             <div class="ee-header-row">
-                <div class="ee-hamb ee-ic" id="eeHamb" aria-label="منو"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
+                <button class="ee-hamb ee-ic" id="eeHamb" type="button" aria-label="باز کردن منو" aria-controls="eeDrawer" aria-expanded="false">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+                </button>
 
                 <a class="ee-logo" href="<?php echo esc_url($ee_url_home); ?>" rel="home">
                     <?php echo function_exists('evented_logo_html') ? evented_logo_html('header') : esc_html(get_bloginfo('name')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- مارک‌آپ امن درون هلپر ساخته می‌شود. ?>
                 </a>
 
-                <form class="ee-search" role="search" method="get" action="<?php echo esc_url($ee_url_home); ?>">
-                    <span class="s-ic material-symbols-outlined ee-ic">search</span>
-                    <input type="search" name="s" placeholder="جستجو در دوره‌ها، اساتید، مقالات..." value="<?php echo esc_attr(get_search_query()); ?>">
-                    <span class="s-tune material-symbols-outlined ee-ic">tune</span>
-                </form>
+                <?php if (function_exists('evented_search_form')) : ?>
+                    <?php evented_search_form('desktop'); ?>
+                <?php endif; ?>
 
                 <div class="ee-h-actions">
+                    <?php echo function_exists('evented_resume_chip_html') ? evented_resume_chip_html('header') : ''; // phpcs:ignore ?>
+                    <?php echo function_exists('evented_notify_bell_html') ? evented_notify_bell_html() : ''; // phpcs:ignore ?>
                     <?php if (is_user_logged_in()) : ?>
-                        <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/panel')); ?>"><span class="material-symbols-outlined ee-ic">person</span> پنل کاربری</a>
+                        <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/panel')); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg> <span class="ee-btn-txt">پنل کاربری</span></a>
                     <?php else : ?>
-                        <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/login')); ?>"><span class="material-symbols-outlined ee-ic">person</span> ورود / عضویت</a>
+                        <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/login')); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg> <span class="ee-btn-txt">ورود / عضویت</span></a>
                     <?php endif; ?>
-                    <button class="ee-btn ee-btn-soft ee-ic" type="button" aria-label="اعلان‌ها"><span class="material-symbols-outlined ee-ic">notifications_none</span></button>
+                    <button class="ee-btn ee-btn-soft ee-ic ee-search-toggle" id="eeSearchToggle" type="button" aria-label="جستجو" aria-expanded="false" aria-controls="eeSearchM"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg></button>
                 </div>
             </div>
 
-            <div class="ee-search-m">
-                <form role="search" method="get" action="<?php echo esc_url($ee_url_home); ?>">
-                    <div class="ee-search" style="display:block;">
-                        <span class="s-ic material-symbols-outlined ee-ic">search</span>
-                        <input type="search" name="s" placeholder="جستجو در دوره‌ها، مقالات، اساتید..." value="<?php echo esc_attr(get_search_query()); ?>">
-                    </div>
-                </form>
+            <div class="ee-search-m" id="eeSearchM" hidden>
+                <?php if (function_exists('evented_search_form')) : ?>
+                    <?php evented_search_form('mobile'); ?>
+                <?php endif; ?>
             </div>
 
-            <nav class="ee-nav" id="eeNav">
-                <a href="<?php echo esc_url($ee_url_home); ?>"<?php echo $ee_is_active('home'); ?>>صفحه نخست</a>
-                <a href="<?php echo esc_url($ee_url_courses); ?>"<?php echo $ee_is_active('courses'); ?>>دوره‌های آموزشی</a>
-                <a href="<?php echo esc_url($ee_articles_url); ?>"<?php echo $ee_is_active('articles'); ?>>مقالات و پژوهش‌ها</a>
-                <a href="<?php echo esc_url($ee_url_instructors); ?>"<?php echo $ee_is_active('instructors'); ?>>اساتید و کارشناسان</a>
-                <a href="<?php echo esc_url($ee_url_contact); ?>"<?php echo $ee_is_active('contact'); ?>>درباره و تماس</a>
+            <nav class="ee-nav" id="eeNav" aria-label="منوی اصلی">
+                <?php foreach ($ee_items as $ee_it) :
+                    $ee_has_sub = !empty($ee_it['children']);
+                    $ee_cls     = array('ee-nav-item');
+                    if ($ee_has_sub) { $ee_cls[] = 'has-sub'; }
+                    if ($ee_active === $ee_it['key']) { $ee_cls[] = 'ee-active'; }
+                    ?>
+                    <?php
+                    $ee_mega = array();
+                    if ('courses' === $ee_it['key'] && function_exists('evented_nav_course_mega')) {
+                        $ee_mega = evented_nav_course_mega();
+                    }
+                    if (!empty($ee_mega)) { $ee_cls[] = 'has-mega'; }
+                    ?>
+                    <div class="<?php echo esc_attr(implode(' ', $ee_cls)); ?>"<?php echo !empty($ee_mega) ? ' data-ee-mega' : ''; ?>>
+                        <a href="<?php echo esc_url($ee_it['url']); ?>"<?php echo $ee_active === $ee_it['key'] ? ' class="ee-active" aria-current="page"' : ''; ?><?php echo !empty($ee_mega) ? ' aria-haspopup="true" aria-expanded="false"' : ''; ?>>
+                            <?php echo esc_html($ee_it['title']); ?>
+                            <?php if ($ee_has_sub || !empty($ee_mega)) : ?><svg class="ee-ic ee-caret" focusable="false" aria-hidden="true"><use href="#i-expand_more"></use></svg><?php endif; ?>
+                        </a>
+                        <?php if (!empty($ee_mega)) : ?>
+                            <div class="ee-mega" role="region" aria-label="دسته‌بندی دوره‌ها">
+                                <div class="ee-mega-in">
+                                    <div class="ee-mega-tabs" role="tablist" aria-orientation="vertical">
+                                        <?php foreach ($ee_mega as $ee_mi => $ee_mt) : ?>
+                                            <button type="button" class="ee-mega-tab<?php echo 0 === $ee_mi ? ' is-on' : ''; ?>" role="tab" id="eeMegaTab-<?php echo (int) $ee_mt['id']; ?>" aria-controls="eeMegaPanel-<?php echo (int) $ee_mt['id']; ?>" aria-selected="<?php echo 0 === $ee_mi ? 'true' : 'false'; ?>" tabindex="<?php echo 0 === $ee_mi ? '0' : '-1'; ?>" data-url="<?php echo esc_url($ee_mt['url']); ?>">
+                                                <span class="ee-mega-tab-name"><?php echo esc_html($ee_mt['name']); ?></span>
+                                                <span class="ee-mega-tab-n"><?php echo esc_html(number_format_i18n((int) $ee_mt['count'])); ?> دوره</span>
+                                                <svg class="ee-ic ee-mega-tab-arrow" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
+                                            </button>
+                                        <?php endforeach; ?>
+                                        <a class="ee-mega-all" href="<?php echo esc_url($ee_it['url']); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg> همهٔ دوره‌ها</a>
+                                    </div>
+                                    <div class="ee-mega-panels">
+                                        <?php foreach ($ee_mega as $ee_mi => $ee_mt) : ?>
+                                            <div class="ee-mega-panel<?php echo 0 === $ee_mi ? ' is-on' : ''; ?>" role="tabpanel" id="eeMegaPanel-<?php echo (int) $ee_mt['id']; ?>" aria-labelledby="eeMegaTab-<?php echo (int) $ee_mt['id']; ?>"<?php echo 0 === $ee_mi ? '' : ' hidden'; ?>>
+                                                <div class="ee-mega-grid">
+                                                    <?php foreach ($ee_mt['courses'] as $ee_mc) : ?>
+                                                        <a class="ee-mega-card" href="<?php echo esc_url($ee_mc['url']); ?>">
+                                                            <span class="ee-mega-thumb">
+                                                                <?php if ($ee_mc['thumb']) : ?>
+                                                                    <img src="<?php echo esc_url($ee_mc['thumb']); ?>" alt="" loading="lazy" decoding="async">
+                                                                <?php else : ?>
+                                                                    <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg>
+                                                                <?php endif; ?>
+                                                            </span>
+                                                            <span class="ee-mega-title"><?php echo esc_html($ee_mc['title']); ?></span>
+                                                            <span class="ee-mega-meta">
+                                                                <?php if ($ee_mc['author']) : ?><span class="ee-mega-author"><?php echo esc_html($ee_mc['author']); ?></span><?php endif; ?>
+                                                                <span class="ee-mega-price<?php echo $ee_mc['free'] ? ' is-free' : ''; ?>"><?php echo esc_html($ee_mc['price']); ?></span>
+                                                            </span>
+                                                        </a>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                                <a class="ee-mega-more" href="<?php echo esc_url($ee_mt['url']); ?>">همهٔ دوره‌های <?php echo esc_html($ee_mt['name']); ?> <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php elseif ($ee_has_sub) : ?>
+                            <div class="ee-sub" role="menu">
+                                <?php foreach ($ee_it['children'] as $ee_sub) : ?>
+                                    <a role="menuitem" href="<?php echo esc_url($ee_sub['url']); ?>">
+                                        <span><?php echo esc_html($ee_sub['title']); ?></span>
+                                        <?php if (!empty($ee_sub['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $ee_sub['count'])); ?></small><?php endif; ?>
+                                    </a>
+                                <?php endforeach; ?>
+                                <a class="ee-sub-all" href="<?php echo esc_url($ee_it['url']); ?>">همهٔ <?php echo esc_html($ee_it['title']); ?> <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
             </nav>
         </div>
     </header>
+
+    <!-- ======= کشوی منوی موبایل ======= -->
+    <div class="ee-drawer-backdrop" id="eeDrawerBackdrop" hidden></div>
+    <aside class="ee-drawer" id="eeDrawer" aria-label="منوی موبایل" aria-hidden="true" tabindex="-1">
+        <div class="ee-drawer-head">
+            <a class="ee-logo" href="<?php echo esc_url($ee_url_home); ?>" rel="home">
+                <?php echo function_exists('evented_logo_html') ? evented_logo_html('drawer') : esc_html(get_bloginfo('name')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+            </a>
+            <button class="ee-drawer-close ee-ic" id="eeDrawerClose" type="button" aria-label="بستن منو"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-close"></use></svg></button>
+        </div>
+
+        <div class="ee-drawer-account">
+            <?php if (is_user_logged_in()) :
+                $ee_cu = wp_get_current_user(); ?>
+                <span class="ee-drawer-av"><?php echo get_avatar($ee_cu->ID, 40); ?></span>
+                <span class="ee-drawer-who">
+                    <strong><?php echo esc_html($ee_cu->display_name); ?></strong>
+                    <a href="<?php echo esc_url(home_url('/panel')); ?>">پنل کاربری</a>
+                    <span class="ee-sep">·</span>
+                    <a href="<?php echo esc_url(wp_logout_url(home_url('/'))); ?>">خروج</a>
+                </span>
+            <?php else : ?>
+                <a class="ee-btn ee-btn-primary" href="<?php echo esc_url(home_url('/login')); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-login"></use></svg> ورود / عضویت</a>
+            <?php endif; ?>
+        </div>
+        <?php echo function_exists('evented_resume_chip_html') ? evented_resume_chip_html('drawer') : ''; // phpcs:ignore ?>
+        <?php echo function_exists('evented_pwa_install_button_html') ? evented_pwa_install_button_html() : ''; // phpcs:ignore ?>
+
+        <nav class="ee-drawer-nav" aria-label="منوی موبایل">
+            <?php foreach ($ee_items as $ee_i => $ee_it) :
+                $ee_has_sub = !empty($ee_it['children']);
+                $ee_sub_id  = 'eeDSub' . $ee_i;
+                ?>
+                <div class="ee-dn-item<?php echo $ee_active === $ee_it['key'] ? ' ee-active' : ''; ?><?php echo $ee_has_sub ? ' has-sub' : ''; ?>">
+                    <div class="ee-dn-row">
+                        <a class="ee-dn-link" href="<?php echo esc_url($ee_it['url']); ?>"<?php echo $ee_active === $ee_it['key'] ? ' aria-current="page"' : ''; ?>>
+                            <?php echo ee_icon($ee_it['icon'], 'ee-dn-ic'); // phpcs:ignore ?>
+                            <span><?php echo esc_html($ee_it['title']); ?></span>
+                        </a>
+                        <?php if ($ee_has_sub) : ?>
+                            <button class="ee-dn-toggle ee-ic" type="button" aria-expanded="false" aria-controls="<?php echo esc_attr($ee_sub_id); ?>" aria-label="زیرمنوی <?php echo esc_attr($ee_it['title']); ?>">
+                                <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-expand_more"></use></svg>
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($ee_has_sub) : ?>
+                        <div class="ee-dn-sub" id="<?php echo esc_attr($ee_sub_id); ?>" hidden>
+                            <?php foreach ($ee_it['children'] as $ee_sub) : ?>
+                                <a href="<?php echo esc_url($ee_sub['url']); ?>">
+                                    <span><?php echo esc_html($ee_sub['title']); ?></span>
+                                    <?php if (!empty($ee_sub['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $ee_sub['count'])); ?></small><?php endif; ?>
+                                </a>
+                            <?php endforeach; ?>
+                            <a class="ee-dn-all" href="<?php echo esc_url($ee_it['url']); ?>">همهٔ <?php echo esc_html($ee_it['title']); ?></a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </nav>
+
+        <?php if (!empty($ee_channels)) : ?>
+            <div class="ee-drawer-foot">
+                <span class="ee-drawer-foot-label">کانال‌های رسمی</span>
+                <div class="ee-drawer-chans">
+                    <?php foreach ($ee_channels as $ee_ch) : ?>
+                        <a href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="--c:<?php echo esc_attr($ee_ch['color']); ?>;"><span class="dot"></span><?php echo esc_html($ee_ch['label']); ?></a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+    </aside>

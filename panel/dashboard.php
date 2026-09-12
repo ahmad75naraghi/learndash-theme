@@ -2,7 +2,7 @@
 /* Template Name: Panel - Dashboard */
 
 if (! is_user_logged_in()) {
-    wp_redirect(add_query_arg('redirect_to', home_url('/panel'), wp_login_url()));
+    wp_safe_redirect(add_query_arg('redirect_to', rawurlencode(home_url('/panel')), home_url('/login')));
     exit;
 }
 
@@ -14,20 +14,18 @@ $courses_count = count($enrolled_courses);
 // جدول تراکنش‌ها — $wpdb در scope قالب در دسترس نیست، پس global می‌شود.
 global $wpdb;
 $payments_table_name = $wpdb->prefix . 'evented_transactions';
-$transactions_count = (int) $wpdb->get_var( $wpdb->prepare(
-    "SELECT COUNT(*) FROM $payments_table_name WHERE user_id = %d",
-    $current_user_id
-) );
+$transactions_count = 0;
+if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $payments_table_name ) ) === $payments_table_name ) {
+    $transactions_count = (int) $wpdb->get_var( $wpdb->prepare(
+        "SELECT COUNT(*) FROM $payments_table_name WHERE user_id = %d",
+        $current_user_id
+    ) );
+}
 
 
-get_header(); ?>
+get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'dashboard', 'ee_panel_title' => 'پیشخوان')); ?>
 
-<div class="container">
-
-    <!-- Sidebar -->
-    <?php locate_template('panel/sidebar.php', true, false); ?>
-    <!-- Main Content -->
-    <main class="main-content">
+        <?php echo function_exists('evented_resume_card_html') ? evented_resume_card_html() : ''; // phpcs:ignore ?>
 
         <!-- Top Stats -->
         <div class="top-stats">
@@ -73,7 +71,7 @@ get_header(); ?>
                         // دریافت تصویر شاخص
                         $course_thumbnail = get_the_post_thumbnail_url( $course_id, 'medium' );
                         if ( ! $course_thumbnail ) {
-                            $course_thumbnail = 'https://via.placeholder.com/300x200?text=No+Image'; // مسیر تصویر جایگزین در صورت نداشتن تصویر شاخص
+                            $course_thumbnail = PATH_DIR_URL . '/assets/img/course-placeholder.svg'; // مسیر تصویر جایگزین در صورت نداشتن تصویر شاخص
                         }
 
                         // دریافت وضعیت و قیمت دوره لرن‌دش
@@ -129,8 +127,6 @@ get_header(); ?>
                 <?php endif; ?>
             </div>
         </div>
-    </main>
+    
 
-</div>
-
-<?php get_footer(); ?>
+<?php get_template_part('template-parts/panel/shell', 'close'); ?>

@@ -61,10 +61,10 @@ while (have_posts()) :
 				<!-- مسیریابی -->
 				<nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
 					<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
-					<span class="material-symbols-outlined ee-ic">chevron_left</span>
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
 					<?php if ($ee_term instanceof WP_Term) : ?>
 						<a href="<?php echo esc_url(get_term_link($ee_term)); ?>"><?php echo esc_html($ee_term->name); ?></a>
-						<span class="material-symbols-outlined ee-ic">chevron_left</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
 					<?php endif; ?>
 					<span class="ee-crumb-current"><?php the_title(); ?></span>
 				</nav>
@@ -84,9 +84,12 @@ while (have_posts()) :
 
 				<!-- نوار اطلاعات -->
 				<div class="ee-course-meta">
-					<span class="ee-meta-item"><span class="material-symbols-outlined ee-ic">calendar_month</span><?php echo esc_html($ee_date); ?></span>
-					<span class="ee-meta-item"><span class="material-symbols-outlined ee-ic">schedule</span><?php echo esc_html($ee_time); ?></span>
-					<a class="ee-meta-item" href="#ee-reviews"><span class="material-symbols-outlined ee-ic">forum</span>
+					<span class="ee-meta-item"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg><?php echo esc_html($ee_date); ?></span>
+					<span class="ee-meta-item"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg><?php echo esc_html($ee_time); ?></span>
+					<?php if (function_exists('evented_course_rating') && evented_course_rating($ee_course_id)['count'] > 0) : $ee_r = evented_course_rating($ee_course_id); ?>
+						<a class="ee-meta-item ee-meta-rating" href="#ee-reviews"><?php echo evented_rating_stars_html($ee_r['avg']); // phpcs:ignore ?><b><?php echo esc_html(number_format_i18n($ee_r['avg'], 1)); ?></b><span>(<?php echo esc_html(number_format_i18n($ee_r['count'])); ?> رأی)</span></a>
+					<?php endif; ?>
+					<a class="ee-meta-item" href="#ee-reviews"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg>
 						<?php
 						if ($ee_comments > 0) {
 							/* translators: %s: تعداد دیدگاه */
@@ -97,9 +100,9 @@ while (have_posts()) :
 						?>
 					</a>
 					<?php if ($ee_term instanceof WP_Term) : ?>
-						<a class="ee-meta-item" href="<?php echo esc_url(get_term_link($ee_term)); ?>"><span class="material-symbols-outlined ee-ic">sell</span><?php echo esc_html($ee_term->name); ?></a>
+						<a class="ee-meta-item" href="<?php echo esc_url(get_term_link($ee_term)); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-sell"></use></svg><?php echo esc_html($ee_term->name); ?></a>
 					<?php endif; ?>
-					<span class="ee-meta-item ee-meta-views"><span class="material-symbols-outlined ee-ic">visibility</span>
+					<span class="ee-meta-item ee-meta-views"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg>
 						<?php
 						/* translators: %s: تعداد بازدید */
 						echo esc_html(sprintf(__('تعداد بازدید : %s', 'evented-edu'), number_format_i18n($ee_views)));
@@ -110,7 +113,7 @@ while (have_posts()) :
 				<!-- وضعیت پیشرفت -->
 				<div class="ee-course-status">
 					<span class="ee-cs-item">
-						<span class="material-symbols-outlined ee-ic">update</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-update"></use></svg>
 						<?php
 						/* translators: %s: تاریخ آخرین فعالیت */
 						echo esc_html(sprintf(__('آخرین به‌روزرسانی: %s', 'evented-edu'), function_exists('evented_post_date') ? evented_post_date($ee_course_id, 'Y/m/d') : get_the_date()));
@@ -138,7 +141,7 @@ while (have_posts()) :
 					<section class="ee-acc is-open" data-acc>
 						<button type="button" class="ee-acc-head" aria-expanded="true">
 							<span><?php esc_html_e('معرفی دوره', 'evented-edu'); ?></span>
-							<span class="material-symbols-outlined ee-ic ee-acc-ic">expand_more</span>
+							<svg class="ee-ic ee-acc-ic" aria-hidden="true" focusable="false"><use href="#i-expand_more"></use></svg>
 						</button>
 						<div class="ee-acc-body">
 							<div class="ee-course-body">
@@ -148,7 +151,7 @@ while (have_posts()) :
 								if (is_array($ee_tags) && !empty($ee_tags)) :
 									?>
 									<div class="ee-post-tags">
-										<span class="ee-tags-label"><span class="material-symbols-outlined ee-ic">tag</span> <?php esc_html_e('برچسب‌ها:', 'evented-edu'); ?></span>
+										<span class="ee-tags-label"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-tag"></use></svg> <?php esc_html_e('برچسب‌ها:', 'evented-edu'); ?></span>
 										<?php foreach ($ee_tags as $ee_tag) : ?>
 											<a href="<?php echo esc_url(get_term_link($ee_tag)); ?>"><?php echo esc_html($ee_tag->name); ?></a>
 										<?php endforeach; ?>
@@ -164,13 +167,13 @@ while (have_posts()) :
 					<section class="ee-acc" data-acc>
 						<button type="button" class="ee-acc-head" aria-expanded="false">
 							<span><?php esc_html_e('آنچه در این دوره می‌آموزید', 'evented-edu'); ?></span>
-							<span class="material-symbols-outlined ee-ic ee-acc-ic">expand_more</span>
+							<svg class="ee-ic ee-acc-ic" aria-hidden="true" focusable="false"><use href="#i-expand_more"></use></svg>
 						</button>
 						<div class="ee-acc-body">
 							<ul class="ee-outcomes">
 								<?php foreach ($ee_outcomes as $ee_outcome) : ?>
 									<li>
-										<span class="material-symbols-outlined ee-ic">task_alt</span>
+										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-task_alt"></use></svg>
 										<?php echo esc_html($ee_outcome); ?>
 									</li>
 								<?php endforeach; ?>
@@ -184,7 +187,7 @@ while (have_posts()) :
 					<section class="ee-acc" data-acc>
 						<button type="button" class="ee-acc-head" aria-expanded="false">
 							<span><?php esc_html_e('سوالات متداول', 'evented-edu'); ?></span>
-							<span class="material-symbols-outlined ee-ic ee-acc-ic">expand_more</span>
+							<svg class="ee-ic ee-acc-ic" aria-hidden="true" focusable="false"><use href="#i-expand_more"></use></svg>
 						</button>
 						<div class="ee-acc-body">
 							<div class="ee-faqs">
@@ -192,7 +195,7 @@ while (have_posts()) :
 									<?php if (empty($ee_faq['question'])) : continue; endif; ?>
 									<div class="ee-faq">
 										<h4>
-											<span class="material-symbols-outlined ee-ic">help</span>
+											<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-help"></use></svg>
 											<?php echo esc_html($ee_faq['question']); ?>
 										</h4>
 										<p><?php echo esc_html(isset($ee_faq['answer']) ? $ee_faq['answer'] : ''); ?></p>
@@ -216,19 +219,19 @@ while (have_posts()) :
 					<section class="ee-acc" data-acc>
 						<button type="button" class="ee-acc-head" aria-expanded="false">
 							<span><?php esc_html_e('وبینار پیش رو', 'evented-edu'); ?></span>
-							<span class="material-symbols-outlined ee-ic ee-acc-ic">expand_more</span>
+							<svg class="ee-ic ee-acc-ic" aria-hidden="true" focusable="false"><use href="#i-expand_more"></use></svg>
 						</button>
 						<div class="ee-acc-body">
 							<div class="ee-webinar">
 								<ul class="ee-webinar-info">
 									<?php if ('' !== $ee_web_date) : ?>
-										<li><span class="material-symbols-outlined ee-ic">event</span><span><?php echo esc_html($ee_web_date); ?></span></li>
+										<li><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-event"></use></svg><span><?php echo esc_html($ee_web_date); ?></span></li>
 									<?php endif; ?>
 									<?php if ('' !== $ee_web_time) : ?>
-										<li><span class="material-symbols-outlined ee-ic">schedule</span><span><?php echo esc_html($ee_web_time); ?></span></li>
+										<li><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg><span><?php echo esc_html($ee_web_time); ?></span></li>
 									<?php endif; ?>
 									<?php if ('' !== $ee_web_place) : ?>
-										<li><span class="material-symbols-outlined ee-ic">location_on</span><span><?php echo esc_html($ee_web_place); ?></span></li>
+										<li><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-location_on"></use></svg><span><?php echo esc_html($ee_web_place); ?></span></li>
 									<?php endif; ?>
 								</ul>
 								<?php if ('' !== $ee_web_map) : ?>
@@ -240,12 +243,12 @@ while (have_posts()) :
 									<div class="ee-webinar-actions">
 										<?php if ('' !== $ee_web_gmap) : ?>
 											<a class="ee-btn-ghost" href="<?php echo esc_url($ee_web_gmap); ?>" target="_blank" rel="noopener">
-												<span class="material-symbols-outlined ee-ic">directions</span><?php esc_html_e('مسیریابی با گوگل‌مپ', 'evented-edu'); ?>
+												<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-directions"></use></svg><?php esc_html_e('مسیریابی با گوگل‌مپ', 'evented-edu'); ?>
 											</a>
 										<?php endif; ?>
 										<?php if ('' !== $ee_web_neshan) : ?>
 											<a class="ee-btn-ghost" href="<?php echo esc_url($ee_web_neshan); ?>" target="_blank" rel="noopener">
-												<span class="material-symbols-outlined ee-ic">map</span><?php esc_html_e('مسیریابی با نشان', 'evented-edu'); ?>
+												<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-map"></use></svg><?php esc_html_e('مسیریابی با نشان', 'evented-edu'); ?>
 											</a>
 										<?php endif; ?>
 									</div>
@@ -263,7 +266,7 @@ while (have_posts()) :
 						<p><?php echo esc_html(get_the_author_meta('description', $ee_author_id) ? get_the_author_meta('description', $ee_author_id) : __('مدرس دوره‌های evented-edu', 'evented-edu')); ?></p>
 						<a class="ee-ab-link" href="<?php echo esc_url(get_author_posts_url($ee_author_id)); ?>">
 							<?php esc_html_e('مشاهدهٔ سایر دوره‌ها', 'evented-edu'); ?>
-							<span class="material-symbols-outlined ee-ic">arrow_back</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
 						</a>
 					</div>
 				</div>
@@ -271,15 +274,18 @@ while (have_posts()) :
 				<!-- نظرات و امتیاز -->
 				<section class="ee-reviews" id="ee-reviews">
 					<h3 class="ee-w-title">
-						<span class="material-symbols-outlined ee-ic">rate_review</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-rate_review"></use></svg>
 						<?php esc_html_e('نظرات کاربران', 'evented-edu'); ?>
 					</h3>
+
+					<?php echo function_exists('evented_rating_summary_html') ? evented_rating_summary_html($ee_course_id) : ''; // phpcs:ignore ?>
 
 					<?php
 					$ee_review_list = get_comments(array(
 						'post_id' => $ee_course_id,
 						'status'  => 'approve',
 						'number'  => 10,
+						'parent'  => 0,
 					));
 					?>
 
@@ -298,7 +304,7 @@ while (have_posts()) :
 											<?php if ($ee_rating > 0) : ?>
 												<span class="ee-stars" role="img" aria-label="<?php echo esc_attr(sprintf('%d از ۵', $ee_rating)); ?>">
 													<?php for ($ee_i = 1; $ee_i <= 5; $ee_i++) : ?>
-														<span class="material-symbols-outlined ee-ic<?php echo $ee_i <= $ee_rating ? ' is-on' : ''; ?>">star</span>
+														<svg class="ee-ic<?php echo $ee_i <= $ee_rating ? ' is-on' : ''; ?> ee-ic" aria-hidden="true" focusable="false"><use href="#i-star_fill"></use></svg>
 													<?php endfor; ?>
 												</span>
 											<?php endif; ?>
@@ -318,7 +324,7 @@ while (have_posts()) :
 								<span class="ee-review-label"><?php esc_html_e('امتیاز شما:', 'evented-edu'); ?></span>
 								<?php for ($ee_i = 5; $ee_i >= 1; $ee_i--) : ?>
 									<button type="button" class="ee-star-btn" data-value="<?php echo esc_attr($ee_i); ?>" aria-label="<?php echo esc_attr($ee_i); ?>">
-										<span class="material-symbols-outlined ee-ic">star</span>
+										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star_fill"></use></svg>
 									</button>
 								<?php endfor; ?>
 								<input type="hidden" name="rating" value="0">
@@ -328,7 +334,7 @@ while (have_posts()) :
 							<div class="ee-review-actions">
 								<button type="submit" class="ee-comment-submit">
 									<?php esc_html_e('فرستادن دیدگاه', 'evented-edu'); ?>
-									<span class="material-symbols-outlined ee-ic">send</span>
+									<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-send"></use></svg>
 								</button>
 								<span class="ee-review-msg" role="status" aria-live="polite"></span>
 							</div>

@@ -33,7 +33,7 @@ while (have_posts()) :
 					<div class="ee-lh-txt">
 						<nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
 							<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
-							<span class="material-symbols-outlined ee-ic">chevron_left</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
 							<span class="ee-crumb-current"><?php the_title(); ?></span>
 						</nav>
 
@@ -44,7 +44,7 @@ while (have_posts()) :
 						<?php endif; ?>
 
 						<span class="ee-lh-count">
-							<span class="material-symbols-outlined ee-ic">category</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-category"></use></svg>
 							<?php
 							/* translators: %s: تعداد دسته */
 							echo esc_html(sprintf(_n('%s دسته‌بندی', '%s دسته‌بندی', count($ee_terms), 'evented-edu'), number_format_i18n(count($ee_terms))));
