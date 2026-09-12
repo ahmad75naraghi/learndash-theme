@@ -202,7 +202,7 @@ function evented_resume_card_html()
 		return '';
 	}
 	$pct  = (int) $r['progress']['percentage'];
-	$ago  = $r['time'] ? human_time_diff($r['time'], time()) . ' پیش' : '';
+	$ago  = $r['time'] ? (function_exists('evented_time_ago') ? evented_time_ago($r['time']) : human_time_diff($r['time'], time()) . ' پیش') : '';
 	ob_start();
 	?>
 	<section class="ee-resume-card<?php echo $r['is_done'] ? ' is-done' : ''; ?>" aria-label="ادامهٔ یادگیری">

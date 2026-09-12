@@ -63,7 +63,7 @@
     margin: 0 0 .9rem; border-radius: 1rem; overflow: hidden;
     border: 1px solid #f1f5f9; background: var(--ee-tealL);
 }
-.ee-course-hero img { display: block; width: 100%; height: auto; max-height: 34.5rem; object-fit: cover; }
+.ee-course-hero img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; max-height: 26rem; object-fit: cover; }
 
 /* نوار اطلاعات ---------------------------------------------------------- */
 .ee-course-meta {

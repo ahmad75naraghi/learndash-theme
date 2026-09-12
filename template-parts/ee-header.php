@@ -27,7 +27,7 @@ $ee_url_contact = function_exists('evented_nav_url') ? evented_nav_url('contact'
 $ee_url_account = is_user_logged_in() ? home_url('/panel') : home_url('/login');
 
 /* تاریخ امروز (در صورت فعال بودن افزونهٔ شمسی‌ساز، خودکار جلالی است) */
-$ee_today = function_exists('evented_wp_date') ? evented_wp_date('Y/m/d') : date('Y/m/d');
+$ee_today = function_exists('evented_today_label') ? evented_today_label() : date_i18n('Y/m/d');
 
 /* پیام‌رسان‌ها (فیلتر evented_channel_links در template_helpers) */
 $ee_channels = function_exists('evented_channel_links') ? (array) evented_channel_links() : array();

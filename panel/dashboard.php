@@ -14,10 +14,13 @@ $courses_count = count($enrolled_courses);
 // جدول تراکنش‌ها — $wpdb در scope قالب در دسترس نیست، پس global می‌شود.
 global $wpdb;
 $payments_table_name = $wpdb->prefix . 'evented_transactions';
-$transactions_count = (int) $wpdb->get_var( $wpdb->prepare(
-    "SELECT COUNT(*) FROM $payments_table_name WHERE user_id = %d",
-    $current_user_id
-) );
+$transactions_count = 0;
+if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $payments_table_name ) ) === $payments_table_name ) {
+    $transactions_count = (int) $wpdb->get_var( $wpdb->prepare(
+        "SELECT COUNT(*) FROM $payments_table_name WHERE user_id = %d",
+        $current_user_id
+    ) );
+}
 
 
 get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'dashboard', 'ee_panel_title' => 'پیشخوان')); ?>

@@ -31,4 +31,4 @@
 .ee-resume-bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--ee-tealP), var(--ee-mintMd)); transition: width .6s; }
 .ee-resume-foot { display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; font-size: .72rem; color: var(--ee-soft); margin-top: .2rem; }
 .ee-resume-card.is-done .ee-resume-bar i { background: linear-gradient(90deg, var(--ee-amberA), #fbbf24); }
-@media (max-width: 575.98px) { .ee-resume-card { grid-template-columns: 1fr; } .ee-resume-card-media { min-height: 7rem; aspect-ratio: 16/7; } .ee-resume-card-body { padding: 0 1rem 1rem; } }
+@media (max-width: 575.98px) { .ee-resume-card { grid-template-columns: 1fr; } .ee-resume-card-media { min-height: 7rem; max-height: 10rem; aspect-ratio: 16/7; overflow: hidden; } .ee-resume-card-body { padding: 0 1rem 1rem; } }

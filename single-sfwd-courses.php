@@ -304,7 +304,7 @@ while (have_posts()) :
 											<?php if ($ee_rating > 0) : ?>
 												<span class="ee-stars" role="img" aria-label="<?php echo esc_attr(sprintf('%d از ۵', $ee_rating)); ?>">
 													<?php for ($ee_i = 1; $ee_i <= 5; $ee_i++) : ?>
-														<svg class="ee-ic<?php echo $ee_i <= $ee_rating ? ' is-on' : ''; ?> ee-ic" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg>
+														<svg class="ee-ic<?php echo $ee_i <= $ee_rating ? ' is-on' : ''; ?> ee-ic" aria-hidden="true" focusable="false"><use href="#i-star_fill"></use></svg>
 													<?php endfor; ?>
 												</span>
 											<?php endif; ?>
@@ -324,7 +324,7 @@ while (have_posts()) :
 								<span class="ee-review-label"><?php esc_html_e('امتیاز شما:', 'evented-edu'); ?></span>
 								<?php for ($ee_i = 5; $ee_i >= 1; $ee_i--) : ?>
 									<button type="button" class="ee-star-btn" data-value="<?php echo esc_attr($ee_i); ?>" aria-label="<?php echo esc_attr($ee_i); ?>">
-										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg>
+										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star_fill"></use></svg>
 									</button>
 								<?php endfor; ?>
 								<input type="hidden" name="rating" value="0">

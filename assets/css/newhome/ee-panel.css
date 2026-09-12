@@ -2,7 +2,10 @@
    (محتوای کارت‌ها/جدول‌ها در assets/css/panel.css) */
 
 .ee-panel { padding: 1.25rem 0 3rem; }
-.ee-panel-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
+.ee-panel-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; align-items: start; min-width: 0; }
+.ee-panel-grid > * { min-width: 0; max-width: 100%; }
+.ee-panel-main > * { min-width: 0; max-width: 100%; }
+.ee-panel-main .course-grid { max-width: 100%; }
 @media (min-width: 1024px) { .ee-panel-grid { grid-template-columns: 17rem minmax(0, 1fr); gap: 1.25rem; } }
 
 /* سایدبار */

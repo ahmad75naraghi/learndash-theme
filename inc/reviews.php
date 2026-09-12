@@ -166,9 +166,9 @@ function evented_rating_stars_html($avg, $class = '')
 	$h = '<span class="ee-stars ' . esc_attr($class) . '" role="img" aria-label="' . esc_attr(sprintf('%s از ۵', number_format_i18n($avg, 1))) . '">';
 	for ($i = 1; $i <= 5; $i++) {
 		if ($i <= $full) {
-			$h .= '<svg class="ee-ic is-on" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg>';
+			$h .= '<svg class="ee-ic is-on" aria-hidden="true" focusable="false"><use href="#i-star_fill"></use></svg>';
 		} elseif ($half && $i === $full + 1) {
-			$h .= '<svg class="ee-ic is-half" aria-hidden="true" focusable="false"><use href="#i-star_half"></use></svg>';
+			$h .= '<svg class="ee-ic is-half" aria-hidden="true" focusable="false"><use href="#i-star_half_fill"></use></svg>';
 		} else {
 			$h .= '<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg>';
 		}
@@ -189,7 +189,7 @@ function evented_rating_badge_html($course_id)
 		return '';
 	}
 	return '<span class="ee-rating-badge" title="' . esc_attr(sprintf('%s از ۵ — %s رأی', number_format_i18n($r['avg'], 1), number_format_i18n($r['count']))) . '">'
-		. '<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg>'
+		. '<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star_fill"></use></svg>'
 		. '<b>' . esc_html(number_format_i18n($r['avg'], 1)) . '</b>'
 		. '<small>(' . esc_html(number_format_i18n($r['count'])) . ')</small>'
 		. '</span>';
@@ -213,7 +213,7 @@ function evented_rating_summary_html($course_id)
 	for ($i = 5; $i >= 1; $i--) {
 		$n   = isset($r['dist'][$i]) ? (int) $r['dist'][$i] : 0;
 		$pct = $r['count'] ? round($n / $r['count'] * 100) : 0;
-		$h  .= '<li><span class="lbl">' . esc_html(number_format_i18n($i)) . ' <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg></span>'
+		$h  .= '<li><span class="lbl">' . esc_html(number_format_i18n($i)) . ' <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star_fill"></use></svg></span>'
 			. '<span class="bar" aria-hidden="true"><i style="width:' . (int) $pct . '%"></i></span>'
 			. '<span class="num">' . esc_html(number_format_i18n($n)) . '</span></li>';
 	}
@@ -400,7 +400,7 @@ add_filter('comment_form_field_comment', static function ($field) {
 	$picker .= '<legend>امتیاز شما به این مطلب <small>(اختیاری)</small></legend>';
 	$picker .= '<div class="ee-rate-stars" role="radiogroup">';
 	for ($i = 1; $i <= 5; $i++) {
-		$picker .= '<label class="ee-rate-star" title="' . esc_attr(sprintf('%s از ۵', number_format_i18n($i))) . '"><input type="radio" name="ee_rating" value="' . $i . '"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg><span class="screen-reader-text">' . esc_html(number_format_i18n($i)) . '</span></label>';
+		$picker .= '<label class="ee-rate-star" title="' . esc_attr(sprintf('%s از ۵', number_format_i18n($i))) . '"><input type="radio" name="ee_rating" value="' . $i . '"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star_fill"></use></svg><span class="screen-reader-text">' . esc_html(number_format_i18n($i)) . '</span></label>';
 	}
 	$picker .= '</div><span class="ee-rate-txt" aria-live="polite"></span></fieldset>';
 	return $picker . $field;

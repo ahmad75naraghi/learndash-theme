@@ -11,10 +11,13 @@ $current_user_id = get_current_user_id();
 // دریافت تراکنش‌های کاربر از جدول اختصاصی
 global $wpdb;
 $table_name = $wpdb->prefix . 'evented_transactions';
-$transactions = $wpdb->get_results( $wpdb->prepare(
-    "SELECT * FROM $table_name WHERE user_id = %d ORDER BY created_at DESC", 
-    $current_user_id
-) );
+$transactions = array();
+if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) ) === $table_name ) {
+    $transactions = $wpdb->get_results( $wpdb->prepare(
+        "SELECT * FROM $table_name WHERE user_id = %d ORDER BY created_at DESC",
+        $current_user_id
+    ) );
+}
 
 get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'payments', 'ee_panel_title' => 'تراکنش‌ها')); ?>
         <div class="transaction-content">

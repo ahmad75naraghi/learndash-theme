@@ -135,7 +135,7 @@ if ('' === $ee_resume_url && !empty($ee_steps)) {
 		</div>
 
 		<?php if ('' !== $ee_resume_url) : ?>
-			<a class="ee-btn-primary ee-enroll-cta" href="<?php echo esc_url($ee_resume_url); ?>">
+			<a class="ee-btn ee-btn-primary ee-enroll-cta" href="<?php echo esc_url($ee_resume_url); ?>">
 				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-play_circle"></use></svg>
 				<?php
 				if (0 === $ee_percentage) {
@@ -150,7 +150,7 @@ if ('' === $ee_resume_url && !empty($ee_steps)) {
 		<?php endif; ?>
 
 		<?php if ('' !== $ee_cert_link) : ?>
-			<a class="ee-btn-ghost ee-enroll-cta" href="<?php echo esc_url($ee_cert_link); ?>" target="_blank" rel="noopener">
+			<a class="ee-btn ee-btn-ghost ee-enroll-cta" href="<?php echo esc_url($ee_cert_link); ?>" target="_blank" rel="noopener">
 				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-workspace_premium"></use></svg>
 				<?php esc_html_e('دریافت گواهینامه', 'evented-edu'); ?>
 			</a>
@@ -159,7 +159,7 @@ if ('' === $ee_resume_url && !empty($ee_steps)) {
 	<?php else : ?>
 
 		<?php if (!is_user_logged_in() && 'closed' !== $ee_pricing['price_type']) : ?>
-			<a class="ee-btn-primary ee-enroll-cta" href="<?php echo esc_url(home_url('/login?redirect_to=' . rawurlencode((string) get_permalink($ee_course_id)))); ?>">
+			<a class="ee-btn ee-btn-primary ee-enroll-cta" href="<?php echo esc_url(home_url('/login?redirect_to=' . rawurlencode((string) get_permalink($ee_course_id)))); ?>">
 				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-login"></use></svg>
 				<?php esc_html_e('برای ثبت‌نام وارد شوید', 'evented-edu'); ?>
 			</a>

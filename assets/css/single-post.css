@@ -27,7 +27,7 @@
 @media (min-width: 768px) { .ee-post-title { font-size: 1.6rem; } }
 
 .ee-post-hero { margin: 0 0 1.1rem; border-radius: var(--ee-r-2xl); overflow: hidden; border: 1px solid #f1f5f9; background: var(--ee-tealL); }
-.ee-post-hero img { width: 100%; height: auto; max-height: 460px; object-fit: cover; display: block; }
+.ee-post-hero img { width: 100%; height: auto; aspect-ratio: 16 / 9; max-height: 420px; object-fit: cover; display: block; }
 
 /* ---------- نوار اطلاعات ---------- */
 .ee-post-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem .9rem; font-size: .72rem; color: var(--ee-soft);
@@ -176,3 +176,12 @@ a.ee-meta-item:hover { color: var(--ee-tealP); }
     .ee-comment-form .comment-form-url { display: inline-block; width: calc(50% - .35rem); }
     .ee-comment-form .comment-form-url { width: 100%; }
 }
+
+/* دیدگاه‌ها — ریزه‌کاری */
+.ee-comment-list .comment-meta { display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; margin: 0 0 .55rem; }
+.ee-comment-list .comment-metadata { font-size: .68rem; color: var(--ee-soft); margin: 0; }
+.ee-comment-list .comment-metadata time { direction: rtl; unicode-bidi: plaintext; }
+.ee-cmt-badge { font-size: .6rem; font-weight: 700; color: var(--ee-tealP); background: var(--ee-mint); border-radius: 999px; padding: .1rem .5rem; }
+.ee-comment-list .children { list-style: none; margin: .6rem 1.6rem 0 0; padding: 0; }
+.ee-comment-list .comment-content { direction: rtl; }
+.ee-logged-in strong { color: var(--ee-ink); }

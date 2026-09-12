@@ -205,7 +205,7 @@ function evented_notify_list($user_id, $limit = 15, $offset = 0)
 			'url'     => (string) $r->url,
 			'is_read' => (bool) $r->is_read,
 			'time'    => function_exists('evented_format_jalali') ? evented_format_jalali($ts, 'j F') : date_i18n('j F', $ts),
-			'ago'     => human_time_diff($ts, current_time('timestamp')) . ' پیش',
+			'ago'     => function_exists('evented_time_ago') ? evented_time_ago($ts, current_time('timestamp')) : human_time_diff($ts, current_time('timestamp')) . ' پیش',
 		);
 	}
 	return $out;

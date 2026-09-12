@@ -1318,3 +1318,98 @@ function evented_quiz_data($quiz_id)
 		'course_id'    => function_exists('learndash_get_course_id') ? (int) learndash_get_course_id($quiz_id) : 0,
 	);
 }
+
+
+/**
+ * رندر هر دیدگاه در فهرست استاندارد (wp_list_comments) — تاریخ شمسی، برچسب‌های فارسی.
+ *
+ * @param WP_Comment $comment
+ * @param array      $args
+ * @param int        $depth
+ */
+function evented_comment_callback($comment, $args, $depth)
+{
+	$tag       = ('div' === $args['style']) ? 'div' : 'li';
+	$ts        = get_comment_time('U', true, false, $comment);
+	$date      = function_exists('evented_format_jalali') ? evented_format_jalali((int) $ts, 'j F Y') : get_comment_date('', $comment);
+	$time      = get_comment_time('H:i', false, false, $comment);
+	$is_author = (int) $comment->user_id && (int) $comment->user_id === (int) get_post_field('post_author', $comment->comment_post_ID);
+	?>
+	<<?php echo $tag; // phpcs:ignore ?> id="comment-<?php comment_ID(); ?>" <?php comment_class($comment->has_children ? 'parent' : '', $comment); ?>>
+		<article id="div-comment-<?php comment_ID(); ?>" class="comment-body">
+			<footer class="comment-meta">
+				<div class="comment-author vcard">
+					<?php echo 0 !== (int) $args['avatar_size'] ? get_avatar($comment, $args['avatar_size']) : ''; ?>
+					<b class="fn"><?php echo esc_html(get_comment_author($comment)); ?></b>
+					<?php if ($is_author) : ?><span class="ee-cmt-badge">نویسنده</span><?php endif; ?>
+				</div>
+				<div class="comment-metadata">
+					<time datetime="<?php comment_time('c'); ?>"><?php echo esc_html($date . ' · ' . $time); ?></time>
+					<?php if ('0' === $comment->comment_approved) : ?>
+						<em class="comment-awaiting-moderation">دیدگاه شما در انتظار تأیید است.</em>
+					<?php endif; ?>
+				</div>
+			</footer>
+			<div class="comment-content"><?php comment_text($comment, $args); ?></div>
+			<?php
+			comment_reply_link(array_merge($args, array(
+				'add_below' => 'div-comment',
+				'depth'     => $depth,
+				'max_depth' => $args['max_depth'],
+				'before'    => '<div class="reply">',
+				'after'     => '</div>',
+			)));
+			?>
+		</article>
+	<?php
+}
+
+
+/**
+ * فاصلهٔ زمانی فارسی («۸ دقیقه پیش»، «دیروز»، «۳ روز پیش»).
+ *
+ * @param int $from timestamp
+ * @param int $to   timestamp (پیش‌فرض اکنون)
+ * @return string
+ */
+function evented_time_ago($from, $to = 0)
+{
+	$to   = $to ? (int) $to : time();
+	$diff = max(0, $to - (int) $from);
+	$fa   = static function ($n) {
+		return strtr((string) $n, array('0' => '۰', '1' => '۱', '2' => '۲', '3' => '۳', '4' => '۴', '5' => '۵', '6' => '۶', '7' => '۷', '8' => '۸', '9' => '۹'));
+	};
+	if ($diff < 60) {
+		return 'همین حالا';
+	}
+	if ($diff < HOUR_IN_SECONDS) {
+		return $fa((int) floor($diff / 60)) . ' دقیقه پیش';
+	}
+	if ($diff < DAY_IN_SECONDS) {
+		return $fa((int) floor($diff / HOUR_IN_SECONDS)) . ' ساعت پیش';
+	}
+	if ($diff < 2 * DAY_IN_SECONDS) {
+		return 'دیروز';
+	}
+	if ($diff < 30 * DAY_IN_SECONDS) {
+		return $fa((int) floor($diff / DAY_IN_SECONDS)) . ' روز پیش';
+	}
+	if ($diff < 365 * DAY_IN_SECONDS) {
+		return $fa((int) floor($diff / (30 * DAY_IN_SECONDS))) . ' ماه پیش';
+	}
+	return $fa((int) floor($diff / (365 * DAY_IN_SECONDS))) . ' سال پیش';
+}
+
+/**
+ * تاریخ امروز برای نوار بالایی: «شنبه ۲۱ شهریور ۱۴۰۵» (اگر افزونهٔ شمسی‌ساز نباشد، تبدیل داخلی).
+ */
+function evented_today_label()
+{
+	$wp = function_exists('evented_wp_date') ? evented_wp_date('l j F Y') : date_i18n('l j F Y');
+	if ($wp && !preg_match('/[0-9]/', $wp)) {
+		return $wp; // افزونهٔ شمسی‌ساز
+	}
+	$days = array('Saturday' => 'شنبه', 'Sunday' => 'یکشنبه', 'Monday' => 'دوشنبه', 'Tuesday' => 'سه‌شنبه', 'Wednesday' => 'چهارشنبه', 'Thursday' => 'پنجشنبه', 'Friday' => 'جمعه');
+	$d    = function_exists('evented_wp_date') ? evented_wp_date('l') : date('l');
+	return (isset($days[$d]) ? $days[$d] . ' ' : '') . evented_format_jalali(current_time('timestamp'), 'j F Y');
+}

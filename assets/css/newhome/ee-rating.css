@@ -41,6 +41,10 @@
 .ee-rate-star input:focus-visible + .ee-ic { outline: 2px solid var(--ee-tealP); outline-offset: 2px; border-radius: 4px; }
 .ee-rate-txt { font-size: .74rem; color: var(--ee-tealP); font-weight: 700; min-width: 5rem; }
 .ee-cmt-rating { margin: 0 0 .35rem; }
-.ee-cmt-rating .ee-stars .ee-ic { font-size: .85rem; }
+.ee-cmt-rating .ee-stars .ee-ic { font-size: .95rem; color: #d6dde6; }
+.ee-cmt-rating .ee-stars .ee-ic.is-on, .ee-cmt-rating .ee-stars .ee-ic.is-half { color: var(--ee-amberA, #FFA726); }
+/* ستاره‌های عمومی (خارج از ee-lms.css) */
+.ee-stars .ee-ic { color: #d6dde6; }
+.ee-stars .ee-ic.is-on { color: var(--ee-amberA, #FFA726); }
 .ee-post-meta .ee-meta-rating b { color: var(--ee-ink); }
 .ee-ac-stats .ee-rating-badge, .art-foot .ee-rating-badge { margin-inline-end: .5rem; }
