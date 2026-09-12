@@ -71,6 +71,9 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 │   ├── theme_options_store.php   اسکیمای تنظیمات قالب + evented_opt() + لینک شبکه‌ها/کانال‌ها
 │   ├── live_search.php           REST جستجوی زنده (/evented/v1/search)
 │   ├── course_filters.php        فیلتر/مرتب‌سازی سمت‌سرور آرشیو دوره‌ها (level/price/status/instructor/orderby)
+│   ├── reviews.php               امتیاز واقعی دوره‌ها (کش متا، ستاره‌ها، AggregateRating/Review، سازگار با Yoast)
+│   ├── resume.php                ادامهٔ یادگیری: آخرین درس، چیپ هدر، کارت پنل، یادآور کاربران غیرفعال (کرون)
+│   ├── pwa.php                   PWA: manifest، سرویس‌ورکر (/ee-sw.js)، صفحهٔ آفلاین، دکمهٔ نصب
 │   ├── notifications.php         اعلان‌ها: جدول {wp}_evented_notifications، REST، رویدادها، پیامک اختیاری
 │   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها) + هلپرهای LMS
 │   ├── navigation.php            منوی استاتیک هدر/فوتر/کشوی موبایل (کش هفتگی) + فیلتر بخش جستجو + تب‌های مقالات خانه
@@ -179,6 +182,8 @@ wp-content/themes/<theme-folder>/
 | پیامک | `sms_username`, `sms_password`, `sms_body_id`, `sms_notify_body_id`, `otp_ttl`, `otp_rate` |
 | سئو | `seo_enabled`, `seo_home_title`, `seo_home_desc`, `seo_default_img`, `org_name`, `org_logo` |
 | اعلان‌ها | `notify_enabled`, `notify_new_lesson`, `notify_comment`, `notify_sms`, `notify_keep_days` + فرم «ارسال اعلان دستی» |
+| یادآور ادامهٔ دوره (تب اعلان‌ها) | `resume_reminder_enabled`, `resume_reminder_days`, `resume_reminder_sms` — کرون روزانهٔ `evented_resume_reminder` |
+| برنامهٔ وب (PWA) | `pwa_enabled`, `pwa_name`, `pwa_short_name`, `pwa_theme_color`, `pwa_bg_color`, `pwa_icon_192/512`, `pwa_install_btn`, `pwa_cache_ver` |
 
 برای محیط‌های حساس می‌توان اعتبارنامهٔ پیامک را در `wp-config.php` گذاشت؛ ثابت‌ها بر تنظیمات اولویت دارند:
 

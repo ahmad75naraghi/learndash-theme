@@ -255,7 +255,9 @@ $ee_slider_mode  = $ee_slide_count > 1;
                             </a>
                             <div class="cc-body">
                                 <h3 class="cc-title"><a href="<?php echo esc_url(get_permalink($c)); ?>"><?php echo esc_html(get_the_title($c)); ?></a></h3>
-                                <div class="cc-instructor"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg> <?php echo $ee_author ? esc_html($ee_author->display_name) : 'نامشخص'; ?></div>
+                                <div class="cc-instructor"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg> <?php echo $ee_author ? esc_html($ee_author->display_name) : 'نامشخص'; ?>
+                                    <?php echo function_exists('evented_rating_badge_html') ? evented_rating_badge_html($c->ID) : ''; // phpcs:ignore ?>
+                                </div>
                                 <div class="cc-foot">
                                     <span class="cc-lessons"><?php echo $ee_cat_terms ? esc_html(implode('، ', array_slice($ee_cat_terms, 0, 2))) : 'دوره تخصصی'; ?></span>
                                     <span class="cc-price <?php echo $ee_free ? '' : 'amber'; ?>"><?php echo $ee_free ? 'رایگان' : esc_html(number_format((float) $ee_amount) . ' تومان'); ?></span>

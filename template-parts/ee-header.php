@@ -77,6 +77,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                 <?php endif; ?>
 
                 <div class="ee-h-actions">
+                    <?php echo function_exists('evented_resume_chip_html') ? evented_resume_chip_html('header') : ''; // phpcs:ignore ?>
                     <?php echo function_exists('evented_notify_bell_html') ? evented_notify_bell_html() : ''; // phpcs:ignore ?>
                     <?php if (is_user_logged_in()) : ?>
                         <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/panel')); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg> <span class="ee-btn-txt">پنل کاربری</span></a>
@@ -146,6 +147,8 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                 <a class="ee-btn ee-btn-primary" href="<?php echo esc_url(home_url('/login')); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-login"></use></svg> ورود / عضویت</a>
             <?php endif; ?>
         </div>
+        <?php echo function_exists('evented_resume_chip_html') ? evented_resume_chip_html('drawer') : ''; // phpcs:ignore ?>
+        <?php echo function_exists('evented_pwa_install_button_html') ? evented_pwa_install_button_html() : ''; // phpcs:ignore ?>
 
         <nav class="ee-drawer-nav" aria-label="منوی موبایل">
             <?php foreach ($ee_items as $ee_i => $ee_it) :

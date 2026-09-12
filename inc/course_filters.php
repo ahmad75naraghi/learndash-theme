@@ -174,7 +174,8 @@ function evented_course_filter_args(array $args)
 	if (!empty($meta_query)) {
 		$args['meta_query'] = $meta_query; // phpcs:ignore WordPress.DB.SlowDBQuery
 	}
-	return $args;
+	/** فیلتر برای افزودن مرتب‌سازی‌های سفارشی (مثلاً امتیاز در inc/reviews.php). */
+	return (array) apply_filters('evented_course_filter_query_args', $args, $v);
 }
 
 /**

@@ -22,6 +22,8 @@ $transactions_count = (int) $wpdb->get_var( $wpdb->prepare(
 
 get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'dashboard', 'ee_panel_title' => 'پیشخوان')); ?>
 
+        <?php echo function_exists('evented_resume_card_html') ? evented_resume_card_html() : ''; // phpcs:ignore ?>
+
         <!-- Top Stats -->
         <div class="top-stats">
             <div class="stat-item">

@@ -17,6 +17,9 @@ function handle_submit_course_review() {
     if (!$course_id || !$rating || empty($content)) {
         wp_send_json_error('لطفا تمام فیلدها و امتیاز را وارد کنید.');
     }
+    if ($rating < 1 || $rating > 5 || 'sfwd-courses' !== get_post_type($course_id)) {
+        wp_send_json_error('امتیاز یا دوره نامعتبر است.');
+    }
 
     $user = wp_get_current_user();
     if (!$user->exists()) {
@@ -32,6 +35,12 @@ function handle_submit_course_review() {
         'user_id'              => $user->ID,
         'comment_approved'     => 0, // مقدار 0 یعنی نیاز به تایید مدیر دارد
     );
+
+    /** امکان وتو (مثلاً جلوگیری از امتیاز تکراری در inc/reviews.php). */
+    $comment_data = apply_filters('evented_review_before_insert', $comment_data, $course_id, $rating);
+    if (is_wp_error($comment_data)) {
+        wp_send_json_error($comment_data->get_error_message());
+    }
 
     // ذخیره کامنت در دیتابیس وردپرس
     $comment_id = wp_insert_comment($comment_data);

@@ -379,11 +379,9 @@ function evented_seo_course_node($course_id)
 		unset($node['hasCourseInstance']['courseWorkload']);
 	}
 
-	// امتیاز (اگر متای نظرات وجود دارد)
-	$rating = get_post_meta($course_id, '_course_rating_avg', true);
-	$count  = (int) get_post_meta($course_id, '_course_rating_count', true);
-	if ($rating && $count > 0) {
-		$node['aggregateRating'] = array('@type' => 'AggregateRating', 'ratingValue' => (string) round((float) $rating, 1), 'ratingCount' => $count, 'bestRating' => '5');
+	// امتیاز و نظرات (inc/reviews.php)
+	if (function_exists('evented_rating_schema_parts')) {
+		$node = array_merge($node, evented_rating_schema_parts($course_id));
 	}
 	return $node;
 }

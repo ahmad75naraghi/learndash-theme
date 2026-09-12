@@ -52,6 +52,9 @@ if (empty($ee_posts)) {
 				</h3>
 
 				<ul class="ee-ccard-meta">
+					<?php if (function_exists('evented_rating_badge_html') && '' !== ($ee_rb = evented_rating_badge_html($ee_card['id']))) : ?>
+						<li class="ee-ccard-rating"><?php echo $ee_rb; // phpcs:ignore ?></li>
+					<?php endif; ?>
 					<?php if (!empty($ee_card['lesson_count'])) : ?>
 						<li><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-menu_book"></use></svg>
 							<?php

@@ -86,6 +86,9 @@ while (have_posts()) :
 				<div class="ee-course-meta">
 					<span class="ee-meta-item"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg><?php echo esc_html($ee_date); ?></span>
 					<span class="ee-meta-item"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg><?php echo esc_html($ee_time); ?></span>
+					<?php if (function_exists('evented_course_rating') && evented_course_rating($ee_course_id)['count'] > 0) : $ee_r = evented_course_rating($ee_course_id); ?>
+						<a class="ee-meta-item ee-meta-rating" href="#ee-reviews"><?php echo evented_rating_stars_html($ee_r['avg']); // phpcs:ignore ?><b><?php echo esc_html(number_format_i18n($ee_r['avg'], 1)); ?></b><span>(<?php echo esc_html(number_format_i18n($ee_r['count'])); ?> رأی)</span></a>
+					<?php endif; ?>
 					<a class="ee-meta-item" href="#ee-reviews"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg>
 						<?php
 						if ($ee_comments > 0) {
@@ -275,11 +278,14 @@ while (have_posts()) :
 						<?php esc_html_e('نظرات کاربران', 'evented-edu'); ?>
 					</h3>
 
+					<?php echo function_exists('evented_rating_summary_html') ? evented_rating_summary_html($ee_course_id) : ''; // phpcs:ignore ?>
+
 					<?php
 					$ee_review_list = get_comments(array(
 						'post_id' => $ee_course_id,
 						'status'  => 'approve',
 						'number'  => 10,
+						'parent'  => 0,
 					));
 					?>
 
