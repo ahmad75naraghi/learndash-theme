@@ -46,6 +46,8 @@ $ee_title  = '' !== $ee_search
 				</div>
 			</header>
 
+			<?php if (function_exists('evented_course_filter_bar')) { evented_course_filter_bar($ee_total); } ?>
+
 			<?php
 			get_template_part('template-parts/lms/course', 'grid', array(
 				'ee_posts' => $ee_posts,

@@ -95,6 +95,8 @@ $ee_total  = isset($wp_query->found_posts) ? (int) $wp_query->found_posts : coun
 			<?php endif; ?>
 
 			<!-- گرید دوره‌ها -->
+			<?php if (function_exists('evented_course_filter_bar')) { evented_course_filter_bar($ee_total); } ?>
+
 			<?php
 			get_template_part('template-parts/lms/course', 'grid', array(
 				'ee_posts' => $ee_posts,

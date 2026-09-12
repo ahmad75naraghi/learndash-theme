@@ -1110,7 +1110,7 @@ function evented_courses_query($args = array())
 		'ignore_sticky_posts' => true,
 	);
 
-	return new WP_Query(array_merge($defaults, (array) $args));
+	return new WP_Query((array) apply_filters('evented_courses_query_args', array_merge($defaults, (array) $args)));
 }
 
 /**
