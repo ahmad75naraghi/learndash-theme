@@ -77,6 +77,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                 <?php endif; ?>
 
                 <div class="ee-h-actions">
+                    <?php echo function_exists('evented_notify_bell_html') ? evented_notify_bell_html() : ''; // phpcs:ignore ?>
                     <?php if (is_user_logged_in()) : ?>
                         <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/panel')); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg> <span class="ee-btn-txt">پنل کاربری</span></a>
                     <?php else : ?>

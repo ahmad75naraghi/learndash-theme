@@ -11,6 +11,7 @@ require_once get_stylesheet_directory() . '/inc/template_helpers.php';
 require_once get_stylesheet_directory() . '/inc/navigation.php';
 require_once get_stylesheet_directory() . '/inc/live_search.php';
 require_once get_stylesheet_directory() . '/inc/course_filters.php';
+require_once get_stylesheet_directory() . '/inc/notifications.php';
 require_once get_stylesheet_directory() . '/inc/meta_functions.php';
 require_once get_stylesheet_directory() . '/inc/theme_options.php';
 require_once get_stylesheet_directory() . '/inc/theme_settings.php';

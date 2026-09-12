@@ -257,6 +257,36 @@ function evented_render_theme_settings_page()
             </table>
             <?php submit_button('ذخیرهٔ تنظیمات'); ?>
         </form>
+
+        <?php if ('notify' === $active && function_exists('evented_notify')) : ?>
+            <?php if (isset($_GET['ee_msg'])) : // phpcs:ignore ?>
+                <div class="notice notice-<?php echo 'sent' === $_GET['ee_msg'] ? 'success' : 'warning'; // phpcs:ignore ?> is-dismissible"><p><?php echo 'sent' === $_GET['ee_msg'] ? esc_html(sprintf('اعلان برای %d کاربر ثبت شد.', (int) ($_GET['n'] ?? 0))) : 'عنوان اعلان خالی است.'; // phpcs:ignore ?></p></div>
+            <?php endif; ?>
+            <hr>
+            <h2>ارسال اعلان دستی</h2>
+            <p class="description">به همهٔ کاربران یا دانشجویان یک دوره اعلان بفرستید (در زنگولهٔ هدر نمایش داده می‌شود).</p>
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <input type="hidden" name="action" value="evented_notify_broadcast">
+                <?php wp_nonce_field('evented_notify_broadcast'); ?>
+                <table class="form-table" role="presentation">
+                    <tr><th scope="row"><label for="ee-nb-title">عنوان</label></th><td><input id="ee-nb-title" class="regular-text" type="text" name="title" required maxlength="190"></td></tr>
+                    <tr><th scope="row"><label for="ee-nb-body">متن</label></th><td><textarea id="ee-nb-body" class="large-text" rows="3" name="body"></textarea></td></tr>
+                    <tr><th scope="row"><label for="ee-nb-url">لینک (اختیاری)</label></th><td><input id="ee-nb-url" class="regular-text" type="url" name="url" dir="ltr"></td></tr>
+                    <tr><th scope="row">گیرندگان</th><td>
+                        <label><input type="radio" name="target" value="all" checked> همهٔ کاربران</label><br>
+                        <label><input type="radio" name="target" value="course"> دانشجویان دوره:</label>
+                        <select name="course_id">
+                            <option value="0">— انتخاب دوره —</option>
+                            <?php foreach (get_posts(array('post_type' => 'sfwd-courses', 'posts_per_page' => 300, 'orderby' => 'title', 'order' => 'ASC')) as $ee_c) : ?>
+                                <option value="<?php echo (int) $ee_c->ID; ?>"><?php echo esc_html(get_the_title($ee_c)); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td></tr>
+                    <tr><th scope="row">پیامک</th><td><label><input type="checkbox" name="sms" value="1"> علاوه بر اعلان، پیامک هم ارسال شود (نیازمند الگوی اعلان و فعال بودن پیامک اعلان‌ها)</label></td></tr>
+                </table>
+                <?php submit_button('ارسال اعلان', 'secondary'); ?>
+            </form>
+        <?php endif; ?>
         <?php endif; ?>
     </div>
     <?php
