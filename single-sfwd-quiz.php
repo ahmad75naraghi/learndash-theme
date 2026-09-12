@@ -44,12 +44,20 @@ while (have_posts()) :
 	$ee_time  = function_exists('evented_post_time') ? evented_post_time($ee_quiz_id) : get_the_time();
 	$ee_views = function_exists('evented_get_post_views') ? evented_get_post_views($ee_quiz_id) : 0;
 
-	/* بدنهٔ آزمون از لرن‌دش */
-	$ee_quiz_body = '';
-	if (function_exists('shortcode_exists') && shortcode_exists('ld_quiz')) {
-		$ee_quiz_body = (string) do_shortcode('[ld_quiz id="' . $ee_quiz_id . '"]');
-	} elseif (function_exists('shortcode_exists') && shortcode_exists('learndash_quiz')) {
-		$ee_quiz_body = (string) do_shortcode('[learndash_quiz id="' . $ee_quiz_id . '"]');
+	/* بدنهٔ آزمون از لرن‌دش:
+	   مسیر استاندارد لرن‌دش فیلتر the_content است (موتور آزمون، اسکریپت‌ها و
+	   کنترل دسترسی را خودش تزریق می‌کند). اگر به هر دلیل موتور آزمون در محتوا
+	   نبود، از شورت‌کد [ld_quiz] استفاده می‌کنیم تا دوبار رندر نشود. */
+	ob_start();
+	the_content();
+	$ee_quiz_body = (string) ob_get_clean();
+	$ee_has_engine = (false !== strpos($ee_quiz_body, 'wpProQuiz') || false !== strpos($ee_quiz_body, 'ld-quiz') || false !== strpos($ee_quiz_body, 'learndash-wrapper'));
+	if (!$ee_has_engine && function_exists('shortcode_exists')) {
+		if (shortcode_exists('ld_quiz')) {
+			$ee_quiz_body .= (string) do_shortcode('[ld_quiz quiz_id="' . $ee_quiz_id . '"]');
+		} elseif (shortcode_exists('learndash_quiz')) {
+			$ee_quiz_body .= (string) do_shortcode('[learndash_quiz quiz_id="' . $ee_quiz_id . '"]');
+		}
 	}
 
 	$ee_logged_in = is_user_logged_in();
@@ -143,11 +151,14 @@ while (have_posts()) :
 				<?php endif; ?>
 
 				<!-- بدنهٔ آزمون -->
-				<div class="ee-quiz-body">
+				<div class="ee-quiz-body learndash">
 					<?php if ('' !== trim($ee_quiz_body)) : ?>
-						<?php echo $ee_quiz_body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی شورت‌کد لرن‌دش. ?>
+						<?php echo $ee_quiz_body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی لرن‌دش. ?>
 					<?php else : ?>
-						<?php the_content(); ?>
+						<div class="ee-quiz-empty">
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-help_center"></use></svg>
+							<p><?php esc_html_e('محتوای این آزمون هنوز آماده نشده است.', 'evented-edu'); ?></p>
+						</div>
 					<?php endif; ?>
 				</div>
 

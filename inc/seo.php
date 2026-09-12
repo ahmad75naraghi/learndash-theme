@@ -297,7 +297,7 @@ function evented_seo_breadcrumb_node()
 			$items[] = array('name' => $terms[0]->name, 'url' => get_term_link($terms[0]));
 		}
 		$items[] = array('name' => get_the_title(), 'url' => get_permalink());
-	} elseif (is_singular(array('sfwd-lessons', 'sfwd-topic', 'sfwd-quizzes'))) {
+	} elseif (is_singular(array('sfwd-lessons', 'sfwd-topic', 'sfwd-quiz'))) {
 		$cid = function_exists('learndash_get_course_id') ? (int) learndash_get_course_id(get_the_ID()) : 0;
 		$items[] = array('name' => 'دوره‌ها', 'url' => get_post_type_archive_link('sfwd-courses'));
 		if ($cid) {
