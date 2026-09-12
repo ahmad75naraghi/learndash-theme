@@ -63,9 +63,9 @@ $ee_render_inner = static function ($item, $is_current) {
 	?>
 	<span class="ee-ln-ic <?php echo esc_attr($ee_state['class']); ?>" aria-hidden="true">
 		<?php if (!empty($item['is_completed'])) : ?>
-			<span class="material-symbols-outlined ee-ic">check</span>
+			<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-check"></use></svg>
 		<?php elseif (empty($item['is_unlocked'])) : ?>
-			<span class="material-symbols-outlined ee-ic">lock</span>
+			<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-lock"></use></svg>
 		<?php endif; ?>
 	</span>
 
@@ -73,10 +73,10 @@ $ee_render_inner = static function ($item, $is_current) {
 		<span class="ee-ln-title"><?php echo esc_html($item['title']); ?></span>
 		<span class="ee-ln-meta">
 			<?php if (!empty($item['duration_text'])) : ?>
-				<span class="material-symbols-outlined ee-ic">schedule</span><?php echo esc_html($item['duration_text']); ?>
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg><?php echo esc_html($item['duration_text']); ?>
 			<?php endif; ?>
 			<?php if (!empty($item['quizzes'])) : ?>
-				<span class="material-symbols-outlined ee-ic">quiz</span>
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-quiz"></use></svg>
 				<?php
 				/* translators: %s: تعداد آزمون */
 				echo esc_html(sprintf(_n('%s آزمون', '%s آزمون', $item['quizzes'], 'evented-edu'), number_format_i18n($item['quizzes'])));
@@ -95,7 +95,7 @@ $ee_render_inner = static function ($item, $is_current) {
 
 		<div class="ee-ln-head">
 			<a class="ee-ln-home" href="<?php echo esc_url($ee_course_url); ?>">
-				<span class="material-symbols-outlined ee-ic">home</span>
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-home"></use></svg>
 				<span><?php esc_html_e('صفحهٔ دوره', 'evented-edu'); ?></span>
 			</a>
 			<?php if ($ee_has_sections) : ?>
@@ -133,7 +133,7 @@ $ee_render_inner = static function ($item, $is_current) {
 						<button type="button" class="ee-ln-group-head" aria-expanded="<?php echo $ee_group_open ? 'true' : 'false'; ?>">
 							<span><?php echo esc_html($ee_group['title']); ?></span>
 							<span class="ee-ln-group-count"><?php echo esc_html(number_format_i18n(count($ee_group['items']))); ?></span>
-							<span class="material-symbols-outlined ee-ic">expand_more</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-expand_more"></use></svg>
 						</button>
 						<ul class="ee-ln-items">
 				<?php else : ?>
@@ -166,7 +166,7 @@ $ee_render_inner = static function ($item, $is_current) {
 		</nav>
 
 		<a class="ee-ln-back" href="<?php echo esc_url($ee_course_url); ?>">
-			<span class="material-symbols-outlined ee-ic">arrow_back</span>
+			<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
 			<span class="ee-ln-back-txt"><?php echo esc_html($ee_course_title); ?></span>
 		</a>
 	</div>

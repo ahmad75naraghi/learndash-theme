@@ -19,7 +19,7 @@
 /* مسیریابی (مشترک) ------------------------------------------------------ */
 .ee-crumb { display: flex; align-items: center; gap: .25rem; flex-wrap: wrap; font-size: .72rem; color: var(--ee-soft); margin-bottom: .8rem; }
 .ee-crumb a:hover { color: var(--ee-tealP); }
-.ee-crumb .material-symbols-outlined { font-size: 1rem; opacity: .55; }
+.ee-crumb svg.ee-ic { font-size: 1rem; opacity: .55; }
 .ee-crumb-current { color: #1e293b; font-weight: 700; }
 
 /* سربرگ فهرست ----------------------------------------------------------- */

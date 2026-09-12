@@ -63,11 +63,11 @@ while (have_posts()) :
 				<h1 class="ee-quiz-title"><?php the_title(); ?></h1>
 
 				<div class="ee-lesson-meta">
-					<span class="ee-meta-item"><span class="material-symbols-outlined ee-ic">calendar_month</span><?php echo esc_html($ee_date); ?></span>
+					<span class="ee-meta-item"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg><?php echo esc_html($ee_date); ?></span>
 					<span class="ee-meta-sep" aria-hidden="true"></span>
-					<span class="ee-meta-item"><span class="material-symbols-outlined ee-ic">schedule</span><?php echo esc_html($ee_time); ?></span>
+					<span class="ee-meta-item"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg><?php echo esc_html($ee_time); ?></span>
 					<span class="ee-meta-sep" aria-hidden="true"></span>
-					<span class="ee-meta-item"><span class="material-symbols-outlined ee-ic">visibility</span>
+					<span class="ee-meta-item"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg>
 						<?php
 						/* translators: %s: تعداد بازدید */
 						echo esc_html(sprintf(__('تعداد بازدید : %s', 'evented-edu'), number_format_i18n($ee_views)));
@@ -80,10 +80,10 @@ while (have_posts()) :
 					<nav class="ee-lr-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
 						<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
 						<?php if ($ee_course_id) : ?>
-							<span class="material-symbols-outlined ee-ic">chevron_left</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
 							<a href="<?php echo esc_url(get_permalink($ee_course_id)); ?>"><?php echo esc_html(get_the_title($ee_course_id)); ?></a>
 						<?php endif; ?>
-						<span class="material-symbols-outlined ee-ic">chevron_left</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
 						<span class="ee-lr-current"><?php the_title(); ?></span>
 					</nav>
 				</div>
@@ -92,14 +92,14 @@ while (have_posts()) :
 				<ul class="ee-quiz-facts">
 					<?php if (!empty($ee_quiz['questions'])) : ?>
 						<li>
-							<span class="material-symbols-outlined ee-ic">help_center</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-help_center"></use></svg>
 							<span class="ee-qf-k"><?php esc_html_e('تعداد سوال', 'evented-edu'); ?></span>
 							<b><?php echo esc_html(number_format_i18n((int) $ee_quiz['questions'])); ?></b>
 						</li>
 					<?php endif; ?>
 					<?php if (!empty($ee_quiz['time_limit'])) : ?>
 						<li>
-							<span class="material-symbols-outlined ee-ic">timer</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-timer"></use></svg>
 							<span class="ee-qf-k"><?php esc_html_e('محدودیت زمانی', 'evented-edu'); ?></span>
 							<b>
 								<?php
@@ -111,21 +111,21 @@ while (have_posts()) :
 					<?php endif; ?>
 					<?php if (!empty($ee_quiz['attempts'])) : ?>
 						<li>
-							<span class="material-symbols-outlined ee-ic">replay</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-replay"></use></svg>
 							<span class="ee-qf-k"><?php esc_html_e('تعداد دفعات مجاز', 'evented-edu'); ?></span>
 							<b><?php echo esc_html(number_format_i18n((int) $ee_quiz['attempts'])); ?></b>
 						</li>
 					<?php endif; ?>
 					<?php if (!empty($ee_quiz['passing'])) : ?>
 						<li>
-							<span class="material-symbols-outlined ee-ic">trending_up</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-trending_up"></use></svg>
 							<span class="ee-qf-k"><?php esc_html_e('درصد قبولی', 'evented-edu'); ?></span>
 							<b><?php echo esc_html(number_format_i18n((int) $ee_quiz['passing'])); ?>٪</b>
 						</li>
 					<?php endif; ?>
 					<?php if (!empty($ee_quiz['certificate'])) : ?>
 						<li>
-							<span class="material-symbols-outlined ee-ic">workspace_premium</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-workspace_premium"></use></svg>
 							<span class="ee-qf-k"><?php esc_html_e('گواهینامه', 'evented-edu'); ?></span>
 							<b><?php esc_html_e('دارد', 'evented-edu'); ?></b>
 						</li>
@@ -134,7 +134,7 @@ while (have_posts()) :
 
 				<?php if (!$ee_logged_in) : ?>
 					<div class="ee-quiz-notice">
-						<span class="material-symbols-outlined ee-ic">info</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-info"></use></svg>
 						<p>
 							<?php esc_html_e('برای شرکت در آزمون ابتدا وارد حساب کاربری شوید.', 'evented-edu'); ?>
 							<a href="<?php echo esc_url(home_url('/login?redirect_to=' . rawurlencode((string) get_permalink($ee_quiz_id)))); ?>"><?php esc_html_e('ورود / ثبت‌نام', 'evented-edu'); ?></a>
@@ -155,7 +155,7 @@ while (have_posts()) :
 				<nav class="ee-step-nav" aria-label="<?php esc_attr_e('ناوبری', 'evented-edu'); ?>">
 					<?php if ($ee_course_id) : ?>
 						<a class="ee-step-btn is-back" href="<?php echo esc_url(get_permalink($ee_course_id)); ?>">
-							<span class="material-symbols-outlined ee-ic">arrow_back</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
 							<span><?php esc_html_e('بازگشت به دوره', 'evented-edu'); ?></span>
 						</a>
 					<?php else : ?>
@@ -167,7 +167,7 @@ while (have_posts()) :
 					if (!empty($ee_adjacent['prev']) && $ee_adjacent['prev'] instanceof WP_Post) :
 						?>
 						<a class="ee-step-btn is-prev" href="<?php echo esc_url(get_permalink($ee_adjacent['prev'])); ?>">
-							<span class="material-symbols-outlined ee-ic">arrow_back</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
 							<span class="ee-step-name"><?php echo esc_html(get_the_title($ee_adjacent['prev'])); ?></span>
 						</a>
 					<?php endif; ?>
@@ -203,7 +203,7 @@ while (have_posts()) :
 				if (!empty($ee_other_courses)) :
 					?>
 					<div class="ee-widget">
-						<h3 class="ee-w-title"><span class="material-symbols-outlined">grid_view</span> <?php esc_html_e('سایر دوره‌ها', 'evented-edu'); ?></h3>
+						<h3 class="ee-w-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-grid_view"></use></svg> <?php esc_html_e('سایر دوره‌ها', 'evented-edu'); ?></h3>
 						<div class="ee-mini-list">
 							<?php foreach ($ee_other_courses as $ee_oc) : ?>
 								<a class="ee-mini" href="<?php echo esc_url(get_permalink($ee_oc)); ?>">
@@ -213,7 +213,7 @@ while (have_posts()) :
 									<?php if (has_post_thumbnail($ee_oc)) : ?>
 										<img class="ee-mini-th" src="<?php echo esc_url(get_the_post_thumbnail_url($ee_oc, 'thumbnail')); ?>" alt="<?php echo esc_attr(get_the_title($ee_oc)); ?>" loading="lazy">
 									<?php else : ?>
-										<span class="ee-mini-th ee-mini-noimg ee-ic"><span class="material-symbols-outlined">image</span></span>
+										<span class="ee-mini-th ee-mini-noimg ee-ic"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-image"></use></svg></span>
 									<?php endif; ?>
 								</a>
 							<?php endforeach; ?>

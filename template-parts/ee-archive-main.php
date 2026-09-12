@@ -75,7 +75,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 		<!-- سربرگ بایگانی -->
 		<header class="ee-arch-head">
 			<h1 class="ee-arch-title">
-				<span class="material-symbols-outlined ee-ic">newspaper</span>
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-newspaper"></use></svg>
 				<?php echo esc_html($ee_arch_title); ?>
 			</h1>
 			<?php if ('' !== trim((string) $ee_arch_subtitle)) : ?>
@@ -83,7 +83,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 			<?php endif; ?>
 			<div class="ee-arch-meta">
 				<span>
-					<span class="material-symbols-outlined ee-ic">article</span>
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-article"></use></svg>
 					<?php
 					/* translators: %s: تعداد نوشته */
 					echo esc_html(sprintf(_n('%s نوشته', '%s نوشته', $ee_arch_count, 'evented-edu'), number_format_i18n($ee_arch_count)));
@@ -92,7 +92,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 				<?php if (is_search()) : ?>
 					<a class="ee-arch-link" href="<?php echo esc_url($ee_blog_url); ?>">
 						<?php esc_html_e('همهٔ نوشته‌ها', 'evented-edu'); ?>
-						<span class="material-symbols-outlined ee-ic">arrow_back</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
 					</a>
 				<?php endif; ?>
 			</div>
@@ -148,7 +148,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 							<?php if (has_post_thumbnail()) : ?>
 								<?php the_post_thumbnail('medium_large', array('loading' => 'lazy')); ?>
 							<?php else : ?>
-								<span class="ee-ac-noimg ee-ic"><span class="material-symbols-outlined">article</span></span>
+								<span class="ee-ac-noimg ee-ic"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-article"></use></svg></span>
 							<?php endif; ?>
 							<?php if ('' !== $ee_p_tag) : ?>
 								<span class="ee-ac-tag"><?php echo esc_html($ee_p_tag); ?></span>
@@ -163,15 +163,15 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 								<span class="ee-ac-date"><?php echo esc_html($ee_p_date); ?></span>
 								<span class="ee-ac-stats">
 									<span title="<?php esc_attr_e('زمان مطالعه', 'evented-edu'); ?>">
-										<span class="material-symbols-outlined ee-ic">schedule</span>
+										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg>
 										<?php echo esc_html(number_format_i18n($ee_p_read)); ?>
 									</span>
 									<span title="<?php esc_attr_e('بازدید', 'evented-edu'); ?>">
-										<span class="material-symbols-outlined ee-ic">visibility</span>
+										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg>
 										<?php echo esc_html(number_format_i18n($ee_p_views)); ?>
 									</span>
 									<span title="<?php esc_attr_e('دیدگاه', 'evented-edu'); ?>">
-										<span class="material-symbols-outlined ee-ic">forum</span>
+										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg>
 										<?php echo esc_html(number_format_i18n($ee_p_cmts)); ?>
 									</span>
 								</span>
@@ -179,7 +179,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 
 							<a class="ee-ac-more" href="<?php the_permalink(); ?>">
 								<?php esc_html_e('ادامه مطلب', 'evented-edu'); ?>
-								<span class="material-symbols-outlined ee-ic">arrow_back</span>
+								<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
 							</a>
 						</div>
 					</article>
@@ -190,8 +190,8 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 			<?php
 			$ee_pager = paginate_links(array(
 				'type'      => 'array',
-				'prev_text' => '<span class="material-symbols-outlined ee-ic">arrow_forward</span>',
-				'next_text' => '<span class="material-symbols-outlined ee-ic">arrow_back</span>',
+				'prev_text' => '<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_forward"></use></svg>',
+				'next_text' => '<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>',
 			));
 			?>
 			<?php if (!empty($ee_pager)) : ?>
@@ -206,7 +206,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 
 			<!-- چیزی پیدا نشد -->
 			<section class="ee-noresult">
-				<span class="material-symbols-outlined ee-ic">search_off</span>
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search_off"></use></svg>
 				<h2><?php esc_html_e('موردی یافت نشد', 'evented-edu'); ?></h2>
 				<p><?php esc_html_e('با عبارت دیگری جستجو کنید یا از دسته‌بندی‌های بالا استفاده نمایید.', 'evented-edu'); ?></p>
 				<form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
@@ -215,7 +215,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 						<input id="ee-noresult-s" type="search" name="s" value="<?php echo esc_attr(get_search_query()); ?>" placeholder="<?php esc_attr_e('جستجو…', 'evented-edu'); ?>">
 						<?php if ('' !== $ee_search_scope) : ?><input type="hidden" name="post_type" value="<?php echo esc_attr($ee_search_scope); ?>"><?php endif; ?>
 						<button type="submit" aria-label="<?php esc_attr_e('جستجو', 'evented-edu'); ?>">
-							<span class="material-symbols-outlined ee-ic">search</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
 						</button>
 					</div>
 				</form>

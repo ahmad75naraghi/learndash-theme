@@ -5,9 +5,18 @@
 
 function send_pattern_sms($mobile, $code): bool
 {
-    $username = 'iranhp';
-    $password = '@Fal#nic1415@';
-    $template_id = intval('315445');
+    $username    = (string) (function_exists('evented_opt') ? evented_opt('sms_username', '') : '');
+    $password    = (string) (function_exists('evented_opt') ? evented_opt('sms_password', '') : '');
+    $template_id = intval(function_exists('evented_opt') ? evented_opt('sms_body_id', 0) : 0);
+
+    if ('' === $username || '' === $password || !$template_id) {
+        error_log('evented-edu: SMS credentials are not configured (Appearance → Theme Settings → SMS).');
+        return false;
+    }
+    if (!class_exists('SoapClient')) {
+        error_log('evented-edu: PHP SOAP extension is missing.');
+        return false;
+    }
 
     try {
         $client = new SoapClient("https://api.payamak-panel.com/post/Send.asmx?wsdl", [

@@ -35,17 +35,17 @@ $ee_side_shares = function_exists('evented_share_links') ? evented_share_links($
 <aside class="ee-side">
 
 	<div class="ee-widget ee-widget-search">
-		<h3 class="ee-w-title"><span class="material-symbols-outlined">search</span> <?php esc_html_e('جستجو در دوره‌ها', 'evented-edu'); ?></h3>
+		<h3 class="ee-w-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg> <?php esc_html_e('جستجو در دوره‌ها', 'evented-edu'); ?></h3>
 		<form class="ee-search-inline" role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
 			<label class="screen-reader-text" for="ee-lms-s"><?php esc_html_e('جستجو', 'evented-edu'); ?></label>
 			<input id="ee-lms-s" type="search" name="s" value="<?php echo esc_attr(get_search_query()); ?>" placeholder="<?php esc_attr_e('نام دوره یا کلیدواژه...', 'evented-edu'); ?>">
-			<button type="submit"><span class="material-symbols-outlined">search</span></button>
+			<button type="submit"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg></button>
 		</form>
 	</div>
 
 	<?php if (!empty($ee_cats)) : ?>
 		<div class="ee-widget">
-			<h3 class="ee-w-title"><span class="material-symbols-outlined">category</span> <?php esc_html_e('دسته‌بندی دوره‌ها', 'evented-edu'); ?></h3>
+			<h3 class="ee-w-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-category"></use></svg> <?php esc_html_e('دسته‌بندی دوره‌ها', 'evented-edu'); ?></h3>
 			<ul class="ee-cats">
 				<?php foreach ($ee_cats as $ee_cat) : ?>
 					<?php if (!$ee_cat instanceof WP_Term) : continue; endif; ?>
@@ -63,7 +63,7 @@ $ee_side_shares = function_exists('evented_share_links') ? evented_share_links($
 	<?php endif; ?>
 
 	<div class="ee-widget">
-		<h3 class="ee-w-title"><span class="material-symbols-outlined">new_releases</span> <?php esc_html_e('آخرین دوره‌ها', 'evented-edu'); ?></h3>
+		<h3 class="ee-w-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-new_releases"></use></svg> <?php esc_html_e('آخرین دوره‌ها', 'evented-edu'); ?></h3>
 		<?php if (!empty($ee_latest)) : ?>
 			<div class="ee-mini-list">
 				<?php foreach ($ee_latest as $ee_lc) : ?>
@@ -75,7 +75,7 @@ $ee_side_shares = function_exists('evented_share_links') ? evented_share_links($
 						<?php if (has_post_thumbnail($ee_lc)) : ?>
 							<img class="ee-mini-th" src="<?php echo esc_url(get_the_post_thumbnail_url($ee_lc, 'thumbnail')); ?>" alt="<?php echo esc_attr(get_the_title($ee_lc)); ?>" loading="lazy">
 						<?php else : ?>
-							<span class="ee-mini-th ee-mini-noimg ee-ic"><span class="material-symbols-outlined">image</span></span>
+							<span class="ee-mini-th ee-mini-noimg ee-ic"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-image"></use></svg></span>
 						<?php endif; ?>
 					</a>
 				<?php endforeach; ?>
@@ -86,7 +86,7 @@ $ee_side_shares = function_exists('evented_share_links') ? evented_share_links($
 	</div>
 
 	<div class="ee-widget">
-		<h3 class="ee-w-title"><span class="material-symbols-outlined">share</span> <?php esc_html_e('اشتراک‌گذاری', 'evented-edu'); ?></h3>
+		<h3 class="ee-w-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-share"></use></svg> <?php esc_html_e('اشتراک‌گذاری', 'evented-edu'); ?></h3>
 		<div class="ee-share-block" style="border:0;margin:0;padding:0">
 			<span class="ee-share-label"><?php esc_html_e('اشتراک‌گذاری این صفحه در:', 'evented-edu'); ?></span>
 			<div class="ee-share-row">
@@ -96,7 +96,7 @@ $ee_side_shares = function_exists('evented_share_links') ? evented_share_links($
 					</a>
 				<?php endforeach; ?>
 				<button type="button" class="ee-share-btn ee-share-copy" data-copy="<?php echo esc_attr($ee_side_url); ?>" title="<?php esc_attr_e('کپی لینک', 'evented-edu'); ?>">
-					<span class="material-symbols-outlined ee-ic">link</span>
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-link"></use></svg>
 				</button>
 			</div>
 		</div>

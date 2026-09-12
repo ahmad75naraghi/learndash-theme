@@ -43,7 +43,7 @@ wp_reset_postdata();
 $ee_articles = array_slice($ee_latest_posts, 0, 3);
 
 /* ۴٫۲) تب‌های مقالات — ۵ دستهٔ تصادفی (کش یک‌هفته‌ای) */
-$ee_article_tabs = function_exists('evented_home_article_tabs') ? evented_home_article_tabs(5, 3) : array();
+$ee_article_tabs = function_exists('evented_home_article_tabs') ? evented_home_article_tabs((int) (function_exists('evented_opt') ? evented_opt('tabs_count', 5) : 5), (int) (function_exists('evented_opt') ? evented_opt('tabs_per', 3) : 3)) : array();
 
 /* آدرس‌های منوی استاتیک (کش‌شده) */
 $ee_nav = static function ($key, $fallback = '') {
@@ -52,6 +52,7 @@ $ee_nav = static function ($key, $fallback = '') {
     }
     return $fallback ?: home_url('/');
 };
+$ee_opt = static function ($k, $d = '') { return function_exists('evented_opt') ? evented_opt($k, $d) : $d; };
 $ee_blog_url = $ee_nav('articles', get_permalink(get_option('page_for_posts')) ?: home_url('/'));
 
 /* ۴٫۱) بلاگ ویژه — نوشته‌های چسبان و در ادامه آخرین نوشته‌ها */
@@ -129,7 +130,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                 <?php endif; ?>
                                 <div class="feat-cta-row">
                                     <?php if (!empty($ee_s['link'])) : ?>
-                                        <a class="ee-btn ee-btn-light" href="<?php echo esc_url($ee_s['link']); ?>"><span class="material-symbols-outlined ee-ic">visibility</span> <?php echo esc_html($ee_s['link_text']); ?></a>
+                                        <a class="ee-btn ee-btn-light" href="<?php echo esc_url($ee_s['link']); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg> <?php echo esc_html($ee_s['link_text']); ?></a>
                                     <?php endif; ?>
                                     <a class="ee-btn ee-btn-solid" href="#ee-courses">مشاهده همه دوره‌ها</a>
                                 </div>
@@ -140,13 +141,13 @@ $ee_slider_mode  = $ee_slide_count > 1;
                     <?php if ($ee_slider_mode) : ?>
                         </div><!-- /.ee-slider -->
                         <div class="ee-slider-controls" id="eeSliderControls">
-                            <button type="button" class="ee-slide-arrow" data-dir="-1" aria-label="اسلاید قبلی"><span class="material-symbols-outlined ee-ic">chevron_right</span></button>
+                            <button type="button" class="ee-slide-arrow" data-dir="-1" aria-label="اسلاید قبلی"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_right"></use></svg></button>
                             <div class="ee-slider-dots" id="eeSliderDots">
                                 <?php for ($ee_d = 0; $ee_d < $ee_slide_count; $ee_d++) : ?>
                                     <button type="button" class="ee-slide-dot<?php echo $ee_d === 0 ? ' is-active' : ''; ?>" data-go="<?php echo esc_attr($ee_d); ?>" aria-label="اسلاید <?php echo esc_attr($ee_d + 1); ?>"></button>
                                 <?php endfor; ?>
                             </div>
-                            <button type="button" class="ee-slide-arrow" data-dir="1" aria-label="اسلاید بعدی"><span class="material-symbols-outlined ee-ic">chevron_left</span></button>
+                            <button type="button" class="ee-slide-arrow" data-dir="1" aria-label="اسلاید بعدی"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg></button>
                         </div>
                     <?php endif; ?>
 
@@ -155,8 +156,8 @@ $ee_slider_mode  = $ee_slide_count > 1;
                 <aside class="ee-latest ee-fade">
                     <div class="ee-latest-card">
                         <div class="lc-head">
-                            <div class="lc-title"><span class="material-symbols-outlined ee-ic">auto_stories</span> آخرین مقالات</div>
-                            <a class="lc-more" href="<?php echo esc_url($ee_blog_url); ?>">مشاهده همه <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                            <div class="lc-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-auto_stories"></use></svg> آخرین مقالات</div>
+                            <a class="lc-more" href="<?php echo esc_url($ee_blog_url); ?>">مشاهده همه <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                         </div>
                         <div class="ee-news-list">
                             <?php foreach ($ee_latest_posts as $p) : ?>
@@ -164,7 +165,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                     <?php if (has_post_thumbnail($p)) : ?>
                                         <img class="th" src="<?php echo esc_url(get_the_post_thumbnail_url($p, 'thumbnail')); ?>" alt="<?php echo esc_attr(get_the_title($p)); ?>">
                                     <?php else : ?>
-                                        <span class="th ee-ic material-symbols-outlined" style="color:var(--ee-tealP);">article</span>
+                                        <svg class="th ee-ic" aria-hidden="true" focusable="false" style="color:var(--ee-tealP);"><use href="#i-article"></use></svg>
                                     <?php endif; ?>
                                     <div style="min-width:0;">
                                         <h4><?php echo esc_html(get_the_title($p)); ?></h4>
@@ -175,9 +176,9 @@ $ee_slider_mode  = $ee_slide_count > 1;
                     </div>
                     <div class="ee-latest-card">
                         <div class="lc-foot">
-                            <span class="channels-ic material-symbols-outlined ee-ic">hub</span>
+                            <svg class="channels-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-hub"></use></svg>
                             <div>
-                                <div class="ch-label">کانال‌های رسمی evented-edu</div>
+                                <div class="ch-label">کانال‌های رسمی <?php echo esc_html(get_bloginfo('name')); ?></div>
                                 <div class="ch-sub">عضویت در پیام‌رسان‌ها و شبکه‌های اجتماعی</div>
                             </div>
                         </div>
@@ -191,18 +192,18 @@ $ee_slider_mode  = $ee_slide_count > 1;
         <section class="ee-quick" id="ee-quick">
             <div class="ee-wrap">
                 <div class="ee-sec-head">
-                    <h3 class="ee-sec-title"><span class="bar"></span> دسترسی سریع به بخش‌های evented-edu</h3>
-                    <span class="ee-sec-sub">مرجع تخصصی آموزش شبکه، سرور و امنیت</span>
+                    <h3 class="ee-sec-title"><span class="bar"></span> <?php echo esc_html($ee_opt('quick_title')); ?></h3>
+                    <span class="ee-sec-sub"><?php echo esc_html($ee_opt('quick_sub')); ?></span>
                 </div>
                 <div class="ee-qgrid">
-                    <a class="ee-qitem" href="<?php echo esc_url($ee_blog_url); ?>"><span class="qi-ic material-symbols-outlined ee-ic">menu_book</span><span>مقالات</span></a>
-                    <a class="ee-qitem ee-q-purple" href="<?php echo esc_url($ee_nav('courses')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">school</span><span>دوره‌ها</span></a>
-                    <a class="ee-qitem ee-q-teal" href="<?php echo esc_url($ee_nav('video')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">smart_display</span><span>ویدیوها</span></a>
-                    <a class="ee-qitem ee-q-amber" href="<?php echo esc_url($ee_nav('downloads')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">download_for_offline</span><span>دانلودها</span></a>
-                    <a class="ee-qitem ee-q-rose" href="<?php echo esc_url($ee_nav('podcast')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">podcasts</span><span>پادکست</span></a>
-                    <a class="ee-qitem" href="<?php echo esc_url($ee_nav('library')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">local_library</span><span>کتابخانه</span></a>
-                    <a class="ee-qitem ee-q-purple" href="<?php echo esc_url($ee_nav('gallery')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">photo_library</span><span>گالری</span></a>
-                    <a class="ee-qitem ee-q-amber" href="<?php echo esc_url($ee_nav('contests')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">emoji_events</span><span>مسابقات</span></a>
+                    <a class="ee-qitem" href="<?php echo esc_url($ee_blog_url); ?>"><svg class="qi-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-menu_book"></use></svg><span>مقالات</span></a>
+                    <a class="ee-qitem ee-q-purple" href="<?php echo esc_url($ee_nav('courses')); ?>"><svg class="qi-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg><span>دوره‌ها</span></a>
+                    <a class="ee-qitem ee-q-teal" href="<?php echo esc_url($ee_nav('video')); ?>"><svg class="qi-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-smart_display"></use></svg><span>ویدیوها</span></a>
+                    <a class="ee-qitem ee-q-amber" href="<?php echo esc_url($ee_nav('downloads')); ?>"><svg class="qi-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-download_for_offline"></use></svg><span>دانلودها</span></a>
+                    <a class="ee-qitem ee-q-rose" href="<?php echo esc_url($ee_nav('podcast')); ?>"><svg class="qi-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-podcasts"></use></svg><span>پادکست</span></a>
+                    <a class="ee-qitem" href="<?php echo esc_url($ee_nav('library')); ?>"><svg class="qi-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-local_library"></use></svg><span>کتابخانه</span></a>
+                    <a class="ee-qitem ee-q-purple" href="<?php echo esc_url($ee_nav('gallery')); ?>"><svg class="qi-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-photo_library"></use></svg><span>گالری</span></a>
+                    <a class="ee-qitem ee-q-amber" href="<?php echo esc_url($ee_nav('contests')); ?>"><svg class="qi-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-emoji_events"></use></svg><span>مسابقات</span></a>
                 </div>
             </div>
         </section>
@@ -212,8 +213,8 @@ $ee_slider_mode  = $ee_slide_count > 1;
             <div class="ee-wrap">
                 <div class="ee-courses-head">
                     <div>
-                        <div class="ch2"><span class="dot"></span> دوره‌های آموزشی تخصصی</div>
-                        <small>آموزش کاربردی فناوری اطلاعات با حضور اساتید و متخصصان تراز اول</small>
+                        <div class="ch2"><span class="dot"></span> <?php echo esc_html($ee_opt('courses_title')); ?></div>
+                        <small><?php echo esc_html($ee_opt('courses_sub')); ?></small>
                     </div>
                     <span class="ee-count-badge"><?php echo esc_html($ee_course_count); ?> دوره فعال</span>
                 </div>
@@ -244,7 +245,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                 <?php if ($ee_thumb) : ?>
                                     <img src="<?php echo esc_url($ee_thumb); ?>" alt="<?php echo esc_attr(get_the_title($c)); ?>" loading="lazy">
                                 <?php else : ?>
-                                    <span class="ee-ic material-symbols-outlined" style="font-size:2.6rem;color:var(--ee-tealP);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">school</span>
+                                    <svg class="ee-ic" aria-hidden="true" focusable="false" style="font-size:2.6rem;color:var(--ee-tealP);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><use href="#i-school"></use></svg>
                                 <?php endif; ?>
                                 <?php if ($ee_free) : ?>
                                     <span class="cc-badge free">رایگان</span>
@@ -254,7 +255,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                             </a>
                             <div class="cc-body">
                                 <h3 class="cc-title"><a href="<?php echo esc_url(get_permalink($c)); ?>"><?php echo esc_html(get_the_title($c)); ?></a></h3>
-                                <div class="cc-instructor"><span class="material-symbols-outlined ee-ic">school</span> <?php echo $ee_author ? esc_html($ee_author->display_name) : 'نامشخص'; ?></div>
+                                <div class="cc-instructor"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg> <?php echo $ee_author ? esc_html($ee_author->display_name) : 'نامشخص'; ?></div>
                                 <div class="cc-foot">
                                     <span class="cc-lessons"><?php echo $ee_cat_terms ? esc_html(implode('، ', array_slice($ee_cat_terms, 0, 2))) : 'دوره تخصصی'; ?></span>
                                     <span class="cc-price <?php echo $ee_free ? '' : 'amber'; ?>"><?php echo $ee_free ? 'رایگان' : esc_html(number_format((float) $ee_amount) . ' تومان'); ?></span>
@@ -269,13 +270,13 @@ $ee_slider_mode  = $ee_slide_count > 1;
                 <!-- نوار CTA کهربایی -->
                 <div class="ee-cta-amber">
                     <div class="cta-text">
-                        <span class="cta-ic material-symbols-outlined ee-ic">workspace_premium</span>
+                        <svg class="cta-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-workspace_premium"></use></svg>
                         <div>
-                            <h4>ثبت‌نام رسمی، شرکت در آزمون و دریافت مدرک معتبر</h4>
-                            <p>فعال‌سازی دسترسی به جزوات تخصصی، آزمون‌های دوره و گواهی پایان دوره</p>
+                            <h4><?php echo esc_html($ee_opt('cta_title')); ?></h4>
+                            <p><?php echo esc_html($ee_opt('cta_sub')); ?></p>
                         </div>
                     </div>
-                    <a class="ee-btn-amber" href="<?php echo is_user_logged_in() ? esc_url(home_url('/panel')) : esc_url(home_url('/login')); ?>">شروع یادگیری رایگان</a>
+                    <a class="ee-btn-amber" href="<?php echo is_user_logged_in() ? esc_url(home_url('/panel')) : esc_url(home_url('/login')); ?>"><?php echo esc_html($ee_opt('cta_btn')); ?></a>
                 </div>
             </div>
         </section>
@@ -285,35 +286,35 @@ $ee_slider_mode  = $ee_slide_count > 1;
             <div class="ee-wrap">
                 <div class="ee-steps-top">
                     <div>
-                        <span class="st-badge"><span class="material-symbols-outlined ee-ic">route</span> مسیر آسان و گام‌به‌گام آموزش</span>
-                        <h3 style="margin-top:.5rem;">۳ گام ساده تا یادگیری مهارت IT</h3>
-                        <p>در چند دقیقه و بدون پیچیدگی، به دوره‌های تخصصی شبکه، سرور و امنیت دسترسی پیدا کنید.</p>
+                        <span class="st-badge"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-route"></use></svg> مسیر آسان و گام‌به‌گام آموزش</span>
+                        <h3 style="margin-top:.5rem;"><?php echo esc_html($ee_opt('steps_title')); ?></h3>
+                        <p><?php echo esc_html($ee_opt('steps_sub')); ?></p>
                     </div>
                 </div>
                 <div class="ee-steps-grid">
                     <div class="ee-step">
                         <div>
-                            <div class="st-top"><span class="st-num">۱</span><span class="st-ic material-symbols-outlined ee-ic">how_to_reg</span></div>
+                            <div class="st-top"><span class="st-num">۱</span><svg class="st-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-how_to_reg"></use></svg></div>
                             <h5 style="margin:.6rem 0 .2rem;">عضویت کاملاً رایگان</h5>
                             <p>ثبت‌نام سریع تنها با یک شماره همراه، بدون نیاز به مدارک پیچیده</p>
                         </div>
-                        <div class="st-foot"><span>شروع سریع</span><span class="material-symbols-outlined ee-ic">arrow_back</span></div>
+                        <div class="st-foot"><span>شروع سریع</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></div>
                     </div>
                     <div class="ee-step st2">
                         <div>
-                            <div class="st-top"><span class="st-num">۲</span><span class="st-ic material-symbols-outlined ee-ic">checklist_rtl</span></div>
+                            <div class="st-top"><span class="st-num">۲</span><svg class="st-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-checklist_rtl"></use></svg></div>
                             <h5 style="margin:.6rem 0 .2rem;">انتخاب دورهٔ دلخواه</h5>
                             <p>فعال‌سازی دوره‌های شبکه، سرور، امنیت و مجازی‌سازی متناسب با سطح خود</p>
                         </div>
-                        <div class="st-foot"><span>انتخاب مبحث</span><span class="material-symbols-outlined ee-ic">arrow_back</span></div>
+                        <div class="st-foot"><span>انتخاب مبحث</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></div>
                     </div>
                     <div class="ee-step st3">
                         <div>
-                            <div class="st-top"><span class="st-num">۳</span><span class="st-ic material-symbols-outlined ee-ic">all_inclusive</span></div>
+                            <div class="st-top"><span class="st-num">۳</span><svg class="st-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-all_inclusive"></use></svg></div>
                             <h5 style="margin:.6rem 0 .2rem;">دسترسی نامحدود و دائمی</h5>
                             <p>مشاهدهٔ ویدیوها، دریافت جزوات و شرکت در آزمون در هر زمان و مکان</p>
                         </div>
-                        <div class="st-foot"><span>مشاهده دوره‌ها</span><span class="material-symbols-outlined ee-ic">arrow_back</span></div>
+                        <div class="st-foot"><span>مشاهده دوره‌ها</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></div>
                     </div>
                 </div>
             </div>
@@ -332,10 +333,10 @@ $ee_slider_mode  = $ee_slide_count > 1;
                 <div class="ee-wrap">
                     <div class="ee-sec-head">
                         <div>
-                            <h3 class="ee-sec-title purple"><span class="bar"></span> بلاگ ویژه</h3>
-                            <p class="sec-sub">منتخبی از نوشته‌های تیم آموزشی؛ تازه‌ترین تجربه‌ها و راهنماهای کاربردی</p>
+                            <h3 class="ee-sec-title purple"><span class="bar"></span> <?php echo esc_html($ee_opt('blog_feat_title')); ?></h3>
+                            <p class="sec-sub"><?php echo esc_html($ee_opt('blog_feat_sub')); ?></p>
                         </div>
-                        <a class="lc-more" style="color:#7e22ce;" href="<?php echo esc_url($ee_bf_url); ?>">همهٔ نوشته‌ها <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                        <a class="lc-more" style="color:#7e22ce;" href="<?php echo esc_url($ee_bf_url); ?>">همهٔ نوشته‌ها <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                     </div>
 
                     <div class="ee-bf-grid">
@@ -345,24 +346,24 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                 <?php if (has_post_thumbnail($ee_bf_hero)) : ?>
                                     <img src="<?php echo esc_url(get_the_post_thumbnail_url($ee_bf_hero, 'large')); ?>" alt="<?php echo esc_attr(get_the_title($ee_bf_hero)); ?>" loading="lazy">
                                 <?php else : ?>
-                                    <span class="bf-hero-noimg"><span class="material-symbols-outlined ee-ic">auto_stories</span></span>
+                                    <span class="bf-hero-noimg"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-auto_stories"></use></svg></span>
                                 <?php endif; ?>
                                 <span class="bf-hero-chip"><?php echo esc_html($ee_bf_hcat); ?></span>
                             </a>
                             <div class="bf-hero-body">
-                                <span class="bf-hero-badge"><span class="material-symbols-outlined ee-ic">workspace_premium</span> <?php esc_html_e('نوشتهٔ ویژه', 'evented-edu'); ?></span>
+                                <span class="bf-hero-badge"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-workspace_premium"></use></svg> <?php esc_html_e('نوشتهٔ ویژه', 'evented-edu'); ?></span>
                                 <h4><a href="<?php echo esc_url(get_permalink($ee_bf_hero)); ?>"><?php echo esc_html(get_the_title($ee_bf_hero)); ?></a></h4>
                                 <p><?php echo esc_html(wp_trim_words(get_the_excerpt($ee_bf_hero), 26)); ?></p>
                                 <div class="bf-hero-foot">
                                     <span class="bf-by">
-                                        <span class="material-symbols-outlined ee-ic">person</span>
+                                        <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg>
                                         <?php echo esc_html(get_the_author_meta('display_name', (int) $ee_bf_hero->post_author)); ?>
                                     </span>
                                     <span class="bf-date">
-                                        <span class="material-symbols-outlined ee-ic">calendar_month</span>
+                                        <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg>
                                         <?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($ee_bf_hero) : get_the_date('', $ee_bf_hero)); ?>
                                     </span>
-                                    <a class="bf-read" href="<?php echo esc_url(get_permalink($ee_bf_hero)); ?>">مطالعه <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                                    <a class="bf-read" href="<?php echo esc_url(get_permalink($ee_bf_hero)); ?>">مطالعه <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                                 </div>
                             </div>
                         </article>
@@ -377,14 +378,14 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                             <?php if (has_post_thumbnail($ee_bf)) : ?>
                                                 <img src="<?php echo esc_url(get_the_post_thumbnail_url($ee_bf, 'medium')); ?>" alt="<?php echo esc_attr(get_the_title($ee_bf)); ?>" loading="lazy">
                                             <?php else : ?>
-                                                <span class="material-symbols-outlined ee-ic">article</span>
+                                                <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-article"></use></svg>
                                             <?php endif; ?>
                                         </span>
                                         <span class="bf-row-txt">
                                             <span class="bf-row-cat"><?php echo esc_html((is_array($ee_bf_cat) && !empty($ee_bf_cat)) ? $ee_bf_cat[0]->name : __('مقالات', 'evented-edu')); ?></span>
                                             <strong><?php echo esc_html(get_the_title($ee_bf)); ?></strong>
                                             <span class="bf-row-meta">
-                                                <span class="material-symbols-outlined ee-ic">calendar_month</span>
+                                                <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg>
                                                 <?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($ee_bf) : get_the_date('', $ee_bf)); ?>
                                             </span>
                                         </span>
@@ -402,9 +403,9 @@ $ee_slider_mode  = $ee_slide_count > 1;
             <div class="ee-wrap">
                 <div class="ee-sec-head">
                     <div>
-                        <h3 class="ee-sec-title purple"><span class="bar"></span> گزیده مقالات و دانستنی‌های فناوری اطلاعات</h3>
+                        <h3 class="ee-sec-title purple"><span class="bar"></span> <?php echo esc_html($ee_opt('articles_title')); ?></h3>
                     </div>
-                    <a class="lc-more" style="color:#7e22ce;" href="<?php echo esc_url($ee_blog_url); ?>">مشاهده همه مقالات <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                    <a class="lc-more" style="color:#7e22ce;" href="<?php echo esc_url($ee_blog_url); ?>">مشاهده همه مقالات <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                 </div>
 
                 <?php
@@ -418,7 +419,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                             <?php if (has_post_thumbnail($a)) : ?>
                                 <img src="<?php echo esc_url(get_the_post_thumbnail_url($a, 'medium')); ?>" alt="<?php echo esc_attr(get_the_title($a)); ?>" loading="lazy">
                             <?php else : ?>
-                                <span class="ee-ic material-symbols-outlined" style="width:100%;height:100%;font-size:2.4rem;color:var(--ee-tealP);">article</span>
+                                <svg class="ee-ic" aria-hidden="true" focusable="false" style="width:100%;height:100%;font-size:2.4rem;color:var(--ee-tealP);"><use href="#i-article"></use></svg>
                             <?php endif; ?>
                         </a>
                         <div>
@@ -428,7 +429,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                         </div>
                         <div class="art-foot">
                             <span><?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($a) : get_the_date('', $a)); ?></span>
-                            <a class="read" href="<?php echo esc_url(get_permalink($a)); ?>">مطالعه کامل <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                            <a class="read" href="<?php echo esc_url(get_permalink($a)); ?>">مطالعه کامل <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                         </div>
                     </article>
                     <?php
@@ -455,7 +456,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                 <?php foreach ($ee_tab['posts'] as $a) { $ee_render_article($a); } ?>
                             </div>
                             <div class="ee-art-panel-foot">
-                                <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(get_term_link($ee_tab['term'])); ?>">همهٔ مطالب «<?php echo esc_html($ee_tab['term']->name); ?>» <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                                <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(get_term_link($ee_tab['term'])); ?>">همهٔ مطالب «<?php echo esc_html($ee_tab['term']->name); ?>» <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -472,17 +473,17 @@ $ee_slider_mode  = $ee_slide_count > 1;
         <!-- ======= اساتید ======= -->
         <section class="ee-instructors" id="ee-instructors">
             <div class="ee-wrap">
-                <h3 class="ee-sec-title" style="justify-content:center;"><span class="bar"></span> اساتید و متخصصان برجسته evented-edu</h3>
-                <p class="sec-sub">همراهی اساتید تراز اول در حوزه شبکه، سرور، امنیت و زیرساخت</p>
+                <h3 class="ee-sec-title" style="justify-content:center;"><span class="bar"></span> <?php echo esc_html($ee_opt('instr_title')); ?></h3>
+                <p class="sec-sub"><?php echo esc_html($ee_opt('instr_sub')); ?></p>
                 <div class="ee-instr-row">
                     <?php if (!empty($ee_instructors)) : foreach ($ee_instructors as $ins) :
                         $ins_av = get_avatar_url($ins->ID, array('size' => 96));
                         $ins_role = get_user_meta($ins->ID, 'instructor_user_role', true);
                     ?>
                         <a class="ee-instr" href="<?php echo esc_url(get_author_posts_url($ins->ID)); ?>">
-                            <span class="av-wrap"><span class="av"><?php if ($ins_av) : ?><img src="<?php echo esc_url($ins_av); ?>" alt="<?php echo esc_attr($ins->display_name); ?>"><?php else : ?><span class="noimg material-symbols-outlined ee-ic">person</span><?php endif; ?></span></span>
+                            <span class="av-wrap"><span class="av"><?php if ($ins_av) : ?><img src="<?php echo esc_url($ins_av); ?>" alt="<?php echo esc_attr($ins->display_name); ?>"><?php else : ?><svg class="noimg ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg><?php endif; ?></span></span>
                             <strong><?php echo esc_html($ins->display_name); ?></strong>
-                            <span class="ee-role"><?php echo $ins_role ? esc_html($ins_role) : esc_html('مدرس evented-edu'); ?></span>
+                            <span class="ee-role"><?php echo $ins_role ? esc_html($ins_role) : esc_html('مدرس'); ?></span>
                         </a>
                     <?php endforeach; else : ?>
                         <div class="ee-empty">هنوز استادی ثبت نشده است.</div>

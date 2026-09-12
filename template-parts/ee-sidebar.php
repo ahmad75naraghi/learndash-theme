@@ -104,7 +104,7 @@ $ee_mini_row = static function ($post_id, $meta = '', $icon = 'article') {
 		<?php if (has_post_thumbnail($post_id)) : ?>
 			<img class="ee-mini-th" src="<?php echo esc_url(get_the_post_thumbnail_url($post_id, 'thumbnail')); ?>" alt="<?php echo esc_attr(get_the_title($post_id)); ?>" loading="lazy">
 		<?php else : ?>
-			<span class="ee-mini-th ee-mini-noimg ee-ic"><span class="material-symbols-outlined"><?php echo esc_html($icon); ?></span></span>
+			<span class="ee-mini-th ee-mini-noimg ee-ic"><?php echo ee_icon($icon); // phpcs:ignore ?></span>
 		<?php endif; ?>
 	</a>
 	<?php
@@ -119,7 +119,7 @@ $ee_mini_row = static function ($post_id, $meta = '', $icon = 'article') {
 			<div class="ee-search-inline">
 				<input id="ee-side-s" type="search" name="s" value="<?php echo esc_attr(get_search_query()); ?>" placeholder="<?php esc_attr_e('جستجو در مطالب', 'evented-edu'); ?>">
 				<button type="submit" aria-label="<?php esc_attr_e('جستجو', 'evented-edu'); ?>">
-					<span class="material-symbols-outlined ee-ic">search</span>
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
 				</button>
 			</div>
 		</form>
@@ -134,7 +134,7 @@ $ee_mini_row = static function ($post_id, $meta = '', $icon = 'article') {
 						</a>
 					<?php endforeach; ?>
 					<button type="button" class="ee-share-btn ee-share-copy" data-copy="<?php echo esc_attr($ee_side_url); ?>" title="<?php esc_attr_e('کپی لینک', 'evented-edu'); ?>">
-						<span class="material-symbols-outlined ee-ic">link</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-link"></use></svg>
 					</button>
 				</div>
 			</div>

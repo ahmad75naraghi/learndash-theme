@@ -18,7 +18,7 @@ if (post_password_required()) {
 
 	<?php if (have_comments()) : ?>
 		<h3 class="ee-w-title ee-comments-title">
-			<span class="material-symbols-outlined ee-ic">forum</span>
+			<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg>
 			<?php
 			$ee_comment_count = (int) get_comments_number();
 			/* translators: %s: تعداد دیدگاه */
@@ -52,13 +52,13 @@ if (post_password_required()) {
 	comment_form(array(
 		'class_form'         => 'ee-comment-form',
 		/* عنوان بدون HTML نگه داشته می‌شود؛ آیکن داخل wrapper (که escape نمی‌شود) است */
-		'title_reply_before' => '<h3 id="reply-title" class="ee-w-title ee-reply-title"><span class="material-symbols-outlined ee-ic">edit_note</span>',
+		'title_reply_before' => '<h3 id="reply-title" class="ee-w-title ee-reply-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-edit_note"></use></svg>',
 		'title_reply'        => 'دیدگاه خود را بنویسید',
 		'title_reply_after'  => '</h3>',
 		'title_reply_to'     => 'پاسخ به %s',
 		'comment_field'      => '<p class="comment-form-comment"><label class="screen-reader-text" for="comment">' . esc_html__('دیدگاه', 'evented-edu') . '</label><textarea id="comment" name="comment" rows="6" placeholder="' . esc_attr__('اینجا بنویسید...', 'evented-edu') . '" required></textarea></p>',
 		'label_submit'       => 'ارسال دیدگاه',
-		'submit_button'      => '<button type="submit" id="%2$s" class="ee-comment-submit">%4$s <span class="material-symbols-outlined ee-ic">send</span></button>',
+		'submit_button'      => '<button type="submit" id="%2$s" class="ee-comment-submit">%4$s <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-send"></use></svg></button>',
 		'submit_field'       => '<div class="ee-comment-submit-row">%1$s %2$s</div>',
 		'comment_notes_before' => '<p class="ee-comment-notes">' . esc_html__('نشانی ایمیل شما منتشر نخواهد شد. بخش‌های موردنیاز علامت‌گذاری شده‌اند *', 'evented-edu') . '</p>',
 		'comment_notes_after'  => '',

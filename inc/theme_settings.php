@@ -99,7 +99,7 @@ function evented_get_home_slides()
     return $out;
 }
 
-/* ---------- ذخیره‌سازی ---------- */
+/* ---------- صفحهٔ تنظیمات (تب‌بندی) ---------- */
 function evented_render_theme_settings_page()
 {
     if (!current_user_can('manage_options')) {
@@ -107,7 +107,9 @@ function evented_render_theme_settings_page()
     }
 
     $updated = false;
+    $active  = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'slides'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
+    /* ذخیرهٔ اسلایدها */
     if (isset($_POST['evented_theme_options_nonce'])) {
         check_admin_referer('save_evented_theme_options', 'evented_theme_options_nonce');
 
@@ -118,108 +120,145 @@ function evented_render_theme_settings_page()
             if (!is_array($row)) {
                 continue;
             }
-
-            $id       = isset($row['image_id']) ? absint($row['image_id']) : 0;
+            $id        = isset($row['image_id']) ? absint($row['image_id']) : 0;
             $image_url = isset($row['image_url']) ? esc_url_raw(wp_unslash($row['image_url'])) : '';
-            $title    = isset($row['title']) ? sanitize_text_field(wp_unslash($row['title'])) : '';
-            $desc     = isset($row['desc']) ? sanitize_textarea_field(wp_unslash($row['desc'])) : '';
-            $badge    = isset($row['badge']) ? sanitize_text_field(wp_unslash($row['badge'])) : '';
-            $link     = isset($row['link']) ? esc_url_raw(wp_unslash($row['link'])) : '';
+            $title     = isset($row['title']) ? sanitize_text_field(wp_unslash($row['title'])) : '';
+            $desc      = isset($row['desc']) ? sanitize_textarea_field(wp_unslash($row['desc'])) : '';
+            $badge     = isset($row['badge']) ? sanitize_text_field(wp_unslash($row['badge'])) : '';
+            $link      = isset($row['link']) ? esc_url_raw(wp_unslash($row['link'])) : '';
 
             if ($id) {
-                // انتخاب از کتابخانهٔ رسانه: نشانی از پیوست خوانده می‌شود
                 $img = wp_get_attachment_image_url($id, 'full');
-                if (!$img) {
-                    continue; // پیوست حذف/نامعتبر شده باشد
-                }
+                if (!$img) { continue; }
             } else {
-                // ورود دستی نشانی (جایگزین وقتی کتابخانهٔ رسانه باز نمی‌شود)
                 $img = $image_url;
             }
+            if (!$img) { continue; }
 
-            if (!$img) {
-                continue; // اسلاید بدون تصویر ذخیره نمی‌شود
-            }
-
-            $saved[] = array(
-                'id'    => $id,
-                'image' => $img,
-                'title' => $title,
-                'desc'  => $desc,
-                'badge' => $badge,
-                'link'  => $link,
-            );
+            $saved[] = array('id' => $id, 'image' => $img, 'title' => $title, 'desc' => $desc, 'badge' => $badge, 'link' => $link);
         }
 
         update_option(EVENTED_OPT_SLIDES, $saved, false);
         $updated = true;
+        $active  = 'slides';
+    }
+
+    /* ذخیرهٔ سایر تب‌ها */
+    if (isset($_POST['evented_opts_nonce'])) {
+        check_admin_referer('save_evented_opts', 'evented_opts_nonce');
+        $input = (isset($_POST['ee']) && is_array($_POST['ee'])) ? $_POST['ee'] : array();
+        // فقط فیلدهای تب جاری را به‌روز کن تا بقیه دست نخورند
+        $tab_key = isset($_POST['ee_tab']) ? sanitize_key($_POST['ee_tab']) : '';
+        $schema  = evented_options_schema();
+        $current = get_option(EVENTED_OPT_KEY, array());
+        $current = is_array($current) ? $current : array();
+        if (isset($schema[$tab_key])) {
+            $clean = evented_options_sanitize($input);
+            foreach ($schema[$tab_key]['fields'] as $k => $f) {
+                $current[$k] = $clean[$k];
+            }
+            update_option(EVENTED_OPT_KEY, $current, false);
+            evented_options_flush();
+            if (function_exists('evented_nav_flush_cache')) {
+                evented_nav_flush_cache(true);
+            }
+            $updated = true;
+            $active  = $tab_key;
+        }
     }
 
     $slides = evented_get_home_slides();
+    $schema = evented_options_schema();
+    $values = array_merge(evented_options_defaults(), (array) get_option(EVENTED_OPT_KEY, array()));
+    $base   = admin_url('themes.php?page=evented-theme-settings');
     ?>
     <div class="wrap evented-settings-wrap">
-        <h1>تنظیمات قالب evented-edu</h1>
-        <p class="description">
-            اسلایدهای <strong>بنر بالای صفحهٔ اصلی (هیرو)</strong> را مدیریت کنید.
-            برای هر اسلاید یک تصویر از کتابخانهٔ رسانه انتخاب کنید و در صورت تمایل عنوان، توضیح کوتاه، برچسب و لینک بدهید.
-            اگر پنجرهٔ کتابخانهٔ رسانه باز نشد، می‌توانید نشانی تصویر را مستقیم در فیلد «نشانی تصویر» همان ردیف وارد کنید.
-            اگر اسلایدی تنظیم نشود، بنر هیرو نمایش داده نمی‌شود و بخش «آخرین مقالات» تمام‌عرض می‌شود (هیچ محتوای جایگزینی ساخته نمی‌شود).
-        </p>
+        <h1>تنظیمات قالب <?php echo esc_html(get_bloginfo('name')); ?></h1>
 
         <?php if ($updated) : ?>
             <div class="notice notice-success is-dismissible"><p>✅ تغییرات با موفقیت ذخیره شد.</p></div>
         <?php endif; ?>
 
-        <form method="post" action="" class="evented-slides-form">
+        <h2 class="nav-tab-wrapper evented-tabs">
+            <a href="<?php echo esc_url(add_query_arg('tab', 'slides', $base)); ?>" class="nav-tab<?php echo 'slides' === $active ? ' nav-tab-active' : ''; ?>"><span class="dashicons dashicons-images-alt2"></span> اسلایدر</a>
+            <?php foreach ($schema as $tk => $tab) : ?>
+                <a href="<?php echo esc_url(add_query_arg('tab', $tk, $base)); ?>" class="nav-tab<?php echo $tk === $active ? ' nav-tab-active' : ''; ?>"><span class="dashicons <?php echo esc_attr($tab['icon']); ?>"></span> <?php echo esc_html($tab['title']); ?></a>
+            <?php endforeach; ?>
+        </h2>
+
+        <?php if ('slides' === $active) : ?>
+        <p class="description">
+            اسلایدهای <strong>بنر بالای صفحهٔ اصلی (هیرو)</strong> را مدیریت کنید.
+            اگر پنجرهٔ کتابخانهٔ رسانه باز نشد، می‌توانید نشانی تصویر را مستقیم در فیلد «نشانی تصویر» وارد کنید.
+        </p>
+        <form method="post" action="<?php echo esc_url(add_query_arg('tab', 'slides', $base)); ?>" class="evented-slides-form">
             <?php wp_nonce_field('save_evented_theme_options', 'evented_theme_options_nonce'); ?>
-
-            <h2 class="title">اسلایدر صفحهٔ اصلی</h2>
-
             <div id="evented-slides-list">
                 <?php
                 if (empty($slides)) {
                     echo '<p class="description" id="evented-slides-empty">هنوز اسلایدی اضافه نکرده‌اید. از دکمهٔ «افزودن اسلایدر» استفاده کنید.</p>';
                 } else {
                     foreach ($slides as $i => $slide) {
-                        echo evented_slide_row_html($i, $slide); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی داخل تابع escape شده است
+                        echo evented_slide_row_html($i, $slide); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                     }
                 }
                 ?>
             </div>
-
-            <p>
-                <button type="button" class="button button-primary" id="evented-add-slide">+ افزودن اسلایدر</button>
-            </p>
-
+            <p><button type="button" class="button button-primary" id="evented-add-slide">+ افزودن اسلایدر</button></p>
             <?php submit_button('ذخیرهٔ اسلایدرها'); ?>
         </form>
-
         <script>
-            /* watchdog: اگر اسکریپت مدیریت اسلایدرها بارگذاری نشد، بی‌صدا نمانیم */
             window.setTimeout(function () {
-                if (window.eventedSlidesReady) {
-                    return;
-                }
+                if (window.eventedSlidesReady) { return; }
                 var wrap = document.querySelector('.evented-settings-wrap');
-                if (!wrap || document.getElementById('evented-slides-error')) {
-                    return;
-                }
+                if (!wrap || document.getElementById('evented-slides-error')) { return; }
                 var box = document.createElement('div');
-                box.className = 'notice notice-error';
-                box.id = 'evented-slides-error';
-                box.innerHTML = '<p><strong>اسکریپت مدیریت اسلایدرها بارگذاری نشد</strong> — دکمهٔ «انتخاب تصویر» و «افزودن اسلایدر» کار نمی‌کنند. ' +
-                    'معمولاً کش مرورگر یا یک افزونهٔ بهینه‌سازی/فشرده‌سازی اسکریپت‌ها سبب آن است. ' +
-                    'اسلایدهای موجود همچنان قابل ویرایش و ذخیره هستند و می‌توانید نشانی تصویر را دستی در فیلد «نشانی تصویر» بگذارید.</p>';
+                box.className = 'notice notice-error'; box.id = 'evented-slides-error';
+                box.innerHTML = '<p><strong>اسکریپت مدیریت اسلایدرها بارگذاری نشد</strong> — می‌توانید نشانی تصویر را دستی وارد کنید.</p>';
                 wrap.insertBefore(box, wrap.firstChild);
             }, 1500);
         </script>
+        <?php echo evented_slide_row_html('__UID__', array()); // phpcs:ignore ?>
 
-        <!-- قالب یک ردیف اسلاید برای کپی توسط JS -->
-        <?php
-        echo evented_slide_row_html('__UID__', array());
-        ?>
+        <?php elseif (isset($schema[$active])) : $tab = $schema[$active]; ?>
+        <form method="post" action="<?php echo esc_url(add_query_arg('tab', $active, $base)); ?>" class="evented-opts-form">
+            <?php wp_nonce_field('save_evented_opts', 'evented_opts_nonce'); ?>
+            <input type="hidden" name="ee_tab" value="<?php echo esc_attr($active); ?>">
+            <?php if ('sms' === $active) : ?>
+                <div class="notice notice-info inline"><p>برای امنیت بیشتر می‌توانید این مقادیر را به‌جای اینجا در <code>wp-config.php</code> تعریف کنید:
+                <code>EVENTED_SMS_USERNAME</code>، <code>EVENTED_SMS_PASSWORD</code>، <code>EVENTED_SMS_BODY_ID</code>. ثابت‌ها بر مقدار ذخیره‌شده اولویت دارند.</p></div>
+            <?php endif; ?>
+            <table class="form-table" role="presentation">
+                <?php foreach ($tab['fields'] as $k => $f) :
+                    $v = $values[$k] ?? $f['default'];
+                    $locked = !empty($f['const']) && defined($f['const']);
+                    $id = 'ee_' . $k;
+                    ?>
+                    <tr>
+                        <th scope="row"><label for="<?php echo esc_attr($id); ?>"><?php echo esc_html($f['label']); ?></label></th>
+                        <td>
+                            <?php if ($locked) : ?>
+                                <input type="text" class="regular-text" value="•••••• (از wp-config)" disabled>
+                            <?php elseif ('textarea' === $f['type']) : ?>
+                                <textarea id="<?php echo esc_attr($id); ?>" name="ee[<?php echo esc_attr($k); ?>]" rows="3" class="large-text"><?php echo esc_textarea((string) $v); ?></textarea>
+                            <?php elseif ('checkbox' === $f['type']) : ?>
+                                <label><input type="checkbox" id="<?php echo esc_attr($id); ?>" name="ee[<?php echo esc_attr($k); ?>]" value="1"<?php checked(!empty($v)); ?>> فعال</label>
+                            <?php elseif ('number' === $f['type']) : ?>
+                                <input type="number" id="<?php echo esc_attr($id); ?>" name="ee[<?php echo esc_attr($k); ?>]" value="<?php echo esc_attr((string) $v); ?>" class="small-text"<?php echo isset($f['min']) ? ' min="' . (int) $f['min'] . '"' : ''; ?><?php echo isset($f['max']) ? ' max="' . (int) $f['max'] . '"' : ''; ?>>
+                            <?php elseif ('password' === $f['type']) : ?>
+                                <input type="password" id="<?php echo esc_attr($id); ?>" name="ee[<?php echo esc_attr($k); ?>]" value="" class="regular-text" dir="ltr" autocomplete="new-password" placeholder="<?php echo '' !== (string) $v ? '•••••••• (ذخیره شده؛ برای تغییر تایپ کنید)' : ''; ?>">
+                            <?php else : ?>
+                                <input type="<?php echo esc_attr('url' === $f['type'] ? 'url' : ('email' === $f['type'] ? 'email' : 'text')); ?>" id="<?php echo esc_attr($id); ?>" name="ee[<?php echo esc_attr($k); ?>]" value="<?php echo esc_attr((string) $v); ?>" class="regular-text"<?php echo !empty($f['dir']) ? ' dir="' . esc_attr($f['dir']) . '"' : ''; ?><?php echo !empty($f['placeholder']) ? ' placeholder="' . esc_attr($f['placeholder']) . '"' : ''; ?>>
+                            <?php endif; ?>
+                            <?php if (!empty($f['desc'])) : ?><p class="description"><?php echo esc_html($f['desc']); ?></p><?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+            <?php submit_button('ذخیرهٔ تنظیمات'); ?>
+        </form>
+        <?php endif; ?>
     </div>
-
     <?php
 }
 

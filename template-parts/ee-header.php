@@ -37,7 +37,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
         <div class="ee-wrap ee-topbar-in">
             <div class="tb-right">
                 <span class="ee-tb-item">
-                    <span class="material-symbols-outlined ee-ic" style="color:var(--ee-tealP);font-size:1rem;">calendar_month</span>
+                    <svg class="ee-ic" aria-hidden="true" focusable="false" style="color:var(--ee-tealP);font-size:1rem;"><use href="#i-calendar_month"></use></svg>
                     <?php echo esc_html('امروز: ' . $ee_today); ?>
                 </span>
                 <span class="ee-tb-sep">|</span>
@@ -78,11 +78,11 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
 
                 <div class="ee-h-actions">
                     <?php if (is_user_logged_in()) : ?>
-                        <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/panel')); ?>"><span class="material-symbols-outlined ee-ic">person</span> <span class="ee-btn-txt">پنل کاربری</span></a>
+                        <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/panel')); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg> <span class="ee-btn-txt">پنل کاربری</span></a>
                     <?php else : ?>
-                        <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/login')); ?>"><span class="material-symbols-outlined ee-ic">person</span> <span class="ee-btn-txt">ورود / عضویت</span></a>
+                        <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(home_url('/login')); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg> <span class="ee-btn-txt">ورود / عضویت</span></a>
                     <?php endif; ?>
-                    <button class="ee-btn ee-btn-soft ee-ic ee-search-toggle" id="eeSearchToggle" type="button" aria-label="جستجو" aria-expanded="false" aria-controls="eeSearchM"><span class="material-symbols-outlined ee-ic">search</span></button>
+                    <button class="ee-btn ee-btn-soft ee-ic ee-search-toggle" id="eeSearchToggle" type="button" aria-label="جستجو" aria-expanded="false" aria-controls="eeSearchM"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg></button>
                 </div>
             </div>
 
@@ -102,7 +102,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                     <div class="<?php echo esc_attr(implode(' ', $ee_cls)); ?>">
                         <a href="<?php echo esc_url($ee_it['url']); ?>"<?php echo $ee_active === $ee_it['key'] ? ' class="ee-active" aria-current="page"' : ''; ?>>
                             <?php echo esc_html($ee_it['title']); ?>
-                            <?php if ($ee_has_sub) : ?><span class="material-symbols-outlined ee-ic ee-caret" aria-hidden="true">expand_more</span><?php endif; ?>
+                            <?php if ($ee_has_sub) : ?><svg class="ee-ic ee-caret" focusable="false" aria-hidden="true"><use href="#i-expand_more"></use></svg><?php endif; ?>
                         </a>
                         <?php if ($ee_has_sub) : ?>
                             <div class="ee-sub" role="menu">
@@ -112,7 +112,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                                         <?php if (!empty($ee_sub['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $ee_sub['count'])); ?></small><?php endif; ?>
                                     </a>
                                 <?php endforeach; ?>
-                                <a class="ee-sub-all" href="<?php echo esc_url($ee_it['url']); ?>">همهٔ <?php echo esc_html($ee_it['title']); ?> <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                                <a class="ee-sub-all" href="<?php echo esc_url($ee_it['url']); ?>">همهٔ <?php echo esc_html($ee_it['title']); ?> <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -128,7 +128,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
             <a class="ee-logo" href="<?php echo esc_url($ee_url_home); ?>" rel="home">
                 <?php echo function_exists('evented_logo_html') ? evented_logo_html('drawer') : esc_html(get_bloginfo('name')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
             </a>
-            <button class="ee-drawer-close ee-ic" id="eeDrawerClose" type="button" aria-label="بستن منو"><span class="material-symbols-outlined ee-ic">close</span></button>
+            <button class="ee-drawer-close ee-ic" id="eeDrawerClose" type="button" aria-label="بستن منو"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-close"></use></svg></button>
         </div>
 
         <div class="ee-drawer-account">
@@ -142,7 +142,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                     <a href="<?php echo esc_url(wp_logout_url(home_url('/'))); ?>">خروج</a>
                 </span>
             <?php else : ?>
-                <a class="ee-btn ee-btn-primary" href="<?php echo esc_url(home_url('/login')); ?>"><span class="material-symbols-outlined ee-ic">login</span> ورود / عضویت</a>
+                <a class="ee-btn ee-btn-primary" href="<?php echo esc_url(home_url('/login')); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-login"></use></svg> ورود / عضویت</a>
             <?php endif; ?>
         </div>
 
@@ -154,12 +154,12 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                 <div class="ee-dn-item<?php echo $ee_active === $ee_it['key'] ? ' ee-active' : ''; ?><?php echo $ee_has_sub ? ' has-sub' : ''; ?>">
                     <div class="ee-dn-row">
                         <a class="ee-dn-link" href="<?php echo esc_url($ee_it['url']); ?>"<?php echo $ee_active === $ee_it['key'] ? ' aria-current="page"' : ''; ?>>
-                            <span class="material-symbols-outlined ee-ic ee-dn-ic"><?php echo esc_html($ee_it['icon']); ?></span>
+                            <?php echo ee_icon($ee_it['icon'], 'ee-dn-ic'); // phpcs:ignore ?>
                             <span><?php echo esc_html($ee_it['title']); ?></span>
                         </a>
                         <?php if ($ee_has_sub) : ?>
                             <button class="ee-dn-toggle ee-ic" type="button" aria-expanded="false" aria-controls="<?php echo esc_attr($ee_sub_id); ?>" aria-label="زیرمنوی <?php echo esc_attr($ee_it['title']); ?>">
-                                <span class="material-symbols-outlined ee-ic">expand_more</span>
+                                <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-expand_more"></use></svg>
                             </button>
                         <?php endif; ?>
                     </div>

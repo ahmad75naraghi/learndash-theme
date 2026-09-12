@@ -1,0 +1,28 @@
+/* فونت‌های محلی قالب — هیچ درخواستی به سرویس خارجی ارسال نمی‌شود */
+@font-face {
+    font-family: "Vazirmatn";
+    src: url("../../fonts/Vazirmatn-Variable.woff2") format("woff2 supports variations"),
+         url("../../fonts/Vazirmatn-Variable.woff2") format("woff2-variations"),
+         url("../../fonts/Vazirmatn-Variable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "دانا";
+    src: url("../../fonts/evented-edu-font.woff2") format("woff2");
+    font-display: swap;
+}
+
+/* آیکن‌های SVG (جایگزین فونت Material Symbols) */
+svg.ee-ic {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    flex: 0 0 auto;
+    vertical-align: -0.15em;
+    display: inline-block;
+    font-size: 1.25em;
+    line-height: 1;
+}
+svg.ee-ic use { pointer-events: none; }

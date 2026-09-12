@@ -624,7 +624,7 @@ $evented_admin_login_url = site_url('wp-login.php?admin=1');
                 </div>
 
                 <button class="btn-submit" id="btn-to-otp" disabled>تایید و ادامه</button>
-                <p class="terms-text">ورود شما به معنی پذیرش <a href="<?php echo esc_url(home_url('/terms/')); ?>">قوانین و مقررات</a> <?php echo esc_html(get_bloginfo('name')); ?> است</p>
+                <p class="terms-text">ورود شما به معنی پذیرش <a href="<?php echo esc_url((function_exists('evented_opt') && evented_opt('terms_url', '')) ? evented_opt('terms_url') : home_url('/terms/')); ?>">قوانین و مقررات</a> <?php echo esc_html(get_bloginfo('name')); ?> است</p>
                 <p class="terms-text admin-login-link"><a href="<?php echo esc_url($evented_admin_login_url); ?>">ورود مدیران و نویسندگان (نام کاربری و رمز)</a></p>
             </div>
 

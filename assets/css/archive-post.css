@@ -15,13 +15,13 @@
 .ee-arch-head { background: linear-gradient(135deg, var(--ee-tealL), #fff 55%, var(--ee-mint));
     border: 1px solid rgb(209 250 229); border-radius: var(--ee-r-3xl); box-shadow: var(--ee-sh-sm); padding: 1.2rem 1.3rem; }
 .ee-arch-title { display: flex; align-items: center; gap: .5rem; font-size: 1.15rem; font-weight: 900; color: #0f172a; }
-.ee-arch-title .material-symbols-outlined { color: var(--ee-tealP); font-size: 1.4rem; }
+.ee-arch-title svg.ee-ic { color: var(--ee-tealP); font-size: 1.4rem; }
 @media (min-width: 768px) { .ee-arch-title { font-size: 1.35rem; } }
 .ee-arch-desc { font-size: .8rem; color: #475569; line-height: 2; margin-top: .6rem; }
 .ee-arch-meta { display: flex; align-items: center; justify-content: space-between; gap: .8rem; flex-wrap: wrap;
     margin-top: .8rem; padding-top: .7rem; border-top: 1px dashed rgb(148 163 184 / .35); }
 .ee-arch-meta > span { display: inline-flex; align-items: center; gap: .3rem; font-size: .74rem; font-weight: 700; color: var(--ee-tealP); }
-.ee-arch-meta .material-symbols-outlined { font-size: 1.05rem; }
+.ee-arch-meta svg.ee-ic { font-size: 1.05rem; }
 .ee-arch-link { display: inline-flex; align-items: center; gap: .25rem; font-size: .74rem; font-weight: 800; color: var(--ee-tealP); }
 .ee-arch-link:hover { text-decoration: underline; }
 
@@ -42,7 +42,7 @@
 .ee-ac-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
 .ee-arch-card:hover .ee-ac-thumb img { transform: scale(1.04); }
 .ee-ac-noimg { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: var(--ee-tealP); }
-.ee-ac-noimg .material-symbols-outlined { font-size: 2.4rem; }
+.ee-ac-noimg svg.ee-ic { font-size: 2.4rem; }
 .ee-ac-tag { position: absolute; top: .6rem; right: .6rem; background: var(--ee-mint); color: #065f46;
     font-size: .64rem; font-weight: 800; padding: .2rem .6rem; border-radius: 999px; box-shadow: var(--ee-sh-sm); }
 
@@ -57,18 +57,18 @@
 .ee-ac-date { font-weight: 700; color: var(--ee-tealP); }
 .ee-ac-stats { display: inline-flex; align-items: center; gap: .6rem; }
 .ee-ac-stats > span { display: inline-flex; align-items: center; gap: .2rem; }
-.ee-ac-stats .material-symbols-outlined { font-size: .95rem; }
+.ee-ac-stats svg.ee-ic { font-size: .95rem; }
 
 .ee-ac-more { display: inline-flex; align-items: center; gap: .25rem; font-size: .74rem; font-weight: 800; color: var(--ee-tealP); }
-.ee-ac-more .material-symbols-outlined { font-size: 1rem; transition: transform .15s; }
-.ee-ac-more:hover .material-symbols-outlined { transform: translateX(-3px); }
+.ee-ac-more svg.ee-ic { font-size: 1rem; transition: transform .15s; }
+.ee-ac-more:hover svg.ee-ic { transform: translateX(-3px); }
 
 /* ---------- صفحه‌بندی ---------- */
 .ee-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .4rem; margin-top: .4rem; }
 .ee-pager .page-numbers { display: inline-flex; align-items: center; justify-content: center; min-width: 2.3rem; height: 2.3rem;
     padding: 0 .55rem; border-radius: .8rem; border: 1px solid var(--ee-line); background: #fff; color: #475569;
     font-size: .8rem; font-weight: 700; transition: all .15s; }
-.ee-pager .page-numbers .material-symbols-outlined { font-size: 1.1rem; }
+.ee-pager .page-numbers svg.ee-ic { font-size: 1.1rem; }
 .ee-pager a.page-numbers:hover { border-color: var(--ee-teal); color: var(--ee-tealP); background: var(--ee-mint); }
 .ee-pager .page-numbers.current { background: var(--ee-tealP); border-color: var(--ee-tealP); color: #fff; }
 .ee-pager .page-numbers.dots { border: 0; background: transparent; color: var(--ee-soft); }
@@ -76,7 +76,7 @@
 /* ---------- نبودِ نتیجه ---------- */
 .ee-noresult { background: #fff; border: 1px dashed var(--ee-line); border-radius: var(--ee-r-2xl);
     padding: 2rem 1.2rem; text-align: center; }
-.ee-noresult > .material-symbols-outlined { font-size: 2.6rem; color: var(--ee-teal); }
+.ee-noresult > svg.ee-ic { font-size: 2.6rem; color: var(--ee-teal); }
 .ee-noresult h2 { font-size: 1.05rem; color: #1e293b; margin: .6rem 0 .3rem; }
 .ee-noresult p { font-size: .8rem; color: var(--ee-soft); margin-bottom: 1rem; }
 .ee-noresult form { max-width: 24rem; margin-inline: auto; }

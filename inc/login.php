@@ -68,7 +68,7 @@ class EventedAuthHandler
         }
 
         // انقضای کد (۱۰ دقیقه)
-        if ((time() - (int) $_SESSION['evented_otp_time']) > 10 * MINUTE_IN_SECONDS) {
+        if ((time() - (int) $_SESSION['evented_otp_time']) > max(2, (int) (function_exists('evented_opt') ? evented_opt('otp_ttl', 10) : 10)) * MINUTE_IN_SECONDS) {
             unset($_SESSION['evented_otp'], $_SESSION['evented_otp_time'], $_SESSION['evented_mobile'], $_SESSION['evented_otp_purpose']);
             wp_send_json_error([
                 'message' => 'کد تایید منقضی شده است. لطفاً دوباره درخواست دهید.'
@@ -282,7 +282,7 @@ class EventedAuthHandler
 
         evented_send_otp_with_bale($mobile, $otp);
 
-        set_transient('otp_limit_' . $mobile, true, 60);
+        set_transient('otp_limit_' . $mobile, true, max(30, (int) (function_exists('evented_opt') ? evented_opt('otp_rate', 60) : 60)));
 
         wp_send_json_success([
             'message' => 'کد تایید ارسال شد.',
@@ -325,7 +325,7 @@ class EventedAuthHandler
             $sms = send_pattern_sms($mobile, (string)$otp);
             if ($sms) {
                 evented_send_otp_with_bale($mobile, $otp);
-                set_transient('otp_limit_' . $mobile, true, 60);
+                set_transient('otp_limit_' . $mobile, true, max(30, (int) (function_exists('evented_opt') ? evented_opt('otp_rate', 60) : 60)));
                 wp_send_json_success(['message' => 'کد تایید ارسال شد.', 'status' => 'register']);
             }
         }

@@ -981,7 +981,7 @@ function evented_logo_html($context = 'header')
 	}
 
 	if ('' === $html) {
-		$html = '<span class="logo-fallback"><span class="material-symbols-outlined ee-ic">school</span> '
+		$html = '<span class="logo-fallback"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg> '
 			. esc_html($site_name ? $site_name : 'evented-edu') . '</span>';
 	}
 
@@ -1145,8 +1145,8 @@ function evented_pagination($query)
 		'total'     => $total,
 		'current'   => $current,
 		'type'      => 'array',
-		'prev_text' => '<span class="material-symbols-outlined ee-ic">chevron_right</span>',
-		'next_text' => '<span class="material-symbols-outlined ee-ic">chevron_left</span>',
+		'prev_text' => '<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_right"></use></svg>',
+		'next_text' => '<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>',
 	));
 
 	if (empty($links)) {

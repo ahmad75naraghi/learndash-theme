@@ -525,10 +525,10 @@ function evented_search_form($context = 'desktop')
 	?>
 	<form class="ee-search ee-search--<?php echo esc_attr($context); ?>" role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
 		<label class="screen-reader-text" for="<?php echo esc_attr($uid); ?>">جستجو</label>
-		<button class="s-ic ee-ic" type="submit" aria-label="جستجو"><span class="material-symbols-outlined ee-ic">search</span></button>
+		<button class="s-ic ee-ic" type="submit" aria-label="جستجو"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg></button>
 		<input id="<?php echo esc_attr($uid); ?>" type="search" name="s" placeholder="جستجو در دوره‌ها، مقالات، کتابخانه…" value="<?php echo esc_attr(get_search_query()); ?>" autocomplete="off">
 		<span class="ee-search-scope">
-			<span class="material-symbols-outlined ee-ic" aria-hidden="true">tune</span>
+			<svg class="ee-ic" focusable="false" aria-hidden="true"><use href="#i-tune"></use></svg>
 			<label class="screen-reader-text" for="<?php echo esc_attr($uid); ?>-scope">جستجو در بخش</label>
 			<select id="<?php echo esc_attr($uid); ?>-scope" name="post_type" title="محدودهٔ جستجو">
 				<?php foreach ($scopes as $value => $label) : ?>
