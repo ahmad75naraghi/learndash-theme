@@ -13,6 +13,7 @@ require_once get_stylesheet_directory() . '/inc/panel_router.php';
 require_once get_stylesheet_directory() . '/inc/live_search.php';
 require_once get_stylesheet_directory() . '/inc/course_filters.php';
 require_once get_stylesheet_directory() . '/inc/reviews.php';
+require_once get_stylesheet_directory() . '/inc/home_catalog.php';
 require_once get_stylesheet_directory() . '/inc/resume.php';
 require_once get_stylesheet_directory() . '/inc/pwa.php';
 require_once get_stylesheet_directory() . '/inc/notifications.php';

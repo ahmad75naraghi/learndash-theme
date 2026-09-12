@@ -340,6 +340,73 @@ $ee_slider_mode  = $ee_slide_count > 1;
             </div>
         </section>
 
+        <!-- ======= کاتالوگ همهٔ دوره‌ها (تب دسته‌ها + بارگذاری بیشتر) ======= -->
+        <?php
+        $ee_ct_tabs  = function_exists('evented_catalog_tabs') ? evented_catalog_tabs() : array();
+        $ee_ct_first = function_exists('evented_catalog_page') ? evented_catalog_page(0, 1) : array('html' => '', 'total' => 0, 'shown' => 0, 'has_more' => false);
+        $ee_ct_fa    = function_exists('evented_fa_digits') ? 'evented_fa_digits' : 'strval';
+        if (!empty($ee_ct_first['html'])) :
+        ?>
+        <section class="ee-catalog" id="ee-catalog" data-ee-catalog>
+            <span class="ee-ct-blob b1" aria-hidden="true"></span>
+            <span class="ee-ct-blob b2" aria-hidden="true"></span>
+            <span class="ee-ct-blob b3" aria-hidden="true"></span>
+            <div class="ee-wrap">
+                <header class="ee-ct-head">
+                    <div class="ee-ct-heading">
+                        <span class="ee-ct-kicker"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-auto_awesome"></use></svg> کتابخانهٔ کامل دوره‌ها</span>
+                        <h2 class="ee-ct-title">همهٔ دوره‌های <em>شمیم آشنا</em> در یک نگاه</h2>
+                        <p class="ee-ct-sub">دسته‌بندی دلخواه را انتخاب کنید؛ دوره‌ها به‌ترتیب جدیدترین نمایش داده می‌شوند.</p>
+                    </div>
+                    <div class="ee-ct-stats" aria-hidden="true">
+                        <span class="ee-ct-stat"><b data-ee-ct-total><?php echo esc_html($ee_ct_fa($ee_ct_first['total'])); ?></b><small>دوره</small></span>
+                        <span class="ee-ct-stat"><b><?php echo esc_html($ee_ct_fa(max(0, count($ee_ct_tabs) - 1))); ?></b><small>دسته</small></span>
+                    </div>
+                </header>
+
+                <div class="ee-ct-tabs-wrap">
+                    <div class="ee-ct-tabs" role="tablist" aria-label="دسته‌بندی دوره‌ها" data-ee-ct-tabs>
+                        <?php foreach ($ee_ct_tabs as $ee_ti => $ee_t) : ?>
+                            <button type="button" class="ee-ct-tab tone-<?php echo (int) evented_catalog_tone($ee_t['id']); ?><?php echo 0 === $ee_ti ? ' is-on' : ''; ?>" role="tab" id="eeCt-<?php echo esc_attr($ee_t['key']); ?>" aria-selected="<?php echo 0 === $ee_ti ? 'true' : 'false'; ?>" aria-controls="eeCtPanel" tabindex="<?php echo 0 === $ee_ti ? '0' : '-1'; ?>" data-cat="<?php echo (int) $ee_t['id']; ?>" data-url="<?php echo esc_url($ee_t['url']); ?>" data-name="<?php echo esc_attr($ee_t['name']); ?>">
+                                <span class="ee-ct-tab-ic" aria-hidden="true"><svg class="ee-ic" focusable="false"><use href="#<?php echo 0 === $ee_ti ? 'i-grid_view' : 'i-folder_open'; ?>"></use></svg></span>
+                                <span class="ee-ct-tab-tx"><?php echo esc_html($ee_t['name']); ?></span>
+                                <span class="ee-ct-tab-n"><?php echo esc_html($ee_ct_fa($ee_t['count'])); ?></span>
+                            </button>
+                        <?php endforeach; ?>
+                        <span class="ee-ct-ink" aria-hidden="true"></span>
+                    </div>
+                </div>
+
+                <div class="ee-ct-bar">
+                    <p class="ee-ct-status" aria-live="polite" data-ee-ct-status>نمایش <b data-ee-ct-shown><?php echo esc_html($ee_ct_fa($ee_ct_first['shown'])); ?></b> از <b data-ee-ct-total2><?php echo esc_html($ee_ct_fa($ee_ct_first['total'])); ?></b> دوره</p>
+                    <span class="ee-ct-progress" aria-hidden="true"><i data-ee-ct-progress style="width:<?php echo $ee_ct_first['total'] ? (int) round($ee_ct_first['shown'] * 100 / $ee_ct_first['total']) : 100; ?>%"></i></span>
+                </div>
+
+                <div class="ee-ct-panel" id="eeCtPanel" role="tabpanel" aria-labelledby="eeCt-all" aria-busy="false" data-ee-ct-panel>
+                    <div class="ee-ct-grid" data-ee-ct-grid data-cat="0" data-page="1" data-total="<?php echo (int) $ee_ct_first['total']; ?>">
+                        <?php echo $ee_ct_first['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML ساخته‌شده در قالب. ?>
+                    </div>
+                    <div class="ee-ct-skel" data-ee-ct-skel hidden aria-hidden="true">
+                        <?php for ($k = 0; $k < 4; $k++) : ?><div class="ee-ct-skel-card" style="--i:<?php echo $k; ?>"><i class="sk-m"></i><i class="sk-l"></i><i class="sk-l w60"></i><i class="sk-l w40"></i></div><?php endfor; ?>
+                    </div>
+                </div>
+
+                <div class="ee-ct-actions">
+                    <button type="button" class="ee-ct-more" data-ee-ct-more<?php echo $ee_ct_first['has_more'] ? '' : ' hidden'; ?>>
+                        <span class="ee-ct-more-ring" aria-hidden="true"></span>
+                        <svg class="ee-ic ee-ct-more-ic" aria-hidden="true" focusable="false"><use href="#i-expand_more"></use></svg>
+                        <span class="ee-ct-more-tx">بارگذاری دوره‌های بیشتر</span>
+                    </button>
+                    <a class="ee-ct-all" href="<?php echo esc_url($ee_nav('courses')); ?>" data-ee-ct-all data-base="<?php echo esc_url($ee_nav('courses')); ?>">
+                        <span data-ee-ct-all-tx>مشاهدهٔ صفحهٔ همهٔ دوره‌ها</span>
+                        <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
+                    </a>
+                    <p class="ee-ct-end" data-ee-ct-end hidden><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-done_all"></use></svg> همهٔ دوره‌های این دسته را دیدید.</p>
+                </div>
+            </div>
+        </section>
+        <?php endif; ?>
+
         <!-- ======= ۳ گام عضویت ======= -->
         <section class="ee-steps" id="ee-steps">
             <div class="ee-wrap">
