@@ -204,15 +204,27 @@ $ee_slider_mode  = $ee_slide_count > 1;
                             <?php endforeach; ?>
                         </div>
                     </div>
-                    <div class="ee-latest-card">
-                        <div class="lc-foot">
-                            <svg class="channels-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-hub"></use></svg>
-                            <div>
-                                <div class="ch-label">کانال‌های رسمی <?php echo esc_html(get_bloginfo('name')); ?></div>
-                                <div class="ch-sub">عضویت در پیام‌رسان‌ها و شبکه‌های اجتماعی</div>
-                            </div>
-                        </div>
-                    </div>
+                    <?php
+                    $ee_radio_url = (string) $ee_opt('radio_url');
+                    if ('' === $ee_radio_url) { $ee_radio_url = $ee_nav('podcast'); }
+                    elseif (0 === strpos($ee_radio_url, '/')) { $ee_radio_url = home_url($ee_radio_url); }
+                    ?>
+                    <a class="ee-radio-card" href="<?php echo esc_url($ee_radio_url); ?>" aria-label="<?php echo esc_attr($ee_opt('radio_title')); ?>">
+                        <span class="ee-radio-glow" aria-hidden="true"></span>
+                        <span class="ee-radio-rings" aria-hidden="true"><i></i><i></i><i></i></span>
+                        <span class="ee-radio-ic" aria-hidden="true">
+                            <svg class="ee-ic"><use href="#i-podcasts"></use></svg>
+                        </span>
+                        <span class="ee-radio-body">
+                            <span class="ee-radio-title">
+                                <?php echo esc_html($ee_opt('radio_title')); ?>
+                                <?php if ('' !== (string) $ee_opt('radio_badge')) : ?><span class="ee-radio-live"><i></i> <?php echo esc_html($ee_opt('radio_badge')); ?></span><?php endif; ?>
+                            </span>
+                            <span class="ee-radio-sub"><?php echo esc_html($ee_opt('radio_sub')); ?></span>
+                        </span>
+                        <span class="ee-radio-eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+                        <span class="ee-radio-play" aria-hidden="true"><svg class="ee-ic"><use href="#i-play_arrow"></use></svg></span>
+                    </a>
                 </aside>
 
             </div>

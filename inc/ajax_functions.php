@@ -166,13 +166,15 @@ function handle_save_user_profile() {
     if (!$user_id) wp_send_json_error('کاربر لاگین نیست');
 
     // لیست فیلدها و کلیدهای متا
+    $only_fa = function ($v) { return trim(preg_replace('/[^\x{0600}-\x{06FF}\x{0750}-\x{077F}\x{FB50}-\x{FDFF}\x{FE70}-\x{FEFF}\s\x{200C}]/u', '', sanitize_text_field(wp_unslash((string) $v)))); };
+    $only_en = function ($v) { return trim(preg_replace("/[^A-Za-z\s.\-']/", '', sanitize_text_field(wp_unslash((string) $v)))); };
     $fields = [
-        'first_name_fa' => sanitize_text_field($_POST['first_name_fa']),
-        'last_name_fa'  => sanitize_text_field($_POST['last_name_fa']),
-        'first_name_en' => sanitize_text_field($_POST['first_name_en']),
-        'last_name_en'  => sanitize_text_field($_POST['last_name_en']),
-        'gender'        => sanitize_text_field($_POST['gender']),
-        'birth_date'    => sanitize_text_field($_POST['birth_date']),
+        'first_name_fa' => $only_fa($_POST['first_name_fa'] ?? ''),
+        'last_name_fa'  => $only_fa($_POST['last_name_fa'] ?? ''),
+        'first_name_en' => $only_en($_POST['first_name_en'] ?? ''),
+        'last_name_en'  => $only_en($_POST['last_name_en'] ?? ''),
+        'gender'        => sanitize_text_field($_POST['gender'] ?? ''),
+        'birth_date'    => sanitize_text_field($_POST['birth_date'] ?? ''),
     ];
 
     foreach ($fields as $key => $value) {
@@ -208,22 +210,30 @@ function handle_save_account_settings() {
 
     // بررسی و تغییر رمز عبور
     if (!empty($_POST['user_password']) && $_POST['user_password'] !== '..........') {
-        $userdata['user_pass'] = sanitize_text_field($_POST['user_password']);
+        $pass  = (string) wp_unslash($_POST['user_password']);
+        $pass2 = isset($_POST['user_password2']) ? (string) wp_unslash($_POST['user_password2']) : $pass;
+        if ($pass !== $pass2) {
+            wp_send_json_error('تکرار رمز عبور با رمز جدید یکسان نیست.');
+        }
+        if (mb_strlen($pass) < 8 || !preg_match('/\d/', $pass) || !preg_match('/[A-Za-z\x{0600}-\x{06FF}]/u', $pass)) {
+            wp_send_json_error('رمز عبور باید حداقل ۸ کاراکتر و شامل حرف و عدد باشد.');
+        }
+        $userdata['user_pass'] = $pass;
     }
 
     // آپدیت ایمیل و رمز عبور (در صورت تغییر)
     if (isset($userdata['user_email']) || isset($userdata['user_pass'])) {
-        $user_id = wp_update_user($userdata);
-        if (is_wp_error($user_id)) {
-            wp_send_json_error($user_id->get_error_message());
+        $result = wp_update_user($userdata);
+        if (is_wp_error($result)) {
+            wp_send_json_error($result->get_error_message());
+        }
+        if (isset($userdata['user_pass'])) {
+            // کاربر پس از تغییر رمز از حساب خارج نشود
+            wp_set_auth_cookie($user_id, true);
         }
     }
 
-    // بروزرسانی شماره موبایل (ذخیره در user_meta - کلید استاندارد ووکامرس)
-    if (!empty($_POST['user_phone'])) {
-        $new_phone = sanitize_text_field($_POST['user_phone']);
-        update_user_meta($user_id, 'billing_phone', $new_phone);
-    }
+    // شماره موبایل شناسهٔ ورود است و از این فرم قابل تغییر نیست.
 
     wp_send_json_success('تغییرات با موفقیت ذخیره شد.');
 }

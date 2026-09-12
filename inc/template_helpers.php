@@ -1413,3 +1413,42 @@ function evented_today_label()
 	$d    = function_exists('evented_wp_date') ? evented_wp_date('l') : date('l');
 	return (isset($days[$d]) ? $days[$d] . ' ' : '') . evented_format_jalali(current_time('timestamp'), 'j F Y');
 }
+
+/**
+ * نام دسته/برچسب‌ها گاهی با تگ HTML (مثل <span>…</span>) ذخیره شده‌اند و در خروجی
+ * escape‌شده به‌صورت «&lt;span&gt;» دیده می‌شوند. همه‌جا تگ‌ها را از نام ترم حذف می‌کنیم.
+ */
+function evented_clean_term_name($name)
+{
+	if (!is_string($name) || false === strpos($name, '<') && false === strpos($name, '&lt;')) {
+		return $name;
+	}
+	$name = html_entity_decode($name, ENT_QUOTES, 'UTF-8');
+	return trim(wp_strip_all_tags($name));
+}
+add_filter('term_name', 'evented_clean_term_name', 5);
+add_filter('single_cat_title', 'evented_clean_term_name', 5);
+add_filter('single_tag_title', 'evented_clean_term_name', 5);
+add_filter('single_term_title', 'evented_clean_term_name', 5);
+add_filter('get_term', function ($term) {
+	if ($term instanceof WP_Term) {
+		$term->name = evented_clean_term_name($term->name);
+	}
+	return $term;
+}, 5);
+add_filter('get_terms', function ($terms) {
+	foreach ((array) $terms as $t) {
+		if ($t instanceof WP_Term) {
+			$t->name = evented_clean_term_name($t->name);
+		}
+	}
+	return $terms;
+}, 5);
+add_filter('get_the_terms', function ($terms) {
+	foreach ((array) $terms as $t) {
+		if ($t instanceof WP_Term) {
+			$t->name = evented_clean_term_name($t->name);
+		}
+	}
+	return $terms;
+}, 5);

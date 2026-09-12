@@ -81,7 +81,7 @@ $ee_copyright = (string) $ee_opt('copyright', '');
                 </div>
                 <div>
                     <h4>بخش‌های پایگاه</h4>
-                    <ul>
+                    <ul class="ee-f-2col">
                         <?php foreach ($ee_nav_items as $ee_fi) : if ('home' === $ee_fi['key']) { continue; } ?>
                             <li><a href="<?php echo esc_url($ee_fi['url']); ?>">• <?php echo esc_html($ee_fi['title']); ?></a></li>
                         <?php endforeach; ?>

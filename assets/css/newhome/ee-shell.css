@@ -217,6 +217,8 @@
 @media (min-width: 1024px) { .ee-fgrid { grid-template-columns: repeat(4, 1fr); } }
 .ee-footer h4 { color: #fff; font-size: .92rem; margin-bottom: .8rem; padding-bottom: .45rem; border-bottom: 1px solid #1e293b; }
 .ee-footer ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .55rem; font-size: .8rem; }
+.ee-footer ul.ee-f-2col { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem .9rem; }
+.ee-footer ul.ee-f-2col a { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ee-footer ul a:hover { color: #34d399; }
 .ee-footer .about p { font-size: .78rem; color: #94a3b8; line-height: 1.9; }
 .ee-f-logo { background: rgb(255 255 255 / .95); border-radius: 1rem; padding: .35rem .7rem; display: inline-flex; margin-bottom: .9rem; }

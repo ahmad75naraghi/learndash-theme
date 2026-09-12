@@ -19,20 +19,20 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                 <div class="form-grid">
                     <div class="form-group">
                         <label>نام (فارسی)</label>
-                        <input type="text" name="first_name_fa" class="form-control" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_fa', true)); ?>" placeholder="نام خود را به فارسی وارد کنید">
+                        <input type="text" name="first_name_fa" class="form-control" data-ee-script="fa" inputmode="text" lang="fa" pattern="[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\u200c]*" title="فقط حروف فارسی/عربی" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_fa', true)); ?>" placeholder="نام خود را به فارسی وارد کنید">
                     </div>
                     <div class="form-group">
                         <label>نام خانوادگی (فارسی)</label>
-                        <input type="text" name="last_name_fa" class="form-control" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_fa', true)); ?>" placeholder="نام خانوادگی خود را به فارسی وارد کنید">
+                        <input type="text" name="last_name_fa" class="form-control" data-ee-script="fa" inputmode="text" lang="fa" pattern="[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\u200c]*" title="فقط حروف فارسی/عربی" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_fa', true)); ?>" placeholder="نام خانوادگی خود را به فارسی وارد کنید">
                     </div>
                     
                     <div class="form-group">
                         <label>نام (انگلیسی)</label>
-                        <input type="text" name="first_name_en" class="form-control" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_en', true)); ?>" placeholder="نام خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
+                        <input type="text" name="first_name_en" class="form-control" data-ee-script="en" lang="en" pattern="[A-Za-z\s\.\-']*" title="فقط حروف انگلیسی" autocapitalize="words" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_en', true)); ?>" placeholder="نام خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
                     </div>
                     <div class="form-group">
                         <label>نام خانوادگی (انگلیسی)</label>
-                        <input type="text" name="last_name_en" class="form-control" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_en', true)); ?>" placeholder="نام خانوادگی خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
+                        <input type="text" name="last_name_en" class="form-control" data-ee-script="en" lang="en" pattern="[A-Za-z\s\.\-']*" title="فقط حروف انگلیسی" autocapitalize="words" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_en', true)); ?>" placeholder="نام خانوادگی خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
                     </div>
 
                     <div class="form-group">
