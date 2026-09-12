@@ -59,7 +59,11 @@ add_filter('show_admin_bar', 'hide_admin_bar_for_subscribers');
 function restrict_subscriber_admin_access()
 {
     // اگر درخواست از نوع AJAX بود، آن را مسدود نکنیم تا سایت دچار اختلال نشود
-    if (defined('DOING_AJAX') && DOING_AJAX) {
+    if ((defined('DOING_AJAX') && DOING_AJAX) || (defined('DOING_CRON') && DOING_CRON) || wp_doing_ajax()) {
+        return;
+    }
+    // فقط کاربران بدون هیچ دسترسی پیشخوان (مشترک خالص) هدایت می‌شوند
+    if (current_user_can('edit_posts') || current_user_can('manage_options')) {
         return;
     }
 

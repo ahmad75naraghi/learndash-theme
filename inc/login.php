@@ -23,6 +23,29 @@ class EventedAuthHandler
         add_action('wp_ajax_nopriv_evented_login_user',                     [$this, 'handle_login_user']);
         add_filter( 'login_url',                                           [$this, 'redirect_login_url'], 10, 3 );
         add_filter( 'logout_redirect',                                     [$this, 'custom_logout_redirect_to_home'], 10, 3 );
+
+        /*
+         * محافظ فرم استاندارد: اگر افزونه/کد دیگری wp-login.php را به /login هدایت کند،
+         * مدیر هرگز نمی‌تواند وارد پیشخوان شود. اینجا هر ریدایرکتِ از wp-login.php به
+         * صفحهٔ ورود سفارشی خنثی می‌شود (ریدایرکت‌های خود وردپرس بعد از ورود موفق دست نمی‌خورد).
+         */
+        add_filter( 'wp_redirect', [ $this, 'protect_wp_login_form' ], 999, 2 );
+    }
+
+    public function protect_wp_login_form( $location, $status ) {
+        $pagenow = isset( $GLOBALS['pagenow'] ) ? (string) $GLOBALS['pagenow'] : '';
+        $uri     = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+        $on_wp_login = ( 'wp-login.php' === $pagenow ) || ( false !== strpos( $uri, 'wp-login.php' ) );
+        if ( ! $on_wp_login ) {
+            return $location;
+        }
+        $target_path = (string) wp_parse_url( (string) $location, PHP_URL_PATH );
+        $custom_path = (string) wp_parse_url( home_url( '/login/' ), PHP_URL_PATH );
+        if ( '' !== $target_path && rtrim( $target_path, '/' ) === rtrim( $custom_path, '/' ) ) {
+            // به‌جای رفتن به /login، همین فرم استاندارد نمایش داده شود
+            return false;
+        }
+        return $location;
     }
 
 
@@ -402,6 +425,35 @@ class EventedAuthHandler
     }
 
 
+    /**
+     * آیا برای این درخواست باید صفحهٔ ورود سفارشی (/login) استفاده شود؟
+     */
+    private function should_use_custom_login( $redirect, $force_reauth ) {
+        if ( $force_reauth || is_admin() ) {
+            return false;
+        }
+
+        $pagenow = isset( $GLOBALS['pagenow'] ) ? (string) $GLOBALS['pagenow'] : '';
+        $uri     = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+        if ( 'wp-login.php' === $pagenow || false !== strpos( $uri, 'wp-login.php' ) || false !== strpos( $uri, '/wp-admin' ) ) {
+            return false;
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( isset( $_GET['admin'] ) || isset( $_GET['interim-login'] ) ) {
+            return false;
+        }
+
+        if ( ! empty( $redirect ) ) {
+            $path = (string) wp_parse_url( $redirect, PHP_URL_PATH );
+            if ( false !== strpos( $path, '/wp-admin' ) || false !== strpos( $path, 'wp-login.php' ) ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function is_rate_limited($mobile)
     {
         return get_transient('otp_limit_' . $mobile) !== false;
@@ -527,31 +579,11 @@ class EventedAuthHandler
 
     public function redirect_login_url( $login_url, $redirect, $force_reauth ) {
         /*
-         * ورود به پیشخوان (wp-admin) باید از فرم استاندارد وردپرس انجام شود؛ صفحهٔ /login
-         * فقط با شماره موبایل + OTP کار می‌کند و مدیران با نام کاربری معمولی نمی‌توانند
-         * از آن وارد شوند. بنابراین در این حالت‌ها آدرس اصلی wp-login.php برگردانده می‌شود:
-         *   - وقتی مقصد پس از ورود داخل wp-admin است (auth_redirect از پیشخوان)
-         *   - reauth اجباری (مثلاً بعد از انقضای نشست در پیشخوان)
-         *   - درخواست‌های داخل خودِ پیشخوان/wp-login.php
-         *   - وقتی صریحاً ?admin=1 به آدرس ورود داده شده باشد
+         * فقط لینک‌های «ورود» در فرانت‌اند به /login (ورود با موبایل) تغییر می‌کنند.
+         * هر جا پای پیشخوان/فرم استاندارد وردپرس در میان باشد، آدرس اصلی wp-login.php
+         * دست‌نخورده برمی‌گردد تا مدیر بتواند با نام کاربری و رمز وارد wp-admin شود.
          */
-        if ( $force_reauth ) {
-            return $login_url;
-        }
-
-        if ( ! empty( $redirect ) ) {
-            $redirect_path = (string) wp_parse_url( $redirect, PHP_URL_PATH );
-            if ( false !== strpos( $redirect_path, '/wp-admin' ) || false !== strpos( $redirect_path, 'wp-login.php' ) ) {
-                return $login_url;
-            }
-        }
-
-        if ( is_admin() || ( isset( $GLOBALS['pagenow'] ) && 'wp-login.php' === $GLOBALS['pagenow'] ) ) {
-            return $login_url;
-        }
-
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- فقط تشخیص مسیر است
-        if ( isset( $_GET['admin'] ) ) {
+        if ( ! $this->should_use_custom_login( $redirect, $force_reauth ) ) {
             return $login_url;
         }
 
