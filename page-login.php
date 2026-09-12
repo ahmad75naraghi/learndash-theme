@@ -3,6 +3,22 @@
 $evented_redirect_to = isset($_GET['redirect_to'])
     ? (string) wp_validate_redirect(wp_unslash($_GET['redirect_to']), home_url('/'))
     : home_url('/');
+
+// اگر مقصد، پیشخوان وردپرس است، این صفحه (ورود با موبایل) به درد نمی‌خورد؛ به فرم استاندارد برو.
+$evented_redirect_path = (string) wp_parse_url($evented_redirect_to, PHP_URL_PATH);
+if (false !== strpos($evented_redirect_path, '/wp-admin')) {
+    wp_safe_redirect(add_query_arg('redirect_to', rawurlencode($evented_redirect_to), site_url('wp-login.php')));
+    exit;
+}
+
+// کاربر لاگین‌شده نیازی به این صفحه ندارد
+if (is_user_logged_in()) {
+    wp_safe_redirect(home_url('/panel'));
+    exit;
+}
+
+/* آدرس فرم استاندارد وردپرس برای مدیران/نویسندگان (بدون عبور از فیلتر login_url) */
+$evented_admin_login_url = site_url('wp-login.php?admin=1');
 ?>
 <!DOCTYPE html>
 
@@ -582,6 +598,9 @@ $evented_redirect_to = isset($_GET['redirect_to'])
                 display: none;
             }
         }
+        .admin-login-link { margin-top: 10px; }
+        .admin-login-link a { color: #94a3b8; font-size: 12px; }
+        .admin-login-link a:hover { color: var(--primary-color); }
     </style>
 </head>
 
@@ -601,11 +620,12 @@ $evented_redirect_to = isset($_GET['redirect_to'])
                 <p class="step-desc">لطفاً شماره موبایل خود را وارد کنید</p>
 
                 <div class="input-group">
-                    <input type="text" class="just_number" id="mobile-input" placeholder="09121234567" maxlength="11">
+                    <input type="tel" inputmode="numeric" autocomplete="tel" class="just_number" id="mobile-input" placeholder="09121234567" maxlength="11" dir="ltr">
                 </div>
 
                 <button class="btn-submit" id="btn-to-otp" disabled>تایید و ادامه</button>
-                <p class="terms-text">ورود شما به معنی پذیرش <a href="#">قوانین</a> و <a href="#">مقررات</a> evented-edu است</p>
+                <p class="terms-text">ورود شما به معنی پذیرش <a href="<?php echo esc_url(home_url('/terms/')); ?>">قوانین و مقررات</a> <?php echo esc_html(get_bloginfo('name')); ?> است</p>
+                <p class="terms-text admin-login-link"><a href="<?php echo esc_url($evented_admin_login_url); ?>">ورود مدیران و نویسندگان (نام کاربری و رمز)</a></p>
             </div>
 
             <div class="auth-step" id="step-password-option">

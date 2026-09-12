@@ -1,28 +1,23 @@
 <?php
 function theme_enqueue()
 {
-    wp_enqueue_style('theme-style', PATH_DIR_URL . '/style.css', '', '1.0.0');
+    /*
+     * پوستهٔ ee-* (همهٔ نماهای عمومی) استایل/اسکریپت خودش را در functions.php بارگذاری می‌کند.
+     * فایل‌های قدیمی (style.css سراسری، Owl Carousel، main.js، front-page.css/js) فقط برای
+     * برگه‌های مستقل (پنل کاربری) لازم‌اند؛ بارگذاری آن‌ها روی صفحهٔ اصلی جدید هم بی‌فایده بود
+     * و هم با ریست سراسری `* { font-family }` روی طراحی جدید اثر می‌گذاشت.
+     */
+    $is_ee_view = function_exists('evented_is_ee_view') && evented_is_ee_view();
 
-    wp_enqueue_style('owl.carousel', PATH_DIR_URL . '/assets/css/owl.carousel.min.css');
-    wp_enqueue_script('owl.carousel', PATH_DIR_URL . '/assets/js/owl.carousel.min.js', ['jquery'], '', true);
+    if ($is_ee_view) {
+        return;
+    }
 
-    wp_enqueue_script('main', PATH_DIR_URL . '/assets/js/main.js', ['jquery'], '1.0.0', true);
-    // wp_enqueue_script('main-ex', PATH_DIR_URL . '/assets/js/main-ex.js', '', '1.0.0', true);
+    wp_enqueue_style('theme-style', PATH_DIR_URL . '/style.css', '', '1.0.1');
+
+    wp_enqueue_script('main', PATH_DIR_URL . '/assets/js/main.js', ['jquery'], '1.0.1', true);
     wp_localize_script('main', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('notification_nonce')));
 
-    // صفحهٔ اصلی: پوستهٔ جدید (ee-shell.css + evented-home.css) در functions.php بارگذاری می‌شود؛
-    // is_home() عمداً اینجا نیست چون برگهٔ نوشته‌ها از قالب آرشیو جدید استفاده می‌کند.
-    if (is_page('home') || is_front_page()) {
-        wp_enqueue_style('front-page', PATH_DIR_URL . '/assets/css/front-page.css', '', '1.0.0');
-        wp_enqueue_script('front-page', PATH_DIR_URL . '/assets/js/front-page.js', '', '1.0.0', true);
-        // wp_enqueue_script('front-page-ex', PATH_DIR_URL . '/assets/js/front-page-ex.js', '', '1.0.0', true);
-    }
-    // بایگانی/دستهٔ دوره، صفحهٔ دوره‌ها، آزمون، اساتید، پروفایل مدرس، برگه و ۴۰۴
-    // همگی با پوستهٔ evented-edu رندر می‌شوند؛ استایل‌های آن‌ها (newhome/ee-courses.css
-    // و newhome/ee-lms.css) در functions.php بارگذاری می‌شوند. فایل‌های قدیمی
-    // archive-courses.css، author.css/js، single-page.css و archive-product.css
-    // دیگر استفاده نمی‌شوند.
-    
     if (is_page()) {
         global $post;
 

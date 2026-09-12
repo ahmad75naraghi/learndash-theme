@@ -303,3 +303,18 @@
 .ee-instr .av-wrap .noimg { font-size: 1.6rem; color: var(--ee-tealP); }
 .ee-instr strong { font-size: .82rem; margin-top: .5rem; color: var(--ee-ink); }
 .ee-instr .ee-role { font-size: .68rem; color: var(--ee-tealP); }
+
+/* ---------- تب‌های مقالات (۵ دستهٔ تصادفی) ---------- */
+.ee-art-tabs { margin-bottom: .6rem; }
+.ee-art-tabs .ee-chip-btn { display: inline-flex; align-items: center; white-space: nowrap; }
+.ee-art-tabs .ee-chip-btn[aria-selected="true"] { background: #7e22ce; border-color: #7e22ce; color: #fff; }
+.ee-art-tabs .ee-chip-btn:hover:not([aria-selected="true"]) { background: var(--ee-lavL); color: #7e22ce; }
+.ee-art-tabs .ee-chip-btn:focus-visible { outline: 2px solid #d8b4fe; outline-offset: 2px; }
+.ee-art-panel[hidden] { display: none; }
+.ee-art-panel { animation: eeFadeUp .3s ease both; }
+.ee-art-panel-foot { display: flex; justify-content: center; margin-top: .9rem; }
+.ee-art-panel-foot .ee-btn { background: var(--ee-lavL); color: #7e22ce; border-color: #ead5ff; }
+.ee-art-panel-foot .ee-btn:hover { background: #ead5ff; }
+
+/* چیپ‌های دسته‌بندی دوره‌ها (لینک واقعی به آرشیو دسته) */
+.ee-chips a.ee-chip-btn { display: inline-flex; align-items: center; white-space: nowrap; }

@@ -59,6 +59,14 @@ $ee_arch_current = (is_category() && get_queried_object() instanceof WP_Term) ? 
 
 $ee_posts_page_id = (int) get_option('page_for_posts');
 $ee_blog_url      = $ee_posts_page_id ? (string) get_permalink($ee_posts_page_id) : (string) home_url('/');
+
+/* در نتایج جستجو: به‌جای دسته‌های وبلاگ، «بخش» جستجو (همه/مقالات/دوره‌ها/…) نمایش داده می‌شود */
+$ee_search_scopes = (is_search() && function_exists('evented_search_scopes')) ? evented_search_scopes() : array();
+$ee_search_scope  = function_exists('evented_search_current_scope') ? evented_search_current_scope() : '';
+if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search_scope])) {
+	/* translators: 1: عبارت جستجو، 2: نام بخش */
+	$ee_arch_title = sprintf(__('نتایج جستجوی «%1$s» در %2$s', 'evented-edu'), get_search_query(), $ee_search_scopes[$ee_search_scope]);
+}
 ?>
 <div class="ee-wrap ee-arch-grid">
 
@@ -90,8 +98,17 @@ $ee_blog_url      = $ee_posts_page_id ? (string) get_permalink($ee_posts_page_id
 			</div>
 		</header>
 
-		<!-- چیپ‌های دسته‌بندی -->
-		<?php if (!empty($ee_arch_cats)) : ?>
+		<?php if (is_search() && !empty($ee_search_scopes)) : ?>
+			<!-- چیپ‌های «بخش» جستجو -->
+			<nav class="ee-arch-chips" aria-label="<?php esc_attr_e('محدودهٔ جستجو', 'evented-edu'); ?>">
+				<?php foreach ($ee_search_scopes as $ee_sc_val => $ee_sc_label) :
+					$ee_sc_url = add_query_arg(array('s' => get_search_query(false), 'post_type' => $ee_sc_val), home_url('/'));
+					if ('' === $ee_sc_val) { $ee_sc_url = remove_query_arg('post_type', $ee_sc_url); } ?>
+					<a class="ee-chip-btn<?php echo $ee_sc_val === $ee_search_scope ? ' ee-on' : ''; ?>" href="<?php echo esc_url($ee_sc_url); ?>"><?php echo esc_html($ee_sc_label); ?></a>
+				<?php endforeach; ?>
+			</nav>
+		<?php elseif (!empty($ee_arch_cats)) : ?>
+			<!-- چیپ‌های دسته‌بندی -->
 			<nav class="ee-arch-chips" aria-label="<?php esc_attr_e('فیلتر دسته‌بندی', 'evented-edu'); ?>">
 				<a class="ee-chip-btn<?php echo 0 === $ee_arch_current ? ' ee-on' : ''; ?>" href="<?php echo esc_url($ee_blog_url); ?>">
 					<?php esc_html_e('همه', 'evented-edu'); ?>
@@ -116,6 +133,11 @@ $ee_blog_url      = $ee_posts_page_id ? (string) get_permalink($ee_posts_page_id
 					$ee_id       = get_the_ID();
 					$ee_p_cats   = get_the_category($ee_id);
 					$ee_p_cat    = !empty($ee_p_cats) ? $ee_p_cats[0] : null;
+					$ee_p_tag    = $ee_p_cat instanceof WP_Term ? $ee_p_cat->name : '';
+					if ('' === $ee_p_tag && 'post' !== get_post_type($ee_id)) {
+						$ee_pto   = get_post_type_object(get_post_type($ee_id));
+						$ee_p_tag = $ee_pto ? (string) $ee_pto->labels->singular_name : '';
+					}
 					$ee_p_read   = function_exists('evented_reading_time') ? evented_reading_time($ee_id) : 1;
 					$ee_p_date   = function_exists('evented_post_date') ? evented_post_date($ee_id, 'Y/m/d') : get_the_date();
 					$ee_p_views  = function_exists('evented_get_post_views') ? evented_get_post_views($ee_id) : 0;
@@ -128,8 +150,8 @@ $ee_blog_url      = $ee_posts_page_id ? (string) get_permalink($ee_posts_page_id
 							<?php else : ?>
 								<span class="ee-ac-noimg ee-ic"><span class="material-symbols-outlined">article</span></span>
 							<?php endif; ?>
-							<?php if ($ee_p_cat instanceof WP_Term) : ?>
-								<span class="ee-ac-tag"><?php echo esc_html($ee_p_cat->name); ?></span>
+							<?php if ('' !== $ee_p_tag) : ?>
+								<span class="ee-ac-tag"><?php echo esc_html($ee_p_tag); ?></span>
 							<?php endif; ?>
 						</a>
 
@@ -190,7 +212,8 @@ $ee_blog_url      = $ee_posts_page_id ? (string) get_permalink($ee_posts_page_id
 				<form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
 					<div class="ee-search-inline">
 						<label class="screen-reader-text" for="ee-noresult-s"><?php esc_html_e('جستجو', 'evented-edu'); ?></label>
-						<input id="ee-noresult-s" type="search" name="s" value="<?php echo esc_attr(get_search_query()); ?>" placeholder="<?php esc_attr_e('جستجو در نوشته‌ها…', 'evented-edu'); ?>">
+						<input id="ee-noresult-s" type="search" name="s" value="<?php echo esc_attr(get_search_query()); ?>" placeholder="<?php esc_attr_e('جستجو…', 'evented-edu'); ?>">
+						<?php if ('' !== $ee_search_scope) : ?><input type="hidden" name="post_type" value="<?php echo esc_attr($ee_search_scope); ?>"><?php endif; ?>
 						<button type="submit" aria-label="<?php esc_attr_e('جستجو', 'evented-edu'); ?>">
 							<span class="material-symbols-outlined ee-ic">search</span>
 						</button>

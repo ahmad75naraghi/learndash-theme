@@ -59,13 +59,14 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 │   ├── css/  front-page · single-courses (بازنشسته) · archive-courses (بازنشسته) · single-post · archive-post · author (بازنشسته) · panel · vendorها
 │   ├── css/newhome/  ee-shell (پوستهٔ مشترک) · evented-home (صفحهٔ اصلی) · ee-lms (دوره، درس و آزمون) · ee-courses (فهرست‌ها، اساتید، برگه و ۴۰۴)
 │   ├── js/   main · front-page · single-courses (بازنشسته) · author · panel + vendorها
-│   ├── js/newhome/evented-home.js  منوی موبایل · اسلایدر هیرو · کپی لینک اشتراک
+│   ├── js/newhome/evented-home.js  کشوی منوی موبایل · زیرمنوها · جستجوی موبایل · تب‌های مقالات · اسلایدر هیرو · کپی لینک
 │   ├── js/newhome/ee-lms.js        آکاردئون · گروه درس‌ها · دیدگاه/امتیاز · تکمیل درس · علاقه‌مندی
 │   ├── fonts/evented-edu-font.woff2   فونت «دانا»
 │   └── img/  front-page (۲۳) · single-page (۸) · panel (۲)
 ├── inc/
 │   ├── includes.php              فقط require کردن ماژول‌های پایین
 │   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها) + هلپرهای LMS
+│   ├── navigation.php            منوی استاتیک هدر/فوتر/کشوی موبایل (کش هفتگی) + فیلتر بخش جستجو + تب‌های مقالات خانه
 │   ├── login.php                 کلاس FalnicAuthHandler (OTP/ورود) + captcha_verify
 │   ├── sms.php                   send_pattern_sms (SOAP)
 │   ├── meta_functions.php        متاباکس دوره/دسته/کاربر + فیلتر آواتار
@@ -140,6 +141,23 @@ wp-content/themes/<theme-folder>/
 # ۹) (اختیاری) تابع بله `evented_send_otp_with_bale` (یا legacy `falnic_send_otp_with_bale`) را در mu-plugin تعریف کنید
 ```
 
+
+## ۵.۳ منوی هدر (استاتیک + کش هفتگی)
+
+منو در پیشخوان ساخته نمی‌شود؛ آیتم‌ها ثابت‌اند و فقط **آدرس/زیرمنو**ی هرکدام از محتوای سایت خوانده و **یک هفته** کش می‌شود (`inc/navigation.php`):
+
+| آیتم | آدرس از کجا می‌آید | زیرمنو |
+|---|---|---|
+| صفحه اصلی | `home_url()` | — |
+| مقالات | برگهٔ «نوشته‌ها» (تنظیمات ← خواندن) یا برگهٔ `blog` | دسته‌بندی‌های وبلاگ (پرمحتواترین‌ها) |
+| کتابخانه / گالری / ویدیو / دانلودها / پادکست | بایگانی پست‌تایپ افزونه (اسلاگ‌های رایج مثل `library`, `gallery`, `video`, `download(s)`, `podcast` امتحان می‌شوند) → در نبود آن، برگهٔ هم‌نام → در نهایت مسیر پیش‌فرض | ترم‌های اولین تاکسونومی آن پست‌تایپ |
+| دوره‌ها | بایگانی `sfwd-courses` یا برگهٔ `courses` | دسته‌های `ld_course_category` |
+| ویژه رمضان / مسابقات / معرفی سایت / ارتباط با ما | برگه با اسلاگ `ramadan` / `contests` / `about` / `contact` (اسلاگ‌های جایگزین هم پشتیبانی می‌شوند) | — |
+
+- اگر افزونه اسلاگ متفاوتی برای پست‌تایپ دارد: `add_filter('evented_nav_post_type_candidates', fn($m) => array_merge($m, ['library' => ['my_books']]))`.
+- بعد از فعال‌کردن افزونه یا ساختن برگه‌ها، کش خودکار باطل می‌شود؛ در صورت نیاز از «بازسازی منو و کش قالب» در نوار مدیریت استفاده کنید.
+- فیلتر جستجوی هدر (`?post_type=`) از همین آیتم‌ها ساخته می‌شود؛ حالت «همه‌جا» فقط همین پست‌تایپ‌ها + برگه‌ها را می‌گردد.
+- ورود مدیران: `/wp-admin` و `wp-login.php?admin=1` به فرم استاندارد وردپرس می‌روند؛ `/login` مخصوص کاربران (موبایل + OTP) است.
 
 ## ۶. پیکربندی (متغیرهای محیطی)
 

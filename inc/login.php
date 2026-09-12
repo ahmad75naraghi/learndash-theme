@@ -526,6 +526,35 @@ class EventedAuthHandler
     }
 
     public function redirect_login_url( $login_url, $redirect, $force_reauth ) {
+        /*
+         * ورود به پیشخوان (wp-admin) باید از فرم استاندارد وردپرس انجام شود؛ صفحهٔ /login
+         * فقط با شماره موبایل + OTP کار می‌کند و مدیران با نام کاربری معمولی نمی‌توانند
+         * از آن وارد شوند. بنابراین در این حالت‌ها آدرس اصلی wp-login.php برگردانده می‌شود:
+         *   - وقتی مقصد پس از ورود داخل wp-admin است (auth_redirect از پیشخوان)
+         *   - reauth اجباری (مثلاً بعد از انقضای نشست در پیشخوان)
+         *   - درخواست‌های داخل خودِ پیشخوان/wp-login.php
+         *   - وقتی صریحاً ?admin=1 به آدرس ورود داده شده باشد
+         */
+        if ( $force_reauth ) {
+            return $login_url;
+        }
+
+        if ( ! empty( $redirect ) ) {
+            $redirect_path = (string) wp_parse_url( $redirect, PHP_URL_PATH );
+            if ( false !== strpos( $redirect_path, '/wp-admin' ) || false !== strpos( $redirect_path, 'wp-login.php' ) ) {
+                return $login_url;
+            }
+        }
+
+        if ( is_admin() || ( isset( $GLOBALS['pagenow'] ) && 'wp-login.php' === $GLOBALS['pagenow'] ) ) {
+            return $login_url;
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- فقط تشخیص مسیر است
+        if ( isset( $_GET['admin'] ) ) {
+            return $login_url;
+        }
+
         // آدرس صفحه لاگین خودت
         $custom_login_url = home_url( '/login/' );
         

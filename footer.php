@@ -74,19 +74,19 @@
                 <!-- نوار بالای فوتر (شبکه های اجتماعی) -->
                 <div class="footer-social-bar">
                     <div class="social-icons">
-                        <a href="http://fb.me/falnic.iranhp">
+                        <a href="<?php echo esc_url(apply_filters('evented_social_facebook', '#')); ?>" rel="noopener" target="_blank" aria-label="فیسبوک">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path opacity="0.4" d="M16.18 2H7.81C4.17 2 2 4.17 2 7.81V16.18C2 19.82 4.17 21.99 7.81 21.99H16.18C19.82 21.99 21.99 19.82 21.99 16.18V7.81C21.99 4.17 19.82 2 16.18 2Z" fill="#FAFCFE" />
                                 <path d="M13.9097 9.27922L13.9597 12.2292L16.5897 12.1892C16.7797 12.1892 16.9197 12.3592 16.8897 12.5392L16.5397 14.4492C16.5097 14.5892 16.3897 14.6892 16.2497 14.6992L13.9997 14.7392L14.1197 21.9892L11.1197 22.0392L10.9997 14.7892L9.29971 14.8192C9.12971 14.8192 8.99973 14.6892 8.99973 14.5192L8.96973 12.6192C8.96973 12.4492 9.09971 12.3192 9.26971 12.3192L10.9697 12.2892L10.9197 9.03922C10.8897 7.37922 12.2097 6.01922 13.8697 5.98922L16.5697 5.94922C16.7397 5.94922 16.8697 6.07922 16.8697 6.24922L16.9097 8.64922C16.9097 8.81922 16.7797 8.94922 16.6097 8.94922L14.2097 8.98922C14.0397 8.97922 13.9097 9.11922 13.9097 9.27922Z" fill="#FAFCFE" />
                             </svg>
                         </a>
-                        <a href="https://www.youtube.com/c/Falnic-iranhp">
+                        <a href="<?php echo esc_url(apply_filters('evented_social_youtube', '#')); ?>" rel="noopener" target="_blank" aria-label="یوتیوب">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path opacity="0.4" d="M17 20H7C4 20 2 18 2 15V9C2 6 4 4 7 4H17C20 4 22 6 22 9V15C22 18 20 20 17 20Z" fill="#FAFCFE" />
                                 <path d="M11.4196 9.49009L13.8896 10.9701C14.8296 11.5401 14.8296 12.4601 13.8896 13.0301L11.4196 14.5101C10.4196 15.1101 9.59961 14.6501 9.59961 13.4801V10.5101C9.59961 9.3501 10.4196 8.89009 11.4196 9.49009Z" fill="#FAFCFE" />
                             </svg>
                         </a>
-                        <a href="https://www.instagram.com/evented_iranhp/">
+                        <a href="<?php echo esc_url(apply_filters('evented_social_instagram', '#')); ?>" rel="noopener" target="_blank" aria-label="اینستاگرام">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path opacity="0.4" d="M16.19 2H7.81C4.17 2 2 4.17 2 7.81V16.18C2 19.83 4.17 22 7.81 22H16.18C19.82 22 21.99 19.83 21.99 16.19V7.81C22 4.17 19.83 2 16.19 2Z" fill="#FAFCFE" />
                                 <path d="M12.0001 15.8791C14.143 15.8791 15.8801 14.142 15.8801 11.9991C15.8801 9.85628 14.143 8.11914 12.0001 8.11914C9.85725 8.11914 8.12012 9.85628 8.12012 11.9991C8.12012 14.142 9.85725 15.8791 12.0001 15.8791Z" fill="#FAFCFE" />
@@ -138,7 +138,7 @@
                                     </svg>
                                 </div>
                                 <div class="contact-text">
-                                    <span class="ltr-text">info@falnic.com</span>
+                                    <a class="ltr-text" href="mailto:<?php echo esc_attr(get_bloginfo('admin_email')); ?>"><?php echo esc_html(get_bloginfo('admin_email')); ?></a>
                                 </div>
                             </li>
                         </ul>
@@ -149,12 +149,12 @@
                         <div class="link-column">
                             <h4 class="footer-title text-yellow">دسترسی سریع</h4>
                             <ul>
-                                <li><a href="https://falnic.com/about-us">درباره ما</a></li>
-                                <li><a href="https://falnic.com/contact-us">تماس با ما</a></li>
-                                <li><a href="https://falnic.com/shop">فروشگاه</a></li>
-                                <li><a href="https://solutions.falnic.com/">راهکارهای سازمانی</a></li>
-                                <li><a href="https://falnic.com/blog/">وبلاگ</a></li>
-                                <li><a href="https://falnic.com/recruitment">فرصت‌های شغلی</a></li>
+                                <?php
+                                $ee_pf_nav = function_exists('evented_nav_items') ? evented_nav_items() : array();
+                                foreach ($ee_pf_nav as $ee_pf) :
+                                    if ('home' === $ee_pf['key']) { continue; } ?>
+                                    <li><a href="<?php echo esc_url($ee_pf['url']); ?>"><?php echo esc_html($ee_pf['title']); ?></a></li>
+                                <?php endforeach; ?>
                             </ul>
                         </div>
                     </div>
@@ -187,40 +187,28 @@
         </div>
 
         <ul class="mobile-menu-list">
-            <li class="has-submenu">
-                <div class="menu-item-header">
-                    دسته بندی دوره ها
-                    <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </div>
-                <ul class="submenu-list">
-                    <?php
-                    // دریافت داینامیک دسته‌بندی‌های لرن‌دش
-                    $course_cats = get_terms(array(
-                        'taxonomy' => 'ld_course_category',
-                        'hide_empty' => true,
-                    ));
-
-                    if (!is_wp_error($course_cats) && !empty($course_cats)) {
-                        foreach ($course_cats as $cat) {
-                            echo '<li><a href="' . esc_url(get_term_link($cat)) . '">' . esc_html($cat->name) . '</a></li>';
-                        }
-                    } else {
-                        // در صورت نداشتن دسته‌بندی، نمایش متون تستی (مطابق عکس)
-                        echo '<li><a href="#">لورم ایپسوم</a></li>';
-                        echo '<li><a href="#">لورم ایپسوم</a></li>';
-                        echo '<li><a href="#">لورم ایپسوم</a></li>';
-                        echo '<li><a href="#">لورم ایپسوم</a></li>';
-                    }
-                    ?>
-                </ul>
-            </li>
-
-            <li><a href="#">تماس با ما</a></li>
-            <li><a href="#">بلاگ</a></li>
-            <li><a href="#">تدریس</a></li>
-            <li><a href="#">اساتید</a></li>
+            <?php
+            $ee_pm_nav = function_exists('evented_nav_items') ? evented_nav_items() : array();
+            foreach ($ee_pm_nav as $ee_pm) :
+                if (!empty($ee_pm['children'])) : ?>
+                    <li class="has-submenu">
+                        <div class="menu-item-header">
+                            <?php echo esc_html($ee_pm['title']); ?>
+                            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <ul class="submenu-list">
+                            <li><a href="<?php echo esc_url($ee_pm['url']); ?>">همهٔ <?php echo esc_html($ee_pm['title']); ?></a></li>
+                            <?php foreach ($ee_pm['children'] as $ee_pmc) : ?>
+                                <li><a href="<?php echo esc_url($ee_pmc['url']); ?>"><?php echo esc_html($ee_pmc['title']); ?></a></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </li>
+                <?php else : ?>
+                    <li><a href="<?php echo esc_url($ee_pm['url']); ?>"><?php echo esc_html($ee_pm['title']); ?></a></li>
+                <?php endif;
+            endforeach; ?>
         </ul>
     </div>
     </body>

@@ -42,6 +42,18 @@ wp_reset_postdata();
 
 $ee_articles = array_slice($ee_latest_posts, 0, 3);
 
+/* ۴٫۲) تب‌های مقالات — ۵ دستهٔ تصادفی (کش یک‌هفته‌ای) */
+$ee_article_tabs = function_exists('evented_home_article_tabs') ? evented_home_article_tabs(5, 3) : array();
+
+/* آدرس‌های منوی استاتیک (کش‌شده) */
+$ee_nav = static function ($key, $fallback = '') {
+    if (function_exists('evented_nav_url')) {
+        return evented_nav_url($key);
+    }
+    return $fallback ?: home_url('/');
+};
+$ee_blog_url = $ee_nav('articles', get_permalink(get_option('page_for_posts')) ?: home_url('/'));
+
 /* ۴٫۱) بلاگ ویژه — نوشته‌های چسبان و در ادامه آخرین نوشته‌ها */
 $ee_blog_feature = function_exists('evented_featured_posts') ? evented_featured_posts(4) : array();
 
@@ -144,7 +156,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                     <div class="ee-latest-card">
                         <div class="lc-head">
                             <div class="lc-title"><span class="material-symbols-outlined ee-ic">auto_stories</span> آخرین مقالات</div>
-                            <a class="lc-more" href="<?php echo esc_url(get_permalink(get_option('page_for_posts')) ?: home_url('/')); ?>">مشاهده همه <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                            <a class="lc-more" href="<?php echo esc_url($ee_blog_url); ?>">مشاهده همه <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
                         </div>
                         <div class="ee-news-list">
                             <?php foreach ($ee_latest_posts as $p) : ?>
@@ -183,14 +195,14 @@ $ee_slider_mode  = $ee_slide_count > 1;
                     <span class="ee-sec-sub">مرجع تخصصی آموزش شبکه، سرور و امنیت</span>
                 </div>
                 <div class="ee-qgrid">
-                    <a class="ee-qitem" href="#ee-articles"><span class="qi-ic material-symbols-outlined ee-ic">menu_book</span><span>مقالات</span></a>
-                    <a class="ee-qitem ee-q-amber" href="#"><span class="qi-ic material-symbols-outlined ee-ic">military_tech</span><span>آزمون‌ها</span></a>
-                    <a class="ee-qitem ee-q-purple" href="#ee-courses"><span class="qi-ic material-symbols-outlined ee-ic">podcasts</span><span>دوره‌ها</span></a>
-                    <a class="ee-qitem ee-q-teal" href="#ee-courses"><span class="qi-ic material-symbols-outlined ee-ic">smart_display</span><span>ویدیوها</span></a>
-                    <a class="ee-qitem ee-q-amber" href="#"><span class="qi-ic material-symbols-outlined ee-ic">download_for_offline</span><span>دانلودها</span></a>
-                    <a class="ee-qitem" href="#ee-instructors"><span class="qi-ic material-symbols-outlined ee-ic">local_library</span><span>اساتید</span></a>
-                    <a class="ee-qitem ee-q-rose" href="#"><span class="qi-ic material-symbols-outlined ee-ic">quiz</span><span>گواهی‌ها</span></a>
-                    <a class="ee-qitem ee-q-teal" href="#"><span class="qi-ic material-symbols-outlined ee-ic">psychology</span><span>مشاوره</span></a>
+                    <a class="ee-qitem" href="<?php echo esc_url($ee_blog_url); ?>"><span class="qi-ic material-symbols-outlined ee-ic">menu_book</span><span>مقالات</span></a>
+                    <a class="ee-qitem ee-q-purple" href="<?php echo esc_url($ee_nav('courses')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">school</span><span>دوره‌ها</span></a>
+                    <a class="ee-qitem ee-q-teal" href="<?php echo esc_url($ee_nav('video')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">smart_display</span><span>ویدیوها</span></a>
+                    <a class="ee-qitem ee-q-amber" href="<?php echo esc_url($ee_nav('downloads')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">download_for_offline</span><span>دانلودها</span></a>
+                    <a class="ee-qitem ee-q-rose" href="<?php echo esc_url($ee_nav('podcast')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">podcasts</span><span>پادکست</span></a>
+                    <a class="ee-qitem" href="<?php echo esc_url($ee_nav('library')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">local_library</span><span>کتابخانه</span></a>
+                    <a class="ee-qitem ee-q-purple" href="<?php echo esc_url($ee_nav('gallery')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">photo_library</span><span>گالری</span></a>
+                    <a class="ee-qitem ee-q-amber" href="<?php echo esc_url($ee_nav('contests')); ?>"><span class="qi-ic material-symbols-outlined ee-ic">emoji_events</span><span>مسابقات</span></a>
                 </div>
             </div>
         </section>
@@ -208,9 +220,11 @@ $ee_slider_mode  = $ee_slide_count > 1;
 
                 <?php if (!empty($ee_cats)) : ?>
                     <div class="ee-chips">
-                        <button class="ee-chip-btn ee-on" type="button">همه دوره‌ها</button>
-                        <?php foreach ($ee_cats as $cat) : ?>
-                            <button class="ee-chip-btn" type="button"><?php echo esc_html($cat->name); ?></button>
+                        <a class="ee-chip-btn ee-on" href="<?php echo esc_url($ee_nav('courses')); ?>">همه دوره‌ها</a>
+                        <?php foreach ($ee_cats as $cat) :
+                            $ee_cat_link = get_term_link($cat);
+                            if (is_wp_error($ee_cat_link)) { continue; } ?>
+                            <a class="ee-chip-btn" href="<?php echo esc_url($ee_cat_link); ?>"><?php echo esc_html($cat->name); ?></a>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
@@ -383,41 +397,75 @@ $ee_slider_mode  = $ee_slide_count > 1;
             </section>
         <?php endif; ?>
 
-        <!-- ======= مقالات منتخب ======= -->
+        <!-- ======= مقالات (تب‌بندی بر اساس ۵ دستهٔ تصادفی؛ کش هفتگی) ======= -->
         <section class="ee-articles" id="ee-articles">
             <div class="ee-wrap">
                 <div class="ee-sec-head">
                     <div>
                         <h3 class="ee-sec-title purple"><span class="bar"></span> گزیده مقالات و دانستنی‌های فناوری اطلاعات</h3>
                     </div>
-                    <a class="lc-more" style="color:#7e22ce;" href="<?php echo esc_url(get_permalink(get_option('page_for_posts')) ?: home_url('/')); ?>">مشاهده همه مقالات <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                    <a class="lc-more" style="color:#7e22ce;" href="<?php echo esc_url($ee_blog_url); ?>">مشاهده همه مقالات <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
                 </div>
-                <div class="ee-agrid">
-                    <?php foreach ($ee_articles as $a) : ?>
-                        <article class="ee-art-card">
-                            <a class="art-thumb" href="<?php echo esc_url(get_permalink($a)); ?>">
-                                <?php if (has_post_thumbnail($a)) : ?>
-                                    <img src="<?php echo esc_url(get_the_post_thumbnail_url($a, 'medium')); ?>" alt="<?php echo esc_attr(get_the_title($a)); ?>" loading="lazy">
-                                <?php else : ?>
-                                    <span class="ee-ic material-symbols-outlined" style="width:100%;height:100%;font-size:2.4rem;color:var(--ee-tealP);">article</span>
-                                <?php endif; ?>
-                            </a>
-                            <div>
-                                <?php
-                                $ee_pcat = get_the_category($a->ID);
-                                $ee_pcat_name = $ee_pcat ? $ee_pcat[0]->name : 'مقالات';
-                                ?>
-                                <span class="art-tag" style="background:var(--ee-mint);color:#065f46;"><?php echo esc_html($ee_pcat_name); ?></span>
-                                <h4><a href="<?php echo esc_url(get_permalink($a)); ?>"><?php echo esc_html(get_the_title($a)); ?></a></h4>
-                                <p><?php echo esc_html(wp_trim_words(get_the_excerpt($a), 16)); ?></p>
+
+                <?php
+                /* رندر یک کارت مقاله (برای تب‌ها و حالت بدون دسته) */
+                $ee_render_article = static function ($a) {
+                    $ee_pcat      = get_the_category($a->ID);
+                    $ee_pcat_name = $ee_pcat ? $ee_pcat[0]->name : 'مقالات';
+                    ?>
+                    <article class="ee-art-card">
+                        <a class="art-thumb" href="<?php echo esc_url(get_permalink($a)); ?>">
+                            <?php if (has_post_thumbnail($a)) : ?>
+                                <img src="<?php echo esc_url(get_the_post_thumbnail_url($a, 'medium')); ?>" alt="<?php echo esc_attr(get_the_title($a)); ?>" loading="lazy">
+                            <?php else : ?>
+                                <span class="ee-ic material-symbols-outlined" style="width:100%;height:100%;font-size:2.4rem;color:var(--ee-tealP);">article</span>
+                            <?php endif; ?>
+                        </a>
+                        <div>
+                            <span class="art-tag" style="background:var(--ee-mint);color:#065f46;"><?php echo esc_html($ee_pcat_name); ?></span>
+                            <h4><a href="<?php echo esc_url(get_permalink($a)); ?>"><?php echo esc_html(get_the_title($a)); ?></a></h4>
+                            <p><?php echo esc_html(wp_trim_words(get_the_excerpt($a), 16)); ?></p>
+                        </div>
+                        <div class="art-foot">
+                            <span><?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($a) : get_the_date('', $a)); ?></span>
+                            <a class="read" href="<?php echo esc_url(get_permalink($a)); ?>">مطالعه کامل <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                        </div>
+                    </article>
+                    <?php
+                };
+                ?>
+
+                <?php if (!empty($ee_article_tabs)) : ?>
+                    <div class="ee-chips ee-art-tabs" id="eeArtTabs" role="tablist" aria-label="دسته‌بندی مقالات">
+                        <?php foreach ($ee_article_tabs as $ee_ti => $ee_tab) : ?>
+                            <button class="ee-chip-btn<?php echo 0 === $ee_ti ? ' ee-on' : ''; ?>" type="button" role="tab"
+                                id="eeArtTab<?php echo esc_attr($ee_ti); ?>"
+                                aria-controls="eeArtPanel<?php echo esc_attr($ee_ti); ?>"
+                                aria-selected="<?php echo 0 === $ee_ti ? 'true' : 'false'; ?>"
+                                tabindex="<?php echo 0 === $ee_ti ? '0' : '-1'; ?>">
+                                <?php echo esc_html($ee_tab['term']->name); ?>
+                                <span class="ee-chip-count"><?php echo esc_html(number_format_i18n((int) $ee_tab['term']->count)); ?></span>
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <?php foreach ($ee_article_tabs as $ee_ti => $ee_tab) : ?>
+                        <div class="ee-art-panel" id="eeArtPanel<?php echo esc_attr($ee_ti); ?>" role="tabpanel" aria-labelledby="eeArtTab<?php echo esc_attr($ee_ti); ?>"<?php echo 0 === $ee_ti ? '' : ' hidden'; ?>>
+                            <div class="ee-agrid">
+                                <?php foreach ($ee_tab['posts'] as $a) { $ee_render_article($a); } ?>
                             </div>
-                            <div class="art-foot">
-                                <span><?php echo esc_html(get_the_date('', $a)); ?></span>
-                                <a class="read" href="<?php echo esc_url(get_permalink($a)); ?>">مطالعه کامل <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
+                            <div class="ee-art-panel-foot">
+                                <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url(get_term_link($ee_tab['term'])); ?>">همهٔ مطالب «<?php echo esc_html($ee_tab['term']->name); ?>» <span class="material-symbols-outlined ee-ic">arrow_back</span></a>
                             </div>
-                        </article>
+                        </div>
                     <?php endforeach; ?>
-                </div>
+                <?php elseif (!empty($ee_articles)) : ?>
+                    <div class="ee-agrid">
+                        <?php foreach ($ee_articles as $a) { $ee_render_article($a); } ?>
+                    </div>
+                <?php else : ?>
+                    <div class="ee-empty">هنوز مقاله‌ای منتشر نشده است.</div>
+                <?php endif; ?>
             </div>
         </section>
 

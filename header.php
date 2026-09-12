@@ -45,12 +45,12 @@ $current_user_id = get_current_user_id();
                     </svg>
 
                 </span>
-                <a href="/" class="logo">
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="logo">
                     <!-- جایگزین با لوگوی واقعی -->
                     <img src='<?php echo PATH_DIR_URL; ?>/assets/img/front-page/evented-edu-logo.webp' alt="لوگو">
                 </a>
                 <div class="categories-dropdown mob-hidden">
-                    <a href="/courses/" >
+                    <a href="<?php echo esc_url(function_exists('evented_nav_url') ? evented_nav_url('courses') : home_url('/courses/')); ?>" >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path d="M22 8.52V3.98C22 2.57 21.36 2 19.77 2H15.73C14.14 2 13.5 2.57 13.5 3.98V8.51C13.5 9.93 14.14 10.49 15.73 10.49H19.77C21.36 10.5 22 9.93 22 8.52Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
                             <path d="M22 19.77V15.73C22 14.14 21.36 13.5 19.77 13.5H15.73C14.14 13.5 13.5 14.14 13.5 15.73V19.77C13.5 21.36 14.14 22 15.73 22H19.77C21.36 22 22 21.36 22 19.77Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -62,10 +62,13 @@ $current_user_id = get_current_user_id();
                 </div>
                 <nav class="main-nav mob-hidden">
                     <ul>
-                        <li><a href="https://falnic.com/contact-us">تماس با ما</a></li>
-                        <li><a href="https://falnic.com/blog/">بلاگ</a></li>
-                        <li><a href="/#categories-section">دوره ها</a></li>
-                        <li><a href="/#instructors-section">اساتید</a></li>
+                        <?php
+                        $ee_panel_nav = function_exists('evented_nav_items') ? evented_nav_items() : array();
+                        $ee_panel_nav_keys = array('home', 'courses', 'articles', 'library', 'podcast', 'contact');
+                        foreach ($ee_panel_nav as $ee_pn) :
+                            if (!in_array($ee_pn['key'], $ee_panel_nav_keys, true)) { continue; } ?>
+                            <li><a href="<?php echo esc_url($ee_pn['url']); ?>"><?php echo esc_html($ee_pn['title']); ?></a></li>
+                        <?php endforeach; ?>
                     </ul>
                 </nav>
             </div>
@@ -85,14 +88,14 @@ $current_user_id = get_current_user_id();
                     </svg>
                 </div>
                 <?php if (is_user_logged_in()) : ?>
-                    <a href="/panel" class="btn-primary btn-login mob-hidden">پنل کاربری</a>
+                    <a href="<?php echo esc_url(home_url('/panel')); ?>" class="btn-primary btn-login mob-hidden">پنل کاربری</a>
                 <?php else : ?>
-                    <a href="/login" class="btn-primary btn-login mob-hidden">ورود / ثبت نام</a>
+                    <a href="<?php echo esc_url(home_url('/login')); ?>" class="btn-primary btn-login mob-hidden">ورود / ثبت نام</a>
                 <?php endif; ?>
             </div>
         </div>
         <div class="mobile-header-panel">
-            <a href="/panel">
+            <a href="<?php echo esc_url(home_url('/panel')); ?>">
                 <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9.85833 0.75L14.9167 5.80833L9.85833 10.8667M0.75 5.80833H14.775" stroke="#333333" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
