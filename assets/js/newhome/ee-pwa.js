@@ -37,7 +37,7 @@
                 if (!nw) { return; }
                 nw.addEventListener('statechange', function () {
                     if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-                        toast(cfg.i18n.update, cfg.i18n.reload, function () { nw.postMessage({ type: 'SKIP_WAITING' }); });
+                        toast(cfg.i18n.update, cfg.i18n.reload, function () { userAskedReload = true; nw.postMessage({ type: 'SKIP_WAITING' }); });
                     }
                 });
             });
@@ -47,9 +47,12 @@
     window.addEventListener('load', function () {
         register(cfg.sw).catch(function () { if (cfg.swFallback) { register(cfg.swFallback).catch(function () {}); } });
     });
+    /* فقط وقتی کاربر خودش «به‌روزرسانی» را زده باشد صفحه رفرش شود؛
+       در اولین بازدید (نصب اولیهٔ SW) نباید صفحه ناگهان reload شود. */
     var refreshing = false;
+    var userAskedReload = false;
     navigator.serviceWorker.addEventListener('controllerchange', function () {
-        if (refreshing) { return; }
+        if (refreshing || !userAskedReload) { return; }
         refreshing = true;
         window.location.reload();
     });

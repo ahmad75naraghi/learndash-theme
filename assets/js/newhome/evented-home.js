@@ -119,12 +119,13 @@
         });
     }
 
-    /* ---------- تب‌های مقالات صفحهٔ اصلی ---------- */
-    var tabsWrap = document.getElementById('eeArtTabs');
-    if (tabsWrap) {
-        var tabBtns   = tabsWrap.querySelectorAll('[role="tab"]');
-        var tabPanels = document.querySelectorAll('.ee-art-panel');
-        var activate  = function (btn) {
+    /* ---------- تب‌ها (مقالات و دوره‌های صفحهٔ اصلی) ---------- */
+    document.querySelectorAll('[role="tablist"]').forEach(function (tabsWrap) {
+        var tabBtns = tabsWrap.querySelectorAll('[role="tab"]');
+        if (!tabBtns.length) { return; }
+        var panels = [];
+        tabBtns.forEach(function (b) { var p = document.getElementById(b.getAttribute('aria-controls') || ''); if (p) { panels.push(p); } });
+        var activate = function (btn) {
             tabBtns.forEach(function (b) {
                 var on = b === btn;
                 b.classList.toggle('ee-on', on);
@@ -132,7 +133,9 @@
                 b.setAttribute('tabindex', on ? '0' : '-1');
             });
             var target = btn.getAttribute('aria-controls');
-            tabPanels.forEach(function (p) { p.hidden = p.id !== target; });
+            panels.forEach(function (p) { p.hidden = p.id !== target; });
+            // تب فعال را در نوار اسکرول‌شونده به دید بیاور
+            if (btn.scrollIntoView) { try { btn.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); } catch (e) {} }
         };
         tabBtns.forEach(function (b, i) {
             b.addEventListener('click', function () { activate(b); });
@@ -140,10 +143,12 @@
                 var n = null;
                 if (e.key === 'ArrowLeft')  { n = tabBtns[(i + 1) % tabBtns.length]; }
                 if (e.key === 'ArrowRight') { n = tabBtns[(i - 1 + tabBtns.length) % tabBtns.length]; }
+                if (e.key === 'Home') { n = tabBtns[0]; }
+                if (e.key === 'End') { n = tabBtns[tabBtns.length - 1]; }
                 if (n) { e.preventDefault(); n.focus(); activate(n); }
             });
         });
-    }
+    });
 
     /* ---------- چیپ‌های دسته‌بندی: فقط جابه‌جایی حالت فعال ---------- */
     var chips = document.querySelectorAll('.ee-chip-btn:not([role="tab"])');
@@ -213,6 +218,60 @@
                 play();
             });
         }
+
+        // سوایپ / درگ (لمسی و ماوس) با Pointer Events
+        var drag = { on: false, x0: 0, y0: 0, dx: 0, moved: false, id: null, blockUntil: 0 };
+        var active = function () { return slides[current]; };
+        slider.addEventListener('pointerdown', function (e) {
+            if (e.button !== undefined && e.button !== 0) { return; }
+            if (e.target.closest('.ee-slider-controls')) { return; }
+            drag.on = true; drag.moved = false; drag.x0 = e.clientX; drag.y0 = e.clientY; drag.dx = 0; drag.id = e.pointerId;
+            stop();
+        });
+        slider.addEventListener('pointermove', function (e) {
+            if (!drag.on) { return; }
+            var dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+            if (!drag.moved) {
+                if (Math.abs(dx) < 8) { return; }
+                if (Math.abs(dy) > Math.abs(dx)) { drag.on = false; return; } // اسکرول عمودی
+                drag.moved = true;
+                slider.classList.add('is-dragging');
+                try { slider.setPointerCapture(drag.id); } catch (err) {}
+            }
+            drag.dx = dx;
+            var el = active();
+            if (el) { el.style.transform = 'translateX(' + dx + 'px)'; el.style.opacity = String(Math.max(.35, 1 - Math.abs(dx) / 600)); }
+            e.preventDefault();
+        });
+        var endDrag = function () {
+            if (!drag.on) { return; }
+            drag.on = false;
+            var el = active();
+            slider.classList.remove('is-dragging');
+            if (el) { el.style.transform = ''; el.style.opacity = ''; }
+            if (drag.moved) {
+                var th = Math.min(90, slider.clientWidth * 0.18);
+                if (drag.dx > th) { prev(); }        // کشیدن به راست → قبلی (RTL)
+                else if (drag.dx < -th) { next(); }  // کشیدن به چپ → بعدی
+                // جلوگیری از کلیک لینک بعد از درگ
+                drag.blockUntil = Date.now() + 400;
+            }
+            play();
+        };
+        slider.addEventListener('click', function (ev) {
+            if (drag.blockUntil && Date.now() < drag.blockUntil) { ev.preventDefault(); ev.stopPropagation(); }
+        }, true);
+        slider.addEventListener('dragstart', function (ev) { ev.preventDefault(); });
+        slider.addEventListener('pointerup', endDrag);
+        slider.addEventListener('pointercancel', endDrag);
+        slider.addEventListener('pointerleave', function () { if (drag.on && drag.moved) { endDrag(); } });
+
+        // کیبورد
+        slider.setAttribute('tabindex', '0');
+        slider.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowLeft') { stop(); next(); play(); }
+            if (e.key === 'ArrowRight') { stop(); prev(); play(); }
+        });
 
         // توقف خودکار هنگام هاور
         slider.addEventListener('mouseenter', stop);

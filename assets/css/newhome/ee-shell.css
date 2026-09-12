@@ -90,13 +90,15 @@
 .ee-header > .ee-wrap { padding-block: .8rem; }
 .ee-header-row { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
 @media (max-width: 899.98px) { .ee-header-row { gap: .8rem; } }
-.ee-logo { display: flex; align-items: center; gap: .65rem; flex-shrink: 0; }
+.ee-logo { display: flex; align-items: center; gap: .65rem; flex-shrink: 0; min-width: 0; }
+@media (max-width: 899.98px) { .ee-logo { flex-shrink: 1; } .ee-logo .logo-fallback { font-size: 1rem; } .ee-logo .logo-fallback span, .ee-logo .logo-fallback .ee-logo-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; } }
+.ee-header-row > * { min-width: 0; }
 .ee-logo img, .ee-logo .logo-fallback { height: 44px; width: auto; }
 /* لوگوی انتخابی وردپرس (سفارشی‌سازی ← هویت سایت) در هدر و فوتر */
 .ee-logo .ee-logo-img { display: block; height: 44px; width: auto; max-width: 12rem; object-fit: contain; }
 .ee-f-logo .ee-logo-img { display: block; height: 40px; width: auto; max-width: 10.5rem; object-fit: contain; }
-.ee-logo .logo-fallback { font-weight: 900; color: var(--ee-tealP); display:flex; align-items:center; font-size:1.15rem; gap:.4rem;}
-.ee-logo .logo-fallback svg { width: 30px; height: 30px; }
+.ee-logo .logo-fallback { font-weight: 900; color: var(--ee-tealP); display:flex; align-items:center; font-size:1.15rem; gap:.4rem; min-width:0; max-width:100%; overflow:hidden;}
+.ee-logo .logo-fallback svg { width: 30px; height: 30px; flex-shrink: 0; }
 /* ---------- جستجوی هدر (با فیلتر بخش) ---------- */
 .ee-search { display: none; flex: 1 1 26rem; max-width: 34rem; margin-inline: auto; position: relative; }
 .ee-search input {
@@ -236,7 +238,7 @@
 .ee-fbottom { border-top: 1px solid #1e293b; padding: 1rem .25rem; text-align: center; font-size: .72rem; color: #64748b; }
 
 /* ---------- نوار پایین موبایل ---------- */
-.ee-mnav { position: fixed; bottom: 0; inset-inline: 0; z-index: 70; background: rgb(255 255 255 / .95); backdrop-filter: blur(10px); border-top: 1px solid var(--ee-line); display: flex; justify-content: space-around; padding: .45rem .5rem calc(.45rem + env(safe-area-inset-bottom)); }
+.ee-mnav { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; max-width: 100vw; box-sizing: border-box; z-index: 70; background: rgb(255 255 255 / .95); backdrop-filter: blur(10px); border-top: 1px solid var(--ee-line); display: flex; justify-content: space-around; padding: .45rem .5rem calc(.45rem + env(safe-area-inset-bottom)); }
 .ee-mnav a { display: flex; flex-direction: column; align-items: center; gap: .15rem; font-size: .62rem; font-weight: 700; color: #94a3b8; }
 .ee-mnav a.ee-active, .ee-mnav a:hover { color: var(--ee-tealP); }
 .ee-mnav .ee-mnav-menu { display: flex; flex-direction: column; align-items: center; gap: .15rem; font-size: .62rem; font-weight: 700; color: #94a3b8; background: none; border: 0; font-family: inherit; cursor: pointer; padding: 0; }

@@ -343,8 +343,18 @@ function evented_nav_flush_cache($tabs_too = true)
 	delete_transient('evented_nav_items_v' . EVENTED_NAV_CACHE_VER);
 	if ($tabs_too) {
 		delete_transient('evented_home_tabs_v' . EVENTED_NAV_CACHE_VER);
+		delete_transient('evented_home_course_tabs');
 	}
 }
+
+/* انتشار/ویرایش/حذف دوره → تب‌های دورهٔ صفحهٔ اصلی تازه شود. */
+add_action('save_post_sfwd-courses', function () { delete_transient('evented_home_course_tabs'); });
+add_action('deleted_post', function ($post_id) {
+	if ('sfwd-courses' === get_post_type($post_id)) { delete_transient('evented_home_course_tabs'); }
+});
+add_action('set_object_terms', function ($object_id) {
+	if ('sfwd-courses' === get_post_type($object_id)) { delete_transient('evented_home_course_tabs'); }
+});
 
 /* ---------- ابطال کش: هر تغییری که ساختار منو را عوض کند ---------- */
 add_action('created_term', 'evented_nav_flush_cache');

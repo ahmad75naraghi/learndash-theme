@@ -973,7 +973,7 @@ function evented_logo_html($context = 'header')
 
 	if ('' === $html) {
 		$html = '<span class="logo-fallback"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg> '
-			. esc_html($site_name ? $site_name : 'evented-edu') . '</span>';
+			. '<span class="ee-logo-text">' . esc_html($site_name ? $site_name : 'evented-edu') . '</span></span>';
 	}
 
 	/**

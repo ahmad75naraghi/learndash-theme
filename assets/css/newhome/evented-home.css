@@ -18,6 +18,50 @@
 .ee-hero-feat > .ee-slider,
 .ee-hero-feat > .ee-feature { flex: 1 1 auto; }
 
+/* اسلایدر هیرو: اسلایدها روی هم (grid stack) + سوایپ */
+.ee-slider { display: grid; position: relative; touch-action: pan-y; user-select: none; -webkit-user-select: none; border-radius: var(--ee-r-3xl); }
+.ee-slider.is-dragging { cursor: grabbing; }
+.ee-slider.is-dragging .ee-slide { transition: none; }
+.ee-slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity .45s ease, transform .45s ease; pointer-events: none; }
+.ee-slide.is-active { opacity: 1; visibility: visible; pointer-events: auto; z-index: 1; }
+.ee-slide.is-dragging { transition: none; }
+
+/* کنترل‌های اسلایدر: فلش‌ها روی تصویر (چپ/راست)، نقطه‌ها پایین */
+.ee-slider-controls { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.ee-slide-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%); pointer-events: auto;
+    width: 2.4rem; height: 2.4rem; border-radius: 999px; border: 1px solid rgb(255 255 255 / .35);
+    background: rgb(15 23 42 / .35); color: #fff; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    cursor: pointer; transition: background .15s, opacity .2s; box-shadow: 0 4px 14px rgb(0 0 0 / .18);
+    opacity: .75;
+}
+.ee-slide-arrow-prev { right: .8rem; }
+.ee-slide-arrow-next { left: .8rem; }
+.ee-slider:hover .ee-slide-arrow, .ee-slide-arrow:focus-visible { opacity: 1; }
+.ee-slide-arrow:hover { background: var(--ee-tealP); border-color: var(--ee-tealP); }
+.ee-slider-dots { position: absolute; bottom: .75rem; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: .35rem; pointer-events: auto; padding: .3rem .55rem; border-radius: 999px; background: rgb(15 23 42 / .28); backdrop-filter: blur(6px); }
+.ee-slide-dot {
+    width: .45rem; height: .45rem; border-radius: 999px; border: 0; padding: 0;
+    background: rgb(255 255 255 / .55); cursor: pointer; transition: all .25s;
+}
+.ee-slide-dot.is-active { width: 1.3rem; background: #fff; }
+@media (max-width: 639.98px) {
+    .ee-slide-arrow { width: 2rem; height: 2rem; font-size: 1rem; opacity: .9; }
+    .ee-slide-arrow-prev { right: .5rem; } .ee-slide-arrow-next { left: .5rem; }
+}
+
+/* اسلاید بدون متن: فقط تصویر با لینک */
+.ee-feature .feat-link { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+.ee-feature .feat-link:focus-visible { outline: 3px solid var(--ee-amberA); outline-offset: -3px; }
+.ee-feature.is-bare { background: var(--ee-tealL); }
+.ee-feature .feat-body { padding-bottom: 2.4rem; }
+.ee-feature .feat-body .ee-btn { position: relative; z-index: 2; }
+.ee-btn-glass { background: rgb(255 255 255 / .16); color: #fff; border: 1px solid rgb(255 255 255 / .45); backdrop-filter: blur(6px); }
+.ee-btn-glass:hover { background: rgb(255 255 255 / .92); color: var(--ee-tealP); }
+
+.ee-feature { flex: 1 1 auto; }
+
 /* اسلایدر هیرو: اسلایدها روی هم (grid stack) */
 .ee-slider { display: grid; }
 .ee-slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity .45s ease; pointer-events: none; }
@@ -49,7 +93,7 @@
 }
 .ee-feature .feat-media { position: absolute; inset: 0; }
 .ee-feature .feat-media img { width: 100%; height: 100%; object-fit: cover; }
-.ee-feature .feat-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgb(15 23 42 / .78), rgb(15 23 42 / .25) 45%, transparent); }
+.ee-feature .feat-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgb(15 23 42 / .82), rgb(15 23 42 / .35) 45%, rgb(15 23 42 / .05)); }
 .ee-feature .feat-tags { position: absolute; top: .9rem; right: 1rem; display: flex; gap: .5rem; z-index: 2; }
 .ee-chip { font-size: .7rem; font-weight: 800; padding: .3rem .8rem; border-radius: 999px; }
 .ee-chip-amber { background: var(--ee-amberA); color: #fff; }
@@ -318,3 +362,15 @@
 
 /* چیپ‌های دسته‌بندی دوره‌ها (لینک واقعی به آرشیو دسته) */
 .ee-chips a.ee-chip-btn { display: inline-flex; align-items: center; white-space: nowrap; }
+
+/* ---------- تب‌های دسته‌بندی دوره‌ها (صفحهٔ اصلی) ---------- */
+.ee-crs-tabs { gap: .45rem; padding-bottom: .9rem; }
+.ee-crs-tabs .ee-chip-btn { display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap; cursor: pointer; font-family: inherit; }
+.ee-crs-tabs .ee-chip-btn .ee-chip-n { font-size: .62rem; font-weight: 800; min-width: 1.25rem; height: 1.25rem; padding: 0 .35rem; border-radius: 999px; background: rgb(0 0 0 / .08); display: inline-flex; align-items: center; justify-content: center; }
+.ee-crs-tabs .ee-chip-btn.ee-on .ee-chip-n { background: rgb(255 255 255 / .25); color: #fff; }
+.ee-crs-tabs .ee-chip-btn:focus-visible { outline: 2px solid var(--ee-tealP); outline-offset: 2px; }
+.ee-crs-panel { animation: eeCrsIn .35s ease both; }
+.ee-crs-panel[hidden] { display: none; }
+@keyframes eeCrsIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ee-crs-more { display: flex; justify-content: center; margin-top: 1rem; }
+.ee-crs-more .ee-btn { gap: .4rem; }

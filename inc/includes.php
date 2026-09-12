@@ -9,6 +9,7 @@ require_once get_stylesheet_directory() . '/inc/login.php';
 require_once get_stylesheet_directory() . '/inc/sms.php';
 require_once get_stylesheet_directory() . '/inc/template_helpers.php';
 require_once get_stylesheet_directory() . '/inc/navigation.php';
+require_once get_stylesheet_directory() . '/inc/panel_router.php';
 require_once get_stylesheet_directory() . '/inc/live_search.php';
 require_once get_stylesheet_directory() . '/inc/course_filters.php';
 require_once get_stylesheet_directory() . '/inc/reviews.php';

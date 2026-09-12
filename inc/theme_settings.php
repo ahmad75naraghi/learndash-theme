@@ -94,6 +94,9 @@ function evented_get_home_slides()
             'desc'  => isset($row['desc']) ? (string) $row['desc'] : '',
             'badge' => isset($row['badge']) ? (string) $row['badge'] : '',
             'link'  => isset($row['link']) ? (string) $row['link'] : '',
+            'link_text' => isset($row['link_text']) ? (string) $row['link_text'] : '',
+            'btn2_text' => isset($row['btn2_text']) ? (string) $row['btn2_text'] : '',
+            'btn2_link' => isset($row['btn2_link']) ? (string) $row['btn2_link'] : '',
         );
     }
     return $out;
@@ -126,6 +129,9 @@ function evented_render_theme_settings_page()
             $desc      = isset($row['desc']) ? sanitize_textarea_field(wp_unslash($row['desc'])) : '';
             $badge     = isset($row['badge']) ? sanitize_text_field(wp_unslash($row['badge'])) : '';
             $link      = isset($row['link']) ? esc_url_raw(wp_unslash($row['link'])) : '';
+            $link_text = isset($row['link_text']) ? sanitize_text_field(wp_unslash($row['link_text'])) : '';
+            $btn2_text = isset($row['btn2_text']) ? sanitize_text_field(wp_unslash($row['btn2_text'])) : '';
+            $btn2_link = isset($row['btn2_link']) ? esc_url_raw(wp_unslash($row['btn2_link'])) : '';
 
             if ($id) {
                 $img = wp_get_attachment_image_url($id, 'full');
@@ -135,7 +141,7 @@ function evented_render_theme_settings_page()
             }
             if (!$img) { continue; }
 
-            $saved[] = array('id' => $id, 'image' => $img, 'title' => $title, 'desc' => $desc, 'badge' => $badge, 'link' => $link);
+            $saved[] = array('id' => $id, 'image' => $img, 'title' => $title, 'desc' => $desc, 'badge' => $badge, 'link' => $link, 'link_text' => $link_text, 'btn2_text' => $btn2_text, 'btn2_link' => $btn2_link);
         }
 
         update_option(EVENTED_OPT_SLIDES, $saved, false);
@@ -305,6 +311,9 @@ function evented_slide_row_html($uid, $slide = array())
     $desc      = isset($slide['desc']) ? $slide['desc'] : '';
     $badge     = isset($slide['badge']) ? $slide['badge'] : '';
     $link      = isset($slide['link']) ? $slide['link'] : '';
+    $link_text = isset($slide['link_text']) ? $slide['link_text'] : '';
+    $btn2_text = isset($slide['btn2_text']) ? $slide['btn2_text'] : '';
+    $btn2_link = isset($slide['btn2_link']) ? $slide['btn2_link'] : '';
     $image_id  = isset($slide['id']) ? absint($slide['id']) : 0;
 
     $img_attrs = $image_url
@@ -338,7 +347,7 @@ function evented_slide_row_html($uid, $slide = array())
                     <input type="text" class="widefat evented-slide-badge" name="slides[<?php echo esc_attr($uid); ?>][badge]" value="<?php echo esc_attr($badge); ?>" placeholder="مثلاً: دورهٔ ویژه">
                 </p>
                 <p>
-                    <label>عنوان</label>
+                    <label>عنوان (اختیاری — خالی = بدون متن روی تصویر)</label>
                     <input type="text" class="widefat evented-slide-title" name="slides[<?php echo esc_attr($uid); ?>][title]" value="<?php echo esc_attr($title); ?>" placeholder="عنوان بزرگ اسلایدر">
                 </p>
                 <p>
@@ -346,9 +355,23 @@ function evented_slide_row_html($uid, $slide = array())
                     <textarea class="widefat evented-slide-desc" name="slides[<?php echo esc_attr($uid); ?>][desc]" rows="2" placeholder="یک توضیح کوتاه زیر عنوان..."><?php echo esc_textarea($desc); ?></textarea>
                 </p>
                 <p>
-                    <label>لینک دکمهٔ اسلایدر (اختیاری)</label>
+                    <label>لینک اسلاید (اختیاری — کل اسلاید و دکمهٔ اول به این نشانی می‌روند)</label>
                     <input type="text" dir="ltr" class="widefat evented-slide-link" name="slides[<?php echo esc_attr($uid); ?>][link]" value="<?php echo esc_attr($link); ?>" placeholder="https://…">
                 </p>
+                <div class="evented-slide-2col">
+                    <p>
+                        <label>متن دکمهٔ اول (خالی = بدون دکمه)</label>
+                        <input type="text" class="widefat" name="slides[<?php echo esc_attr($uid); ?>][link_text]" value="<?php echo esc_attr($link_text); ?>" placeholder="مثلاً: مشاهده و شروع">
+                    </p>
+                    <p>
+                        <label>متن دکمهٔ دوم (خالی = بدون دکمه)</label>
+                        <input type="text" class="widefat" name="slides[<?php echo esc_attr($uid); ?>][btn2_text]" value="<?php echo esc_attr($btn2_text); ?>" placeholder="مثلاً: مشاهده همهٔ دوره‌ها">
+                    </p>
+                    <p>
+                        <label>لینک دکمهٔ دوم</label>
+                        <input type="text" dir="ltr" class="widefat" name="slides[<?php echo esc_attr($uid); ?>][btn2_link]" value="<?php echo esc_attr($btn2_link); ?>" placeholder="https://…">
+                    </p>
+                </div>
             </div>
         </div>
         <div class="evented-slide-actions">

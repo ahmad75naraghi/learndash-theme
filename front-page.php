@@ -22,14 +22,25 @@ if (is_wp_error($ee_cats)) {
     $ee_cats = array();
 }
 
-/* ۳) دوره‌های «پیشنهادی» (آخرین دوره‌ها برای شبکهٔ کارت‌ها) */
-$ee_courses_q = new WP_Query(array(
-    'post_type'      => 'sfwd-courses',
-    'posts_per_page' => 8,
-    'no_found_rows'  => true,
-));
-$ee_courses = $ee_courses_q->posts;
-wp_reset_postdata();
+/* ۳) دوره‌ها: تب «همه» (۴ دورهٔ آخر) + هر دستهٔ دوره یک تب با ۴ دوره (کش ۱۲ ساعته) */
+$ee_course_tabs = get_transient('evented_home_course_tabs');
+if (!is_array($ee_course_tabs)) {
+    $ee_course_tabs = array();
+    $ee_tab_q = new WP_Query(array('post_type' => 'sfwd-courses', 'posts_per_page' => 4, 'no_found_rows' => true, 'fields' => 'ids'));
+    $ee_course_tabs[] = array('key' => 'all', 'name' => 'همه', 'ids' => $ee_tab_q->posts, 'link' => '');
+    foreach ($ee_cats as $cat) {
+        $ee_tab_q = new WP_Query(array(
+            'post_type' => 'sfwd-courses', 'posts_per_page' => 4, 'no_found_rows' => true, 'fields' => 'ids',
+            'tax_query' => array(array('taxonomy' => 'ld_course_category', 'field' => 'term_id', 'terms' => (int) $cat->term_id)),
+        ));
+        if (empty($ee_tab_q->posts)) { continue; }
+        $ee_link = get_term_link($cat);
+        $ee_course_tabs[] = array('key' => 'cat-' . (int) $cat->term_id, 'name' => $cat->name, 'count' => (int) $cat->count, 'ids' => $ee_tab_q->posts, 'link' => is_wp_error($ee_link) ? '' : $ee_link);
+    }
+    wp_reset_postdata();
+    set_transient('evented_home_course_tabs', $ee_course_tabs, 12 * HOUR_IN_SECONDS);
+}
+$ee_courses = !empty($ee_course_tabs[0]['ids']) ? array_filter(array_map('get_post', $ee_course_tabs[0]['ids'])) : array();
 
 /* ۴) آخرین مقالات (پست‌های عادی) — یک کوئری، دو مصرف */
 $ee_posts_q = new WP_Query(array(
@@ -84,10 +95,12 @@ foreach ($ee_saved_slides as $s) {
     $ee_feature_slides[] = array(
         'img'       => $slide_img,
         'badge'     => !empty($s['badge']) ? $s['badge'] : '',
-        'title'     => !empty($s['title']) ? $s['title'] : 'دوره‌های تخصصی فناوری اطلاعات',
-        'desc'      => $s['desc'],
-        'link'      => $s['link'],
-        'link_text' => 'مشاهده و شروع',
+        'title'     => !empty($s['title']) ? $s['title'] : '',
+        'desc'      => !empty($s['desc']) ? $s['desc'] : '',
+        'link'      => !empty($s['link']) ? $s['link'] : '',
+        'link_text' => !empty($s['link_text']) ? $s['link_text'] : '',
+        'btn2_text' => !empty($s['btn2_text']) ? $s['btn2_text'] : '',
+        'btn2_link' => !empty($s['btn2_link']) ? $s['btn2_link'] : '',
     );
 }
 
@@ -112,43 +125,60 @@ $ee_slider_mode  = $ee_slide_count > 1;
                         <div class="ee-slider" id="eeSlider" data-count="<?php echo esc_attr($ee_slide_count); ?>">
                     <?php endif; ?>
 
-                    <?php foreach ($ee_feature_slides as $ee_i => $ee_s) : ?>
-                        <div class="ee-feature<?php echo $ee_slider_mode ? ' ee-slide' : ''; ?><?php echo ($ee_slider_mode && $ee_i === 0) ? ' is-active' : ''; ?>"<?php echo $ee_slider_mode ? ' data-index="' . esc_attr($ee_i) . '"' : ''; ?>>
+                    <?php foreach ($ee_feature_slides as $ee_i => $ee_s) :
+                        $ee_has_text = ($ee_s['title'] !== '' || $ee_s['desc'] !== '');
+                        $ee_btn1     = ($ee_s['link'] !== '' && $ee_s['link_text'] !== '');
+                        $ee_btn2     = ($ee_s['btn2_link'] !== '' && $ee_s['btn2_text'] !== '');
+                        $ee_has_body = $ee_has_text || $ee_btn1 || $ee_btn2;
+                        $ee_alt      = $ee_s['title'] !== '' ? $ee_s['title'] : 'اسلاید ' . ($ee_i + 1);
+                    ?>
+                        <div class="ee-feature<?php echo $ee_slider_mode ? ' ee-slide' : ''; ?><?php echo ($ee_slider_mode && $ee_i === 0) ? ' is-active' : ''; ?><?php echo $ee_has_body ? '' : ' is-bare'; ?>"<?php echo $ee_slider_mode ? ' data-index="' . esc_attr($ee_i) . '"' : ''; ?>>
+                            <?php if ($ee_s['link'] !== '') : ?>
+                                <a class="feat-link" href="<?php echo esc_url($ee_s['link']); ?>" aria-label="<?php echo esc_attr($ee_alt); ?>"></a>
+                            <?php endif; ?>
                             <div class="feat-media">
-                                <img src="<?php echo esc_url($ee_s['img']); ?>" alt="<?php echo esc_attr($ee_s['title']); ?>" loading="<?php echo $ee_i === 0 ? 'eager' : 'lazy'; ?>">
-                                <div class="feat-shade"></div>
+                                <img src="<?php echo esc_url($ee_s['img']); ?>" alt="<?php echo esc_attr($ee_alt); ?>" loading="<?php echo $ee_i === 0 ? 'eager' : 'lazy'; ?>" draggable="false">
+                                <?php if ($ee_has_body) : ?><div class="feat-shade"></div><?php endif; ?>
                             </div>
                             <?php if (!empty($ee_s['badge'])) : ?>
                                 <div class="feat-tags">
                                     <span class="ee-chip ee-chip-amber"><?php echo esc_html($ee_s['badge']); ?></span>
                                 </div>
                             <?php endif; ?>
+                            <?php if ($ee_has_body) : ?>
                             <div class="feat-body">
-                                <h1 class="feat-title"><?php echo esc_html($ee_s['title']); ?></h1>
-                                <?php if (!empty($ee_s['desc'])) : ?>
+                                <?php if ($ee_s['title'] !== '') : ?>
+                                    <<?php echo $ee_i === 0 ? 'h1' : 'h2'; ?> class="feat-title"><?php echo esc_html($ee_s['title']); ?></<?php echo $ee_i === 0 ? 'h1' : 'h2'; ?>>
+                                <?php endif; ?>
+                                <?php if ($ee_s['desc'] !== '') : ?>
                                     <p class="feat-desc"><?php echo esc_html($ee_s['desc']); ?></p>
                                 <?php endif; ?>
+                                <?php if ($ee_btn1 || $ee_btn2) : ?>
                                 <div class="feat-cta-row">
-                                    <?php if (!empty($ee_s['link'])) : ?>
-                                        <a class="ee-btn ee-btn-light" href="<?php echo esc_url($ee_s['link']); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg> <?php echo esc_html($ee_s['link_text']); ?></a>
+                                    <?php if ($ee_btn1) : ?>
+                                        <a class="ee-btn ee-btn-solid" href="<?php echo esc_url($ee_s['link']); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-play_circle"></use></svg> <?php echo esc_html($ee_s['link_text']); ?></a>
                                     <?php endif; ?>
-                                    <a class="ee-btn ee-btn-solid" href="#ee-courses">مشاهده همه دوره‌ها</a>
+                                    <?php if ($ee_btn2) : ?>
+                                        <a class="ee-btn ee-btn-glass" href="<?php echo esc_url($ee_s['btn2_link']); ?>"><?php echo esc_html($ee_s['btn2_text']); ?> <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
+                                    <?php endif; ?>
                                 </div>
+                                <?php endif; ?>
                             </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
 
                     <?php if ($ee_slider_mode) : ?>
-                        </div><!-- /.ee-slider -->
                         <div class="ee-slider-controls" id="eeSliderControls">
-                            <button type="button" class="ee-slide-arrow" data-dir="-1" aria-label="اسلاید قبلی"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_right"></use></svg></button>
+                            <button type="button" class="ee-slide-arrow ee-slide-arrow-prev" data-dir="-1" aria-label="اسلاید قبلی"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_right"></use></svg></button>
+                            <button type="button" class="ee-slide-arrow ee-slide-arrow-next" data-dir="1" aria-label="اسلاید بعدی"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg></button>
                             <div class="ee-slider-dots" id="eeSliderDots">
                                 <?php for ($ee_d = 0; $ee_d < $ee_slide_count; $ee_d++) : ?>
                                     <button type="button" class="ee-slide-dot<?php echo $ee_d === 0 ? ' is-active' : ''; ?>" data-go="<?php echo esc_attr($ee_d); ?>" aria-label="اسلاید <?php echo esc_attr($ee_d + 1); ?>"></button>
                                 <?php endfor; ?>
                             </div>
-                            <button type="button" class="ee-slide-arrow" data-dir="1" aria-label="اسلاید بعدی"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg></button>
                         </div>
+                        </div><!-- /.ee-slider -->
                     <?php endif; ?>
 
                 </div>
@@ -219,19 +249,24 @@ $ee_slider_mode  = $ee_slide_count > 1;
                     <span class="ee-count-badge"><?php echo esc_html($ee_course_count); ?> دوره فعال</span>
                 </div>
 
-                <?php if (!empty($ee_cats)) : ?>
-                    <div class="ee-chips">
-                        <a class="ee-chip-btn ee-on" href="<?php echo esc_url($ee_nav('courses')); ?>">همه دوره‌ها</a>
-                        <?php foreach ($ee_cats as $cat) :
-                            $ee_cat_link = get_term_link($cat);
-                            if (is_wp_error($ee_cat_link)) { continue; } ?>
-                            <a class="ee-chip-btn" href="<?php echo esc_url($ee_cat_link); ?>"><?php echo esc_html($cat->name); ?></a>
+                <?php if (count($ee_course_tabs) > 1) : ?>
+                    <div class="ee-chips ee-crs-tabs" id="eeCrsTabs" role="tablist" aria-label="دسته‌بندی دوره‌ها">
+                        <?php foreach ($ee_course_tabs as $ee_ti => $ee_tab) : ?>
+                            <button type="button" class="ee-chip-btn<?php echo 0 === $ee_ti ? ' ee-on' : ''; ?>" role="tab" id="eeCrsTab-<?php echo esc_attr($ee_tab['key']); ?>" aria-controls="eeCrsPanel-<?php echo esc_attr($ee_tab['key']); ?>" aria-selected="<?php echo 0 === $ee_ti ? 'true' : 'false'; ?>" tabindex="<?php echo 0 === $ee_ti ? '0' : '-1'; ?>">
+                                <?php echo esc_html($ee_tab['name']); ?>
+                                <?php if (!empty($ee_tab['count'])) : ?><span class="ee-chip-n"><?php echo esc_html($ee_tab['count']); ?></span><?php endif; ?>
+                            </button>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
 
-                <div class="ee-cgrid" id="eeCourseGrid">
-                    <?php if (!empty($ee_courses)) : foreach ($ee_courses as $c) :
+                <?php foreach ($ee_course_tabs as $ee_ti => $ee_tab) :
+                    $ee_tab_courses = array_filter(array_map('get_post', $ee_tab['ids']));
+                    $ee_more_link   = $ee_tab['link'] ? $ee_tab['link'] : $ee_nav('courses');
+                ?>
+                <div class="ee-crs-panel" id="eeCrsPanel-<?php echo esc_attr($ee_tab['key']); ?>" role="tabpanel" aria-labelledby="eeCrsTab-<?php echo esc_attr($ee_tab['key']); ?>"<?php echo 0 === $ee_ti ? '' : ' hidden'; ?>>
+                <div class="ee-cgrid">
+                    <?php if (!empty($ee_tab_courses)) : foreach ($ee_tab_courses as $c) :
                         $ee_thumb = get_the_post_thumbnail_url($c->ID, 'medium');
                         $ee_price = get_post_meta($c->ID, '_sfwd-courses', true);
                         $ee_ptype = isset($ee_price['sfwd-courses_course_price_type']) ? $ee_price['sfwd-courses_course_price_type'] : '';
@@ -259,7 +294,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                     <?php echo function_exists('evented_rating_badge_html') ? evented_rating_badge_html($c->ID) : ''; // phpcs:ignore ?>
                                 </div>
                                 <div class="cc-foot">
-                                    <span class="cc-lessons"><?php echo $ee_cat_terms ? esc_html(implode('، ', array_slice($ee_cat_terms, 0, 2))) : 'دوره تخصصی'; ?></span>
+                                    <span class="cc-lessons"><?php echo $ee_cat_terms && !is_wp_error($ee_cat_terms) ? esc_html(implode('، ', array_slice($ee_cat_terms, 0, 2))) : 'دوره تخصصی'; ?></span>
                                     <span class="cc-price <?php echo $ee_free ? '' : 'amber'; ?>"><?php echo $ee_free ? 'رایگان' : esc_html(number_format((float) $ee_amount) . ' تومان'); ?></span>
                                 </div>
                             </div>
@@ -268,6 +303,16 @@ $ee_slider_mode  = $ee_slide_count > 1;
                         <div class="ee-empty">هنوز دوره‌ای ثبت نشده است. به‌زودی دوره‌های تخصصی اضافه می‌شوند.</div>
                     <?php endif; ?>
                 </div>
+                <?php if (!empty($ee_tab_courses)) : ?>
+                    <div class="ee-crs-more">
+                        <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url($ee_more_link); ?>">
+                            <?php echo 'all' === $ee_tab['key'] ? 'مشاهدهٔ همهٔ دوره‌ها' : 'همهٔ دوره‌های ' . esc_html($ee_tab['name']); ?>
+                            <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
+                        </a>
+                    </div>
+                <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
 
                 <!-- نوار CTA کهربایی -->
                 <div class="ee-cta-amber">
