@@ -1,0 +1,69 @@
+/* پوستهٔ پنل کاربری evented-edu — گرید، سایدبار، سربرگ، مودال‌ها
+   (محتوای کارت‌ها/جدول‌ها در assets/css/panel.css) */
+
+.ee-panel { padding: 1.25rem 0 3rem; }
+.ee-panel-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
+@media (min-width: 1024px) { .ee-panel-grid { grid-template-columns: 17rem minmax(0, 1fr); gap: 1.25rem; } }
+
+/* سایدبار */
+.ee-panel-side {
+    background: #fff; border: 1px solid var(--ee-line); border-radius: var(--ee-r-2xl);
+    box-shadow: var(--ee-sh-sm); padding: 1rem; position: sticky; top: 5rem;
+}
+.ee-panel-user { display: flex; align-items: center; gap: .7rem; padding-bottom: .9rem; margin-bottom: .6rem; border-bottom: 1px dashed var(--ee-line); }
+.ee-panel-avatar .av { width: 3.2rem; height: 3.2rem; border-radius: 1rem; object-fit: cover; border: 2px solid var(--ee-mint); }
+.ee-panel-user-txt { display: flex; flex-direction: column; min-width: 0; }
+.ee-panel-user-txt strong { font-size: .9rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ee-panel-user-txt span { font-size: .7rem; color: var(--ee-soft); direction: ltr; text-align: right; }
+.ee-panel-nav { display: flex; flex-direction: column; gap: .2rem; }
+.ee-panel-nav-item {
+    display: flex; align-items: center; gap: .6rem; padding: .62rem .75rem; border-radius: .8rem;
+    font-size: .84rem; font-weight: 600; color: var(--ee-ink); background: transparent; border: 0;
+    cursor: pointer; font-family: inherit; text-align: right; width: 100%; transition: background .15s, color .15s;
+}
+.ee-panel-nav-item svg.ee-ic { font-size: 1.25rem; color: var(--ee-soft); }
+.ee-panel-nav-item:hover { background: var(--ee-bg); color: var(--ee-tealP); }
+.ee-panel-nav-item:hover svg.ee-ic { color: var(--ee-tealP); }
+.ee-panel-nav-item.is-active { background: var(--ee-mint); color: var(--ee-tealP); }
+.ee-panel-nav-item.is-active svg.ee-ic { color: var(--ee-tealP); }
+.ee-panel-logout { margin-top: .4rem; border-top: 1px dashed var(--ee-line); border-radius: 0 0 .8rem .8rem; padding-top: .8rem; color: #be123c; }
+.ee-panel-logout svg.ee-ic { color: #be123c; }
+.ee-panel-logout:hover { background: #fff1f2; color: #9f1239; }
+
+/* موبایل: سایدبار به نوار افقی اسکرول‌شونده تبدیل می‌شود */
+@media (max-width: 1023px) {
+    .ee-panel-side { position: static; padding: .75rem; }
+    .ee-panel-user { padding-bottom: .6rem; margin-bottom: .5rem; }
+    .ee-panel-nav { flex-direction: row; overflow-x: auto; gap: .35rem; padding-bottom: .2rem; scrollbar-width: thin; }
+    .ee-panel-nav-item { width: auto; white-space: nowrap; padding: .5rem .7rem; font-size: .78rem; }
+    .ee-panel-logout { margin: 0; border: 0; padding-top: .5rem; border-radius: .8rem; }
+}
+
+/* سربرگ صفحه */
+.ee-panel-main { min-width: 0; display: flex; flex-direction: column; gap: 1.25rem; }
+.ee-panel-head { display: flex; flex-direction: column; gap: .3rem; }
+.ee-panel-title { font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0; }
+.ee-panel-head .ee-crumb { margin: 0; }
+
+/* مودال عمومی */
+.ee-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.ee-modal[hidden] { display: none; }
+.ee-modal-bg { position: absolute; inset: 0; background: rgb(15 23 42 / .55); backdrop-filter: blur(3px); }
+.ee-modal-box {
+    position: relative; background: #fff; border-radius: var(--ee-r-3xl); box-shadow: var(--ee-sh-md);
+    width: min(26rem, 100%); padding: 1.75rem 1.5rem 1.25rem; text-align: center; animation: eeModalIn .2s ease-out;
+}
+@keyframes eeModalIn { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+.ee-modal-x { position: absolute; top: .7rem; left: .7rem; background: var(--ee-bg); border: 0; width: 2rem; height: 2rem; border-radius: 50%; cursor: pointer; color: var(--ee-soft); display: inline-flex; align-items: center; justify-content: center; }
+.ee-modal-ic { width: 3.4rem; height: 3.4rem; border-radius: 1.1rem; background: #fff1f2; color: #be123c; display: inline-flex; align-items: center; justify-content: center; font-size: 1.7rem; margin-bottom: .7rem; }
+.ee-modal-box h3 { font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0 0 .4rem; }
+.ee-modal-box p { font-size: .82rem; color: var(--ee-soft); margin: 0 0 1.1rem; }
+.ee-modal-actions { display: flex; gap: .6rem; justify-content: center; }
+.ee-btn-danger { background: #e11d48; color: #fff; }
+.ee-btn-danger:hover { background: #be123c; }
+
+/* سازگاری محتوای قدیمی پنل با پوستهٔ جدید */
+.ee-panel-main .section-title { color: #0f172a; }
+.ee-panel-main .btn-primary { display: inline-flex; align-items: center; gap: .4rem; background: var(--ee-tealP); color: #fff; border-radius: .8rem; padding: .55rem 1rem; font-weight: 700; font-size: .84rem; }
+.ee-panel-main .overlay, .ee-panel-main .password-modal { position: fixed; inset: 0; z-index: 9998; background: rgb(15 23 42 / .55); display: none; align-items: center; justify-content: center; padding: 1rem; }
+.ee-panel-main .overlay.is-open, .ee-panel-main .password-modal.is-open { display: flex; }

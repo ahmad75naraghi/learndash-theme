@@ -10,14 +10,10 @@
 defined('ABSPATH') || exit;
 
 /**
- * آیا برگهٔ جاری یکی از برگه‌های مستقل (ورود / پنل کاربری) است؟
+ * آیا برگهٔ جاری صفحهٔ مستقل ورود است؟
  *
- * این برگه‌ها طراحی جداگانهٔ خودشان را دارند:
- *  - page-login.php : قالب اسلاگی که HTML کامل صفحهٔ ورود را چاپ می‌کند؛
- *  - page-panel.php : قالب اسلاگی که کاربر را به داشبورد هدایت می‌کند؛
- *  - panel/*.php    : قالب‌های پنل کاربری با هدر/فوتر قدیمی و panel.css.
- *
- * برای این برگه‌ها هیچ‌چیز از پوستهٔ ee-* بارگذاری نمی‌شود.
+ * page-login.php HTML کامل خودش را چاپ می‌کند و پوستهٔ ee-* را نمی‌خواهد.
+ * پنل کاربری (panel/*.php) از نسخهٔ ۲ روی همان پوستهٔ ee-* سوار است.
  *
  * @return bool
  */
@@ -28,18 +24,13 @@ function evented_is_standalone_page()
 	}
 
 	$template = (string) get_page_template_slug();
-
-	/* قالب‌های پنل کاربری (Template Name: Panel - …) و قالب‌های اسلاگی مستقل */
-	if ('' !== $template) {
-		if (0 === strpos($template, 'panel/') || in_array($template, array('page-login.php', 'page-panel.php'), true)) {
-			return true;
-		}
+	if ('page-login.php' === $template) {
+		return true;
 	}
 
-	/* page-login.php / page-panel.php هدر «Template Name» ندارند و با اسلاگ انتخاب می‌شوند */
 	$ee_page = get_queried_object();
 
-	return $ee_page instanceof WP_Post && in_array((string) $ee_page->post_name, array('login', 'panel'), true);
+	return $ee_page instanceof WP_Post && 'login' === (string) $ee_page->post_name;
 }
 
 /**

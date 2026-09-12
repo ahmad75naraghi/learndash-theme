@@ -2,7 +2,7 @@
 /* Template Name: Panel - Account Settings */
 
 if (! is_user_logged_in()) {
-    wp_redirect(add_query_arg('redirect_to', home_url('/panel/settings'), wp_login_url()));
+    wp_safe_redirect(add_query_arg('redirect_to', rawurlencode(home_url('/panel/settings')), home_url('/login')));
     exit;
 }
 
@@ -19,14 +19,7 @@ if (!$has_real_email) {
     $user_email = '';
 }
 
-get_header(); ?>
-<div class="container">
-
-    <!-- Sidebar -->
-    <?php locate_template('panel/sidebar.php', true, false); ?>
-
-    <!-- Main Content -->
-    <main class="main-content">
+get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'settings', 'ee_panel_title' => 'حساب کاربری')); ?>
         <div class="settings-panel">
             <h2 class="section-title">تنظیمات حساب کاربری</h2>
 
@@ -104,8 +97,7 @@ get_header(); ?>
             <div id="settings-msg" style="margin-top: 15px; text-align: center; font-weight: bold; border-radius: 8px; padding: 10px; display: none;"></div>
 
         </div>
-    </main>
-</div>
+    
 <style>
 
 </style>
@@ -159,77 +151,4 @@ get_header(); ?>
         <button class="btn-submit" id="btn-save-password" disabled>تغییر رمز</button>
     </div>
 </div>
-<!-- کدهای جاوااسکریپت و ایجکس -->
-<script>
-    jQuery(document).ready(function($) {
-
-        // ۲. ارسال فرم تنظیمات با ایجکس
-        $('#settings-form').on('submit', function(e) {
-            e.preventDefault();
-
-            var formData = $(this).serialize();
-            var btn = $('#settings-footer .btn-submit');
-            var msgDiv = $('#settings-msg');
-
-            btn.text('در حال ذخیره...').prop('disabled', true);
-
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                type: 'POST',
-                data: formData + '&action=save_account_settings&security=' + $('#settings_nonce').val(),
-                success: function(response) {
-                    if (response.success) {
-                        msgDiv.text(response.data).css({
-                            'color': 'green',
-                            'background': '#e8f5e9'
-                        }).fadeIn();
-
-                        // برگرداندن فیلدها به حالت Readonly
-                        $('#settings-form input').prop('readonly', true);
-                        if ($('input[name="user_password"]').val() !== '') {
-                            $('input[name="user_password"]').val('..........');
-                        }
-                        setTimeout(function() {
-                            $('#settings-footer').slideUp();
-                        }, 1500);
-
-                    } else {
-                        msgDiv.text(response.data || 'خطایی رخ داد!').css({
-                            'color': 'red',
-                            'background': '#ffebee'
-                        }).fadeIn();
-                    }
-                },
-                error: function() {
-                    msgDiv.text('خطای ارتباط با سرور').css({
-                        'color': 'red',
-                        'background': '#ffebee'
-                    }).fadeIn();
-                },
-                complete: function() {
-                    btn.text('ذخیره تغییرات').prop('disabled', false);
-                    setTimeout(function() {
-                        msgDiv.fadeOut();
-                    }, 4000);
-                }
-            });
-        });
-        $('input[type="password"] + .icon-edit').on('click', function(e) {
-            $('.password-modal').fadeIn(200).css('display', 'flex');
-        });
-        // بستن مودال با کلیک روی دکمه انصراف یا ضربدر
-        $('.password-modal .close').on('click', function(e) {
-            e.preventDefault();
-            $('.password-modal').fadeOut(200);
-        });
-
-        // بستن مودال در صورت کلیک روی فضای خالی تیره رنگ (overlay)
-        $('.password-modal').on('click', function(e) {
-            if (e.target === this) {
-                $(this).fadeOut(200);
-            }
-        });
-    });
-</script>
-
-<?php get_footer(); ?>
+<?php get_template_part('template-parts/panel/shell', 'close'); ?>

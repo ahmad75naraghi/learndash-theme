@@ -2,7 +2,7 @@
 /* Template Name: Panel - Dashboard */
 
 if (! is_user_logged_in()) {
-    wp_redirect(add_query_arg('redirect_to', home_url('/panel'), wp_login_url()));
+    wp_safe_redirect(add_query_arg('redirect_to', rawurlencode(home_url('/panel')), home_url('/login')));
     exit;
 }
 
@@ -20,14 +20,7 @@ $transactions_count = (int) $wpdb->get_var( $wpdb->prepare(
 ) );
 
 
-get_header(); ?>
-
-<div class="container">
-
-    <!-- Sidebar -->
-    <?php locate_template('panel/sidebar.php', true, false); ?>
-    <!-- Main Content -->
-    <main class="main-content">
+get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'dashboard', 'ee_panel_title' => 'پیشخوان')); ?>
 
         <!-- Top Stats -->
         <div class="top-stats">
@@ -129,8 +122,6 @@ get_header(); ?>
                 <?php endif; ?>
             </div>
         </div>
-    </main>
+    
 
-</div>
-
-<?php get_footer(); ?>
+<?php get_template_part('template-parts/panel/shell', 'close'); ?>

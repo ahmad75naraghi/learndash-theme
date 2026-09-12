@@ -3,7 +3,7 @@
 
 if (! is_user_logged_in()) {
     // ریدایرکت به صفحه لاگین
-    wp_redirect(add_query_arg('redirect_to', home_url('/panel/certificates'), wp_login_url()));
+    wp_safe_redirect(add_query_arg('redirect_to', rawurlencode(home_url('/panel/certificates')), home_url('/login')));
     exit;
 }
 
@@ -33,14 +33,7 @@ if ( !empty($enrolled_courses) ) {
     }
 }
 
-get_header(); ?>
-<div class="container">
-
-    <!-- Sidebar -->
-    <?php locate_template('panel/sidebar.php', true, false); ?>
-    
-    <!-- Main Content -->
-    <main class="main-content">
+get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'certificates', 'ee_panel_title' => 'گواهینامه‌ها')); ?>
         <div>
 
             <h2 class="section-title">گواهینامه ها</h2>
@@ -98,7 +91,6 @@ get_header(); ?>
 
             </div>
         </div>
-    </main>
-</div>
+    
 
-<?php get_footer(); ?>
+<?php get_template_part('template-parts/panel/shell', 'close'); ?>

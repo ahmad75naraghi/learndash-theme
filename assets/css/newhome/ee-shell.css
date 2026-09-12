@@ -48,7 +48,7 @@
 .ee-wrap { max-width: 80rem; margin-inline: auto; padding-inline: 1.25rem; }
 .ee-ic { display: inline-flex; align-items: center; justify-content: center; }
 
-/* فونت: اول وزیرمتن از گوگل‌فونت؛ در نبود آن دانای محلی */
+/* فونت: وزیرمتن محلی (ee-fonts.css)؛ در نبود آن دانای محلی */
 .ee-home { font-family: "Vazirmatn", "دانا", Tahoma, sans-serif; }
 
 /* ---------- نوار ابزار بالای هدر ---------- */

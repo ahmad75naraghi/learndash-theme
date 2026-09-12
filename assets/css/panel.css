@@ -1,52 +1,8 @@
-:root {
-    --bg-color: #f4f5f7;
-    --white: #ffffff;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-400: #9ca3af;
-    --gray-500: #6b7280;
-    --gray-700: #374151;
-    --gray-800: #1f2937;
-    --gray-900: #111827;
-    --indigo-50: #eef2ff;
-    --indigo-100: #e0e7ff;
-    --indigo-200: #c7d2fe;
-    --indigo-600: #4f46e5;
-    --indigo-700: #4338ca;
-    --indigo-900: #312e81;
-    --orange-100: #ffedd5;
-    --orange-700: #c2410c;
-}
+/* استایل محتوای پنل کاربری (کارت‌ها، جدول‌ها، فرم‌ها)
+   پوستهٔ صفحه (هدر/فوتر/سایدبار/گرید) در newhome/ee-panel.css است. */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Vazirmatn', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--gray-800);
-}
-
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    gap: 1.5rem;
-    align-items: flex-start;
-    padding: 60px 0;
-}
 
 /* Main Content */
-.main-content {
-    width: 75%;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
 
 /* Top Stats */
 .top-stats {
@@ -218,78 +174,13 @@ body {
     flex-flow: column;
     align-items: center;
     width: 100%;
-}
-
-/* Sidebar */
-.sidebar {
-    width: 25%;
-    background-color: var(--white);
-    border-radius: 12px;
-    padding: 1rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    border: 1px solid #DADADA;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.user-greeting {
-    border: 1px solid #BDAAFF;
-    color: #000;
-    font-weight: 500;
-    text-align: center;
-    padding: 0.75rem;
-    border-radius: 6px;
-    margin-bottom: 1rem;
-    font-size: 14px;
-    line-height: 20px;
-}
-
-.user-greeting.active {
-    background-color: #ECE6FF;
-    border: 0;
-}
-
-.nav-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    text-decoration: none;
-    color: #444444;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.2s;
-}
-
-.nav-item svg {
-    width: 24px;
-    height: 24px;
-    color: var(--indigo-600);
-}
-
-.nav-item:hover {
-    background-color: var(--gray-50);
-}
+}/* Sidebar */
 
 .course-grid .no-exist-notice p {
     margin-bottom: 8px;
     color: #696969;
     font-size: 16px;
     line-height: 32px;
-}
-
-.nav-item.active {
-    background-color: #ECE6FF;
-    color: #400BFF;
-    font-weight: 600;
 }
 
 .mt-4 {
@@ -520,7 +411,6 @@ body {
     color: #374151;
     text-align: center;
 }
-
 
 .btn-receipt {
     padding: 8px 15px;
@@ -972,119 +862,11 @@ body {
     text-align: left;
     padding-left: 40px;
     padding-right: 15px;
-}
-
-/**
+}/**
  ** logout Modal Panel
 **/
-.logout-modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 99999;
-    align-items: center;
-    justify-content: center;
-    direction: rtl;
-    backdrop-filter: blur(2px);
-}
-
-.logout-modal-box {
-    background: #ffffff;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    padding: 30px;
-    position: relative;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    font-family: inherit;
-}
-
-.logout-modal-close {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #888;
-    line-height: 1;
-    transition: 0.2s;
-}
-
-.logout-modal-close:hover {
-    color: #333;
-}
-
-.logout-modal-content {
-    margin-bottom: 25px;
-    margin-top: 5px;
-}
-
-.logout-modal-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #111;
-    margin-bottom: 12px;
-}
-
-.logout-modal-desc {
-    font-size: 13px;
-    color: #666;
-    line-height: 1.8;
-    margin: 0;
-}
-
-.logout-modal-actions {
-    display: flex;
-    gap: 15px;
-    justify-content: flex-end;
-    /* در چینش راست‌چین (RTL)، دکمه‌ها را به سمت چپ می‌برد */
-}
-
-.logout-modal-confirm {
-    background-color: #0b2545;
-    /* رنگ سورمه‌ای تیره دقیقاً مثل عکس */
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 24px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: bold;
-    font-family: inherit;
-    transition: background 0.2s;
-}
-
-.logout-modal-confirm:hover {
-    background-color: #081d36;
-}
-
-.logout-modal-cancel {
-    background-color: #ffffff;
-    color: #0b2545;
-    border: 1px solid #0b2545;
-    border-radius: 6px;
-    padding: 10px 24px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: bold;
-    font-family: inherit;
-    transition: background 0.2s;
-}
-
-.logout-modal-cancel:hover {
-    background-color: #f8f9fa;
-}
 
 @media (max-width: 768px) {
-    .page-template header.site-header {
-        padding: 16px 16px;
-    }
 
     .page-template-panel .mobile-header-panel {
         display: flex;
@@ -1368,7 +1150,6 @@ h2 {
     }
 }
 
-
 /* ---------------------------------
 حالت موفقیت (Success - رنگ سبز)
 --------------------------------- */
@@ -1411,9 +1192,7 @@ h2 {
     transform: rotate(42deg);
 }
 @media (max-width: 1200px){
-    .container {
-    padding: 60px 16px;
-}
+
 }
 @media (max-width: 990px){
    .certificates-container .card {
@@ -1513,31 +1292,6 @@ h2 {
  }
  
 @media (max-width: 600px) {
-    .page-template .container {
-        padding: 10px 0;
-        flex-direction: column;
-        background-color: #fff;
-    }
-
-    .sidebar {
-        display: none;
-    }
-
-    .page-template-paneldashboard-php .sidebar {
-        width: 100%;
-        border-radius: 0;
-        padding: 1rem;
-        border: 0;
-        display: flex;
-        flex-direction: column;
-    }
-
-
-    .main-content {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-    }
 
     .top-stats {
         padding: 8px;
@@ -1570,9 +1324,7 @@ h2 {
         overflow-x: auto;
         grid-template-columns: none !important;
     }
-    body {
-        background-color: #ffffff;
-    }
+
     
 .horizontal-grid {
     grid-template-columns: repeat(1, 1fr);
@@ -1621,7 +1373,6 @@ h2 {
   flex-wrap: wrap;
   gap: 6px;
 }
-
 
 .get-certificate {
     padding: 8px 8px;
