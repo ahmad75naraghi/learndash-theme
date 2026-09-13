@@ -10,7 +10,7 @@
 
 | محل | مشکل | ریسک | راه‌حل |
 |---|---|---|---|
-| `header.php` (لوگو)، `footer.php` (لوگو/نمادها)، `front-page.php`، `single-sfwd-courses.php`، `inc/meta_functions.php` (آواتار پیش‌فرض)، `page-panel.php` + `panel/*.php` (ریدایرکت‌ها)، `style.css` (سطر ~۳۰۳) | آدرس‌های مطلق `https://edu.falnic.com/wp-content/themes/edu-falnic/...` و `/wp-content/themes/edu-falnic/...` | اجرا در لوکال/دامنهٔ جدید می‌شکند (تصویر/ریدایرکت خراب) | جایگزینی با `get_template_directory_uri()` / `home_url()`؛ تعریف ثابت `FALNIC_*` در wp-config |
+| ~~هاردکد دامنه~~ | ✅ برطرف شد — هیچ آدرس `edu.falnic.com`/`edu-falnic` در کد نیست؛ `bin/lint.sh` در CI آن را چک می‌کند | — | — |
 | `inc/sms.php` | اعتبارنامهٔ پیامک (username/password/bodyId) در سورس | افشای راز در Git | خواندن از ثابت wp-config؛ fallback برای لوکال |
 | `inc/login.php` | `session_start()` بدون نام و تنظیمات امن | Session fixation/محتوای پیش‌فرض | سشن با `session_set_cookie_params` امن یا حذف و جایگزینی |
 

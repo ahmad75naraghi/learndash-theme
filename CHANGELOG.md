@@ -18,6 +18,7 @@
 ## [Unreleased]
 
 ### Added
+- CI: `.github/workflows/lint.yml` + `bin/lint.sh` (php -l در PHP 7.4/8.1/8.3، `node --check`، توازن آکولاد CSS، منع دامنهٔ قدیمی و تگ‌های خارجی).
 - `screenshot.png` واقعی ۱۲۰۰×۹۰۰ برای پوسته.
 - کلاس‌های ابزاری `ee-u-*` در `ee-shell.css` (جایگزین استایل‌های inline).
 
