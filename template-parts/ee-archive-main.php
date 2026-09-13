@@ -89,22 +89,40 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 					echo esc_html(sprintf(_n('%s نوشته', '%s نوشته', $ee_arch_count, 'evented-edu'), number_format_i18n($ee_arch_count)));
 					?>
 				</span>
-				<?php if (is_search()) : ?>
-					<a class="ee-arch-link" href="<?php echo esc_url($ee_blog_url); ?>">
-						<?php esc_html_e('همهٔ نوشته‌ها', 'evented-edu'); ?>
-						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
-					</a>
-				<?php endif; ?>
+				<?php
+				/* فیلتر سریع تاریخ */
+				$ee_range   = isset($_GET['range']) ? sanitize_key(wp_unslash($_GET['range'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+				$ee_ranges  = array('' => __('همهٔ زمان‌ها', 'evented-edu'), 'week' => __('این هفته', 'evented-edu'), 'month' => __('این ماه', 'evented-edu'), 'year' => __('امسال', 'evented-edu'));
+				?>
+				<nav class="ee-arch-range" aria-label="<?php esc_attr_e('فیلتر تاریخ', 'evented-edu'); ?>">
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg>
+					<?php foreach ($ee_ranges as $ee_rk => $ee_rl) : ?>
+						<a class="<?php echo $ee_rk === $ee_range ? 'is-on' : ''; ?>" href="<?php echo esc_url('' === $ee_rk ? remove_query_arg(array('range', 'paged')) : add_query_arg('range', $ee_rk, remove_query_arg('paged'))); ?>"><?php echo esc_html($ee_rl); ?></a>
+					<?php endforeach; ?>
+				</nav>
 			</div>
+			<?php if (is_search()) : ?>
+				<form class="ee-arch-search" role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
+					<label class="screen-reader-text" for="ee-arch-s"><?php esc_html_e('جستجو', 'evented-edu'); ?></label>
+					<input id="ee-arch-s" type="search" name="s" value="<?php echo esc_attr(get_search_query()); ?>" placeholder="<?php esc_attr_e('عبارت دیگری جست‌وجو کنید…', 'evented-edu'); ?>">
+					<?php if ('' !== $ee_search_scope) : ?><input type="hidden" name="post_type" value="<?php echo esc_attr($ee_search_scope); ?>"><?php endif; ?>
+					<button type="submit" class="ee-btn ee-btn-primary"><?php esc_html_e('جستجو', 'evented-edu'); ?></button>
+				</form>
+			<?php endif; ?>
 		</header>
 
 		<?php if (is_search() && !empty($ee_search_scopes)) : ?>
 			<!-- چیپ‌های «بخش» جستجو -->
 			<nav class="ee-arch-chips" aria-label="<?php esc_attr_e('محدودهٔ جستجو', 'evented-edu'); ?>">
-				<?php foreach ($ee_search_scopes as $ee_sc_val => $ee_sc_label) :
+				<?php
+				$ee_scope_counts = function_exists('evented_search_scope_counts') ? evented_search_scope_counts(get_search_query(false)) : array();
+				foreach ($ee_search_scopes as $ee_sc_val => $ee_sc_label) :
 					$ee_sc_url = add_query_arg(array('s' => get_search_query(false), 'post_type' => $ee_sc_val), home_url('/'));
-					if ('' === $ee_sc_val) { $ee_sc_url = remove_query_arg('post_type', $ee_sc_url); } ?>
-					<a class="ee-chip-btn<?php echo $ee_sc_val === $ee_search_scope ? ' ee-on' : ''; ?>" href="<?php echo esc_url($ee_sc_url); ?>"><?php echo esc_html($ee_sc_label); ?></a>
+					if ('' === $ee_sc_val) { $ee_sc_url = remove_query_arg('post_type', $ee_sc_url); }
+					$ee_sc_n = isset($ee_scope_counts[$ee_sc_val]) ? (int) $ee_scope_counts[$ee_sc_val] : -1;
+					if ('' !== $ee_sc_val && 0 === $ee_sc_n) { continue; } ?>
+					<a class="ee-chip-btn<?php echo $ee_sc_val === $ee_search_scope ? ' ee-on' : ''; ?>" href="<?php echo esc_url($ee_sc_url); ?>"><?php echo esc_html($ee_sc_label); ?><?php if ($ee_sc_n >= 0) : ?><span class="ee-chip-count"><?php echo esc_html(number_format_i18n($ee_sc_n)); ?></span><?php endif; ?></a>
 				<?php endforeach; ?>
 			</nav>
 		<?php elseif (!empty($ee_arch_cats)) : ?>
@@ -124,11 +142,19 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 
 		<?php if (have_posts()) : ?>
 
+			<?php if (is_search() && 'sfwd-courses' === $ee_search_scope && function_exists('evented_catalog_card_html')) : ?>
+				<!-- نتایج دوره‌ها با کارت واحد دوره -->
+				<?php get_template_part('template-parts/lms/course', 'grid', array('ee_posts' => $GLOBALS['wp_query']->posts)); ?>
+			<?php else : ?>
 			<!-- شبکهٔ کارت نوشته‌ها -->
 			<div class="ee-arch-cards">
 				<?php
 				while (have_posts()) :
 					the_post();
+					if ('sfwd-courses' === get_post_type() && function_exists('evented_catalog_card_html')) {
+						echo '<div class="ee-cgrid-v2 is-inline">' . evented_catalog_card_html(evented_catalog_card_data(get_the_ID())) . '</div>'; // phpcs:ignore
+						continue;
+					}
 
 					$ee_id       = get_the_ID();
 					$ee_p_cats   = get_the_category($ee_id);
@@ -186,41 +212,33 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 					</article>
 				<?php endwhile; ?>
 			</div>
+			<?php endif; ?>
 
 			<!-- صفحه‌بندی -->
-			<?php
-			$ee_pager = paginate_links(array(
-				'type'      => 'array',
-				'prev_text' => '<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_forward"></use></svg>',
-				'next_text' => '<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>',
-			));
-			?>
-			<?php if (!empty($ee_pager)) : ?>
-				<nav class="ee-pager" aria-label="<?php esc_attr_e('صفحه‌بندی', 'evented-edu'); ?>">
-					<?php foreach ($ee_pager as $ee_page_link) : ?>
-						<?php echo wp_kses_post($ee_page_link); ?>
-					<?php endforeach; ?>
-				</nav>
-			<?php endif; ?>
+			<?php echo function_exists('evented_pagination') ? evented_pagination($GLOBALS['wp_query']) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 
 		<?php else : ?>
 
 			<!-- چیزی پیدا نشد -->
-			<section class="ee-noresult">
-				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search_off"></use></svg>
-				<h2><?php esc_html_e('موردی یافت نشد', 'evented-edu'); ?></h2>
-				<p><?php esc_html_e('با عبارت دیگری جستجو کنید یا از دسته‌بندی‌های بالا استفاده نمایید.', 'evented-edu'); ?></p>
-				<form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
-					<div class="ee-search-inline">
-						<label class="screen-reader-text" for="ee-noresult-s"><?php esc_html_e('جستجو', 'evented-edu'); ?></label>
-						<input id="ee-noresult-s" type="search" name="s" value="<?php echo esc_attr(get_search_query()); ?>" placeholder="<?php esc_attr_e('جستجو…', 'evented-edu'); ?>">
-						<?php if ('' !== $ee_search_scope) : ?><input type="hidden" name="post_type" value="<?php echo esc_attr($ee_search_scope); ?>"><?php endif; ?>
-						<button type="submit" aria-label="<?php esc_attr_e('جستجو', 'evented-edu'); ?>">
-							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
-						</button>
-					</div>
-				</form>
-			</section>
+			<?php
+			$ee_es_actions = array();
+			if (is_search()) {
+				if ('' !== $ee_search_scope) { $ee_es_actions[] = array('label' => __('جست‌وجو در همه‌جا', 'evented-edu'), 'url' => add_query_arg('s', get_search_query(false), home_url('/')), 'primary' => true); }
+				$ee_es_actions[] = array('label' => __('مشاهدهٔ دوره‌ها', 'evented-edu'), 'url' => function_exists('evented_nav_url') ? evented_nav_url('sfwd-courses') : $ee_blog_url, 'primary' => empty($ee_es_actions));
+				$ee_es_actions[] = array('label' => __('همهٔ نوشته‌ها', 'evented-edu'), 'url' => $ee_blog_url);
+			} else {
+				if ('' !== $ee_range) { $ee_es_actions[] = array('label' => __('همهٔ زمان‌ها', 'evented-edu'), 'url' => remove_query_arg('range'), 'primary' => true); }
+				$ee_es_actions[] = array('label' => __('همهٔ نوشته‌ها', 'evented-edu'), 'url' => $ee_blog_url, 'primary' => empty($ee_es_actions));
+			}
+			if (function_exists('evented_empty_state')) {
+				echo evented_empty_state(array( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					'title'   => is_search() ? sprintf(__('برای «%s» چیزی پیدا نشد', 'evented-edu'), get_search_query()) : __('موردی یافت نشد', 'evented-edu'),
+					'text'    => is_search() ? __('املای عبارت را بررسی کنید، از کلمات کلی‌تر استفاده کنید یا بخش دیگری را انتخاب کنید.', 'evented-edu') : __('در این بازه یا دسته مطلبی منتشر نشده است.', 'evented-edu'),
+					'icon'    => 'search_off',
+					'actions' => $ee_es_actions,
+				));
+			}
+			?>
 
 		<?php endif; ?>
 

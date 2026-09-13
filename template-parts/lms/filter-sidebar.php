@@ -113,8 +113,9 @@ $ee_icons = array('level' => 'signal_cellular_alt', 'price' => 'sell', 'status' 
 			<?php endforeach; ?>
 
 			<!-- مدرس + مرتب‌سازی (select) -->
+			<?php $ee_lock_instr = !empty($args['ee_lock_instructor']); ?>
 			<?php foreach (array('instructor', 'orderby') as $ee_k) :
-				if (empty($ee_defs[$ee_k])) { continue; }
+				if (empty($ee_defs[$ee_k]) || ('instructor' === $ee_k && $ee_lock_instr)) { continue; }
 				$ee_d = $ee_defs[$ee_k];
 				?>
 				<div class="ee-fside-box">

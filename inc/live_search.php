@@ -22,7 +22,7 @@ add_action('wp_enqueue_scripts', static function () {
 		return;
 	}
 	wp_enqueue_style('ee-live-search', PATH_DIR_URL . '/assets/css/newhome/ee-live-search.css', array('ee-shell'), '1.0.0');
-	wp_enqueue_script('ee-live-search', PATH_DIR_URL . '/assets/js/newhome/ee-live-search.js', array(), '1.0.0', true);
+	wp_enqueue_script('ee-live-search', PATH_DIR_URL . '/assets/js/newhome/ee-live-search.js', array(), '1.1.0', true);
 	wp_localize_script('ee-live-search', 'eeLiveSearch', array(
 		'endpoint' => esc_url_raw(rest_url('evented/v1/search')),
 		'nonce'    => wp_create_nonce('wp_rest'),

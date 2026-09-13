@@ -31,7 +31,7 @@ $ee_panel_menu = array(
 );
 $ee_panel_menu = apply_filters('evented_panel_menu', $ee_panel_menu);
 ?>
-<main class="ee-panel">
+<main id="ee-main" class="ee-panel">
 	<div class="ee-wrap ee-panel-grid">
 
 		<aside class="ee-panel-side" aria-label="منوی پنل کاربری">

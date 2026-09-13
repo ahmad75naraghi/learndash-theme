@@ -53,7 +53,7 @@ while (have_posts()) :
 	$ee_webinar_active = (string) get_post_meta($ee_course_id, '_webinar_active', true);
 	?>
 
-	<main class="ee-lms-main">
+	<main id="ee-main" class="ee-lms-main">
 		<div class="ee-wrap ee-lms-grid">
 
 			<article id="course-<?php echo esc_attr($ee_course_id); ?>" <?php post_class('ee-course-card'); ?>>

@@ -21,7 +21,7 @@ $ee_title  = '' !== $ee_search
 	: __('همهٔ دوره‌های آموزشی', 'evented-edu');
 ?>
 
-<main class="ee-list-main">
+<main id="ee-main" class="ee-list-main">
 	<div class="ee-wrap ee-list-grid is-filter">
 
 		<div class="ee-list-col">
@@ -46,6 +46,7 @@ $ee_title  = '' !== $ee_search
 				</div>
 			</header>
 
+			<?php echo function_exists('evented_results_toolbar') ? evented_results_toolbar($ee_total) : ''; // phpcs:ignore ?>
 			<?php if (function_exists('evented_course_filter_chips')) { evented_course_filter_chips(); } ?>
 
 			<?php

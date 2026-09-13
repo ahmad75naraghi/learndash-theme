@@ -43,7 +43,7 @@ $ee_posts  = isset($wp_query->posts) && is_array($wp_query->posts) ? $wp_query->
 $ee_total  = isset($wp_query->found_posts) ? (int) $wp_query->found_posts : count($ee_posts);
 ?>
 
-<main class="ee-list-main">
+<main id="ee-main" class="ee-list-main">
 	<div class="ee-wrap ee-list-grid is-filter">
 
 		<div class="ee-list-col">
@@ -95,6 +95,7 @@ $ee_total  = isset($wp_query->found_posts) ? (int) $wp_query->found_posts : coun
 			<?php endif; ?>
 
 			<!-- گرید دوره‌ها -->
+			<?php echo function_exists('evented_results_toolbar') ? evented_results_toolbar($ee_total) : ''; // phpcs:ignore ?>
 			<?php if (function_exists('evented_course_filter_chips')) { evented_course_filter_chips(); } ?>
 
 			<?php

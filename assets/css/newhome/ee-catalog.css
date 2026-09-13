@@ -219,3 +219,20 @@ a.ee-cat-chip:hover i { background: #fff; }
     .ee-ct-title em::after { transform: none; }
     .ee-cat-play { opacity: 1; transform: none; }
 }
+
+/* --- کارت واحد در فهرست‌ها (بایگانی/دسته/مدرس) --- */
+.ee-cgrid-v2 {
+    --ct-t1: var(--ee-tealP);   --ct-t1-l: var(--ee-tealL);  --ct-t1-m: #B2DFDB;
+    --ct-t2: #C2410C;           --ct-t2-l: var(--ee-peachL); --ct-t2-m: var(--ee-peachMd);
+    --ct-t3: var(--ee-lavD);    --ct-t3-l: var(--ee-lavL);   --ct-t3-m: #E9D5FF;
+    --ct-t4: #BE185D;           --ct-t4-l: var(--ee-roseL);  --ct-t4-m: #FBCFE8;
+    --ct-t5: #0369A1;           --ct-t5-l: #E0F2FE;          --ct-t5-m: #BAE6FD;
+    --ct-t0: var(--ee-mintDk);  --ct-t0-l: var(--ee-mint);   --ct-t0-m: var(--ee-mintMd);
+}
+.ee-cgrid-v2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+@media (min-width: 560px) { .ee-cgrid-v2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .ee-cgrid-v2 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.ee-cat-prog { height: .35rem; border-radius: 999px; background: #e2e8f0; overflow: hidden; margin-top: .6rem; }
+.ee-cat-prog span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(to left, var(--ee-teal), var(--ee-tealP)); }
+.ee-cat-price.is-joined { align-items: center; color: var(--ee-mintDk); background: var(--ee-mint); }
+.ee-cat-price.is-joined .ee-ic { font-size: .95rem; }

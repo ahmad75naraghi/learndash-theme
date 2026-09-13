@@ -1114,7 +1114,8 @@ function evented_courses_query($args = array())
 }
 
 /**
- * صفحه‌بندی با paginate_links (RTL و کلاس‌های ee-*).
+ * صفحه‌بندی با paginate_links (RTL و کلاس‌های ee-*) — نسخهٔ ۲:
+ * قبلی/بعدی با برچسب، «صفحهٔ X از Y»، در موبایل فقط قبلی/بعدی + شماره.
  *
  * @param WP_Query $query کوئری جاری.
  * @return string
@@ -1131,25 +1132,121 @@ function evented_pagination($query)
 	}
 
 	$current = max(1, (int) get_query_var('paged'), (int) get_query_var('page'));
+	$fa      = function_exists('evented_fa_digits') ? 'evented_fa_digits' : 'strval';
 
 	$links = paginate_links(array(
 		'total'     => $total,
 		'current'   => $current,
 		'type'      => 'array',
-		'prev_text' => '<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_right"></use></svg>',
-		'next_text' => '<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>',
+		'mid_size'  => 1,
+		'end_size'  => 1,
+		'prev_next' => false,
 	));
 
 	if (empty($links)) {
 		return '';
 	}
 
-	$out = '<nav class="ee-pager" aria-label="' . esc_attr__('صفحه‌بندی', 'evented-edu') . '">';
+	$prev = $current > 1 ? get_pagenum_link($current - 1) : '';
+	$next = $current < $total ? get_pagenum_link($current + 1) : '';
+
+	$out  = '<nav class="ee-pager v2" aria-label="' . esc_attr__('صفحه‌بندی', 'evented-edu') . '">';
+	$out .= $prev
+		? '<a class="ee-pager-btn is-prev" href="' . esc_url($prev) . '" rel="prev"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_forward"></use></svg><span>' . esc_html__('قبلی', 'evented-edu') . '</span></a>'
+		: '<span class="ee-pager-btn is-prev is-off" aria-disabled="true"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_forward"></use></svg><span>' . esc_html__('قبلی', 'evented-edu') . '</span></span>';
+	$out .= '<div class="ee-pager-nums">';
 	foreach ($links as $link) {
 		$out .= str_replace('page-numbers', 'ee-page-num', (string) $link);
 	}
+	$out .= '</div>';
+	/* translators: 1: صفحهٔ فعلی 2: تعداد صفحات */
+	$out .= '<span class="ee-pager-of">' . esc_html(sprintf(__('صفحهٔ %1$s از %2$s', 'evented-edu'), $fa($current), $fa($total))) . '</span>';
+	$out .= $next
+		? '<a class="ee-pager-btn is-next" href="' . esc_url($next) . '" rel="next"><span>' . esc_html__('بعدی', 'evented-edu') . '</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>'
+		: '<span class="ee-pager-btn is-next is-off" aria-disabled="true"><span>' . esc_html__('بعدی', 'evented-edu') . '</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></span>';
 	$out .= '</nav>';
 
+	return $out;
+}
+
+/**
+ * حالت خالی یکدست (تصویر + عنوان + توضیح + دکمه‌ها).
+ *
+ * @param array $args {
+ *   @type string $title   عنوان.
+ *   @type string $text    توضیح.
+ *   @type string $icon    نام آیکن اسپرایت (پیش‌فرض search_off).
+ *   @type array  $actions آرایه‌ای از ['label'=>..., 'url'=>..., 'primary'=>bool].
+ *   @type string $class   کلاس اضافه.
+ * }
+ * @return string
+ */
+function evented_empty_state($args = array())
+{
+	$a = wp_parse_args($args, array(
+		'title'   => __('چیزی پیدا نشد', 'evented-edu'),
+		'text'    => '',
+		'icon'    => 'search_off',
+		'actions' => array(),
+		'class'   => '',
+	));
+	$out  = '<div class="ee-empty-state ' . esc_attr($a['class']) . '">';
+	$out .= '<span class="ee-es-art" aria-hidden="true">';
+	$out .= '<svg class="ee-es-bg" viewBox="0 0 200 120" fill="none"><ellipse cx="100" cy="106" rx="78" ry="8" fill="#E0F2F1"/><circle cx="46" cy="38" r="10" fill="#F3E8FF"/><circle cx="160" cy="26" r="6" fill="#FFEDD5"/><circle cx="172" cy="70" r="4" fill="#D1FAE5"/><path d="M28 78c10-24 40-32 66-24" stroke="#B2DFDB" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 8"/><rect x="62" y="30" width="76" height="60" rx="14" fill="#fff" stroke="#B2DFDB" stroke-width="2.5"/><rect x="76" y="46" width="48" height="6" rx="3" fill="#E2E8F0"/><rect x="76" y="60" width="34" height="6" rx="3" fill="#E2E8F0"/><rect x="76" y="74" width="20" height="6" rx="3" fill="#E2E8F0"/></svg>';
+	$out .= '<span class="ee-es-ic">' . ee_icon($a['icon']) . '</span></span>'; // phpcs:ignore
+	$out .= '<h3 class="ee-es-title">' . esc_html($a['title']) . '</h3>';
+	if ('' !== $a['text']) {
+		$out .= '<p class="ee-es-text">' . esc_html($a['text']) . '</p>';
+	}
+	if (!empty($a['actions'])) {
+		$out .= '<div class="ee-es-actions">';
+		foreach ((array) $a['actions'] as $act) {
+			if (empty($act['url']) || empty($act['label'])) {
+				continue;
+			}
+			$out .= '<a class="ee-btn ' . (!empty($act['primary']) ? 'ee-btn-primary' : 'ee-btn-ghost') . '" href="' . esc_url($act['url']) . '">' . esc_html($act['label']) . '</a>';
+		}
+		$out .= '</div>';
+	}
+	$out .= '</div>';
+	return $out;
+}
+
+/**
+ * نوار ابزار بالای فهرست نتایج: «نمایش X دوره» + مرتب‌سازی جمع‌وجور.
+ *
+ * @param int    $total تعداد کل.
+ * @param string $unit  واحد (دوره/نوشته).
+ * @return string
+ */
+function evented_results_toolbar($total, $unit = '')
+{
+	$fa   = function_exists('evented_fa_digits') ? 'evented_fa_digits' : 'strval';
+	$unit = '' !== $unit ? $unit : __('دوره', 'evented-edu');
+	$out  = '<div class="ee-rtb">';
+	/* translators: 1: تعداد 2: واحد */
+	$out .= '<span class="ee-rtb-n">' . ee_icon('grid_view') . ' ' . esc_html(sprintf(__('نمایش %1$s %2$s', 'evented-edu'), $fa((int) $total), $unit)) . '</span>'; // phpcs:ignore
+	if (function_exists('evented_course_filter_defs')) {
+		$defs = evented_course_filter_defs();
+		$vals = evented_course_filter_values();
+		if (isset($defs['orderby'])) {
+			$out .= '<form class="ee-rtb-sort" method="get" action="' . esc_url(function_exists('evented_course_filter_base_url') ? evented_course_filter_base_url() : '') . '" data-ee-rtb-sort>';
+			foreach ($vals as $k => $v) {
+				if ('orderby' !== $k && '' !== $v) {
+					$out .= '<input type="hidden" name="' . esc_attr($k) . '" value="' . esc_attr($v) . '">';
+				}
+			}
+			if ('' !== get_search_query()) {
+				$out .= '<input type="hidden" name="s" value="' . esc_attr(get_search_query()) . '">';
+			}
+			$out .= '<label>' . ee_icon('sort') . '<span class="screen-reader-text">' . esc_html__('مرتب‌سازی', 'evented-edu') . '</span><select name="orderby">'; // phpcs:ignore
+			foreach ($defs['orderby']['options'] as $ok => $ol) {
+				$out .= '<option value="' . esc_attr($ok) . '"' . selected($vals['orderby'], $ok, false) . '>' . esc_html($ol) . '</option>';
+			}
+			$out .= '</select>' . ee_icon('expand_more') . '</label></form>'; // phpcs:ignore
+		}
+	}
+	$out .= '</div>';
 	return $out;
 }
 

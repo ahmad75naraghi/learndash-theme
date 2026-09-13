@@ -22,8 +22,8 @@ while (have_posts()) :
 		: array('items' => array(), 'total' => 0, 'pages' => 0, 'current' => 1);
 	?>
 
-	<main class="ee-list-main">
-		<div class="ee-wrap ee-list-grid">
+	<main id="ee-main" class="ee-list-main">
+		<div class="ee-wrap ee-list-grid is-filter">
 
 			<div class="ee-list-col">
 
@@ -104,12 +104,12 @@ while (have_posts()) :
 						</nav>
 					<?php endif; ?>
 				<?php else : ?>
-					<p class="ee-empty"><?php esc_html_e('مدرسی برای نمایش یافت نشد.', 'evented-edu'); ?></p>
+					<?php echo function_exists('evented_empty_state') ? evented_empty_state(array('title' => __('مدرسی برای نمایش یافت نشد', 'evented-edu'), 'icon' => 'person', 'actions' => array(array('label' => __('مشاهدهٔ دوره‌ها', 'evented-edu'), 'url' => evented_nav_url('sfwd-courses'), 'primary' => true)))) : '<p class="ee-empty">' . esc_html__('مدرسی برای نمایش یافت نشد.', 'evented-edu') . '</p>'; // phpcs:ignore ?>
 				<?php endif; ?>
 
 			</div>
 
-			<?php get_template_part('template-parts/lms/courses', 'sidebar'); ?>
+			<?php get_template_part('template-parts/lms/filter', 'sidebar'); ?>
 
 		</div>
 	</main>

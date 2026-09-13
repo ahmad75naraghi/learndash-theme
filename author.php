@@ -52,8 +52,8 @@ $ee_social_icons = array(
 );
 ?>
 
-<main class="ee-list-main">
-	<div class="ee-wrap ee-list-grid">
+<main id="ee-main" class="ee-list-main">
+	<div class="ee-wrap ee-list-grid is-filter">
 
 		<div class="ee-list-col">
 
@@ -167,7 +167,7 @@ $ee_social_icons = array(
 
 		</div>
 
-		<?php get_template_part('template-parts/lms/courses', 'sidebar'); ?>
+		<?php get_template_part('template-parts/lms/filter', 'sidebar', array('ee_total' => (int) $ee_courses_query->found_posts, 'ee_lock_instructor' => true)); ?>
 
 	</div>
 </main>

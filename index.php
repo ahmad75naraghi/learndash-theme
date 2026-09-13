@@ -16,7 +16,7 @@ if (is_singular()) {
 	get_template_part('template-parts/ee', 'header', array('ee_active' => ''));
 	?>
 
-	<main class="ee-list-main">
+	<main id="ee-main" class="ee-list-main">
 		<div class="ee-wrap ee-list-grid">
 
 			<?php

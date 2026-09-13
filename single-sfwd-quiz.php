@@ -110,7 +110,7 @@ while (have_posts()) :
 	}
 	?>
 
-	<main class="ee-lms-main ee-quiz-page-main">
+	<main id="ee-main" class="ee-lms-main ee-quiz-page-main">
 		<div class="ee-wrap ee-lms-grid is-quiz">
 
 			<article id="quiz-<?php echo esc_attr($ee_quiz_id); ?>" <?php post_class('ee-quiz-main'); ?>>

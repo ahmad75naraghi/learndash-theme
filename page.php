@@ -16,7 +16,7 @@ while (have_posts()) :
 	the_post();
 	?>
 
-	<main class="ee-list-main">
+	<main id="ee-main" class="ee-list-main">
 		<div class="ee-wrap ee-list-grid">
 
 			<article <?php post_class('ee-page-card'); ?>>

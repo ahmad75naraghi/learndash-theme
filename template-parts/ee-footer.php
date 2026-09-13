@@ -53,8 +53,35 @@ $ee_email     = function_exists('evented_support_email') ? evented_support_email
 $ee_phone     = (string) $ee_opt('phone', '');
 $ee_copyright = (string) $ee_opt('copyright', '');
 ?>
-    <!-- ======= فوتر ======= -->
-    <footer class="ee-footer" id="ee-contact">
+    <!-- ======= فوتر (v2) ======= -->
+    <?php
+    $ee_app_page = get_page_by_path('app');
+    $ee_url_app  = $ee_app_page instanceof WP_Post ? (string) get_permalink($ee_app_page) : '';
+    ?>
+    <footer class="ee-footer v2" id="ee-contact">
+        <!-- نوار CTA -->
+        <div class="ee-wrap">
+            <div class="ee-fcta">
+                <div class="ee-fcta-txt">
+                    <span class="ee-fcta-ic" aria-hidden="true"><svg class="ee-ic"><use href="#i-install_mobile"></use></svg></span>
+                    <div>
+                        <b><?php echo esc_html(sprintf('اپلیکیشن %s را نصب کنید', get_bloginfo('name'))); ?></b>
+                        <p>دسترسی سریع به دوره‌ها، مقالات و پادکست‌ها؛ حتی بدون اینترنت.</p>
+                    </div>
+                </div>
+                <div class="ee-fcta-act">
+                    <?php if ('' !== $ee_url_app) : ?><a class="ee-btn ee-btn-primary" href="<?php echo esc_url($ee_url_app); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg> دریافت اپلیکیشن</a><?php endif; ?>
+                    <?php if (!empty($ee_channels)) : ?>
+                        <div class="ee-fcta-ch">
+                            <?php foreach ($ee_channels as $ee_ch) : ?>
+                                <a href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" title="<?php echo esc_attr('پیام‌رسان ' . $ee_ch['label']); ?>"><span class="dot" style="background:<?php echo esc_attr($ee_ch['color']); ?>;"></span><?php echo esc_html($ee_ch['label']); ?></a>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
         <div class="ee-wrap ee-fwrap">
             <div class="ee-fgrid">
                 <div class="about">
@@ -72,47 +99,55 @@ $ee_copyright = (string) $ee_opt('copyright', '');
                     <?php endif; ?>
                 </div>
                 <div>
-                    <h4>دوره‌های تخصصی</h4>
+                    <h4><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg> دوره‌های تخصصی</h4>
                     <ul>
                         <?php if (!empty($ee_course_cats)) : foreach ($ee_course_cats as $ee_cc) : ?>
-                            <li><a href="<?php echo esc_url($ee_cc['url']); ?>">• <?php echo esc_html($ee_cc['title']); ?></a></li>
-                        <?php endforeach; else : ?>
-                            <li><a href="<?php echo esc_url($ee_url_courses); ?>">• همهٔ دوره‌ها</a></li>
-                        <?php endif; ?>
-                        <li><a href="<?php echo esc_url($ee_url_courses); ?>">• مشاهدهٔ همهٔ دوره‌ها</a></li>
+                            <li><a href="<?php echo esc_url($ee_cc['url']); ?>"><?php echo esc_html($ee_cc['title']); ?></a></li>
+                        <?php endforeach; endif; ?>
+                        <li><a class="ee-f-more" href="<?php echo esc_url($ee_url_courses); ?>">مشاهدهٔ همهٔ دوره‌ها <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4>بخش‌های پایگاه</h4>
+                    <h4><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-apps"></use></svg> بخش‌های پایگاه</h4>
                     <ul class="ee-f-2col">
                         <?php foreach ($ee_nav_items as $ee_fi) : if ('home' === $ee_fi['key']) { continue; } ?>
-                            <li><a href="<?php echo esc_url($ee_fi['url']); ?>">• <?php echo esc_html($ee_fi['title']); ?></a></li>
+                            <li><a href="<?php echo esc_url($ee_fi['url']); ?>"><?php echo esc_html($ee_fi['title']); ?></a></li>
                         <?php endforeach; ?>
-                        <li><a href="<?php echo esc_url($ee_url_instructors); ?>">• اساتید و کارشناسان</a></li>
+                        <li><a href="<?php echo esc_url($ee_url_instructors); ?>">اساتید و کارشناسان</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4>کانال‌های رسمی و تماس</h4>
-                    <?php if (!empty($ee_channels)) : ?>
-                        <div class="ee-fchan">
-                            <?php foreach ($ee_channels as $ee_ch) : ?>
-                                <a href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener"><span class="cn"><span class="dot" style="background:<?php echo esc_attr($ee_ch['color']); ?>;"></span> پیام‌رسان <?php echo esc_html($ee_ch['label']); ?></span><span class="id"><?php echo esc_html(preg_replace('#^https?://#', '', $ee_ch['url'])); ?></span></a>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
+                    <h4><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-support_agent"></use></svg> ارتباط با ما</h4>
                     <div class="ee-fmeta">
-                        <?php if ('' !== $ee_phone) : ?><div><span class="mk">تلفن:</span><a class="mv" href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $ee_phone)); ?>"><?php echo esc_html($ee_phone); ?></a></div><?php endif; ?>
-                        <?php if ('' !== (string) $ee_opt('phone_hours')) : ?><div><span class="mk">پاسخگویی:</span><span class="mv" style="direction:rtl;font-family:inherit;"><?php echo esc_html($ee_opt('phone_hours')); ?></span></div><?php endif; ?>
-                        <div><span class="mk">پشتیبانی:</span><a class="mv" href="mailto:<?php echo esc_attr($ee_email); ?>"><?php echo esc_html($ee_email); ?></a></div>
-                        <?php if ('' !== (string) $ee_opt('address')) : ?><div><span class="mk">آدرس:</span><span class="mv" style="direction:rtl;font-family:inherit;text-align:right;"><?php echo esc_html($ee_opt('address')); ?></span></div><?php endif; ?>
+                        <?php if ('' !== $ee_phone) : ?><div><span class="mk"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-call"></use></svg> تلفن</span><a class="mv" href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $ee_phone)); ?>"><?php echo esc_html($ee_phone); ?></a></div><?php endif; ?>
+                        <?php if ('' !== (string) $ee_opt('phone_hours')) : ?><div><span class="mk"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg> پاسخگویی</span><span class="mv"><?php echo esc_html($ee_opt('phone_hours')); ?></span></div><?php endif; ?>
+                        <div><span class="mk"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-mail"></use></svg> ایمیل</span><a class="mv" href="mailto:<?php echo esc_attr($ee_email); ?>"><?php echo esc_html($ee_email); ?></a></div>
+                        <?php if ('' !== (string) $ee_opt('address')) : ?><div><span class="mk"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-location_on"></use></svg> آدرس</span><span class="mv"><?php echo esc_html($ee_opt('address')); ?></span></div><?php endif; ?>
+                    </div>
+                    <div class="ee-ftrust">
+                        <span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-verified_user"></use></svg> پرداخت امن</span>
+                        <span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-workspace_premium"></use></svg> گواهینامهٔ معتبر</span>
+                        <span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-support_agent"></use></svg> پشتیبانی پاسخگو</span>
                     </div>
                 </div>
             </div>
         </div>
         <div class="ee-fbottom">
-            <div class="ee-wrap"><?php echo '' !== $ee_copyright ? esc_html($ee_copyright) : esc_html('تمام حقوق مادی و معنوی این وب‌سایت متعلق به ' . get_bloginfo('name') . ' است.'); ?></div>
+            <div class="ee-wrap ee-fbottom-in">
+                <span><?php echo '' !== $ee_copyright ? esc_html($ee_copyright) : esc_html('تمام حقوق مادی و معنوی این وب‌سایت متعلق به ' . get_bloginfo('name') . ' است.'); ?></span>
+                <nav class="ee-fbottom-links" aria-label="پیوندهای پایین">
+                    <a href="<?php echo esc_url($ee_url_about); ?>">معرفی سایت</a>
+                    <a href="<?php echo esc_url($ee_url_contact); ?>">ارتباط با ما</a>
+                    <?php $ee_rules = get_page_by_path('آیین-نامه-ها-و-مقررات'); if ($ee_rules instanceof WP_Post) : ?><a href="<?php echo esc_url(get_permalink($ee_rules)); ?>">قوانین و مقررات</a><?php endif; ?>
+                </nav>
+            </div>
         </div>
     </footer>
+
+    <!-- بازگشت به بالا -->
+    <button type="button" class="ee-totop" data-ee-totop aria-label="بازگشت به بالای صفحه" hidden>
+        <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-expand_less"></use></svg>
+    </button>
 
     <!-- نوار پایین موبایل -->
     <nav class="ee-mnav">

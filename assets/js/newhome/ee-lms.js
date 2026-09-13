@@ -320,3 +320,29 @@
         });
     }
 })();
+
+/* ---- درس: نوار پیشرفت چسبان بعد از عبور از هیرو ---- */
+(function () {
+    'use strict';
+    var bar = document.querySelector('[data-ee-ls-sticky]');
+    var hero = document.querySelector('.ee-ls-hero');
+    if (!bar || !hero || !('IntersectionObserver' in window)) { return; }
+    new IntersectionObserver(function (entries) {
+        var e = entries[0];
+        var show = !e.isIntersecting && e.boundingClientRect.top < 0;
+        bar.classList.toggle('is-show', show);
+        bar.setAttribute('aria-hidden', show ? 'false' : 'true');
+    }, { threshold: 0 }).observe(hero);
+})();
+
+/* ---- نوار نتایج: مرتب‌سازی با تغییر select ---- */
+(function () {
+    'use strict';
+    var f = document.querySelector('[data-ee-rtb-sort]');
+    if (!f) { return; }
+    f.addEventListener('change', function () {
+        var sel = f.querySelector('select[name="orderby"]');
+        if (sel && sel.value === 'newest') { sel.disabled = true; }
+        f.submit();
+    });
+})();

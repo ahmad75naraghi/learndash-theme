@@ -113,7 +113,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
 
     <?php get_template_part('template-parts/ee', 'header', array('ee_active' => 'home')); ?>
 
-    <main class="ee-home-main">
+    <main id="ee-main" class="ee-home-main">
 
         <!-- ======= هیرو: اسلایدر بنر + آخرین مقالات ======= -->
         <section class="ee-hero<?php echo empty($ee_feature_slides) ? ' is-no-slider' : ''; ?>">

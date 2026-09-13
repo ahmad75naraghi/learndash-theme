@@ -142,6 +142,9 @@ function evented_catalog_card_data($id)
 		'is_free'    => $is_free,
 		'price'      => $is_free ? '' : number_format((float) $price),
 		'is_new'     => $age_days <= 21,
+		'level'      => (string) get_post_meta($id, '_course_level', true),
+		'has_access' => is_user_logged_in() && function_exists('sfwd_lms_has_access') ? (bool) sfwd_lms_has_access($id, get_current_user_id()) : false,
+		'progress'   => (is_user_logged_in() && function_exists('evented_course_progress')) ? (int) (evented_course_progress($id)['percentage'] ?? 0) : 0,
 		'excerpt'    => (mb_strlen($excerpt = wp_trim_words(wp_strip_all_tags(strip_shortcodes(has_excerpt($id) ? $post->post_excerpt : $post->post_content)), 14, '…')) >= 12) ? $excerpt : '',
 	);
 }
@@ -196,9 +199,16 @@ function evented_catalog_card_html($c, $i = 0)
 				<span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg><?php echo esc_html($c['instructor'] ?: 'مدرس سایت'); ?></span>
 				<?php if ($c['lessons'] > 0) : ?><span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-play_lesson"></use></svg><?php echo esc_html($fa($c['lessons'])); ?> درس</span><?php endif; ?>
 				<?php if ($c['duration']) : ?><span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg><?php echo esc_html($c['duration']); ?></span><?php endif; ?>
+				<?php if (!empty($c['level'])) : ?><span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-signal_cellular_alt"></use></svg><?php echo esc_html($c['level']); ?></span><?php endif; ?>
 				<?php if ($c['views'] > 0 && $c['lessons'] < 1) : ?><span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg><?php echo esc_html($fa(number_format($c['views']))); ?></span><?php endif; ?>
 			</div>
+			<?php if (!empty($c['has_access'])) : ?>
+				<div class="ee-cat-prog" title="<?php echo esc_attr($fa($c['progress']) . '٪ پیشرفت'); ?>"><span style="width:<?php echo (int) $c['progress']; ?>%"></span></div>
+			<?php endif; ?>
 			<div class="ee-cat-foot">
+				<?php if (!empty($c['has_access'])) : ?>
+					<span class="ee-cat-price is-joined"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-task_alt"></use></svg> <?php echo $c['progress'] >= 100 ? 'تکمیل شده' : ($c['progress'] > 0 ? esc_html($fa($c['progress'])) . '٪ پیشرفت' : 'ثبت‌نام شده'); ?></span>
+				<?php else : ?>
 				<span class="ee-cat-price<?php echo $c['is_free'] ? ' is-free' : ''; ?>">
 					<?php if ($c['is_free']) : ?>
 						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-verified"></use></svg> رایگان
@@ -206,8 +216,9 @@ function evented_catalog_card_html($c, $i = 0)
 						<b><?php echo esc_html($fa($c['price'])); ?></b><small>تومان</small>
 					<?php endif; ?>
 				</span>
+				<?php endif; ?>
 				<a class="ee-cat-go" href="<?php echo esc_url($c['url']); ?>" aria-label="<?php echo esc_attr('مشاهدهٔ ' . $c['title']); ?>">
-					<span>مشاهده</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
+					<span><?php echo !empty($c['has_access']) ? 'ادامه' : 'مشاهده'; ?></span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
 				</a>
 			</div>
 		</div>
@@ -281,10 +292,16 @@ add_action('wp_ajax_nopriv_evented_catalog', 'evented_catalog_ajax');
 
 /** دارایی‌های بخش (فقط صفحهٔ اصلی). */
 add_action('wp_enqueue_scripts', static function () {
-	if (!is_front_page() || !function_exists('evented_is_ee_view') || !evented_is_ee_view()) {
+	if (!function_exists('evented_is_ee_view') || !evented_is_ee_view()) {
 		return;
 	}
-	wp_enqueue_style('ee-catalog', PATH_DIR_URL . '/assets/css/newhome/ee-catalog.css', array('ee-shell'), '1.0.0');
+	// استایل کارت دوره در همهٔ فهرست‌ها مشترک است (کارت واحد)
+	if (is_front_page() || is_post_type_archive('sfwd-courses') || is_tax('ld_course_category') || is_author() || is_page() || is_search() || is_404()) {
+		wp_enqueue_style('ee-catalog', PATH_DIR_URL . '/assets/css/newhome/ee-catalog.css', array('ee-shell'), '1.1.0');
+	}
+	if (!is_front_page()) {
+		return;
+	}
 	wp_enqueue_script('ee-catalog', PATH_DIR_URL . '/assets/js/newhome/ee-catalog.js', array(), '1.0.0', true);
 	wp_localize_script('ee-catalog', 'eeCatalog', array(
 		'ajax'  => admin_url('admin-ajax.php'),

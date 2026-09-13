@@ -80,3 +80,24 @@
 .ee-noresult h2 { font-size: 1.05rem; color: #1e293b; margin: .6rem 0 .3rem; }
 .ee-noresult p { font-size: .8rem; color: var(--ee-soft); margin-bottom: 1rem; }
 .ee-noresult form { max-width: 24rem; margin-inline: auto; }
+
+/* ---------- v2: هیرو جستجو، فیلتر تاریخ، کارت دوره در نتایج ---------- */
+.ee-arch-head { position: relative; overflow: hidden; isolation: isolate; }
+.ee-arch-head::after { content: ""; position: absolute; z-index: -1; width: 12rem; height: 12rem; border-radius: 50%; background: var(--ee-teal); filter: blur(40px); opacity: .18; left: -3rem; top: -4rem; pointer-events: none; }
+.ee-search-results .ee-arch-title { font-size: 1.05rem; }
+.ee-search-results .ee-arch-title em, .ee-arch-title q { font-style: normal; color: var(--ee-tealP); }
+.ee-arch-range { display: inline-flex; align-items: center; gap: .25rem; flex-wrap: wrap; }
+.ee-arch-range > svg.ee-ic { color: var(--ee-tealP); font-size: 1rem; margin-inline-end: .1rem; }
+.ee-arch-range a { font-size: .68rem; font-weight: 700; color: var(--ee-soft); background: #fff; border: 1px solid var(--ee-line); border-radius: 999px; padding: .2rem .6rem; transition: all .15s; }
+.ee-arch-range a:hover { border-color: var(--ee-teal); color: var(--ee-tealP); }
+.ee-arch-range a.is-on { background: var(--ee-tealP); border-color: var(--ee-tealP); color: #fff; }
+.ee-arch-search { display: flex; align-items: center; gap: .5rem; margin-top: .9rem; background: #fff; border: 1px solid var(--ee-line); border-radius: 999px; padding: .3rem .3rem .3rem .9rem; padding-inline: .9rem .3rem; box-shadow: var(--ee-sh-sm); }
+.ee-arch-search:focus-within { border-color: var(--ee-teal); box-shadow: 0 0 0 3px var(--ee-tealL); }
+.ee-arch-search > svg.ee-ic { color: var(--ee-tealP); font-size: 1.2rem; flex-shrink: 0; }
+.ee-arch-search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font-family: inherit; font-size: .84rem; color: var(--ee-ink); padding: .3rem 0; }
+.ee-arch-search input::-webkit-search-cancel-button { display: none; }
+.ee-arch-search .ee-btn { font-size: .78rem; font-weight: 800; padding: .5rem 1.1rem; flex-shrink: 0; }
+.ee-arch-chips .ee-chip-btn .ee-chip-count { margin-inline-start: .3rem; }
+.ee-arch-cards .ee-cgrid-v2.is-inline { display: contents; }
+.ee-arch-main .ee-cgrid-v2 { grid-template-columns: 1fr; }
+@media (min-width: 640px) { .ee-arch-main .ee-cgrid-v2 { grid-template-columns: 1fr 1fr; } }

@@ -14,7 +14,7 @@ get_template_part('template-parts/ee', 'head', array('ee_body_class' => 'ee-arch
 get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'));
 ?>
 
-<main class="ee-archive-main">
+<main id="ee-main" class="ee-archive-main">
     <?php get_template_part('template-parts/ee-archive', 'main'); ?>
 </main>
 

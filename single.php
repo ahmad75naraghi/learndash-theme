@@ -17,7 +17,7 @@ get_template_part('template-parts/ee', 'head', array('ee_body_class' => 'ee-sing
 get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'));
 ?>
 
-<main class="ee-single-main">
+<main id="ee-main" class="ee-single-main">
     <?php
     while (have_posts()) :
         the_post();

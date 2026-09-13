@@ -406,3 +406,61 @@
         });
     });
 })();
+
+/* ---- مشترک: بازگشت به بالا، نوار پیشرفت خواندن، reveal on scroll ---- */
+(function () {
+    'use strict';
+    document.documentElement.classList.remove('no-js');
+
+    var totop = document.querySelector('[data-ee-totop]');
+    var readbar = document.querySelector('[data-ee-readbar] i');
+    var readTarget = document.querySelector('.ee-post-body, .ee-lesson-body, .ee-single-main article, #ee-main');
+    var ticking = false;
+
+    function onScroll() {
+        if (ticking) { return; }
+        ticking = true;
+        requestAnimationFrame(function () {
+            var y = window.scrollY || document.documentElement.scrollTop;
+            if (totop) {
+                if (y > 600) { totop.hidden = false; requestAnimationFrame(function () { totop.classList.add('is-show'); }); }
+                else { totop.classList.remove('is-show'); }
+            }
+            if (readbar && readTarget) {
+                var r = readTarget.getBoundingClientRect();
+                var top = r.top + y;
+                var h = r.height - window.innerHeight;
+                var p = h > 0 ? Math.min(1, Math.max(0, (y - top) / h)) : (y > top ? 1 : 0);
+                readbar.style.width = (p * 100).toFixed(1) + '%';
+            }
+            ticking = false;
+        });
+    }
+    if (totop) {
+        totop.addEventListener('click', function () {
+            var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+        });
+        totop.addEventListener('transitionend', function () { if (!totop.classList.contains('is-show')) { totop.hidden = true; } });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    /* reveal: کارت‌ها و سکشن‌های اصلی؛ بدون کتابخانه، با احترام به reduced-motion */
+    if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return; }
+    var sel = '.ee-cat-card, .ee-arch-card, .ee-ccard, .ee-cur-item, .ee-qz-stat, .ee-home-main > section, .ee-list-head, .ee-fside-form, .ee-fcta, .ee-empty-state';
+    var nodes = Array.prototype.slice.call(document.querySelectorAll(sel));
+    if (!nodes.length) { return; }
+    nodes.forEach(function (el) {
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.9) { return; } /* آنچه از ابتدا دیده می‌شود انیمیت نشود */
+        var siblings = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.classList.contains('ee-rv'); }).length;
+        el.style.setProperty('--rv-i', Math.min(siblings, 8));
+        el.classList.add('ee-rv');
+    });
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+        });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+    document.querySelectorAll('.ee-rv').forEach(function (el) { io.observe(el); });
+})();

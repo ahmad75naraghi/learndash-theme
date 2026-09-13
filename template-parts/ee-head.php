@@ -16,7 +16,7 @@ defined('ABSPATH') || exit;
 $ee_body_class = isset($args['ee_body_class']) ? (string) $args['ee_body_class'] : '';
 ?>
 <!DOCTYPE html>
-<html <?php language_attributes(); ?> dir="rtl">
+<html <?php language_attributes(); ?> dir="rtl" class="no-js">
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,3 +24,5 @@ $ee_body_class = isset($args['ee_body_class']) ? (string) $args['ee_body_class']
 </head>
 <body <?php body_class(trim('ee-home ee-body-pad ' . $ee_body_class)); ?>>
 <?php wp_body_open(); ?>
+<a class="ee-skip" href="#ee-main">پرش به محتوای اصلی</a>
+<?php if (is_singular(array('post', 'sfwd-lessons', 'sfwd-topic'))) : ?><div class="ee-readbar" data-ee-readbar aria-hidden="true"><i></i></div><?php endif; ?>

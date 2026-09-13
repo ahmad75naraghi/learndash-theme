@@ -73,7 +73,7 @@
             if (cache[key]) { render(cache[key]); return; }
             if (ctrl) { ctrl.abort(); }
             ctrl = ('AbortController' in window) ? new AbortController() : null;
-            state('<span class="ee-ls-spin" aria-hidden="true"></span><span>' + esc(cfg.i18n.loading) + '</span>');
+            box.innerHTML = '<div class="ee-ls-skel" aria-busy="true" aria-label="' + esc(cfg.i18n.loading) + '">' + Array(4).join('<div class="ee-skel-row"><span class="ee-skel av"></span><span style="flex:1;display:flex;flex-direction:column;gap:.4rem"><span class="ee-skel t"></span><span class="ee-skel s"></span></span></div>') + '</div>'; open();
             var url = cfg.endpoint + (cfg.endpoint.indexOf('?') > -1 ? '&' : '?') + 'q=' + encodeURIComponent(q) + '&scope=' + encodeURIComponent(scope);
             fetch(url, { credentials: 'same-origin', signal: ctrl ? ctrl.signal : undefined, headers: { 'X-WP-Nonce': cfg.nonce || '' } })
                 .then(function (r) { return r.json(); })

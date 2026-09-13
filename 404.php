@@ -13,7 +13,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => ''));
 $ee_404_courses = function_exists('evented_latest_courses') ? evented_latest_courses(4) : array();
 ?>
 
-<main class="ee-list-main">
+<main id="ee-main" class="ee-list-main">
 	<div class="ee-wrap">
 
 		<section class="ee-404">

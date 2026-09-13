@@ -612,6 +612,60 @@ function evented_search_post_types()
 	return array_values(array_unique((array) apply_filters('evented_search_post_types', $types)));
 }
 
+
+/**
+ * تعداد نتایج هر بخش برای یک عبارت (کش ۱۰ دقیقه‌ای).
+ *
+ * @param string $q عبارت.
+ * @return array<string,int>  کلید '' = همه‌جا.
+ */
+function evented_search_scope_counts($q)
+{
+	$q = trim((string) $q);
+	if ('' === $q) {
+		return array();
+	}
+	$key = 'ee_sc_' . md5($q);
+	$out = get_transient($key);
+	if (is_array($out)) {
+		return $out;
+	}
+	$out = array();
+	foreach (evented_search_scopes() as $pt => $label) {
+		$types = '' === $pt ? evented_search_post_types() : array($pt);
+		$wq = new WP_Query(array(
+			's'                      => $q,
+			'post_type'              => $types,
+			'post_status'            => 'publish',
+			'posts_per_page'         => 1,
+			'fields'                 => 'ids',
+			'no_found_rows'          => false,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		));
+		$out[$pt] = (int) $wq->found_posts;
+	}
+	set_transient($key, $out, 10 * MINUTE_IN_SECONDS);
+	return $out;
+}
+
+/**
+ * فیلتر سریع تاریخ (?range=week|month|year) روی فهرست‌های نوشته و جستجو.
+ */
+add_action('pre_get_posts', static function ($q) {
+	if (is_admin() || !$q->is_main_query()) {
+		return;
+	}
+	if (!($q->is_home() || $q->is_archive() || $q->is_search())) {
+		return;
+	}
+	$range = isset($_GET['range']) ? sanitize_key(wp_unslash($_GET['range'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+	$map   = array('week' => '1 week ago', 'month' => '1 month ago', 'year' => '1 year ago');
+	if (isset($map[$range])) {
+		$q->set('date_query', array(array('after' => $map[$range], 'inclusive' => true)));
+	}
+});
+
 /**
  * دامنهٔ جستجوی جاری (از ?post_type=).
  *

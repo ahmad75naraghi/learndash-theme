@@ -24,8 +24,8 @@ while (have_posts()) :
 	}
 	?>
 
-	<main class="ee-list-main">
-		<div class="ee-wrap ee-list-grid">
+	<main id="ee-main" class="ee-list-main">
+		<div class="ee-wrap ee-list-grid is-filter">
 
 			<div class="ee-list-col">
 
@@ -59,7 +59,7 @@ while (have_posts()) :
 
 			</div>
 
-			<?php get_template_part('template-parts/lms/courses', 'sidebar'); ?>
+			<?php get_template_part('template-parts/lms/filter', 'sidebar'); ?>
 
 		</div>
 	</main>

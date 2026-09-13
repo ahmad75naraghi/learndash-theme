@@ -21,8 +21,8 @@ while (have_posts()) :
 	$ee_total = (int) $ee_query->found_posts;
 	?>
 
-	<main class="ee-list-main">
-		<div class="ee-wrap ee-list-grid">
+	<main id="ee-main" class="ee-list-main">
+		<div class="ee-wrap ee-list-grid is-filter">
 
 			<div class="ee-list-col">
 
@@ -50,7 +50,8 @@ while (have_posts()) :
 					</div>
 				</header>
 
-				<?php if (function_exists('evented_course_filter_bar')) { evented_course_filter_bar($ee_total); } ?>
+				<?php echo function_exists('evented_results_toolbar') ? evented_results_toolbar($ee_total) : ''; // phpcs:ignore ?>
+				<?php if (function_exists('evented_course_filter_chips')) { evented_course_filter_chips(); } ?>
 
 				<?php
 				get_template_part('template-parts/lms/course', 'grid', array(
@@ -63,7 +64,7 @@ while (have_posts()) :
 
 			</div>
 
-			<?php get_template_part('template-parts/lms/courses', 'sidebar'); ?>
+			<?php get_template_part('template-parts/lms/filter', 'sidebar', array('ee_total' => $ee_total)); ?>
 
 		</div>
 	</main>

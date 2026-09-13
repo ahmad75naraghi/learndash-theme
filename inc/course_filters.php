@@ -252,6 +252,9 @@ function evented_course_filter_base_url()
 	if (is_singular('page')) {
 		return get_permalink();
 	}
+	if (is_author()) {
+		return get_author_posts_url((int) get_queried_object_id());
+	}
 	return get_post_type_archive_link('sfwd-courses');
 }
 
