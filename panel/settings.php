@@ -73,7 +73,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                 </div>
             </div>
 
-            <div id="settings-msg" style="margin-top: 15px; text-align: center; font-weight: bold; border-radius: 8px; padding: 10px; display: none;"></div>
+            <div id="settings-msg" class="ee-u-msg is-box" hidden></div>
         </div>
 
 <!-- مودال ایمیل -->

@@ -29,7 +29,7 @@
 - [x] **`page-panel.php` خالی** — کاربر لاگین‌شده را به `/panel/my-courses` ریدایرکت می‌کند؛ همچنین باگ‌های باز نشدن صفحات پنل (نبود `global $wpdb` در داشبورد، include نسبی سایدبار و بارگذاری‌نشدن `panel.css` برای قالب‌های `panel/*`) رفع شد.
 - [x] **`index.php` باکس دیباگ** — با یک قالب بازگشتی واقعی جایگزین شد؛ آرشیو/برگهٔ نوشته‌ها/جستجو هم به `archive.php`/`home.php`/`search.php` منتقل شدند.
 - [ ] **لاگین با OTP برای کاربر موجود → `wp_set_current_user($user->ID)` روی null** در `handle_register_user` (چون `wp_set_password` id برنمی‌گرداند) — تست و اصلاح.
-- [ ] **`falnic_submit_cta`** — hook ثبت شده اما متد `handle_cta_submit` وجود ندارد (در صورت فراخوانی Fatal).
+- [x] **`falnic_submit_cta`** — hook و کد مرتبط دیگر در پروژه وجود ندارد (حذف شده).
 - [x] **`author.php` لینک فیسبوک** — قالب بازنویسی شد؛ شبکه‌های اجتماعی از `evented_instructor_data()` (کلیدهای `youtube`/`linkedin`/`instagram`/`facebook` در user meta) خوانده می‌شوند.
 - [x] **`author.js`** — دیگر enqueue نمی‌شود (قالب مدرس با پوستهٔ ee-* بازنویسی شد)؛ فایل باقی‌مانده مرده است و می‌توان حذفش کرد.
 - [ ] **settings.php نمایش ایمیل جعلی** — اگر ایمیل با `09` شروع شود، مقدار نمایشی `sdasd@dfsfd.dfd` نشان داده می‌شود (باید ایمیل واقعی یا حالت «تنظیم نشده»).
@@ -46,7 +46,7 @@
 | ~~`assets/css/single-page.css`~~ | ✅ شرط enqueue حذف شد (برگه‌ها از `ee-courses.css` استفاده می‌کنند) | — |
 | ~~`assets/css/archive-product.css`~~ | ✅ شرط enqueue حذف شد (۴۰۴ در همهٔ برگه‌ها رفع شد) | — |
 | ~~`assets/css/archive-post.css`~~ | ✅ پر شد (استایل آرشیو نوشته‌ها) | — |
-| ~~`screenshot.png`~~ | ✅ فایل ۰ بایتی حذف شد | افزودن تصویر واقعی ۱۲۰۰×۹۰۰ (اختیاری) |
+| ~~`screenshot.png`~~ | ✅ تصویر واقعی ۱۲۰۰×۹۰۰ (رندر واقعی هدر/هیرو/کارت‌های دوره) اضافه شد | — |
 | ~~`assets/css/photoswipe.min .css`~~ | ✅ حذف شد | — |
 | ~~`images/default-cat.jpg`~~ | ✅ در `page-courses-cat.php` حذف شد؛ کارت دستهٔ بدون تصویر آیکن Material می‌گیرد | — |
 | ~~`assets/fonts/DanaVF.ttf`~~ | ✅ captcha حذف شد | — |
@@ -56,7 +56,7 @@
 
 ## ۵. کد مرده / غیرفعال (Dead Code)
 
-- [x] `inc/captcha.php` حذف شد (`captcha_verify()` در `inc/login.php` مانده و بی‌استفاده است — در پاک‌سازی بعدی حذف شود).
+- [x] `inc/captcha.php` حذف شد؛ `captcha_verify()` هم از `inc/login.php` حذف شد.
 - [ ] بخش «وبینار پیش رو» در `front-page.php` داخل `if (false) {}`.
 - [x] PhotoSwipe حذف شد.
 - [x] `assets_functions.php` بازنویسی شد (فقط دارایی‌های پنل).
@@ -64,7 +64,7 @@
 - [x] `single-courses.css/js` حذف شدند.
 - [ ] کلیدهای پادکست درس (`_lesson_audio`/`_lesson_audio_url`/`sfwd-lessons_lesson_audio_url`) و پیوست‌ها (`_lesson_attachments`) بر اساس کلیدهای سفارشی این قالب حدس زده شده‌اند؛ باید با دادهٔ واقعی سایت بررسی و در صورت نیاز متاباکس رسمی اضافه شود.
 - [ ] اسکریپت particle canvas کامنت‌شده در `front-page.php`.
-- [ ] متغیر/کلاس بلااستفاده (مثل `FalnicAuthHandler::$crm_guids`) در login.php.
+- [x] متغیر/کلاس بلااستفاده (`FalnicAuthHandler::$crm_guids`) دیگر در login.php وجود ندارد.
 
 ## ۶. استاتیک‌هایی که باید داینامیک شوند
 
@@ -81,3 +81,12 @@
 - [ ] تکمیل پوشش‌دهی هر تغییر جدید در `CHANGELOG.md`.
 - [ ] به‌روزرسانی جدول «کلیدهای متا» در `ARCHITECTURE.md` هنگام افزودن فیلد جدید.
 - [ ] افزودن تست خودکار (حداقل `php -l` در CI).
+
+## پاک‌سازی ۱۴۰۵/۰۶ (انجام‌شده)
+
+- [x] `assets/css/panel.css` هرس شد (۱۶۸۸ → ۱۳۷۵ خط؛ قوانین کلاس‌های بلااستفاده و بلوک‌های کامنت‌شده حذف شدند).
+- [x] `style=""`های ایستا در قالب‌ها به کلاس‌های ابزاری `ee-u-*` (در `ee-shell.css`) تبدیل شدند؛ فقط مقادیر پویا (درصد پیشرفت، `--p`، `--c`، `background-image`) inline مانده‌اند.
+- [x] کد مردهٔ `captcha_verify()` حذف شد.
+- [x] `screenshot.png` واقعی ۱۲۰۰×۹۰۰.
+- [ ] ادامهٔ بازطراحی `panel.css` به زبان بصری `ee-*`.
+- [ ] CI برای `php -l`.

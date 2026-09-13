@@ -65,11 +65,11 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                     <div class="course-card wishlist-item" data-title="<?php echo esc_attr($course_title); ?>">
                         
                         <!-- دکمه حذف از علاقه‌مندی‌ها با کلاس یکسان -->
-                        <button class="remove-from-wishlist" data-course-id="<?php echo esc_attr($course_id); ?>" title="حذف از علاقه‌مندی‌ها" style="position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; color: #ff4757; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <button class="remove-from-wishlist ee-u-remove-fab" data-course-id="<?php echo esc_attr($course_id); ?>" title="حذف از علاقه‌مندی‌ها">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
                         </button>
 
-                        <a href="<?php echo esc_url($course_link); ?>" style="text-decoration: none; color: inherit; display: block;">
+                        <a href="<?php echo esc_url($course_link); ?>" class="ee-u-plain-link">
                             <div class="card-header">
                                 <div class="image-placeholder">
                                     <img src="<?php echo esc_url($course_thumbnail); ?>" />
@@ -97,7 +97,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                     endforeach; 
                 else : 
                 ?>
-                    <div class="no-exist-notice" style="grid-column: 1 / -1; padding: 20px; text-align: center; color: #666;">
+                    <div class="no-exist-notice ee-u-grid-empty">
                         <p>
                             هنوز دوره ای به لیست علاقمندی خود اضافه نکردی!!
                         </p>

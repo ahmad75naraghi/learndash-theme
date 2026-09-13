@@ -44,13 +44,13 @@ function theme_enqueue()
 
     wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.0.0');
     wp_enqueue_style('ee-panel', PATH_DIR_URL . '/assets/css/newhome/ee-panel.css', array('ee-shell'), '1.0.0');
-    wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', array('ee-panel'), '2.0.0');
+    wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', array('ee-panel'), '2.1.0');
 
     wp_enqueue_style('jalalidatepicker-css', PATH_DIR_URL . '/assets/css/jalalidatepicker.min.css', array(), '1.0.0');
     wp_enqueue_script('jalalidatepicker-js', PATH_DIR_URL . '/assets/js/jalalidatepicker.min.js', array(), '1.0.0', true);
     wp_add_inline_script('jalalidatepicker-js', 'window.jalaliDatepicker && jalaliDatepicker.startWatch({ persianDigits: true, showTodayBtn: true, showEmptyBtn: true, hasSecond: false });');
 
-    wp_enqueue_script('ee-panel', PATH_DIR_URL . '/assets/js/newhome/ee-panel.js', array(), '1.0.0', true);
+    wp_enqueue_script('ee-panel', PATH_DIR_URL . '/assets/js/newhome/ee-panel.js', array(), '1.1.0', true);
     wp_localize_script('ee-panel', 'eePanel', array(
         'ajax_url'       => admin_url('admin-ajax.php'),
         'wishlist_nonce' => wp_create_nonce('wishlist_nonce'),

@@ -607,22 +607,6 @@ add_action('init', function () {
 });
 
 
-function captcha_verify($captcha)
-{
-    if (!session_id()) {
-        session_start();
-    }
-
-    if (empty($captcha) || !isset($_SESSION['captcha_code'])) {
-        return false;
-    }
-
-    $persian    = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-    $english    = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    $user_input = str_replace($persian, $english, trim($captcha));
-
-    return ($user_input === $_SESSION['captcha_code']);
-}
 
 /**
  * ارسال کد تایید از طریق ربات «بله».

@@ -46,7 +46,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
         <div class="ee-wrap ee-topbar-in">
             <div class="tb-right">
                 <span class="ee-tb-item">
-                    <svg class="ee-ic" aria-hidden="true" focusable="false" style="color:var(--ee-tealP);font-size:1rem;"><use href="#i-calendar_month"></use></svg>
+                    <svg class="ee-ic ee-u-teal ee-u-fs1" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg>
                     <?php echo esc_html('امروز: ' . $ee_today); ?>
                 </span>
                 <span class="ee-tb-sep">|</span>
@@ -54,9 +54,9 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                 <?php if (!empty($ee_channels)) : foreach ($ee_channels as $ee_ch) : ?>
                     <a class="ee-tb-item" href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="color:<?php echo esc_attr($ee_ch['color']); ?>;font-weight:600;"><span class="dot" style="background:<?php echo esc_attr($ee_ch['color']); ?>;"></span><?php echo esc_html($ee_ch['label']); ?></a>
                 <?php endforeach; else : ?>
-                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_bale); ?>" style="color:var(--ee-tealP);font-weight:600;"><span class="dot" style="background:#10b981;"></span>بله</a>
-                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_eitaa); ?>" style="color:#b45309;font-weight:600;"><span class="dot" style="background:#f59e0b;"></span>ایتا</a>
-                    <a class="ee-tb-item" href="<?php echo esc_url($ee_url_rubika); ?>" style="color:#7e22ce;font-weight:600;"><span class="dot" style="background:#a855f7;"></span>روبیکا</a>
+                    <a class="ee-tb-item ee-u-teal ee-u-b" href="<?php echo esc_url($ee_url_bale); ?>"><span class="dot ee-u-bg-green"></span>بله</a>
+                    <a class="ee-tb-item ee-u-amber ee-u-b" href="<?php echo esc_url($ee_url_eitaa); ?>"><span class="dot ee-u-bg-amber"></span>ایتا</a>
+                    <a class="ee-tb-item ee-u-lav ee-u-b" href="<?php echo esc_url($ee_url_rubika); ?>"><span class="dot ee-u-bg-lav"></span>روبیکا</a>
                 <?php endif; ?>
             </div>
             <div class="ee-tb-links">

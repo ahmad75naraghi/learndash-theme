@@ -62,7 +62,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                     <button type="submit" class="btn-submit">ذخیره اطلاعات</button>
                 </div>
             </form>
-            <div id="form-msg" style="margin-top:15px; text-align:center; font-weight:bold;"></div>
+            <div id="form-msg" class="ee-u-msg"></div>
         </div>
         
 <?php get_template_part('template-parts/panel/shell', 'close'); ?>

@@ -511,3 +511,26 @@ html.no-js .ee-rv, .ee-rv.is-in { opacity: 1; transform: none; }
     .ee-ls-hero::before, .ee-qz-hero::before { background: none !important; }
     .ee-ls-blob, .ee-qz-orb { display: none !important; }
 }
+
+/* ========================================================================
+   کلاس‌های کمکی (جایگزین استایل‌های inline)
+   ======================================================================== */
+.ee-home .ee-u-teal { color: var(--ee-tealP); }
+.ee-home .ee-u-lav { color: #7e22ce; }
+.ee-home .ee-u-amber { color: #b45309; }
+.ee-home .ee-u-b { font-weight: 600; }
+.ee-home .ee-u-fs1 { font-size: 1rem; }
+.ee-home .ee-u-min0 { min-width: 0; }
+.ee-home .ee-u-mt6 { margin: .6rem 0 .2rem; }
+.ee-home .ee-u-mint { background: var(--ee-mint); color: #065f46; }
+.ee-home .ee-u-bg-green { background: #10b981; }
+.ee-home .ee-u-bg-amber { background: #f59e0b; }
+.ee-home .ee-u-bg-lav { background: #a855f7; }
+.ee-home .ee-u-cover-ic { font-size: 2.6rem; color: var(--ee-tealP); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.ee-home .ee-u-fill-ic { width: 100%; height: 100%; font-size: 2.4rem; color: var(--ee-tealP); }
+.ee-home .ee-u-plain-link { text-decoration: none; color: inherit; display: block; }
+.ee-home .ee-u-grid-empty { grid-column: 1 / -1; padding: 20px; text-align: center; color: var(--ee-soft); }
+.ee-home .ee-u-msg { margin-top: 15px; text-align: center; font-weight: 700; }
+.ee-home .ee-u-msg.is-box { border-radius: 8px; padding: 10px; }
+.ee-home .ee-u-remove-fab { position: absolute; top: 10px; left: 10px; z-index: 10; background: rgb(255 255 255 / .85); border: 0; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; color: #ff4757; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgb(0 0 0 / .1); }
+[hidden] { display: none !important; }

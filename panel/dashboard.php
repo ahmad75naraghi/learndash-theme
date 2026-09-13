@@ -85,7 +85,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                 ?>
                     <div class="course-card">
                         <!-- تگ a برای کلیک‌پذیر کردن کل کارت (در صورت نیاز استایل را در CSS تنظیم کنید) -->
-                        <a href="<?php echo esc_url($course_link); ?>" style="text-decoration: none; color: inherit; display: block;">
+                        <a href="<?php echo esc_url($course_link); ?>" class="ee-u-plain-link">
                             <div class="card-header">
                                 <div class="image-placeholder">
                                     <img src="<?php echo esc_url($course_thumbnail); ?>" />
@@ -113,7 +113,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                     endforeach; 
                 else : 
                 ?>
-                    <div class="no-exist-notice" style="grid-column: 1 / -1; padding: 20px; text-align: center; color: #666;">
+                    <div class="no-exist-notice ee-u-grid-empty">
                         <p>
                             هنوز دوره ای شرکت نکردی!!
                         </p>

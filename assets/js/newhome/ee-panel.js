@@ -64,10 +64,10 @@
     function formData(form) { var o = {}; new FormData(form).forEach(function (v, k) { o[k] = v; }); return o; }
     function flash(el, text, ok) {
         if (!el) { return; }
-        el.textContent = text; el.style.display = 'block';
+        el.textContent = text; el.hidden = false; el.style.display = 'block';
         el.style.color = ok ? '#047857' : '#b91c1c'; el.style.background = ok ? '#ecfdf5' : '#fef2f2';
         el.style.padding = '.6rem .8rem'; el.style.borderRadius = '.7rem';
-        clearTimeout(el._t); el._t = setTimeout(function () { el.style.display = 'none'; }, 4000);
+        clearTimeout(el._t); el._t = setTimeout(function () { el.style.display = 'none'; el.hidden = true; }, 4000);
     }
 
     /* پروفایل */

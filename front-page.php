@@ -195,9 +195,9 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                     <?php if (has_post_thumbnail($p)) : ?>
                                         <img class="th" src="<?php echo esc_url(get_the_post_thumbnail_url($p, 'thumbnail')); ?>" alt="<?php echo esc_attr(get_the_title($p)); ?>">
                                     <?php else : ?>
-                                        <svg class="th ee-ic" aria-hidden="true" focusable="false" style="color:var(--ee-tealP);"><use href="#i-article"></use></svg>
+                                        <svg class="th ee-ic ee-u-teal" aria-hidden="true" focusable="false"><use href="#i-article"></use></svg>
                                     <?php endif; ?>
-                                    <div style="min-width:0;">
+                                    <div class="ee-u-min0">
                                         <h4><?php echo esc_html(get_the_title($p)); ?></h4>
                                     </div>
                                 </a>
@@ -292,7 +292,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                 <?php if ($ee_thumb) : ?>
                                     <img src="<?php echo esc_url($ee_thumb); ?>" alt="<?php echo esc_attr(get_the_title($c)); ?>" loading="lazy">
                                 <?php else : ?>
-                                    <svg class="ee-ic" aria-hidden="true" focusable="false" style="font-size:2.6rem;color:var(--ee-tealP);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><use href="#i-school"></use></svg>
+                                    <svg class="ee-ic ee-u-cover-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg>
                                 <?php endif; ?>
                                 <?php if ($ee_free) : ?>
                                     <span class="cc-badge free">رایگان</span>
@@ -421,7 +421,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                     <div class="ee-step">
                         <div>
                             <div class="st-top"><span class="st-num">۱</span><svg class="st-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-how_to_reg"></use></svg></div>
-                            <h5 style="margin:.6rem 0 .2rem;">عضویت کاملاً رایگان</h5>
+                            <h5 class="ee-u-mt6">عضویت کاملاً رایگان</h5>
                             <p>ثبت‌نام سریع تنها با یک شماره همراه، بدون نیاز به مدارک پیچیده</p>
                         </div>
                         <div class="st-foot"><span>شروع سریع</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></div>
@@ -429,7 +429,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                     <div class="ee-step st2">
                         <div>
                             <div class="st-top"><span class="st-num">۲</span><svg class="st-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-checklist_rtl"></use></svg></div>
-                            <h5 style="margin:.6rem 0 .2rem;">انتخاب دورهٔ دلخواه</h5>
+                            <h5 class="ee-u-mt6">انتخاب دورهٔ دلخواه</h5>
                             <p>فعال‌سازی دوره‌های شبکه، سرور، امنیت و مجازی‌سازی متناسب با سطح خود</p>
                         </div>
                         <div class="st-foot"><span>انتخاب مبحث</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></div>
@@ -437,7 +437,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                     <div class="ee-step st3">
                         <div>
                             <div class="st-top"><span class="st-num">۳</span><svg class="st-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-all_inclusive"></use></svg></div>
-                            <h5 style="margin:.6rem 0 .2rem;">دسترسی نامحدود و دائمی</h5>
+                            <h5 class="ee-u-mt6">دسترسی نامحدود و دائمی</h5>
                             <p>مشاهدهٔ ویدیوها، دریافت جزوات و شرکت در آزمون در هر زمان و مکان</p>
                         </div>
                         <div class="st-foot"><span>مشاهده دوره‌ها</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></div>
@@ -462,7 +462,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                             <h3 class="ee-sec-title purple"><span class="bar"></span> <?php echo esc_html($ee_opt('blog_feat_title')); ?></h3>
                             <p class="sec-sub"><?php echo esc_html($ee_opt('blog_feat_sub')); ?></p>
                         </div>
-                        <a class="lc-more" style="color:#7e22ce;" href="<?php echo esc_url($ee_bf_url); ?>">همهٔ نوشته‌ها <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
+                        <a class="lc-more ee-u-lav" href="<?php echo esc_url($ee_bf_url); ?>">همهٔ نوشته‌ها <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                     </div>
 
                     <div class="ee-bf-grid">
@@ -531,7 +531,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                     <div>
                         <h3 class="ee-sec-title purple"><span class="bar"></span> <?php echo esc_html($ee_opt('articles_title')); ?></h3>
                     </div>
-                    <a class="lc-more" style="color:#7e22ce;" href="<?php echo esc_url($ee_blog_url); ?>">مشاهده همه مقالات <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
+                    <a class="lc-more ee-u-lav" href="<?php echo esc_url($ee_blog_url); ?>">مشاهده همه مقالات <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                 </div>
 
                 <?php
@@ -545,11 +545,11 @@ $ee_slider_mode  = $ee_slide_count > 1;
                             <?php if (has_post_thumbnail($a)) : ?>
                                 <img src="<?php echo esc_url(get_the_post_thumbnail_url($a, 'medium')); ?>" alt="<?php echo esc_attr(get_the_title($a)); ?>" loading="lazy">
                             <?php else : ?>
-                                <svg class="ee-ic" aria-hidden="true" focusable="false" style="width:100%;height:100%;font-size:2.4rem;color:var(--ee-tealP);"><use href="#i-article"></use></svg>
+                                <svg class="ee-ic ee-u-fill-ic" aria-hidden="true" focusable="false"><use href="#i-article"></use></svg>
                             <?php endif; ?>
                         </a>
                         <div>
-                            <span class="art-tag" style="background:var(--ee-mint);color:#065f46;"><?php echo esc_html($ee_pcat_name); ?></span>
+                            <span class="art-tag ee-u-mint"><?php echo esc_html($ee_pcat_name); ?></span>
                             <h4><a href="<?php echo esc_url(get_permalink($a)); ?>"><?php echo esc_html(get_the_title($a)); ?></a></h4>
                             <p><?php echo esc_html(wp_trim_words(get_the_excerpt($a), 16)); ?></p>
                         </div>

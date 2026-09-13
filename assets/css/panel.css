@@ -1,10 +1,5 @@
-/* استایل محتوای پنل کاربری (کارت‌ها، جدول‌ها، فرم‌ها)
-   پوستهٔ صفحه (هدر/فوتر/سایدبار/گرید) در newhome/ee-panel.css است. */
-
-
-/* Main Content */
-
 /* Top Stats */
+
 .top-stats {
     display: flex;
     align-items: center;
@@ -40,6 +35,7 @@
 }
 
 /* Section Title */
+
 .section-title {
     font-size: 16px;
     font-weight: 600;
@@ -49,6 +45,7 @@
 }
 
 /* Course Grid Vertical */
+
 .course-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -92,19 +89,6 @@
     height: 160px;
     border-radius: 18px;
     padding: 12px;
-}
-
-.card-overlay-text {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: linear-gradient(to top, rgba(199, 210, 254, 0.9), transparent);
-    padding: 0.5rem;
-    text-align: center;
-    color: var(--indigo-900);
-    font-weight: 700;
-    font-size: 0.875rem;
 }
 
 .card-body {
@@ -154,13 +138,6 @@
     background-color: #FFEAC6;
 }
 
-.tag-indigo {
-    background-color: var(--indigo-100);
-    color: var(--indigo-700);
-    padding: 0.25rem 0.5rem;
-    border-radius: 9999px;
-}
-
 .card-price {
     font-weight: 700;
     font-size: 14px;
@@ -174,7 +151,9 @@
     flex-flow: column;
     align-items: center;
     width: 100%;
-}/* Sidebar */
+}
+
+/* Sidebar */
 
 .course-grid .no-exist-notice p {
     margin-bottom: 8px;
@@ -187,11 +166,8 @@
     margin-top: 1rem;
 }
 
-.text-center {
-    text-align: center;
-}
-
 /* Search Bar */
+
 .search-bar {
     background-color: var(--white);
     border: 1px solid #DADADA;
@@ -227,6 +203,7 @@
 }
 
 /* Horizontal Course Grid */
+
 .horizontal-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -272,19 +249,8 @@
     background-size: cover;
 }
 
-.horizontal-overlay-text {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    background: linear-gradient(to top, rgba(199, 210, 254, 1), transparent);
-    padding: 0.25rem;
-    text-align: center;
-    color: var(--indigo-900);
-    font-weight: 700;
-    font-size: 0.5625rem;
-}
-
 /* Progress Bar */
+
 .progress-wrapper {
     display: flex;
     align-items: center;
@@ -322,6 +288,7 @@
 }
 
 /* Buttons */
+
 .card-actions {
     display: flex;
     justify-content: flex-end;
@@ -388,6 +355,7 @@
 /*
     Payments Page
 */
+
 .table-header {
     display: grid;
     grid-template-columns: 2.5fr 1fr 1.5fr 1fr 1.5fr 1fr;
@@ -446,6 +414,7 @@
 }
 
 /* Modal */
+
 .overlay {
     position: fixed;
     top: 0;
@@ -683,24 +652,10 @@
     width: 100%;
 }
 
-.certificates-container .card .cert-mock-text {
-    background: rgba(0, 0, 0, 0.1);
-    height: 4px;
-    border-radius: 2px;
-    width: 80%;
-    margin: 3px 0;
-}
-
-.certificates-container .card .cert-mock-title {
-    font-size: 10px;
-    font-weight: bold;
-    color: #312e81;
-    margin-bottom: 5px;
-}
-
 /**
  **   Profile Panel
 **/
+
 .profile-panel .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -862,25 +817,12 @@
     text-align: left;
     padding-left: 40px;
     padding-right: 15px;
-}/**
+}
+
+/**
  ** logout Modal Panel
 **/
 
-@media (max-width: 768px) {
-
-    .page-template-panel .mobile-header-panel {
-        display: flex;
-        gap: 14px;
-        align-items: center;
-        color: #333;
-        font-weight: 600;
-        line-height: 26px;
-    }
-
-    .mobile-header-panel a svg {
-        transform: translate(0px, 2px);
-    }
-}
 .password-modal {
     display: none;
     position: fixed;
@@ -895,192 +837,8 @@
     direction: rtl;
     backdrop-filter: blur(2px);
 }
-.modal-content {
-    background: #ffffff;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    padding: 30px;
-    position: relative;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    font-family: inherit;
-}
-/* بخش امنیت پسورد و خط ها (مرحله ۴) */
-.password-strength-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: 19px;
-    margin-bottom: 19px;
-}
-
-.strength-label {
-    font-size: 12px;
-    margin-bottom: 6px;
-    font-weight: bold;
-}
-
-.strength-label.weak {
-    color: #ED2E2E;
-}
-
-.strength-label.medium {
-    color: #F4B740;
-}
-
-.strength-label.strong {
-    color: #00BA88;
-}
-
-.strength-bars {
-    display: flex;
-    width: 100%;
-    gap: 6px;
-}
-
-.bar {
-    flex: 1;
-    height: 5px;
-    background-color: #e2e2e2;
-    border-radius: 20px;
-    transition: background-color 0.3s;
-}
-
-/* لیست قوانین پسورد */
-.password-rules {
-    list-style: none;
-    margin-bottom: 25px;
-    padding-right: 5px;
-}
-
-.password-rules li {
-    font-size: 12px;
-    color: #000;
-    margin-bottom: 6px;
-    position: relative;
-    padding-right: 15px;
-}
-
-.password-rules li::before {
-    content: '•';
-    position: absolute;
-    right: 0;
-    color: #000;
-    font-size: 20px;
-    top: -9px;
-}
-
-.password-rules li.valid {
-    color: #00BA88;
-}
-
-.password-rules li.valid::before {
-    color: #00BA88;
-}
-
-.toast-wrapper {
-    display: none;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
-    max-width: 550px;
-    padding: 20px;
-    margin-top: auto;
-}
-
-.toast-wrapper:has(.active) {
-    display: flex;
-}
-
-/* استایل کلی و مشترک کارت‌ها */
-.toast-card {
-    display: none;
-    background-color: #ffffff;
-    border-radius: 8px;
-    overflow: hidden;
-    min-height: 46px;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    position: relative;
-}
-
-.toast-card.success.active, .toast-card.error.active {
-    display: flex;
-}
-
-/* بخش محتوای متنی و آیکون */
-.toast-content {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    /* برای چسبیدن متن و آیکون به سمت راست مطابق عکس */
-    padding: 15px 12px;
-    gap: 8px;
-}
-
-.toast-text {
-    font-size: 12px;
-    font-weight: 400;
-}
-
-.toast-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* نوار رنگی عمودی لبه سمت راست */
-.toast-side-bar {
-    width: 12px;
-    height: 100%;
-}
-
-/* فیلدهای پسورد چشمی دار */
-.password-wrapper {
-    position: relative;
-}
-
-.password-wrapper input {
-    padding-left: 45px;
-    text-align: right;
-    direction: ltr;
-}
-
-.toggle-password {
-    position: absolute;
-    left: 15px;
-    top: 35%;
-    cursor: pointer;
-    color: #888;
-    user-select: none;
-}
 
 /* متن خطا */
-.error-message {
-    display: none;
-    background-color: #fff5f5;
-    border: 1px solid #ffccd0;
-    color: #ED2E2E;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    margin-top: 15px;
-    align-items: center;
-    gap: 8px;
-    border-right: 5px solid #ED2E2E;
-}
-
-.error-icon {
-    background: #ED2E2E;
-    color: white;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-}
 
 input:focus {
     border-color: #b0b0b0;
@@ -1105,38 +863,26 @@ h2 {
     font-weight: 600;
 }
 
-.step-desc {
-    font-size: 16px;
-    color: #000;
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-/* فیلدهای ورودی */
-.input-group {
-    position: relative;
-    margin-bottom: 24px;
-}
-
 /* دکمه اصلی */
-    .btn-submit {
-        width: 100%;
-        padding: 14px;
-        border: none;
-        border-radius: 10px;
-        background-color: #fca326;
-        color: #000;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
 
-    .btn-submit:disabled {
-        background-color: #fca326;
-        color: #fff;
-        cursor: not-allowed;
-    }
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background-color: #fca326;
+    color: #000;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-submit:disabled {
+    background-color: #fca326;
+    color: #fff;
+    cursor: not-allowed;
+}
 
 @keyframes fadeIn {
     from {
@@ -1151,60 +897,26 @@ h2 {
 }
 
 /* ---------------------------------
-حالت موفقیت (Success - رنگ سبز)
---------------------------------- */
-.toast-card.success .toast-text {
-    color: #00BA88;
-}
-
-.toast-card.success .toast-icon {
-    color: #10A853;
-}
-
-.toast-card.success .toast-side-bar {
-    background-color: #00BA88;
-}
-/* ---------------------------------
 حالت خطا (Error - رنگ قرمز)
 --------------------------------- */
-.toast-card.error .toast-text {
-    color: #ED2E2E;
-}
 
-.toast-card.error .toast-icon {
-    color: #DC2626;
-}
-
-.toast-card.error .toast-side-bar {
-    background-color: #ED2E2E;
-}
-
-.show-password + span::after {
-    content: "|";
-    width: 18px;
-    height: 18px;
-    position: absolute;
-    left: 5px;
-    color: #000;
-    text-align: center;
-    font-size: 25px;
-    top: -7px;
-    transform: rotate(42deg);
-}
-@media (max-width: 1200px){
+@media (max-width: 1200px) {
 
 }
-@media (max-width: 990px){
-   .certificates-container .card {
-    width: 100%;
+
+@media (max-width: 990px) {
+    .certificates-container .card {
+        width: 100%;
+    }
 }
-}
-@media (max-width: 768px){
+
+@media (max-width: 768px) {
     .transaction-content .table-header {
         display: none;
     }
 
     /* تبدیل هر سطر به یک کارت */
+
     .transaction-content .table-row {
         display: flex;
         flex-direction: column;
@@ -1217,6 +929,7 @@ h2 {
     }
 
     /* تنظیم لایه‌بندی آیتم‌های داخل کارت (عنوان سمت راست، مقدار سمت چپ) */
+
     .transaction-content .table-row > div {
         display: flex;
         justify-content: space-between;
@@ -1228,18 +941,34 @@ h2 {
     }
 
     /* ایجاد لیبل‌های سمت راست با استفاده از CSS Pseudo-elements */
+
     .transaction-content .table-row > div::before {
         font-weight: 500;
         color: #666;
     }
 
-    .transaction-content .table-row > div:nth-child(1)::before { content: "عنوان دوره"; }
-    .transaction-content .table-row > div:nth-child(2)::before { content: "وضعیت تراکنش"; }
-    .transaction-content .table-row > div:nth-child(3)::before { content: "تاریخ تراکنش"; }
-    .transaction-content .table-row > div:nth-child(4)::before { content: "شماره تراکنش"; }
-    .transaction-content .table-row > div:nth-child(5)::before { content: "مبلغ تراکنش"; }
+    .transaction-content .table-row > div:nth-child(1)::before {
+        content: "عنوان دوره";
+    }
+
+    .transaction-content .table-row > div:nth-child(2)::before {
+        content: "وضعیت تراکنش";
+    }
+
+    .transaction-content .table-row > div:nth-child(3)::before {
+        content: "تاریخ تراکنش";
+    }
+
+    .transaction-content .table-row > div:nth-child(4)::before {
+        content: "شماره تراکنش";
+    }
+
+    .transaction-content .table-row > div:nth-child(5)::before {
+        content: "مبلغ تراکنش";
+    }
 
     /* دکمه رسید (ستون آخر) */
+
     .transaction-content .table-row > div:last-child {
         display: block;
         padding-top: 12px;
@@ -1251,6 +980,7 @@ h2 {
     }
 
     /* استایل دکمه دانلود رسید */
+
     .transaction-content .btn-receipt {
         width: 100%;
         padding: 10px;
@@ -1262,12 +992,14 @@ h2 {
     }
 
     /* استایل دکمه فعال (نارنجی) */
+
     .transaction-content .btn-receipt.active {
         background-color: #ffa500;
         color: #000;
     }
 
     /* استایل دکمه غیرفعال/ناموفق (خاکستری) */
+
     .transaction-content .btn-receipt.disabled,
     .transaction-content .btn-receipt:disabled {
         background-color: #e0e0e0;
@@ -1276,6 +1008,7 @@ h2 {
     }
 
     /* استایل رنگ وضعیت‌ها */
+
     .status-success {
         color: #2e7d32;
         font-weight: bold;
@@ -1285,35 +1018,18 @@ h2 {
         color: #d32f2f;
         font-weight: bold;
     }
+
     .datetime span {
         padding-left: 0;
     }
+}
 
- }
- 
 @media (max-width: 600px) {
-
     .top-stats {
         padding: 8px;
     }
 
-    /* حالت عادی: SVG اول ظاهر، SVG دوم مخفی */
-    .action-bar ul li a svg:nth-of-type(1) {
-        display: inline-block !important;
-    }
-
-    .action-bar ul li a svg:nth-of-type(2) {
-        display: none !important;
-    }
-
     /* حالت اکتیو: SVG اول مخفی، SVG دوم ظاهر */
-    .action-bar ul li a.active svg:nth-of-type(1) {
-        display: none !important;
-    }
-
-    .action-bar ul li a.active svg:nth-of-type(2) {
-        display: inline-block !important;
-    }
 
     .course-grid {
         scrollbar-width: none;
@@ -1325,74 +1041,80 @@ h2 {
         grid-template-columns: none !important;
     }
 
-    
-.horizontal-grid {
-    grid-template-columns: repeat(1, 1fr);
-}
-.horizontal-card-image {
-    background-color: var(--indigo-50);
-    object-fit: cover;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    background-repeat: no-repeat;
-    width: 120px;
-    height: 90px;
-    flex-shrink: 0;
-    background-size: cover;
-    background-position: center;
-    border-radius: 8px;
-}
-.card-title {
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 19px;
-    min-height: auto;
-}
-/* ۱. کانتینر اصلی */
-.horizontal-card {
-  position: relative;
-  /* ایجاد فضای کافی در پایین بخش top برای قرارگیری بج‌ها */
-}
+    .horizontal-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
 
-/* ۲. ایجاد فاصله در پایین بخش بالای کارت تا بج‌ها روی محتوای بعدی نیافتند */
-.horizontal-card-top {
-  position: relative;
-  margin-bottom: 45px; /* ارتفاع تقریبی بج‌ها + فاصله */
-}
+    .horizontal-card-image {
+        background-color: var(--indigo-50);
+        object-fit: cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background-repeat: no-repeat;
+        width: 120px;
+        height: 90px;
+        flex-shrink: 0;
+        background-size: cover;
+        background-position: center;
+        border-radius: 8px;
+    }
 
-/* ۳. خارج کردن بج‌ها از داخل info و انتقال مطلق به زیر عکس و عنوان */
-.horizontal-card .card-tags {
-  position: absolute;
-  bottom: -44px; /* فاصله از پایین horizontal-card-top */
-  right: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
+    .card-title {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 19px;
+        min-height: auto;
+    }
 
-.get-certificate {
-    padding: 8px 8px;
-    font-size: 12px;
-}
+    /* ۱. کانتینر اصلی */
 
-.submit-comment-btn {
-    padding: 8px 10px;
-    font-size: 12px;
-}
+    .horizontal-card {
+        position: relative;
+        /* ایجاد فضای کافی در پایین بخش top برای قرارگیری بج‌ها */
+    }
 
-.start-course-btn {
-    padding: 8px 10px;
-    font-size: 12px;
-}
-.certificates-container .card {
-    width: 100%;
-}
+    /* ۲. ایجاد فاصله در پایین بخش بالای کارت تا بج‌ها روی محتوای بعدی نیافتند */
 
-.card {
+    .horizontal-card-top {
+        position: relative;
+        margin-bottom: 45px; /* ارتفاع تقریبی بج‌ها + فاصله */
+    }
+
+    /* ۳. خارج کردن بج‌ها از داخل info و انتقال مطلق به زیر عکس و عنوان */
+
+    .horizontal-card .card-tags {
+        position: absolute;
+        bottom: -44px; /* فاصله از پایین horizontal-card-top */
+        right: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .get-certificate {
+        padding: 8px 8px;
+        font-size: 12px;
+    }
+
+    .submit-comment-btn {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .start-course-btn {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .certificates-container .card {
+        width: 100%;
+    }
+
+    .card {
         position: relative;
         padding-bottom: 65px !important;
     }
@@ -1402,7 +1124,6 @@ h2 {
         left: 12px;
         right: 12px;
         bottom: 12px;
-
         width: auto;
         display: flex;
         align-items: center;
@@ -1422,9 +1143,11 @@ h2 {
         align-items: center;
         justify-content: center;
     }
+
     .progress-desc {
         margin: 16px 0px 31px 0;
     }
+
     .modal {
         border-radius: 0px;
         width: 100%;
@@ -1433,74 +1156,50 @@ h2 {
         height: 100%;
         justify-content: flex-start;
     }
+
     .invoice-table td:first-child {
         font-weight: 500;
         color: #000000;
     }
-    
-    /* .modal-content {
-        background: #ffffff;
-        border-radius: 0;
-        width: 100%;
-        max-width: 100%;
-        padding: 97px 16px 24px 16px;
-        position: absolute;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        font-family: inherit;
-        bottom: 0;
-    } */
-    
+
     .close {
         position: absolute;
         z-index: 1;
         top: 110px;
         left: 16px;
     }
-    
-    .modal-content h2{
-    
-        font-size: 14px;
-        color: #000;
-        text-align: right;
-        margin-bottom: 12px;
-        font-weight: 600;
-    }
-    
-    .step-desc {
-        font-size: 12px;
-        color: #444444;
-        text-align: right;
-        margin-bottom: 25px;
-    }
+
     #profile-form {
         direction: rtl;
         padding: 24px 0;
         border-radius: 12px;
         box-sizing: border-box;
-      }
-    
-      /* تک ستونه کردن گرید فرم */
-      #profile-form .form-grid {
+    }
+
+    /* تک ستونه کردن گرید فرم */
+
+    #profile-form .form-grid {
         display: flex;
         flex-direction: column;
         gap: 16px;
-      }
-    
-      #profile-form .form-group {
+    }
+
+    #profile-form .form-group {
         display: flex;
         flex-direction: column;
         gap: 8px;
-      }
-    
-      #profile-form .form-group label {
+    }
+
+    #profile-form .form-group label {
         font-size: 14px;
         font-weight: 600;
         color: #333333;
         text-align: right;
-      }
-    
-      /* استایل اینپوت‌ها و سلکت‌باکس */
-      #profile-form .form-control {
+    }
+
+    /* استایل اینپوت‌ها و سلکت‌باکس */
+
+    #profile-form .form-control {
         width: 100%;
         height: 48px;
         padding: 0 16px;
@@ -1511,36 +1210,28 @@ h2 {
         color: #333333;
         outline: none;
         box-sizing: border-box;
-      }
-    
-      #profile-form .form-control::placeholder {
+    }
+
+    #profile-form .form-control::placeholder {
         color: #9ca3af;
-      }
-    
-      #profile-form .form-control:focus {
+    }
+
+    #profile-form .form-control:focus {
         border-color: #0b2545;
-      }
-    
-      /* سفارشی‌سازی ظاهر select */
-      /* #profile-form select.form-control {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%206b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-        background-repeat: no-repeat;
-        background-position: left 16px center;
-      } */
-    
-      /* جابجایی ترتیب دکمه و باکس پیام alert */
-      #profile-form .form-footer {
+    }
+
+    /* جابجایی ترتیب دکمه و باکس پیام alert */
+
+    #profile-form .form-footer {
         display: flex;
         flex-direction: column-reverse; /* دکمه بالا و پیام زیر آن قرار می‌گیرد */
         margin-top: 24px;
         gap: 16px;
-      }
-    
-      /* استایل دکمه ارسال */
-      #profile-form .btn-submit {
+    }
+
+    /* استایل دکمه ارسال */
+
+    #profile-form .btn-submit {
         width: 100%;
         height: 40px;
         background-color: #0b2545;
@@ -1551,14 +1242,15 @@ h2 {
         font-weight: 400;
         cursor: pointer;
         transition: background-color 0.2s ease;
-      }
-    
-      #profile-form .btn-submit:hover {
+    }
+
+    #profile-form .btn-submit:hover {
         background-color: #13345c;
-      }
-    
-      /* استایل باکس هشدار/توضیحات زیر دکمه */
-      #profile-form .info-alert {
+    }
+
+    /* استایل باکس هشدار/توضیحات زیر دکمه */
+
+    #profile-form .info-alert {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1567,35 +1259,39 @@ h2 {
         padding: 0;
         font-size: 13px;
         color: #333333;
-      }
-    
-      #profile-form .info-alert svg {
+    }
+
+    #profile-form .info-alert svg {
         flex-shrink: 0;
         width: 20px;
         height: 20px;
-      }
-      .section-title {
+    }
+
+    .section-title {
         font-size: 14px;
         font-weight: 600;
         margin-bottom: 20px;
         text-align: right;
         color: #333333;
     }
+
     .settings-panel .settings-grid {
         grid-template-columns: repeat(1, 1fr);
     }
+
     .settings-panel .input-header {
         display: flex;
         justify-content: flex-start;
         align-items: center;
         gap: 8px;
     }
+
     .settings-panel .input-label {
         font-size: 12px;
         font-weight: 500;
         color: #333;
     }
-    
+
     .settings-panel .badge-verified {
         display: flex;
         align-items: center;
@@ -1604,6 +1300,7 @@ h2 {
         font-size: 10px;
         font-weight: 400;
     }
+
     .settings-panel .btn-submit {
         background-color: #0f172a;
         color: #fff;
@@ -1613,12 +1310,13 @@ h2 {
         font-weight: 500;
         font-size: 14px;
     }
-    
+
     .settings-panel .email-input {
         text-align: right;
         padding-left: 15px;
         padding-right: 40px;
     }
+
     .settings-panel .icon-edit {
         position: absolute;
         right: 12px;
@@ -1627,33 +1325,28 @@ h2 {
         height: 18px;
         cursor: pointer;
     }
-    /* لایه تیره پس‌زمینه (Overlay) */
-  .password-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5); /* تیرگی پشت مودال */
-    z-index: 10000;
-    display: flex !important;
-    align-items: flex-end; /* چسباندن مودال به کف صفحه */
-    justify-content: center;
-    box-sizing: border-box;
-  }
 
-  /* تنظیم فریم مودال در پایین صفحه */
-  .password-modal .modal-content {
-    width: 100%;
-    background-color: #ffffff;
-    border-radius: 12px 12px 0 0;
-    box-sizing: border-box;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 29px 16px 24px 16px;
-  }
+    /* لایه تیره پس‌زمینه (Overlay) */
+
+    .password-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5); /* تیرگی پشت مودال */
+        z-index: 10000;
+        display: flex !important;
+        align-items: flex-end; /* چسباندن مودال به کف صفحه */
+        justify-content: center;
+        box-sizing: border-box;
+    }
+
+    /* تنظیم فریم مودال در پایین صفحه */
 }
+
 /* --- دکمهٔ اصلی حالت‌های خالی (پرداخت‌ها / علاقه‌مندی / گواهینامه‌ها / داشبورد) --- */
+
 .no-exist-notice .btn-primary {
     display: inline-block;
     background-color: #082B4C;
@@ -1672,6 +1365,7 @@ h2 {
 }
 
 /* --- ردیف دکمه‌های کارت دوره در «دوره‌های من» --- */
+
 .card-actions .course-actions {
     display: flex;
     align-items: center;
@@ -1679,10 +1373,3 @@ h2 {
 }
 
 /* --- قواعد رمز عبور: حالت نامعتبر --- */
-.password-rules li.invalid {
-    color: #b91c1c;
-}
-
-.password-rules li.invalid::before {
-    color: #b91c1c;
-}

@@ -75,7 +75,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                     </div>
                 <?php endforeach; ?>
             <?php else : ?>
-                <div class="no-exist-notice" style="grid-column: 1 / -1; padding: 20px; text-align: center; color: #666;">
+                <div class="no-exist-notice ee-u-grid-empty">
                     <p>
                         هنوز دوره ای شرکت نکردی!!
                     </p>
@@ -91,7 +91,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
         </div>
         
         <!-- Modal Overlay (مخفی به صورت پیش‌فرض) -->
-        <div class="overlay" style="display: none;">
+        <div class="overlay">
             <div class="modal">
                 <div class="modal-header">
                     <div class="modal-title">جزئیات فاکتور شما</div>
