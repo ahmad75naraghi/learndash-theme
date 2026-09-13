@@ -32,7 +32,7 @@ if (empty($ee_terms)) {
 				<?php if ('' !== $ee_image) : ?>
 					<img src="<?php echo esc_url($ee_image); ?>" alt="<?php echo esc_attr($ee_term->name); ?>" loading="lazy" decoding="async">
 				<?php else : ?>
-					<span class="material-symbols-outlined ee-ic">category</span>
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-category"></use></svg>
 				<?php endif; ?>
 			</span>
 			<span class="ee-catcard-txt">

@@ -21,8 +21,8 @@ while (have_posts()) :
 	$ee_total = (int) $ee_query->found_posts;
 	?>
 
-	<main class="ee-list-main">
-		<div class="ee-wrap ee-list-grid">
+	<main id="ee-main" class="ee-list-main">
+		<div class="ee-wrap ee-list-grid is-filter">
 
 			<div class="ee-list-col">
 
@@ -30,7 +30,7 @@ while (have_posts()) :
 					<div class="ee-lh-txt">
 						<nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
 							<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
-							<span class="material-symbols-outlined ee-ic">chevron_left</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
 							<span class="ee-crumb-current"><?php the_title(); ?></span>
 						</nav>
 
@@ -41,7 +41,7 @@ while (have_posts()) :
 						<?php endif; ?>
 
 						<span class="ee-lh-count">
-							<span class="material-symbols-outlined ee-ic">inventory_2</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-inventory_2"></use></svg>
 							<?php
 							/* translators: %s: تعداد دوره */
 							echo esc_html(sprintf(_n('%s دوره', '%s دوره', $ee_total, 'evented-edu'), number_format_i18n($ee_total)));
@@ -49,6 +49,9 @@ while (have_posts()) :
 						</span>
 					</div>
 				</header>
+
+				<?php echo function_exists('evented_results_toolbar') ? evented_results_toolbar($ee_total) : ''; // phpcs:ignore ?>
+				<?php if (function_exists('evented_course_filter_chips')) { evented_course_filter_chips(); } ?>
 
 				<?php
 				get_template_part('template-parts/lms/course', 'grid', array(
@@ -61,7 +64,7 @@ while (have_posts()) :
 
 			</div>
 
-			<?php get_template_part('template-parts/lms/courses', 'sidebar'); ?>
+			<?php get_template_part('template-parts/lms/filter', 'sidebar', array('ee_total' => $ee_total)); ?>
 
 		</div>
 	</main>

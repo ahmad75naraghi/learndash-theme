@@ -17,6 +17,9 @@ function handle_submit_course_review() {
     if (!$course_id || !$rating || empty($content)) {
         wp_send_json_error('لطفا تمام فیلدها و امتیاز را وارد کنید.');
     }
+    if ($rating < 1 || $rating > 5 || 'sfwd-courses' !== get_post_type($course_id)) {
+        wp_send_json_error('امتیاز یا دوره نامعتبر است.');
+    }
 
     $user = wp_get_current_user();
     if (!$user->exists()) {
@@ -32,6 +35,12 @@ function handle_submit_course_review() {
         'user_id'              => $user->ID,
         'comment_approved'     => 0, // مقدار 0 یعنی نیاز به تایید مدیر دارد
     );
+
+    /** امکان وتو (مثلاً جلوگیری از امتیاز تکراری در inc/reviews.php). */
+    $comment_data = apply_filters('evented_review_before_insert', $comment_data, $course_id, $rating);
+    if (is_wp_error($comment_data)) {
+        wp_send_json_error($comment_data->get_error_message());
+    }
 
     // ذخیره کامنت در دیتابیس وردپرس
     $comment_id = wp_insert_comment($comment_data);
@@ -121,13 +130,13 @@ function handle_toggle_course_wishlist() {
     $course_id = isset($_POST['course_id']) ? intval($_POST['course_id']) : 0;
     $user_id = get_current_user_id();
 
-    if (!$course_id || !$user_id) {
+    if (!$course_id || !$user_id || 'sfwd-courses' !== get_post_type($course_id)) {
         wp_send_json_error('درخواست نامعتبر');
     }
 
-    // دریافت لیست فعلی از متای کاربر
-    $fav_courses_str = get_user_meta($user_id, 'fav_courses', true);
-    $fav_courses = $fav_courses_str ? explode(',', $fav_courses_str) : array();
+    // دریافت لیست فعلی از متای کاربر (فقط شناسه‌های عددی معتبر)
+    $fav_courses_str = (string) get_user_meta($user_id, 'fav_courses', true);
+    $fav_courses = $fav_courses_str ? array_map('intval', explode(',', $fav_courses_str)) : array();
 
     $status = '';
     
@@ -140,8 +149,8 @@ function handle_toggle_course_wishlist() {
         $status = 'added';
     }
 
-    // تمیز کردن آرایه و تبدیل مجدد به رشته با کاما
-    $fav_courses = array_unique(array_filter($fav_courses));
+    // تمیز کردن آرایه و تبدیل مجدد به رشته با کاما (سقف ۲۰۰ مورد)
+    $fav_courses = array_slice(array_values(array_unique(array_filter($fav_courses))), -200);
     update_user_meta($user_id, 'fav_courses', implode(',', $fav_courses));
 
     // ارسال موفقیت‌آمیز وضعیت جدید به فرانت‌اند
@@ -157,14 +166,17 @@ function handle_save_user_profile() {
     if (!$user_id) wp_send_json_error('کاربر لاگین نیست');
 
     // لیست فیلدها و کلیدهای متا
+    $only_fa = function ($v) { return trim(preg_replace('/[^\x{0600}-\x{06FF}\x{0750}-\x{077F}\x{FB50}-\x{FDFF}\x{FE70}-\x{FEFF}\s\x{200C}]/u', '', sanitize_text_field(wp_unslash((string) $v)))); };
+    $only_en = function ($v) { return trim(preg_replace("/[^A-Za-z\s.\-']/", '', sanitize_text_field(wp_unslash((string) $v)))); };
     $fields = [
-        'first_name_fa' => sanitize_text_field($_POST['first_name_fa']),
-        'last_name_fa'  => sanitize_text_field($_POST['last_name_fa']),
-        'first_name_en' => sanitize_text_field($_POST['first_name_en']),
-        'last_name_en'  => sanitize_text_field($_POST['last_name_en']),
-        'gender'        => sanitize_text_field($_POST['gender']),
-        'birth_date'    => sanitize_text_field($_POST['birth_date']),
+        'first_name_fa' => $only_fa($_POST['first_name_fa'] ?? ''),
+        'last_name_fa'  => $only_fa($_POST['last_name_fa'] ?? ''),
+        'first_name_en' => $only_en($_POST['first_name_en'] ?? ''),
+        'last_name_en'  => $only_en($_POST['last_name_en'] ?? ''),
+        'gender'        => in_array($_POST['gender'] ?? '', array('male', 'female', 'other', ''), true) ? (string) $_POST['gender'] : '',
+        'birth_date'    => preg_match('/^\d{4}\/\d{2}\/\d{2}$/', (string) ($_POST['birth_date'] ?? '')) ? (string) $_POST['birth_date'] : '',
     ];
+    // فیلدهای بالا تنها متاهای قابل‌نوشتن از سمت کاربر هستند (whitelist).
 
     foreach ($fields as $key => $value) {
         update_user_meta($user_id, $key, $value);
@@ -197,24 +209,37 @@ function handle_save_account_settings() {
         }
     }
 
-    // بررسی و تغییر رمز عبور
+    // بررسی و تغییر رمز عبور — اگر رمز فعلی ارسال شده باشد باید درست باشد
     if (!empty($_POST['user_password']) && $_POST['user_password'] !== '..........') {
-        $userdata['user_pass'] = sanitize_text_field($_POST['user_password']);
+        $current_user_obj = wp_get_current_user();
+        if (isset($_POST['current_password']) && '' !== (string) $_POST['current_password']
+            && !wp_check_password((string) wp_unslash($_POST['current_password']), $current_user_obj->user_pass, $user_id)) {
+            wp_send_json_error('رمز عبور فعلی صحیح نیست.');
+        }
+        $pass  = (string) wp_unslash($_POST['user_password']);
+        $pass2 = isset($_POST['user_password2']) ? (string) wp_unslash($_POST['user_password2']) : $pass;
+        if ($pass !== $pass2) {
+            wp_send_json_error('تکرار رمز عبور با رمز جدید یکسان نیست.');
+        }
+        if (mb_strlen($pass) < 8 || !preg_match('/\d/', $pass) || !preg_match('/[A-Za-z\x{0600}-\x{06FF}]/u', $pass)) {
+            wp_send_json_error('رمز عبور باید حداقل ۸ کاراکتر و شامل حرف و عدد باشد.');
+        }
+        $userdata['user_pass'] = $pass;
     }
 
     // آپدیت ایمیل و رمز عبور (در صورت تغییر)
     if (isset($userdata['user_email']) || isset($userdata['user_pass'])) {
-        $user_id = wp_update_user($userdata);
-        if (is_wp_error($user_id)) {
-            wp_send_json_error($user_id->get_error_message());
+        $result = wp_update_user($userdata);
+        if (is_wp_error($result)) {
+            wp_send_json_error($result->get_error_message());
+        }
+        if (isset($userdata['user_pass'])) {
+            // کاربر پس از تغییر رمز از حساب خارج نشود
+            wp_set_auth_cookie($user_id, true);
         }
     }
 
-    // بروزرسانی شماره موبایل (ذخیره در user_meta - کلید استاندارد ووکامرس)
-    if (!empty($_POST['user_phone'])) {
-        $new_phone = sanitize_text_field($_POST['user_phone']);
-        update_user_meta($user_id, 'billing_phone', $new_phone);
-    }
+    // شماره موبایل شناسهٔ ورود است و از این فرم قابل تغییر نیست.
 
     wp_send_json_success('تغییرات با موفقیت ذخیره شد.');
 }

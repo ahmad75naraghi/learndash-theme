@@ -16,14 +16,14 @@ while (have_posts()) :
 	the_post();
 	?>
 
-	<main class="ee-list-main">
+	<main id="ee-main" class="ee-list-main">
 		<div class="ee-wrap ee-list-grid">
 
 			<article <?php post_class('ee-page-card'); ?>>
 
 				<nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
 					<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
-					<span class="material-symbols-outlined ee-ic">chevron_left</span>
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
 					<span class="ee-crumb-current"><?php the_title(); ?></span>
 				</nav>
 

@@ -16,9 +16,14 @@ if (post_password_required()) {
 ?>
 <div id="comments" class="ee-comments-wrap">
 
+	<?php if (function_exists('evented_rating_summary_html') && function_exists('evented_rating_form_enabled') && evented_rating_form_enabled() && evented_course_rating(get_the_ID())['count'] > 0) : ?>
+		<h3 class="ee-w-title ee-comments-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-star"></use></svg><?php esc_html_e('امتیاز خوانندگان', 'evented-edu'); ?></h3>
+		<?php echo evented_rating_summary_html(get_the_ID()); // phpcs:ignore ?>
+	<?php endif; ?>
+
 	<?php if (have_comments()) : ?>
 		<h3 class="ee-w-title ee-comments-title">
-			<span class="material-symbols-outlined ee-ic">forum</span>
+			<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg>
 			<?php
 			$ee_comment_count = (int) get_comments_number();
 			/* translators: %s: تعداد دیدگاه */
@@ -32,6 +37,8 @@ if (post_password_required()) {
 				'style'       => 'ol',
 				'short_ping'  => true,
 				'avatar_size' => 44,
+				'reply_text'  => 'پاسخ',
+				'callback'    => function_exists('evented_comment_callback') ? 'evented_comment_callback' : null,
 			));
 			?>
 		</ol>
@@ -52,16 +59,23 @@ if (post_password_required()) {
 	comment_form(array(
 		'class_form'         => 'ee-comment-form',
 		/* عنوان بدون HTML نگه داشته می‌شود؛ آیکن داخل wrapper (که escape نمی‌شود) است */
-		'title_reply_before' => '<h3 id="reply-title" class="ee-w-title ee-reply-title"><span class="material-symbols-outlined ee-ic">edit_note</span>',
+		'title_reply_before' => '<h3 id="reply-title" class="ee-w-title ee-reply-title"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-edit_note"></use></svg>',
 		'title_reply'        => 'دیدگاه خود را بنویسید',
 		'title_reply_after'  => '</h3>',
 		'title_reply_to'     => 'پاسخ به %s',
 		'comment_field'      => '<p class="comment-form-comment"><label class="screen-reader-text" for="comment">' . esc_html__('دیدگاه', 'evented-edu') . '</label><textarea id="comment" name="comment" rows="6" placeholder="' . esc_attr__('اینجا بنویسید...', 'evented-edu') . '" required></textarea></p>',
-		'label_submit'       => 'ارسال دیدگاه',
-		'submit_button'      => '<button type="submit" id="%2$s" class="ee-comment-submit">%4$s <span class="material-symbols-outlined ee-ic">send</span></button>',
+		'submit_button'      => '<button type="submit" id="%2$s" class="ee-comment-submit">%4$s <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-send"></use></svg></button>',
 		'submit_field'       => '<div class="ee-comment-submit-row">%1$s %2$s</div>',
 		'comment_notes_before' => '<p class="ee-comment-notes">' . esc_html__('نشانی ایمیل شما منتشر نخواهد شد. بخش‌های موردنیاز علامت‌گذاری شده‌اند *', 'evented-edu') . '</p>',
 		'comment_notes_after'  => '',
+		'logged_in_as'         => '<p class="ee-comment-notes ee-logged-in">' . sprintf(
+			/* translators: 1: نام کاربر 2: لینک خروج */
+			'با نام <strong>%1$s</strong> وارد شده‌اید. <a href="%2$s">خروج؟</a>',
+			esc_html(wp_get_current_user()->display_name),
+			esc_url(wp_logout_url(apply_filters('the_permalink', get_permalink())))
+		) . '</p>',
+		'cancel_reply_link'    => 'انصراف از پاسخ',
+		'label_submit'         => 'ارسال دیدگاه',
 	));
 	?>
 

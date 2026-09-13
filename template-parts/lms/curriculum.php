@@ -29,7 +29,7 @@ $ee_number       = 0;
 
 	<div class="ee-cur-head">
 		<h2 class="ee-w-title">
-			<span class="material-symbols-outlined ee-ic">list_alt</span>
+			<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-list_alt"></use></svg>
 			<?php esc_html_e('محتوای دوره', 'evented-edu'); ?>
 		</h2>
 		<span class="ee-cur-count"><?php echo esc_html(number_format_i18n(count($ee_steps))); ?> <?php esc_html_e('جلسه', 'evented-edu'); ?></span>
@@ -45,7 +45,7 @@ $ee_number       = 0;
 				$ee_last_section = $ee_step['section_title'];
 				?>
 				<div class="ee-cur-section">
-					<span class="material-symbols-outlined ee-ic">folder_open</span>
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-folder_open"></use></svg>
 					<?php echo esc_html($ee_last_section); ?>
 				</div>
 			<?php endif; ?>
@@ -71,7 +71,7 @@ $ee_number       = 0;
 							<em class="ee-cur-dur"><?php echo esc_html($ee_step['duration_text']); ?></em>
 						<?php endif; ?>
 						<a class="ee-cur-lock" href="#ee-enroll" title="<?php esc_attr_e('برای دسترسی، دوره را ثبت‌نام کنید', 'evented-edu'); ?>">
-							<span class="material-symbols-outlined ee-ic">lock</span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-lock"></use></svg>
 						</a>
 					</span>
 				</div>
@@ -85,7 +85,7 @@ $ee_number       = 0;
 						<?php endif; ?>
 						<?php if (!empty($ee_step['quizzes'])) : ?>
 							<em class="ee-cur-quiz" title="<?php esc_attr_e('دارای آزمون', 'evented-edu'); ?>">
-								<span class="material-symbols-outlined ee-ic">quiz</span>
+								<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-quiz"></use></svg>
 								<?php echo esc_html(number_format_i18n((int) $ee_step['quizzes'])); ?>
 							</em>
 						<?php endif; ?>
@@ -94,9 +94,9 @@ $ee_number       = 0;
 						<?php endif; ?>
 						<span class="ee-cur-dot" aria-hidden="true">
 							<?php if (!empty($ee_step['is_completed'])) : ?>
-								<span class="material-symbols-outlined ee-ic">check_circle</span>
+								<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-check_circle"></use></svg>
 							<?php else : ?>
-								<span class="material-symbols-outlined ee-ic">play_circle</span>
+								<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-play_circle"></use></svg>
 							<?php endif; ?>
 						</span>
 					</span>

@@ -10,14 +10,10 @@
 defined('ABSPATH') || exit;
 
 /**
- * آیا برگهٔ جاری یکی از برگه‌های مستقل (ورود / پنل کاربری) است؟
+ * آیا برگهٔ جاری صفحهٔ مستقل ورود است؟
  *
- * این برگه‌ها طراحی جداگانهٔ خودشان را دارند:
- *  - page-login.php : قالب اسلاگی که HTML کامل صفحهٔ ورود را چاپ می‌کند؛
- *  - page-panel.php : قالب اسلاگی که کاربر را به داشبورد هدایت می‌کند؛
- *  - panel/*.php    : قالب‌های پنل کاربری با هدر/فوتر قدیمی و panel.css.
- *
- * برای این برگه‌ها هیچ‌چیز از پوستهٔ ee-* بارگذاری نمی‌شود.
+ * page-login.php HTML کامل خودش را چاپ می‌کند و پوستهٔ ee-* را نمی‌خواهد.
+ * پنل کاربری (panel/*.php) از نسخهٔ ۲ روی همان پوستهٔ ee-* سوار است.
  *
  * @return bool
  */
@@ -28,18 +24,13 @@ function evented_is_standalone_page()
 	}
 
 	$template = (string) get_page_template_slug();
-
-	/* قالب‌های پنل کاربری (Template Name: Panel - …) و قالب‌های اسلاگی مستقل */
-	if ('' !== $template) {
-		if (0 === strpos($template, 'panel/') || in_array($template, array('page-login.php', 'page-panel.php'), true)) {
-			return true;
-		}
+	if ('page-login.php' === $template) {
+		return true;
 	}
 
-	/* page-login.php / page-panel.php هدر «Template Name» ندارند و با اسلاگ انتخاب می‌شوند */
 	$ee_page = get_queried_object();
 
-	return $ee_page instanceof WP_Post && in_array((string) $ee_page->post_name, array('login', 'panel'), true);
+	return $ee_page instanceof WP_Post && 'login' === (string) $ee_page->post_name;
 }
 
 /**
@@ -89,7 +80,11 @@ function evented_current_url()
 	}
 
 	if (is_post_type_archive()) {
-		return (string) get_post_type_archive_link((string) get_query_var('post_type'));
+		$pt = get_query_var('post_type');
+		if (is_array($pt)) {
+			$pt = (string) reset($pt);
+		}
+		return (string) get_post_type_archive_link((string) $pt);
 	}
 
 	if (is_author()) {
@@ -981,8 +976,8 @@ function evented_logo_html($context = 'header')
 	}
 
 	if ('' === $html) {
-		$html = '<span class="logo-fallback"><span class="material-symbols-outlined ee-ic">school</span> '
-			. esc_html($site_name ? $site_name : 'evented-edu') . '</span>';
+		$html = '<span class="logo-fallback"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg> '
+			. '<span class="ee-logo-text">' . esc_html($site_name ? $site_name : 'evented-edu') . '</span></span>';
 	}
 
 	/**
@@ -1119,11 +1114,12 @@ function evented_courses_query($args = array())
 		'ignore_sticky_posts' => true,
 	);
 
-	return new WP_Query(array_merge($defaults, (array) $args));
+	return new WP_Query((array) apply_filters('evented_courses_query_args', array_merge($defaults, (array) $args)));
 }
 
 /**
- * صفحه‌بندی با paginate_links (RTL و کلاس‌های ee-*).
+ * صفحه‌بندی با paginate_links (RTL و کلاس‌های ee-*) — نسخهٔ ۲:
+ * قبلی/بعدی با برچسب، «صفحهٔ X از Y»، در موبایل فقط قبلی/بعدی + شماره.
  *
  * @param WP_Query $query کوئری جاری.
  * @return string
@@ -1140,25 +1136,121 @@ function evented_pagination($query)
 	}
 
 	$current = max(1, (int) get_query_var('paged'), (int) get_query_var('page'));
+	$fa      = function_exists('evented_fa_digits') ? 'evented_fa_digits' : 'strval';
 
 	$links = paginate_links(array(
 		'total'     => $total,
 		'current'   => $current,
 		'type'      => 'array',
-		'prev_text' => '<span class="material-symbols-outlined ee-ic">chevron_right</span>',
-		'next_text' => '<span class="material-symbols-outlined ee-ic">chevron_left</span>',
+		'mid_size'  => 1,
+		'end_size'  => 1,
+		'prev_next' => false,
 	));
 
 	if (empty($links)) {
 		return '';
 	}
 
-	$out = '<nav class="ee-pager" aria-label="' . esc_attr__('صفحه‌بندی', 'evented-edu') . '">';
+	$prev = $current > 1 ? get_pagenum_link($current - 1) : '';
+	$next = $current < $total ? get_pagenum_link($current + 1) : '';
+
+	$out  = '<nav class="ee-pager v2" aria-label="' . esc_attr__('صفحه‌بندی', 'evented-edu') . '">';
+	$out .= $prev
+		? '<a class="ee-pager-btn is-prev" href="' . esc_url($prev) . '" rel="prev"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_forward"></use></svg><span>' . esc_html__('قبلی', 'evented-edu') . '</span></a>'
+		: '<span class="ee-pager-btn is-prev is-off" aria-disabled="true"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_forward"></use></svg><span>' . esc_html__('قبلی', 'evented-edu') . '</span></span>';
+	$out .= '<div class="ee-pager-nums">';
 	foreach ($links as $link) {
 		$out .= str_replace('page-numbers', 'ee-page-num', (string) $link);
 	}
+	$out .= '</div>';
+	/* translators: 1: صفحهٔ فعلی 2: تعداد صفحات */
+	$out .= '<span class="ee-pager-of">' . esc_html(sprintf(__('صفحهٔ %1$s از %2$s', 'evented-edu'), $fa($current), $fa($total))) . '</span>';
+	$out .= $next
+		? '<a class="ee-pager-btn is-next" href="' . esc_url($next) . '" rel="next"><span>' . esc_html__('بعدی', 'evented-edu') . '</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>'
+		: '<span class="ee-pager-btn is-next is-off" aria-disabled="true"><span>' . esc_html__('بعدی', 'evented-edu') . '</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></span>';
 	$out .= '</nav>';
 
+	return $out;
+}
+
+/**
+ * حالت خالی یکدست (تصویر + عنوان + توضیح + دکمه‌ها).
+ *
+ * @param array $args {
+ *   @type string $title   عنوان.
+ *   @type string $text    توضیح.
+ *   @type string $icon    نام آیکن اسپرایت (پیش‌فرض search_off).
+ *   @type array  $actions آرایه‌ای از ['label'=>..., 'url'=>..., 'primary'=>bool].
+ *   @type string $class   کلاس اضافه.
+ * }
+ * @return string
+ */
+function evented_empty_state($args = array())
+{
+	$a = wp_parse_args($args, array(
+		'title'   => __('چیزی پیدا نشد', 'evented-edu'),
+		'text'    => '',
+		'icon'    => 'search_off',
+		'actions' => array(),
+		'class'   => '',
+	));
+	$out  = '<div class="ee-empty-state ' . esc_attr($a['class']) . '">';
+	$out .= '<span class="ee-es-art" aria-hidden="true">';
+	$out .= '<svg class="ee-es-bg" viewBox="0 0 200 120" fill="none"><ellipse cx="100" cy="106" rx="78" ry="8" fill="#E0F2F1"/><circle cx="46" cy="38" r="10" fill="#F3E8FF"/><circle cx="160" cy="26" r="6" fill="#FFEDD5"/><circle cx="172" cy="70" r="4" fill="#D1FAE5"/><path d="M28 78c10-24 40-32 66-24" stroke="#B2DFDB" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 8"/><rect x="62" y="30" width="76" height="60" rx="14" fill="#fff" stroke="#B2DFDB" stroke-width="2.5"/><rect x="76" y="46" width="48" height="6" rx="3" fill="#E2E8F0"/><rect x="76" y="60" width="34" height="6" rx="3" fill="#E2E8F0"/><rect x="76" y="74" width="20" height="6" rx="3" fill="#E2E8F0"/></svg>';
+	$out .= '<span class="ee-es-ic">' . ee_icon($a['icon']) . '</span></span>'; // phpcs:ignore
+	$out .= '<h3 class="ee-es-title">' . esc_html($a['title']) . '</h3>';
+	if ('' !== $a['text']) {
+		$out .= '<p class="ee-es-text">' . esc_html($a['text']) . '</p>';
+	}
+	if (!empty($a['actions'])) {
+		$out .= '<div class="ee-es-actions">';
+		foreach ((array) $a['actions'] as $act) {
+			if (empty($act['url']) || empty($act['label'])) {
+				continue;
+			}
+			$out .= '<a class="ee-btn ' . (!empty($act['primary']) ? 'ee-btn-primary' : 'ee-btn-ghost') . '" href="' . esc_url($act['url']) . '">' . esc_html($act['label']) . '</a>';
+		}
+		$out .= '</div>';
+	}
+	$out .= '</div>';
+	return $out;
+}
+
+/**
+ * نوار ابزار بالای فهرست نتایج: «نمایش X دوره» + مرتب‌سازی جمع‌وجور.
+ *
+ * @param int    $total تعداد کل.
+ * @param string $unit  واحد (دوره/نوشته).
+ * @return string
+ */
+function evented_results_toolbar($total, $unit = '')
+{
+	$fa   = function_exists('evented_fa_digits') ? 'evented_fa_digits' : 'strval';
+	$unit = '' !== $unit ? $unit : __('دوره', 'evented-edu');
+	$out  = '<div class="ee-rtb">';
+	/* translators: 1: تعداد 2: واحد */
+	$out .= '<span class="ee-rtb-n">' . ee_icon('grid_view') . ' ' . esc_html(sprintf(__('نمایش %1$s %2$s', 'evented-edu'), $fa((int) $total), $unit)) . '</span>'; // phpcs:ignore
+	if (function_exists('evented_course_filter_defs')) {
+		$defs = evented_course_filter_defs();
+		$vals = evented_course_filter_values();
+		if (isset($defs['orderby'])) {
+			$out .= '<form class="ee-rtb-sort" method="get" action="' . esc_url(function_exists('evented_course_filter_base_url') ? evented_course_filter_base_url() : '') . '" data-ee-rtb-sort>';
+			foreach ($vals as $k => $v) {
+				if ('orderby' !== $k && '' !== $v) {
+					$out .= '<input type="hidden" name="' . esc_attr($k) . '" value="' . esc_attr($v) . '">';
+				}
+			}
+			if ('' !== get_search_query()) {
+				$out .= '<input type="hidden" name="s" value="' . esc_attr(get_search_query()) . '">';
+			}
+			$out .= '<label>' . ee_icon('sort') . '<span class="screen-reader-text">' . esc_html__('مرتب‌سازی', 'evented-edu') . '</span><select name="orderby">'; // phpcs:ignore
+			foreach ($defs['orderby']['options'] as $ok => $ol) {
+				$out .= '<option value="' . esc_attr($ok) . '"' . selected($vals['orderby'], $ok, false) . '>' . esc_html($ol) . '</option>';
+			}
+			$out .= '</select>' . ee_icon('expand_more') . '</label></form>'; // phpcs:ignore
+		}
+	}
+	$out .= '</div>';
 	return $out;
 }
 
@@ -1327,3 +1419,137 @@ function evented_quiz_data($quiz_id)
 		'course_id'    => function_exists('learndash_get_course_id') ? (int) learndash_get_course_id($quiz_id) : 0,
 	);
 }
+
+
+/**
+ * رندر هر دیدگاه در فهرست استاندارد (wp_list_comments) — تاریخ شمسی، برچسب‌های فارسی.
+ *
+ * @param WP_Comment $comment
+ * @param array      $args
+ * @param int        $depth
+ */
+function evented_comment_callback($comment, $args, $depth)
+{
+	$tag       = ('div' === $args['style']) ? 'div' : 'li';
+	$ts        = get_comment_time('U', true, false, $comment);
+	$date      = function_exists('evented_format_jalali') ? evented_format_jalali((int) $ts, 'j F Y') : get_comment_date('', $comment);
+	$time      = get_comment_time('H:i', false, false, $comment);
+	$is_author = (int) $comment->user_id && (int) $comment->user_id === (int) get_post_field('post_author', $comment->comment_post_ID);
+	?>
+	<<?php echo $tag; // phpcs:ignore ?> id="comment-<?php comment_ID(); ?>" <?php comment_class($comment->has_children ? 'parent' : '', $comment); ?>>
+		<article id="div-comment-<?php comment_ID(); ?>" class="comment-body">
+			<footer class="comment-meta">
+				<div class="comment-author vcard">
+					<?php echo 0 !== (int) $args['avatar_size'] ? get_avatar($comment, $args['avatar_size']) : ''; ?>
+					<b class="fn"><?php echo esc_html(get_comment_author($comment)); ?></b>
+					<?php if ($is_author) : ?><span class="ee-cmt-badge">نویسنده</span><?php endif; ?>
+				</div>
+				<div class="comment-metadata">
+					<time datetime="<?php comment_time('c'); ?>"><?php echo esc_html($date . ' · ' . $time); ?></time>
+					<?php if ('0' === $comment->comment_approved) : ?>
+						<em class="comment-awaiting-moderation">دیدگاه شما در انتظار تأیید است.</em>
+					<?php endif; ?>
+				</div>
+			</footer>
+			<div class="comment-content"><?php comment_text($comment, $args); ?></div>
+			<?php
+			comment_reply_link(array_merge($args, array(
+				'add_below' => 'div-comment',
+				'depth'     => $depth,
+				'max_depth' => $args['max_depth'],
+				'before'    => '<div class="reply">',
+				'after'     => '</div>',
+			)));
+			?>
+		</article>
+	<?php
+}
+
+
+/**
+ * فاصلهٔ زمانی فارسی («۸ دقیقه پیش»، «دیروز»، «۳ روز پیش»).
+ *
+ * @param int $from timestamp
+ * @param int $to   timestamp (پیش‌فرض اکنون)
+ * @return string
+ */
+function evented_time_ago($from, $to = 0)
+{
+	$to   = $to ? (int) $to : time();
+	$diff = max(0, $to - (int) $from);
+	$fa   = static function ($n) {
+		return strtr((string) $n, array('0' => '۰', '1' => '۱', '2' => '۲', '3' => '۳', '4' => '۴', '5' => '۵', '6' => '۶', '7' => '۷', '8' => '۸', '9' => '۹'));
+	};
+	if ($diff < 60) {
+		return 'همین حالا';
+	}
+	if ($diff < HOUR_IN_SECONDS) {
+		return $fa((int) floor($diff / 60)) . ' دقیقه پیش';
+	}
+	if ($diff < DAY_IN_SECONDS) {
+		return $fa((int) floor($diff / HOUR_IN_SECONDS)) . ' ساعت پیش';
+	}
+	if ($diff < 2 * DAY_IN_SECONDS) {
+		return 'دیروز';
+	}
+	if ($diff < 30 * DAY_IN_SECONDS) {
+		return $fa((int) floor($diff / DAY_IN_SECONDS)) . ' روز پیش';
+	}
+	if ($diff < 365 * DAY_IN_SECONDS) {
+		return $fa((int) floor($diff / (30 * DAY_IN_SECONDS))) . ' ماه پیش';
+	}
+	return $fa((int) floor($diff / (365 * DAY_IN_SECONDS))) . ' سال پیش';
+}
+
+/**
+ * تاریخ امروز برای نوار بالایی: «شنبه ۲۱ شهریور ۱۴۰۵» (اگر افزونهٔ شمسی‌ساز نباشد، تبدیل داخلی).
+ */
+function evented_today_label()
+{
+	$wp = function_exists('evented_wp_date') ? evented_wp_date('l j F Y') : date_i18n('l j F Y');
+	if ($wp && !preg_match('/[0-9]/', $wp)) {
+		return $wp; // افزونهٔ شمسی‌ساز
+	}
+	$days = array('Saturday' => 'شنبه', 'Sunday' => 'یکشنبه', 'Monday' => 'دوشنبه', 'Tuesday' => 'سه‌شنبه', 'Wednesday' => 'چهارشنبه', 'Thursday' => 'پنجشنبه', 'Friday' => 'جمعه');
+	$d    = function_exists('evented_wp_date') ? evented_wp_date('l') : date('l');
+	return (isset($days[$d]) ? $days[$d] . ' ' : '') . evented_format_jalali(current_time('timestamp'), 'j F Y');
+}
+
+/**
+ * نام دسته/برچسب‌ها گاهی با تگ HTML (مثل <span>…</span>) ذخیره شده‌اند و در خروجی
+ * escape‌شده به‌صورت «&lt;span&gt;» دیده می‌شوند. همه‌جا تگ‌ها را از نام ترم حذف می‌کنیم.
+ */
+function evented_clean_term_name($name)
+{
+	if (!is_string($name) || false === strpos($name, '<') && false === strpos($name, '&lt;')) {
+		return $name;
+	}
+	$name = html_entity_decode($name, ENT_QUOTES, 'UTF-8');
+	return trim(wp_strip_all_tags($name));
+}
+add_filter('term_name', 'evented_clean_term_name', 5);
+add_filter('single_cat_title', 'evented_clean_term_name', 5);
+add_filter('single_tag_title', 'evented_clean_term_name', 5);
+add_filter('single_term_title', 'evented_clean_term_name', 5);
+add_filter('get_term', function ($term) {
+	if ($term instanceof WP_Term) {
+		$term->name = evented_clean_term_name($term->name);
+	}
+	return $term;
+}, 5);
+add_filter('get_terms', function ($terms) {
+	foreach ((array) $terms as $t) {
+		if ($t instanceof WP_Term) {
+			$t->name = evented_clean_term_name($t->name);
+		}
+	}
+	return $terms;
+}, 5);
+add_filter('get_the_terms', function ($terms) {
+	foreach ((array) $terms as $t) {
+		if ($t instanceof WP_Term) {
+			$t->name = evented_clean_term_name($t->name);
+		}
+	}
+	return $terms;
+}, 5);

@@ -120,3 +120,4 @@
 }
 .evented-inline-notice-x:hover,
 .evented-inline-notice-x:focus { color: #1d2327; }
+.evented-slide-2col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0 12px; }

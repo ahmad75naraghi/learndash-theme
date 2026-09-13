@@ -10,11 +10,11 @@
 - [ ] **escape کردن `redirect_to`** — `page-login.php` (۳ نقطهٔ فعال + ۱ نمونهٔ کامنت‌شده در inline JS):
   `window.location.href = '<?= $_GET['redirect_to'] ?? home_url(); ?>'` — باید `esc_url_raw()` + `esc_js()` شود (و باگ double-encode ناشی از `urlencode` در `FalnicAuthHandler::redirect_login_url` هم رفع شود).
 - [ ] **الزام تأیید OTP در ساخت حساب** — `handle_save_user_register_name` (`inc/login.php`) بدون بررسی `fl_otp_verified` با دانستن nonce کاربر می‌سازد.
-- [ ] **اعتبارنامهٔ SMS در سورس** — `inc/sms.php`: username/رمز/bodyId هاردکد → انتقال به wp-config/option.
+- [x] **اعتبارنامهٔ SMS در سورس** — به تنظیمات قالب (تب پیامک) / ثابت‌های `EVENTED_SMS_*` منتقل شد.
 - [x] **دکمهٔ «انتخاب تصویر» در تنظیمات قالب** — بازتولید با jsdom روی HTML رندرشدهٔ واقعی: دو مسیر شکست بی‌صدا (early-return اسکریپت و `ReferenceError` در نبود `wp.media`) رفع شد، به‌همراه افزودن اسلایدر ناقص (کپی `innerHTML` به‌جای کل ردیف)، جایگزین ورود دستی نشانی و watchdog صفحه.
 - [x] **لوگوی سفارشی در فوتر بدون استایل** — قواعد `.ee-logo-img` اضافه شد.
 - [x] **لینک‌های سخت‌کد سایدبار پنل** — شش لینک `/panel/…` به `home_url()` تبدیل شد.
-- [ ] **انتقال هاردکدهای دامنه** — همهٔ `https://edu.falnic.com/...` و `/wp-content/themes/edu-falnic/...` در فایل‌ها (فهرست کامل در `TECH_DEBT.md`).
+- [x] **انتقال هاردکدهای دامنه** — هیچ `edu.falnic.com` / `themes/edu-falnic` در کد نمانده (CI با `bin/lint.sh` جلوی بازگشت آن را می‌گیرد).
 
 ## ۲. امنیت (Security)
 
@@ -24,15 +24,15 @@
 
 ## ۳. باگ‌های عملکردی (Functional)
 
-- [ ] **ریدایرکت اشتباه `panel/certificates.php`** — گارد مهمان به `https://edu.falnic.com/panel/payments.php` می‌رود (باید به صفحهٔ certificates خودش).
-- [ ] **redirect_to های دارای `.php`** — در `panel/my-courses.php`, `panel/payments.php`, `panel/wishlist.php`, `panel/settings.php` مقدار `.../panel/xxx.php` است (باید بدون `.php`).
+- [x] **ریدایرکت اشتباه `panel/certificates.php`** — رفع شد (همهٔ قالب‌های پنل به `/login?redirect_to=` صفحهٔ خودشان می‌روند).
+- [x] **redirect_to های دارای `.php`** — در `panel/my-courses.php`, `panel/payments.php`, `panel/wishlist.php`, `panel/settings.php` مقدار `.../panel/xxx.php` است (باید بدون `.php`).
 - [x] **`page-panel.php` خالی** — کاربر لاگین‌شده را به `/panel/my-courses` ریدایرکت می‌کند؛ همچنین باگ‌های باز نشدن صفحات پنل (نبود `global $wpdb` در داشبورد، include نسبی سایدبار و بارگذاری‌نشدن `panel.css` برای قالب‌های `panel/*`) رفع شد.
 - [x] **`index.php` باکس دیباگ** — با یک قالب بازگشتی واقعی جایگزین شد؛ آرشیو/برگهٔ نوشته‌ها/جستجو هم به `archive.php`/`home.php`/`search.php` منتقل شدند.
 - [ ] **لاگین با OTP برای کاربر موجود → `wp_set_current_user($user->ID)` روی null** در `handle_register_user` (چون `wp_set_password` id برنمی‌گرداند) — تست و اصلاح.
-- [ ] **`falnic_submit_cta`** — hook ثبت شده اما متد `handle_cta_submit` وجود ندارد (در صورت فراخوانی Fatal).
+- [x] **`falnic_submit_cta`** — hook و کد مرتبط دیگر در پروژه وجود ندارد (حذف شده).
 - [x] **`author.php` لینک فیسبوک** — قالب بازنویسی شد؛ شبکه‌های اجتماعی از `evented_instructor_data()` (کلیدهای `youtube`/`linkedin`/`instagram`/`facebook` در user meta) خوانده می‌شوند.
 - [x] **`author.js`** — دیگر enqueue نمی‌شود (قالب مدرس با پوستهٔ ee-* بازنویسی شد)؛ فایل باقی‌مانده مرده است و می‌توان حذفش کرد.
-- [ ] **settings.php نمایش ایمیل جعلی** — اگر ایمیل با `09` شروع شود، مقدار نمایشی `sdasd@dfsfd.dfd` نشان داده می‌شود (باید ایمیل واقعی یا حالت «تنظیم نشده»).
+- [x] **settings.php نمایش ایمیل جعلی** — ایمیل‌های placeholder (شروع با `09`) خالی نمایش داده می‌شوند تا کاربر ایمیل واقعی ثبت کند.
 - [ ] **toast موفقیت بی‌قیدوشرط در صفحهٔ لاگین** — بعد از `falnic_reset_password`/`falnic_register_user` بدون بررسی پاسخ سرور پیام موفقیت می‌آید.
 - [x] **دوره‌های مرتبط بدون فیلتر دسته** — در قالب جدید دوره از `evented_related_courses()` استفاده می‌شود: `tax_query` روی `ld_course_category` فعال است و اگر دوره دسته نداشت، به آخرین دوره‌ها برمی‌گردد.
 
@@ -46,25 +46,25 @@
 | ~~`assets/css/single-page.css`~~ | ✅ شرط enqueue حذف شد (برگه‌ها از `ee-courses.css` استفاده می‌کنند) | — |
 | ~~`assets/css/archive-product.css`~~ | ✅ شرط enqueue حذف شد (۴۰۴ در همهٔ برگه‌ها رفع شد) | — |
 | ~~`assets/css/archive-post.css`~~ | ✅ پر شد (استایل آرشیو نوشته‌ها) | — |
-| `screenshot.png` | ۰ بایت | تصویر واقعی ۱۲۰۰×۹۰۰ |
-| `assets/css/photoswipe.min .css` | نام دارای فاصله | اصلاح نام / حذف |
+| ~~`screenshot.png`~~ | ✅ تصویر واقعی ۱۲۰۰×۹۰۰ (رندر واقعی هدر/هیرو/کارت‌های دوره) اضافه شد | — |
+| ~~`assets/css/photoswipe.min .css`~~ | ✅ حذف شد | — |
 | ~~`images/default-cat.jpg`~~ | ✅ در `page-courses-cat.php` حذف شد؛ کارت دستهٔ بدون تصویر آیکن Material می‌گیرد | — |
-| `assets/fonts/DanaVF.ttf` | مفقود (برای captcha) | افزودن یا حذف captcha |
+| ~~`assets/fonts/DanaVF.ttf`~~ | ✅ captcha حذف شد | — |
 | ~~فونت FontAwesome~~ | ✅ `author.php` بازنویسی شد و از Material Symbols استفاده می‌کند | — |
 
-> توجه: `plyr.css`/`plyr.polyfilled.js` سالم‌اند اما از زمان بازطراحی صفحهٔ دوره/درس دیگر enqueue نمی‌شوند (ویدیو با `<video controls>` پخش می‌شود)؛ پس از تأیید بصری می‌توان حذفشان کرد. همین‌طور `assets/css/single-courses.css` (~۳۸KB) و `assets/js/single-courses.js` (۳۰۹ خط) که فقط به قالب قدیمی دوره تعلق داشتند.
+> Plyr، PhotoSwipe، Owl، `main.js`، `front-page.css/js`، `single-courses.css/js`، `author.js/css` و `archive-courses.css` حذف شدند؛ فرانت‌اند بدون jQuery است.
 
 ## ۵. کد مرده / غیرفعال (Dead Code)
 
-- [ ] `inc/captcha.php` + `captcha_verify()` — به هیچ فرمی وصل نیست؛ فعال یا حذف شود.
+- [x] `inc/captcha.php` حذف شد؛ `captcha_verify()` هم از `inc/login.php` حذف شد.
 - [ ] بخش «وبینار پیش رو» در `front-page.php` داخل `if (false) {}`.
-- [ ] PhotoSwipe (`assets/js/photoswipe.min.js` و CSS) — استفاده نمی‌شود.
-- [ ] کامنت‌های اسکریپت/استایل `*-ex` (main-ex/front-page-ex) در `assets_functions.php`.
-- [ ] `Untitled-1.json` در ریشه (schema.org خارج از قالب).
-- [ ] `assets/css/single-courses.css` + `assets/js/single-courses.js` — با قالب جدید دوره/درس بلااستفاده شدند؛ پس از QA حذف شوند.
+- [x] PhotoSwipe حذف شد.
+- [x] `assets_functions.php` بازنویسی شد (فقط دارایی‌های پنل).
+- [x] `Untitled-1.json` حذف شد؛ Schema.org اکنون در `inc/seo.php` تولید می‌شود.
+- [x] `single-courses.css/js` حذف شدند.
 - [ ] کلیدهای پادکست درس (`_lesson_audio`/`_lesson_audio_url`/`sfwd-lessons_lesson_audio_url`) و پیوست‌ها (`_lesson_attachments`) بر اساس کلیدهای سفارشی این قالب حدس زده شده‌اند؛ باید با دادهٔ واقعی سایت بررسی و در صورت نیاز متاباکس رسمی اضافه شود.
 - [ ] اسکریپت particle canvas کامنت‌شده در `front-page.php`.
-- [ ] متغیر/کلاس بلااستفاده (مثل `FalnicAuthHandler::$crm_guids`) در login.php.
+- [x] متغیر/کلاس بلااستفاده (`FalnicAuthHandler::$crm_guids`) دیگر در login.php وجود ندارد.
 
 ## ۶. استاتیک‌هایی که باید داینامیک شوند
 
@@ -80,4 +80,23 @@
 
 - [ ] تکمیل پوشش‌دهی هر تغییر جدید در `CHANGELOG.md`.
 - [ ] به‌روزرسانی جدول «کلیدهای متا» در `ARCHITECTURE.md` هنگام افزودن فیلد جدید.
-- [ ] افزودن تست خودکار (حداقل `php -l` در CI).
+- [x] افزودن تست خودکار — `.github/workflows/lint.yml` + `bin/lint.sh` (php -l روی PHP 7.4/8.1/8.3، node --check، توازن CSS، الگوهای ممنوع).
+
+## پاک‌سازی ۱۴۰۵/۰۶ (انجام‌شده)
+
+- [x] `assets/css/panel.css` هرس شد (۱۶۸۸ → ۱۳۷۵ خط؛ قوانین کلاس‌های بلااستفاده و بلوک‌های کامنت‌شده حذف شدند).
+- [x] `style=""`های ایستا در قالب‌ها به کلاس‌های ابزاری `ee-u-*` (در `ee-shell.css`) تبدیل شدند؛ فقط مقادیر پویا (درصد پیشرفت، `--p`، `--c`، `background-image`) inline مانده‌اند.
+- [x] کد مردهٔ `captcha_verify()` حذف شد.
+- [x] `screenshot.png` واقعی ۱۲۰۰×۹۰۰.
+- [ ] ادامهٔ بازطراحی `panel.css` به زبان بصری `ee-*`.
+- [x] CI برای `php -l` (`bin/lint.sh`).
+
+## دور ۱۴۰۵/۰۶ — تکمیل باقی‌مانده‌ها
+- [x] سختی‌سازی کلاینت SMS (timeout/لاگ).
+- [x] whitelist فیلدهای profile/settings و wishlist.
+- [x] متاباکس واقعی رسانهٔ درس.
+- [x] متن‌های ایستای front-page (۳ گام) → تنظیمات قالب؛ پیش‌فرض‌ها با حوزهٔ سایت هماهنگ شد.
+- [x] panel.css به پالت ee-*.
+- [ ] `session_start` در inc/login.php — طبق تصمیم، کد ورود قالب دست نمی‌خورد (افزونهٔ جداگانه).
+- [ ] تست روی staging با LearnDash واقعی.
+- [ ] Merge PR #2 و تگ ریلیز 2.1.0.

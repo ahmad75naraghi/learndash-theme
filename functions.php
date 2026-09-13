@@ -22,31 +22,28 @@ add_action('wp_enqueue_scripts', function () {
         return;
     }
 
-    // فونت وزیرمتن (اولویت: گوگل‌فونت؛ در نبود آن فونت محلی دانا استفاده می‌شود)
-    wp_enqueue_style('ee-vazirmatn', 'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap', array(), null);
-
-    // آیکن‌های Material Symbols
-    wp_enqueue_style('ee-material-icons', 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap', array(), null);
+    // فونت‌ها و آیکن‌ها کاملاً محلی هستند (بدون هیچ درخواست خارجی): @font-face در ee-fonts.css و آیکن‌ها در اسپرایت SVG
+    wp_enqueue_style('ee-fonts', PATH_DIR_URL . '/assets/css/newhome/ee-fonts.css', array(), '1.0.0');
 
     // پوستهٔ مشترک: توکن‌ها، هدر، فوتر، نوار موبایل و ویجت‌های سایدبار
-    wp_enqueue_style('ee-shell', PATH_DIR_URL . '/assets/css/newhome/ee-shell.css', array(), '1.1.0');
+    wp_enqueue_style('ee-shell', PATH_DIR_URL . '/assets/css/newhome/ee-shell.css', array('ee-fonts'), '1.5.2');
 
     // رفتارها: منوی موبایل، اسلایدر هیرو، کپی لینک اشتراک‌گذاری
-    wp_enqueue_script('ee-home-js', PATH_DIR_URL . '/assets/js/newhome/evented-home.js', array(), '1.1.0', true);
+    wp_enqueue_script('ee-home-js', PATH_DIR_URL . '/assets/js/newhome/evented-home.js', array(), '1.3.0', true);
 
     if (is_front_page()) {
         wp_enqueue_style('ee-home', PATH_DIR_URL . '/assets/css/newhome/evented-home.css', array('ee-shell'), '1.1.0');
     } elseif (is_singular('post')) {
         wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.0.0');
-    } elseif (is_singular(array('sfwd-courses', 'sfwd-lessons', 'sfwd-quizzes'))) {
+    } elseif (is_singular(array('sfwd-courses', 'sfwd-lessons', 'sfwd-topic', 'sfwd-quiz'))) {
         // دوره، درس و آزمون: استایل + رفتارها (آکاردئون، دیدگاه، تکمیل درس، علاقه‌مندی)
-        wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.0.0');
-        wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.0.0', true);
+        wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.3.0');
+        wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.2.0', true);
         wp_localize_script('ee-lms', 'eeLms', array('ajax_url' => admin_url('admin-ajax.php')));
 
-        if (is_singular('sfwd-quizzes')) {
+        if (is_singular('sfwd-quiz')) {
             // سایدبار آزمون کارت دوره و گرید دوره‌ها را نشان می‌دهد.
-            wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.0.0');
+            wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.2.0');
         }
     } elseif (
         is_post_type_archive('sfwd-courses')
@@ -57,8 +54,10 @@ add_action('wp_enqueue_scripts', function () {
     ) {
         // فهرست‌ها: بایگانی/دستهٔ دوره، برگهٔ دوره‌ها، اساتید، پروفایل مدرس،
         // برگهٔ عمومی و صفحهٔ ۴۰۴.
-        wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.0.0');
+        wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.2.0');
+        // سایدبار فیلتر دوره‌ها و نوار مرتب‌سازی (باز/بسته در موبایل، ارسال خودکار)
+        wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.2.0', true);
     } elseif (is_home() || is_archive() || is_search()) {
-        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.0.0');
+        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.1.0');
     }
 }, 20);

@@ -35,7 +35,7 @@ $ee_channels = function_exists('evented_channel_links') ? evented_channel_links(
 			<div class="ee-search-inline">
 				<input id="ee-course-s" type="search" name="s" value="<?php echo esc_attr(get_search_query()); ?>" placeholder="<?php esc_attr_e('جستجو در دوره‌ها', 'evented-edu'); ?>">
 				<button type="submit" aria-label="<?php esc_attr_e('جستجو', 'evented-edu'); ?>">
-					<span class="material-symbols-outlined ee-ic">search</span>
+					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
 				</button>
 			</div>
 		</form>
@@ -50,7 +50,7 @@ $ee_channels = function_exists('evented_channel_links') ? evented_channel_links(
 						</a>
 					<?php endforeach; ?>
 					<button type="button" class="ee-share-btn ee-share-copy" data-copy="<?php echo esc_attr(get_permalink($ee_course_id)); ?>" title="<?php esc_attr_e('کپی لینک', 'evented-edu'); ?>">
-						<span class="material-symbols-outlined ee-ic">link</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-link"></use></svg>
 					</button>
 				</div>
 			</div>
@@ -76,7 +76,7 @@ $ee_channels = function_exists('evented_channel_links') ? evented_channel_links(
 						<?php if (has_post_thumbnail($ee_rc)) : ?>
 							<img class="ee-mini-th" src="<?php echo esc_url(get_the_post_thumbnail_url($ee_rc, 'thumbnail')); ?>" alt="<?php echo esc_attr(get_the_title($ee_rc)); ?>" loading="lazy">
 						<?php else : ?>
-							<span class="ee-mini-th ee-mini-noimg ee-ic"><span class="material-symbols-outlined">school</span></span>
+							<span class="ee-mini-th ee-mini-noimg ee-ic"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg></span>
 						<?php endif; ?>
 					</a>
 				<?php endforeach; ?>
@@ -98,7 +98,7 @@ $ee_channels = function_exists('evented_channel_links') ? evented_channel_links(
 						<?php if (has_post_thumbnail($ee_lc)) : ?>
 							<img class="ee-mini-th" src="<?php echo esc_url(get_the_post_thumbnail_url($ee_lc, 'thumbnail')); ?>" alt="<?php echo esc_attr(get_the_title($ee_lc)); ?>" loading="lazy">
 						<?php else : ?>
-							<span class="ee-mini-th ee-mini-noimg ee-ic"><span class="material-symbols-outlined">school</span></span>
+							<span class="ee-mini-th ee-mini-noimg ee-ic"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-school"></use></svg></span>
 						<?php endif; ?>
 					</a>
 				<?php endforeach; ?>

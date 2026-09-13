@@ -32,7 +32,7 @@ flowchart TD
 
 نکات:
 - `EventedAuthHandler` با `add_action('init', fn => new EventedAuthHandler())` نمونه‌سازی می‌شود.
-- `inc/captcha.php` و `captcha_verify()` (در login.php) فعلاً **به هیچ فرمی متصل نیستند** (کد مردهٔ آماده).
+- کپچا: `inc/captcha.php` و `captcha_verify()` حذف شده‌اند (ورود از طریق افزونهٔ جداگانه انجام می‌شود؛ کد ورود قالب دست‌نخورده باقی مانده).
 - هوک‌های ریدایرکت: `login_url` → `/login/` و `logout_redirect` → خانه (هر دو در `inc/login.php`)؛ `login_redirect` برای نقش subscriber → `/panel` (در `inc/theme_options.php`).
 
 ## ۳. ساختار پایگاه‌داده (Data Structures)
@@ -374,7 +374,8 @@ flowchart TD
   `custom_mark_lesson_complete` (پاسخ = خروجی `learndash_course_progress`؛ نوارهای پیشرفت و
   شمارندهٔ درس‌ها بدون رفرش به‌روز می‌شوند) و `toggle_course_wishlist`.
 - `main.js` لوکال‌سازی: `ajax_object = {ajax_url, nonce}` — nonce مربوط به `notification_nonce` است و استفاده نمی‌شود؛ اسکریپت‌های واقعی nonce را از `data-nonce` می‌خوانند.
-- پنل: `panel.css` + `jalalidatepicker.min.js` + `panel.js` وقتی برگه، خودِ `panel` یا زیرمجموعهٔ آن باشد.
+- پنل: `ee-courses.css` + `ee-panel.css` + `panel.css` (هرس‌شده، v2.1.0) + `jalalidatepicker` + `assets/js/newhome/ee-panel.js` (v1.1.0، با `eePanel` localize) وقتی برگه، خودِ `panel` یا زیرمجموعهٔ آن باشد. سایدبار/شل پنل در `template-parts/panel/shell-open.php` و `shell-close.php` است.
+- کلاس‌های ابزاری `ee-u-*` (در انتهای `ee-shell.css`) جایگزین استایل‌های inline ایستا در قالب‌ها هستند؛ `[hidden]{display:none!important}` هم آنجا تعریف شده.
 - کتابخانه‌ها: Owl Carousel (سراسری)، Plyr (دیگر enqueue نمی‌شود)، Jalali Date Picker (پنل)، PhotoSwipe (enqueue نشده — بدون استفاده)، Font Awesome (یک آیکن در `author.php` بدون لودر!).
 
 ## ۷. قراردادهای AJAX (Inventory)

@@ -13,6 +13,13 @@
 (function () {
     'use strict';
 
+
+    /* تعویض آیکن SVG اسپرایت (جایگزین متن فونت آیکن) */
+    function setIcon(el, name) {
+        if (!el) { return; }
+        var use = el.querySelector ? el.querySelector('use') : null;
+        if (use) { use.setAttribute('href', '#i-' + name); } else { el.textContent = name; }
+    }
     /* ---------- ابزارها ---------- */
     function cfg() {
         if (window.eeLms && window.eeLms.ajax_url) { return window.eeLms.ajax_url; }
@@ -202,7 +209,7 @@
                         var label = button.querySelector('[data-mark-label]');
                         if (label) { label.textContent = 'تکمیل شد'; }
                         var icon = button.querySelector('.ee-ic');
-                        if (icon) { icon.textContent = 'task_alt'; }
+                        if (icon) { setIcon(icon, 'task_alt'); }
                         applyProgress(res.data);
                         msg(box, 'این درس تکمیل شد.', false);
                     } else {
@@ -242,7 +249,7 @@
                     var on = (status === 'added') || (!status && !button.classList.contains('is-on'));
                     button.classList.toggle('is-on', on);
                     if (label) { label.textContent = on ? 'در علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'; }
-                    if (icon) { icon.textContent = on ? 'favorite' : 'favorite_border'; }
+                    if (icon) { setIcon(icon, on ? 'favorite' : 'favorite_border'); }
                 }).catch(function () {
                     /* خطای شبکه: وضعیت تغییری نمی‌کند */
                 }).then(function () {
@@ -261,3 +268,81 @@
         scrollToCurrent();
     });
 }());
+
+/* ---- سایدبار فیلتر دوره‌ها: باز/بسته در موبایل، ارسال خودکار، دسته‌های بیشتر ---- */
+(function () {
+    'use strict';
+    var side = document.querySelector('[data-ee-fside]');
+    if (!side) { return; }
+    var toggle = side.querySelector('[data-ee-fside-toggle]');
+    var form = side.querySelector('[data-ee-fside-form]');
+    var more = side.querySelector('[data-ee-fside-more]');
+
+    if (toggle) {
+        toggle.addEventListener('click', function () {
+            var open = !side.classList.contains('is-open');
+            side.classList.toggle('is-open', open);
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    }
+    if (more) {
+        more.addEventListener('click', function () {
+            var list = side.querySelector('.ee-fside-cats');
+            var open = !list.classList.contains('is-expanded');
+            list.classList.toggle('is-expanded', open);
+            more.classList.toggle('is-open', open);
+            more.querySelector('span').textContent = open ? 'نمایش کمتر' : 'نمایش همهٔ دسته‌ها';
+        });
+    }
+    if (form) {
+        side.classList.add('is-auto');
+        var t;
+        var submit = function () {
+            clearTimeout(t);
+            t = setTimeout(function () {
+                /* پارامترهای خالی ارسال نشوند تا آدرس تمیز بماند */
+                Array.prototype.forEach.call(form.querySelectorAll('input[type="radio"]:checked, select, input[type="search"]'), function (el) {
+                    el.disabled = ('' === el.value) || (el.name === 'orderby' && el.value === 'newest');
+                });
+                form.submit();
+            }, 120);
+        };
+        form.addEventListener('change', function (e) {
+            if (e.target.matches('input[type="radio"], select')) {
+                form.querySelectorAll('.ee-fside-chip').forEach(function (c) { c.classList.toggle('is-on', c.querySelector('input').checked); });
+                submit();
+            }
+        });
+        form.addEventListener('submit', function () {
+            Array.prototype.forEach.call(form.querySelectorAll('input[type="radio"]:checked, select, input[type="search"]'), function (el) {
+                el.disabled = ('' === el.value) || (el.name === 'orderby' && el.value === 'newest');
+            });
+        });
+    }
+})();
+
+/* ---- درس: نوار پیشرفت چسبان بعد از عبور از هیرو ---- */
+(function () {
+    'use strict';
+    var bar = document.querySelector('[data-ee-ls-sticky]');
+    var hero = document.querySelector('.ee-ls-hero');
+    if (!bar || !hero || !('IntersectionObserver' in window)) { return; }
+    new IntersectionObserver(function (entries) {
+        var e = entries[0];
+        var show = !e.isIntersecting && e.boundingClientRect.top < 0;
+        bar.classList.toggle('is-show', show);
+        bar.setAttribute('aria-hidden', show ? 'false' : 'true');
+    }, { threshold: 0 }).observe(hero);
+})();
+
+/* ---- نوار نتایج: مرتب‌سازی با تغییر select ---- */
+(function () {
+    'use strict';
+    var f = document.querySelector('[data-ee-rtb-sort]');
+    if (!f) { return; }
+    f.addEventListener('change', function () {
+        var sel = f.querySelector('select[name="orderby"]');
+        if (sel && sel.value === 'newest') { sel.disabled = true; }
+        f.submit();
+    });
+})();

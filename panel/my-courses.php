@@ -2,7 +2,7 @@
 /* Template Name: Panel - My Courses */
 
 if (! is_user_logged_in()) {
-    wp_redirect(add_query_arg('redirect_to', home_url('/panel/my-courses'), wp_login_url()));
+    wp_safe_redirect(add_query_arg('redirect_to', rawurlencode(home_url('/panel/my-courses')), home_url('/login')));
     exit;
 }
 
@@ -82,13 +82,7 @@ function evented_to_persian_digits($number)
     return str_replace($en, $fa, (string) $number);
 }
 
-get_header(); ?>
-<div class="container">
-
-    <!-- Sidebar -->
-    <?php locate_template('panel/sidebar.php', true, false); ?>
-    <!-- Main Content -->
-    <main class="main-content">
+get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'my-courses', 'ee_panel_title' => 'دوره‌های من')); ?>
 
         <!-- Search Bar -->
         <div class="search-bar">
@@ -248,22 +242,6 @@ get_header(); ?>
                 <?php endif; ?>
             </div>
         </div>
-    </main>
-</div>
+    
 
-<script>
-// جستجوی ساده سمت کلاینت روی «دوره های من»
-document.addEventListener('DOMContentLoaded', function () {
-    var input = document.getElementById('my-courses-search');
-    if (!input) return;
-    input.addEventListener('input', function () {
-        var term = input.value.trim();
-        document.querySelectorAll('.horizontal-card').forEach(function (card) {
-            var title = card.getAttribute('data-course-title') || '';
-            card.style.display = title.indexOf(term) !== -1 ? '' : 'none';
-        });
-    });
-});
-</script>
-
-<?php get_footer(); ?>
+<?php get_template_part('template-parts/panel/shell', 'close'); ?>

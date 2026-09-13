@@ -1,0 +1,34 @@
+/* ===== ادامهٔ یادگیری (inc/resume.php) ===== */
+.ee-resume { display: inline-flex; align-items: center; gap: .5rem; max-width: 15rem; padding: .25rem .35rem .25rem .6rem; border-radius: 999px; background: linear-gradient(135deg, var(--ee-mint), var(--ee-tealL)); border: 1px solid rgb(167 243 208); color: var(--ee-ink); text-decoration: none; transition: transform .2s, box-shadow .2s; }
+.ee-resume:hover { transform: translateY(-1px); box-shadow: var(--ee-sh-sm); color: var(--ee-tealP); }
+.ee-resume-ic { display: inline-flex; width: 1.9rem; height: 1.9rem; border-radius: 999px; background: var(--ee-tealP); color: #fff; align-items: center; justify-content: center; flex-shrink: 0; }
+.ee-resume-ic .ee-ic { font-size: 1.2rem; }
+.ee-resume-txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.ee-resume-txt small { font-size: .58rem; color: var(--ee-tealP); font-weight: 700; }
+.ee-resume-txt strong { font-size: .72rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 9.5rem; }
+.ee-resume-ring { --p: 0; width: 2rem; height: 2rem; border-radius: 999px; flex-shrink: 0; display: inline-grid; place-items: center; background: conic-gradient(var(--ee-tealP) calc(var(--p) * 1%), #e2e8f0 0); }
+.ee-resume-ring i { width: 1.5rem; height: 1.5rem; border-radius: 999px; background: #fff; display: grid; place-items: center; font-style: normal; font-size: .5rem; font-weight: 800; color: var(--ee-tealP); }
+@media (max-width: 991.98px) { .ee-resume-header { display: none; } }
+
+/* کشوی موبایل */
+.ee-resume-drawer { display: flex; max-width: none; margin: .6rem .9rem 0; padding: .45rem .5rem .45rem .8rem; border-radius: 1rem; }
+.ee-resume-drawer .ee-resume-txt strong { max-width: none; }
+.ee-resume-drawer .ee-resume-txt { flex: 1; }
+
+/* کارت پیشخوان */
+.ee-resume-card { display: grid; grid-template-columns: 9rem 1fr; gap: 1.1rem; background: #fff; border: 1px solid rgb(209 250 229); border-radius: 1.3rem; overflow: hidden; box-shadow: var(--ee-sh-sm); margin-bottom: 1.4rem; }
+.ee-resume-card-media { background: var(--ee-tealL); display: grid; place-items: center; min-height: 8rem; }
+.ee-resume-card-media img { width: 100%; height: 100%; object-fit: cover; }
+.ee-resume-card-media .ee-ic { font-size: 2.6rem; color: var(--ee-tealP); }
+.ee-resume-card-body { padding: 1rem 1.1rem 1rem 0; display: flex; flex-direction: column; gap: .4rem; min-width: 0; }
+.ee-resume-kicker { display: inline-flex; align-items: center; gap: .3rem; font-size: .7rem; color: var(--ee-tealP); font-weight: 700; }
+.ee-resume-card h3 { margin: 0; font-size: 1rem; font-weight: 800; }
+.ee-resume-card h3 a { color: var(--ee-ink); text-decoration: none; }
+.ee-resume-card h3 a:hover { color: var(--ee-tealP); }
+.ee-resume-step { margin: 0; font-size: .78rem; color: var(--ee-soft); display: inline-flex; align-items: center; gap: .3rem; }
+.ee-resume-step .ee-ic { color: var(--ee-amberA); }
+.ee-resume-bar { height: .5rem; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+.ee-resume-bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--ee-tealP), var(--ee-mintMd)); transition: width .6s; }
+.ee-resume-foot { display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; font-size: .72rem; color: var(--ee-soft); margin-top: .2rem; }
+.ee-resume-card.is-done .ee-resume-bar i { background: linear-gradient(90deg, var(--ee-amberA), #fbbf24); }
+@media (max-width: 575.98px) { .ee-resume-card { grid-template-columns: 1fr; } .ee-resume-card-media { min-height: 7rem; max-height: 10rem; aspect-ratio: 16/7; overflow: hidden; } .ee-resume-card-body { padding: 0 1rem 1rem; } }

@@ -15,74 +15,28 @@ $ee_posts = isset($args['ee_posts']) && is_array($args['ee_posts']) ? $args['ee_
 $ee_empty = isset($args['ee_empty']) ? (string) $args['ee_empty'] : __('دوره‌ای یافت نشد.', 'evented-edu');
 
 if (empty($ee_posts)) {
-	echo '<p class="ee-empty">' . esc_html($ee_empty) . '</p>';
+	if (function_exists('evented_empty_state')) {
+		$ee_acts = array();
+		if (function_exists('evented_course_filters_active') && evented_course_filters_active()) {
+			$ee_acts[] = array('label' => __('پاک کردن فیلترها', 'evented-edu'), 'url' => evented_course_filter_base_url(), 'primary' => true);
+		}
+		$ee_acts[] = array('label' => __('مشاهدهٔ همهٔ دوره‌ها', 'evented-edu'), 'url' => function_exists('evented_nav_url') ? evented_nav_url('sfwd-courses') : get_post_type_archive_link('sfwd-courses'), 'primary' => empty($ee_acts));
+		echo evented_empty_state(array('title' => $ee_empty, 'text' => __('فیلترها را تغییر دهید یا عبارت دیگری جست‌وجو کنید.', 'evented-edu'), 'icon' => 'school', 'actions' => $ee_acts)); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	} else {
+		echo '<p class="ee-empty">' . esc_html($ee_empty) . '</p>';
+	}
 	return;
 }
 ?>
-<div class="ee-cgrid">
-	<?php foreach ($ee_posts as $ee_post) : ?>
-		<?php $ee_card = function_exists('evented_course_card_data') ? evented_course_card_data($ee_post) : array(); ?>
-		<?php if (empty($ee_card)) : continue; endif; ?>
-
-		<article class="ee-ccard">
-			<a class="ee-ccard-media" href="<?php echo esc_url($ee_card['url']); ?>">
-				<?php if (!empty($ee_card['thumb'])) : ?>
-					<img src="<?php echo esc_url($ee_card['thumb']); ?>" alt="<?php echo esc_attr($ee_card['title']); ?>" loading="lazy" decoding="async">
-				<?php else : ?>
-					<span class="ee-ccard-noimg"><span class="material-symbols-outlined ee-ic">school</span></span>
-				<?php endif; ?>
-
-				<?php if (!empty($ee_card['cat_name'])) : ?>
-					<span class="ee-ccard-cat"><?php echo esc_html($ee_card['cat_name']); ?></span>
-				<?php endif; ?>
-
-				<span class="ee-ccard-price<?php echo !empty($ee_card['is_free']) ? ' is-free' : ''; ?>">
-					<?php if (!empty($ee_card['is_free'])) : ?>
-						<?php esc_html_e('رایگان', 'evented-edu'); ?>
-					<?php else : ?>
-						<?php echo esc_html(number_format_i18n((float) $ee_card['price'])); ?>
-						<small><?php esc_html_e('تومان', 'evented-edu'); ?></small>
-					<?php endif; ?>
-				</span>
-			</a>
-
-			<div class="ee-ccard-body">
-				<h3 class="ee-ccard-title">
-					<a href="<?php echo esc_url($ee_card['url']); ?>"><?php echo esc_html($ee_card['title']); ?></a>
-				</h3>
-
-				<ul class="ee-ccard-meta">
-					<?php if (!empty($ee_card['lesson_count'])) : ?>
-						<li><span class="material-symbols-outlined ee-ic">menu_book</span>
-							<?php
-							/* translators: %s: تعداد جلسه */
-							echo esc_html(sprintf(__('%s جلسه', 'evented-edu'), number_format_i18n($ee_card['lesson_count'])));
-							?>
-						</li>
-					<?php endif; ?>
-					<?php if (!empty($ee_card['duration'])) : ?>
-						<li><span class="material-symbols-outlined ee-ic">timer</span><?php echo esc_html($ee_card['duration']); ?></li>
-					<?php endif; ?>
-					<?php if (!empty($ee_card['level'])) : ?>
-						<li><span class="material-symbols-outlined ee-ic">signal_cellular_alt</span><?php echo esc_html($ee_card['level']); ?></li>
-					<?php endif; ?>
-				</ul>
-
-				<div class="ee-ccard-foot">
-					<span class="ee-ccard-by">
-						<span class="material-symbols-outlined ee-ic">person</span>
-						<?php echo esc_html($ee_card['instructor'] ? $ee_card['instructor'] : __('evented-edu', 'evented-edu')); ?>
-					</span>
-					<?php if (!empty($ee_card['has_access'])) : ?>
-						<span class="ee-ccard-badge is-joined"><?php esc_html_e('ثبت‌نام شده', 'evented-edu'); ?></span>
-					<?php else : ?>
-						<span class="ee-ccard-cta">
-							<?php esc_html_e('مشاهده دوره', 'evented-edu'); ?>
-							<span class="material-symbols-outlined ee-ic">arrow_back</span>
-						</span>
-					<?php endif; ?>
-				</div>
-			</div>
-		</article>
+<div class="ee-cgrid ee-cgrid-v2">
+	<?php $ee_i = 0; foreach ($ee_posts as $ee_post) : ?>
+		<?php
+		$ee_pid = $ee_post instanceof WP_Post ? $ee_post->ID : (int) $ee_post;
+		if (function_exists('evented_catalog_card_html')) {
+			echo evented_catalog_card_html(evented_catalog_card_data($ee_pid), $ee_i++); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- مارک‌آپ امن.
+		} else {
+			echo '<article class="ee-ccard"><h3 class="ee-ccard-title"><a href="' . esc_url(get_permalink($ee_pid)) . '">' . esc_html(get_the_title($ee_pid)) . '</a></h3></article>';
+		}
+		?>
 	<?php endforeach; ?>
 </div>

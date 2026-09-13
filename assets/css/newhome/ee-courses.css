@@ -19,7 +19,7 @@
 /* مسیریابی (مشترک) ------------------------------------------------------ */
 .ee-crumb { display: flex; align-items: center; gap: .25rem; flex-wrap: wrap; font-size: .72rem; color: var(--ee-soft); margin-bottom: .8rem; }
 .ee-crumb a:hover { color: var(--ee-tealP); }
-.ee-crumb .material-symbols-outlined { font-size: 1rem; opacity: .55; }
+.ee-crumb svg.ee-ic { font-size: 1rem; opacity: .55; }
 .ee-crumb-current { color: #1e293b; font-weight: 700; }
 
 /* سربرگ فهرست ----------------------------------------------------------- */
@@ -274,3 +274,119 @@
 @media (prefers-reduced-motion: reduce) {
     .ee-list-main *, .ee-list-main *::before, .ee-list-main *::after { transition: none !important; animation: none !important; }
 }
+
+/* ---------- نوار فیلتر/مرتب‌سازی دوره‌ها (inc/course_filters.php) ---------- */
+.ee-cf { background: #fff; border: 1px solid var(--ee-line); border-radius: 1rem; padding: .7rem .8rem; margin-bottom: 1rem; box-shadow: var(--ee-sh-sm); }
+.ee-cf-row { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.ee-cf-lead { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem; font-weight: 800; color: #0f172a; margin-inline-end: .3rem; }
+.ee-cf-lead svg.ee-ic { color: var(--ee-tealP); font-size: 1.15rem; }
+.ee-cf-lead b { color: var(--ee-tealP); font-weight: 800; }
+.ee-cf-field { position: relative; display: inline-flex; align-items: center; gap: .3rem; background: var(--ee-bg); border: 1px solid var(--ee-line); border-radius: 999px; padding: .3rem .55rem .3rem .4rem; transition: border-color .15s, background .15s; }
+.ee-cf-field:hover { border-color: var(--ee-teal); }
+.ee-cf-field.is-set { background: var(--ee-mint); border-color: rgb(167 243 208); }
+.ee-cf-field > svg.ee-ic { color: var(--ee-tealP); font-size: 1rem; }
+.ee-cf-field select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; font-family: inherit; font-size: .76rem; font-weight: 700; color: var(--ee-ink); outline: none; cursor: pointer; padding: 0 0 0 1.1rem; max-width: 11rem; text-overflow: ellipsis; }
+.ee-cf-field select:focus-visible { outline: 2px solid var(--ee-teal); border-radius: .4rem; }
+.ee-cf-caret { position: absolute; left: .45rem; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 1rem; color: var(--ee-soft); }
+.ee-cf-apply { padding: .38rem .9rem; font-size: .76rem; border-radius: 999px; }
+.ee-cf-reset { display: inline-flex; align-items: center; gap: .2rem; font-size: .74rem; font-weight: 700; color: #be123c; padding: .35rem .6rem; border-radius: 999px; }
+.ee-cf-reset:hover { background: #fff1f2; }
+.ee-cf-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; padding-top: .6rem; border-top: 1px dashed var(--ee-line); }
+.ee-cf-chip { display: inline-flex; align-items: center; gap: .25rem; font-size: .7rem; font-weight: 700; color: var(--ee-tealP); background: var(--ee-mint); border-radius: 999px; padding: .2rem .6rem; }
+.ee-cf-chip svg.ee-ic { font-size: .9rem; }
+.ee-cf-chip:hover { background: rgb(209 250 229); }
+@media (max-width: 640px) { .ee-cf-field { flex: 1 1 calc(50% - .25rem); } .ee-cf-field select { max-width: none; flex: 1; } .ee-cf-apply { flex: 1 1 100%; justify-content: center; } }
+
+/* ========================================================================
+   سایدبار فیلتر دوره‌ها (template-parts/lms/filter-sidebar.php)
+   ======================================================================== */
+.ee-cf-chips.is-standalone { border: 0; padding: 0; margin: -.3rem 0 .9rem; }
+@media (min-width: 1024px) { .ee-list-grid.is-filter { grid-template-columns: minmax(0, 1fr) 19rem; gap: 1.4rem; } }
+.ee-fside { display: flex; flex-direction: column; gap: 0; min-width: 0; order: -1; }
+@media (min-width: 1024px) { .ee-fside { position: sticky; top: 1rem; order: 2; max-height: calc(100vh - 2rem); overflow-y: auto; scrollbar-width: thin; } }
+
+/* دکمهٔ باز/بسته در موبایل */
+.ee-fside-toggle { display: flex; align-items: center; gap: .5rem; width: 100%; font-family: inherit; font-size: .84rem; font-weight: 800; color: #0f172a; background: #fff; border: 1px solid var(--ee-line); border-radius: 1rem; padding: .7rem .9rem; cursor: pointer; box-shadow: var(--ee-sh-sm); }
+.ee-fside-toggle > .ee-ic:first-child { color: var(--ee-tealP); font-size: 1.2rem; }
+.ee-fside-toggle .chev { margin-inline-start: auto; color: var(--ee-soft); transition: transform .25s; }
+.ee-fside-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.ee-fside-n { font-size: .66rem; min-width: 1.3rem; height: 1.3rem; padding: 0 .35rem; border-radius: 999px; background: var(--ee-tealP); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+.ee-fside-body { display: none; flex-direction: column; gap: .9rem; margin-top: .7rem; }
+.ee-fside.is-open .ee-fside-body { display: flex; animation: eeFsIn .3s ease both; }
+@keyframes eeFsIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@media (min-width: 1024px) { .ee-fside-toggle { display: none; } .ee-fside-body { display: flex !important; margin-top: 0; } }
+
+.ee-fside-form { display: flex; flex-direction: column; gap: .8rem; background: #fff; border: 1px solid rgb(209 250 229 / .9); border-radius: var(--ee-r-3xl); box-shadow: var(--ee-sh-sm); padding: .95rem; }
+.ee-fside-box { border: 0; margin: 0; padding: 0 0 .8rem; min-width: 0; border-bottom: 1px dashed #e2e8f0; }
+.ee-fside-box:last-of-type { border-bottom: 0; padding-bottom: 0; }
+.ee-fside-box legend { float: inline-start; width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: .35rem; font-size: .78rem; font-weight: 900; color: #0f172a; padding: 0; margin-bottom: .55rem; }
+.ee-fside-box legend .ee-ic { color: var(--ee-tealP); font-size: 1.1rem; }
+
+/* جستجو */
+.ee-fside-search { display: flex; align-items: center; gap: .4rem; background: var(--ee-bg); border: 1px solid var(--ee-line); border-radius: 999px; padding: .4rem .7rem; transition: border-color .15s, box-shadow .15s; }
+.ee-fside-search:focus-within { border-color: var(--ee-teal); box-shadow: 0 0 0 3px var(--ee-tealL); background: #fff; }
+.ee-fside-search > .ee-ic { color: var(--ee-tealP); font-size: 1.15rem; flex-shrink: 0; }
+.ee-fside-search input { flex: 1; min-width: 0; border: 0; background: transparent; font-family: inherit; font-size: .8rem; color: var(--ee-ink); outline: none; padding: .15rem 0; }
+.ee-fside-search input::-webkit-search-cancel-button { display: none; }
+.ee-fside-clear { display: inline-flex; color: var(--ee-soft); padding: .15rem; border-radius: 50%; }
+.ee-fside-clear:hover { color: #be123c; background: #fff1f2; }
+
+/* سربرگ */
+.ee-fside-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.ee-fside-title { display: inline-flex; align-items: center; gap: .35rem; font-size: .84rem; font-weight: 900; color: #0f172a; }
+.ee-fside-title .ee-ic { color: var(--ee-tealP); font-size: 1.15rem; }
+.ee-fside-title small { font-size: .66rem; font-weight: 700; color: var(--ee-tealP); background: var(--ee-tealL); padding: .1rem .5rem; border-radius: 999px; }
+.ee-fside-reset { display: inline-flex; align-items: center; gap: .2rem; font-size: .7rem; font-weight: 700; color: #be123c; padding: .25rem .5rem; border-radius: 999px; }
+.ee-fside-reset:hover { background: #fff1f2; }
+
+/* دسته‌ها */
+.ee-fside-cats { clear: both; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .2rem; }
+.ee-fside-cats li.is-more { display: none; }
+.ee-fside-cats.is-expanded li.is-more { display: block; }
+.ee-fside-cats a { display: flex; align-items: center; gap: .5rem; font-size: .78rem; color: #334155; padding: .42rem .6rem; border-radius: .8rem; transition: all .15s; }
+.ee-fside-cats a i { width: .5rem; height: .5rem; border-radius: 50%; background: #cbd5e1; flex-shrink: 0; transition: all .2s; }
+.ee-fside-cats a span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ee-fside-cats a b { font-size: .64rem; font-weight: 800; color: var(--ee-soft); background: #f1f5f9; padding: .1rem .45rem; border-radius: 999px; }
+.ee-fside-cats a:hover { background: var(--ee-tealL); color: var(--ee-tealP); }
+.ee-fside-cats a:hover i { background: var(--ee-teal); }
+.ee-fside-cats li.is-on a { background: var(--ee-tealP); color: #fff; font-weight: 800; box-shadow: 0 8px 16px -10px var(--ee-tealP); }
+.ee-fside-cats li.is-on a i { background: #fff; box-shadow: 0 0 0 3px rgb(255 255 255 / .3); }
+.ee-fside-cats li.is-on a b { background: rgb(255 255 255 / .22); color: #fff; }
+.ee-fside-more { display: inline-flex; align-items: center; gap: .25rem; margin-top: .3rem; font-family: inherit; font-size: .72rem; font-weight: 700; color: var(--ee-tealP); background: none; border: 0; cursor: pointer; padding: .3rem .6rem; border-radius: 999px; }
+.ee-fside-more:hover { background: var(--ee-tealL); }
+.ee-fside-more .ee-ic { transition: transform .25s; }
+.ee-fside-more.is-open .ee-ic { transform: rotate(180deg); }
+
+/* چیپ‌های رادیویی */
+.ee-fside-chips { clear: both; display: flex; flex-wrap: wrap; gap: .35rem; }
+.ee-fside-chip { position: relative; cursor: pointer; }
+.ee-fside-chip input { position: absolute; opacity: 0; width: 0; height: 0; }
+.ee-fside-chip span { display: inline-flex; align-items: center; gap: .3rem; font-size: .72rem; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid var(--ee-line); border-radius: 999px; padding: .32rem .75rem; transition: all .18s; }
+.ee-fside-chip span::before { content: ""; width: .45rem; height: .45rem; border-radius: 50%; border: 1.5px solid #cbd5e1; transition: all .18s; }
+.ee-fside-chip:hover span { border-color: var(--ee-teal); color: var(--ee-tealP); background: #fff; }
+.ee-fside-chip.is-on span, .ee-fside-chip input:checked + span { background: var(--ee-tealL); border-color: var(--ee-teal); color: var(--ee-tealP); font-weight: 800; }
+.ee-fside-chip input:checked + span::before { background: var(--ee-tealP); border-color: var(--ee-tealP); box-shadow: 0 0 0 2px #fff inset; }
+.ee-fside-chip input:focus-visible + span { outline: 2px solid var(--ee-teal); outline-offset: 2px; }
+
+/* select */
+.ee-fside-select { display: flex; flex-direction: column; gap: .4rem; }
+.ee-fside-select .lbl { display: flex; align-items: center; gap: .35rem; font-size: .78rem; font-weight: 900; color: #0f172a; }
+.ee-fside-select .lbl .ee-ic { color: var(--ee-tealP); font-size: 1.1rem; }
+.ee-fside-select .ctl { position: relative; display: block; }
+.ee-fside-select select { width: 100%; appearance: none; -webkit-appearance: none; font-family: inherit; font-size: .78rem; font-weight: 700; color: var(--ee-ink); background: var(--ee-bg); border: 1px solid var(--ee-line); border-radius: .9rem; padding: .55rem 2rem .55rem .8rem; padding-inline: .9rem 2.1rem; outline: none; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.ee-fside-select select:hover { border-color: var(--ee-teal); }
+.ee-fside-select select:focus-visible { border-color: var(--ee-teal); box-shadow: 0 0 0 3px var(--ee-tealL); }
+.ee-fside-select .caret { position: absolute; inset-inline-end: .7rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--ee-soft); }
+
+.ee-fside-actions { display: flex; flex-direction: column; gap: .45rem; padding-top: .2rem; }
+.ee-fside-actions .ee-btn { justify-content: center; width: 100%; }
+.ee-fside.is-auto .ee-fside-actions .ee-btn-primary { display: none; }
+
+/* کارت راهنما */
+.ee-fside-help { display: flex; gap: .7rem; align-items: flex-start; margin-top: .9rem; background: linear-gradient(135deg, var(--ee-lavL), #fff 70%); border: 1px solid #e9d5ff; border-radius: var(--ee-r-3xl); padding: .9rem; }
+.ee-fside-help > .ee-ic { flex-shrink: 0; width: 2.2rem; height: 2.2rem; border-radius: .8rem; background: #fff; color: var(--ee-lavD); font-size: 1.25rem; display: inline-flex; align-items: center; justify-content: center; padding: .4rem; box-sizing: border-box; box-shadow: var(--ee-sh-sm); }
+.ee-fside-help b { display: block; font-size: .8rem; font-weight: 900; color: #0f172a; }
+.ee-fside-help p { font-size: .7rem; color: var(--ee-soft); margin: .15rem 0 .4rem; line-height: 1.8; }
+.ee-fside-help a { display: inline-flex; align-items: center; gap: .25rem; font-size: .72rem; font-weight: 800; color: var(--ee-lavD); }
+.ee-fside-help a:hover .ee-ic { transform: translateX(-3px); }
+.ee-fside-help a .ee-ic { transition: transform .2s; }

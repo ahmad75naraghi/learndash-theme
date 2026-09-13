@@ -75,59 +75,85 @@ while (have_posts()) :
 	$ee_duration = (int) get_post_meta($ee_lesson_id, '_learndash_course_grid_duration', true);
 	?>
 
-	<main class="ee-lms-main">
+	<main id="ee-main" class="ee-lms-main">
 		<div class="ee-wrap ee-lms-grid is-lesson">
 
 			<article id="lesson-<?php echo esc_attr($ee_lesson_id); ?>" <?php post_class('ee-lesson-main'); ?>>
 
-				<h1 class="ee-lesson-title"><?php the_title(); ?></h1>
-
-				<!-- نوار اطلاعات -->
-				<div class="ee-lesson-meta">
-					<span class="ee-meta-item"><span class="material-symbols-outlined ee-ic">calendar_month</span><?php echo esc_html($ee_date); ?></span>
-					<span class="ee-meta-sep" aria-hidden="true"></span>
-					<span class="ee-meta-item"><span class="material-symbols-outlined ee-ic">schedule</span><?php echo esc_html($ee_time); ?></span>
-					<span class="ee-meta-sep" aria-hidden="true"></span>
-					<span class="ee-meta-item"><span class="material-symbols-outlined ee-ic">forum</span>
-						<?php
-						if ($ee_comments > 0) {
-							/* translators: %s: تعداد دیدگاه */
-							echo esc_html(sprintf(_n('%s دیدگاه', '%s دیدگاه', $ee_comments, 'evented-edu'), number_format_i18n($ee_comments)));
-						} else {
-							esc_html_e('بدون دیدگاه', 'evented-edu');
-						}
-						?>
-					</span>
-					<span class="ee-meta-sep" aria-hidden="true"></span>
-					<span class="ee-meta-item"><span class="material-symbols-outlined ee-ic">visibility</span>
-						<?php
-						/* translators: %s: تعداد بازدید */
-						echo esc_html(sprintf(__('تعداد بازدید : %s', 'evented-edu'), number_format_i18n($ee_views)));
-						?>
-					</span>
-					<?php if ($ee_duration > 0 && function_exists('evented_format_duration')) : ?>
-						<span class="ee-meta-sep" aria-hidden="true"></span>
-						<span class="ee-meta-item"><span class="material-symbols-outlined ee-ic">timer</span><?php echo esc_html(evented_format_duration($ee_duration)); ?></span>
-					<?php endif; ?>
-				</div>
-
-				<!-- نوار وضعیت + مسیریابی -->
-				<div class="ee-lesson-ribbon">
-					<span class="ee-lr-state <?php echo esc_attr($ee_state['class']); ?>"><?php echo esc_html($ee_state['label']); ?></span>
-					<nav class="ee-lr-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
+				<?php
+				/* شمارهٔ درس در دوره و درس بعدی برای هیرو */
+				$ee_fa        = function_exists('evented_fa_digits') ? 'evented_fa_digits' : 'strval';
+				$ee_lesson_no = 0;
+				$ee_lessons_n = 0;
+				foreach ($ee_steps as $ee_i => $ee_s) {
+					if (empty($ee_s['type']) || 'sfwd-lessons' === $ee_s['type']) {
+						$ee_lessons_n++;
+						if ((int) $ee_s['id'] === $ee_lesson_id) { $ee_lesson_no = $ee_lessons_n; }
+					}
+				}
+				$ee_pct = isset($ee_progress['percentage']) ? (int) $ee_progress['percentage'] : 0;
+				$ee_kind = !empty($ee_media['video']) ? 'video' : (!empty($ee_media['audio']) ? 'audio' : 'text');
+				$ee_kind_lbl = array('video' => __('درس ویدیویی', 'evented-edu'), 'audio' => __('درس صوتی', 'evented-edu'), 'text' => __('درس متنی', 'evented-edu'));
+				$ee_kind_ic  = array('video' => 'play_circle', 'audio' => 'podcasts', 'text' => 'article');
+				?>
+				<!-- هیرو درس -->
+				<header class="ee-ls-hero is-<?php echo esc_attr($ee_state['class']); ?>">
+					<span class="ee-ls-blob b1" aria-hidden="true"></span><span class="ee-ls-blob b2" aria-hidden="true"></span>
+					<nav class="ee-crumb ee-ls-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
+						<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
 						<?php if ($ee_course_post instanceof WP_Post) : ?>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
 							<a href="<?php echo esc_url(get_permalink($ee_course_post)); ?>"><?php echo esc_html(get_the_title($ee_course_post)); ?></a>
-							<span class="material-symbols-outlined ee-ic">chevron_left</span>
 						<?php endif; ?>
-						<span class="ee-lr-current"><?php the_title(); ?></span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg>
+						<span class="ee-crumb-current"><?php the_title(); ?></span>
 					</nav>
-				</div>
+					<div class="ee-ls-hero-row">
+						<div class="ee-ls-hero-ic" aria-hidden="true"><svg class="ee-ic"><use href="#i-<?php echo esc_attr($ee_kind_ic[$ee_kind]); ?>"></use></svg></div>
+						<div class="ee-ls-hero-txt">
+							<div class="ee-ls-tags">
+								<?php if ($ee_lesson_no) : ?><span class="ee-ls-tag is-no"><?php echo esc_html(sprintf(__('درس %1$s از %2$s', 'evented-edu'), $ee_fa($ee_lesson_no), $ee_fa($ee_lessons_n))); ?></span><?php endif; ?>
+								<span class="ee-ls-tag"><?php echo esc_html($ee_kind_lbl[$ee_kind]); ?></span>
+								<?php if (!empty($ee_state['label'])) : ?><span class="ee-ls-tag is-state <?php echo esc_attr($ee_state['class']); ?>"><?php echo esc_html($ee_state['label']); ?></span><?php endif; ?>
+							</div>
+							<h1 class="ee-lesson-title"><?php the_title(); ?></h1>
+							<div class="ee-lesson-meta">
+								<span class="ee-meta-item"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg><?php echo esc_html($ee_date); ?></span>
+								<?php if ($ee_duration > 0 && function_exists('evented_format_duration')) : ?>
+									<span class="ee-meta-item"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-timer"></use></svg><?php echo esc_html(evented_format_duration($ee_duration)); ?></span>
+								<?php endif; ?>
+								<span class="ee-meta-item"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg><?php echo esc_html(sprintf(__('%s بازدید', 'evented-edu'), number_format_i18n($ee_views))); ?></span>
+								<span class="ee-meta-item"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg><?php echo $ee_comments > 0 ? esc_html(sprintf(_n('%s دیدگاه', '%s دیدگاه', $ee_comments, 'evented-edu'), number_format_i18n($ee_comments))) : esc_html__('بدون دیدگاه', 'evented-edu'); ?></span>
+							</div>
+						</div>
+					</div>
+					<?php if ($ee_course_id && !empty($ee_progress['total'])) : ?>
+						<div class="ee-ls-prog" role="progressbar" aria-valuenow="<?php echo esc_attr($ee_pct); ?>" aria-valuemin="0" aria-valuemax="100" aria-label="<?php esc_attr_e('پیشرفت دوره', 'evented-edu'); ?>">
+							<span class="ee-ls-prog-lbl"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-trending_up"></use></svg> <?php esc_html_e('پیشرفت دوره', 'evented-edu'); ?></span>
+							<span class="ee-ls-prog-bar"><i style="width:<?php echo esc_attr($ee_pct); ?>%"></i></span>
+							<b><?php echo esc_html($ee_fa($ee_pct)); ?>٪</b>
+							<small><?php echo esc_html(sprintf(__('%1$s از %2$s گام', 'evented-edu'), $ee_fa((int) $ee_progress['completed']), $ee_fa((int) $ee_progress['total']))); ?></small>
+						</div>
+					<?php endif; ?>
+				</header>
+
+				<!-- نوار پیشرفت چسبان (فقط هنگام اسکرول) -->
+				<?php if ($ee_course_id && !empty($ee_progress['total'])) : ?>
+					<div class="ee-ls-sticky" data-ee-ls-sticky aria-hidden="true">
+						<span class="ee-ls-sticky-t"><?php the_title(); ?></span>
+						<span class="ee-ls-prog-bar"><i style="width:<?php echo esc_attr($ee_pct); ?>%"></i></span>
+						<b><?php echo esc_html($ee_fa($ee_pct)); ?>٪</b>
+						<?php if (!empty($ee_adjacent['next']) && $ee_adjacent['next'] instanceof WP_Post) : ?>
+							<a class="ee-ls-sticky-next" href="<?php echo esc_url(get_permalink($ee_adjacent['next'])); ?>"><?php esc_html_e('بعدی', 'evented-edu'); ?> <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
+						<?php endif; ?>
+					</div>
+				<?php endif; ?>
 
 				<?php if (!$ee_has_access) : ?>
 
 					<!-- درس قفل‌شده -->
 					<div class="ee-locked">
-						<span class="material-symbols-outlined ee-ic">lock</span>
+						<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-lock"></use></svg>
 						<h2><?php esc_html_e('محتوای این درس قفل است', 'evented-edu'); ?></h2>
 						<p><?php esc_html_e('برای تماشای این درس ابتدا در دوره ثبت‌نام کنید.', 'evented-edu'); ?></p>
 						<?php if ($ee_course_post instanceof WP_Post) : ?>
@@ -144,7 +170,7 @@ while (have_posts()) :
 						<section class="ee-acc is-open" data-acc>
 							<button type="button" class="ee-acc-head" aria-expanded="true">
 								<span><?php esc_html_e('کلیپ', 'evented-edu'); ?></span>
-								<span class="material-symbols-outlined ee-ic ee-acc-ic">expand_more</span>
+								<svg class="ee-ic ee-acc-ic" aria-hidden="true" focusable="false"><use href="#i-expand_more"></use></svg>
 							</button>
 							<div class="ee-acc-body">
 								<div class="ee-player">
@@ -153,7 +179,7 @@ while (have_posts()) :
 								<?php if (preg_match('/\.(mp4|webm|ogg|ogv|m4v)(\?|#|$)/i', $ee_media['video'])) : ?>
 									<div class="ee-player-actions">
 										<a class="ee-btn ee-btn-primary" href="<?php echo esc_url($ee_media['video']); ?>" download>
-											<span class="material-symbols-outlined ee-ic">download</span>
+											<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg>
 											<?php esc_html_e('دانلود کلیپ', 'evented-edu'); ?>
 										</a>
 									</div>
@@ -167,12 +193,12 @@ while (have_posts()) :
 						<section class="ee-acc" data-acc>
 							<button type="button" class="ee-acc-head" aria-expanded="false">
 								<span><?php esc_html_e('پادکست', 'evented-edu'); ?></span>
-								<span class="material-symbols-outlined ee-ic ee-acc-ic">expand_more</span>
+								<svg class="ee-ic ee-acc-ic" aria-hidden="true" focusable="false"><use href="#i-expand_more"></use></svg>
 							</button>
 							<div class="ee-acc-body">
 								<?php foreach ($ee_media['audio'] as $ee_audio) : ?>
 									<div class="ee-audio-row">
-										<span class="material-symbols-outlined ee-ic">podcasts</span>
+										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-podcasts"></use></svg>
 										<?php echo evented_media_player($ee_audio); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- مارک‌آپ امن درون تابع ساخته می‌شود. ?>
 										<a class="ee-dl" href="<?php echo esc_url($ee_audio); ?>" download>
 											<?php esc_html_e('دانلود پادکست', 'evented-edu'); ?>
@@ -187,7 +213,7 @@ while (have_posts()) :
 					<section class="ee-acc<?php echo empty($ee_media['video']) && empty($ee_media['audio']) ? ' is-open' : ''; ?>" data-acc>
 						<button type="button" class="ee-acc-head" aria-expanded="<?php echo empty($ee_media['video']) && empty($ee_media['audio']) ? 'true' : 'false'; ?>">
 							<span><?php esc_html_e('متن', 'evented-edu'); ?></span>
-							<span class="material-symbols-outlined ee-ic ee-acc-ic">expand_more</span>
+							<svg class="ee-ic ee-acc-ic" aria-hidden="true" focusable="false"><use href="#i-expand_more"></use></svg>
 						</button>
 						<div class="ee-acc-body">
 							<div class="ee-lesson-body">
@@ -196,10 +222,10 @@ while (have_posts()) :
 
 							<?php if (!empty($ee_media['files'])) : ?>
 								<div class="ee-files">
-									<span class="ee-files-label"><span class="material-symbols-outlined ee-ic">folder</span> <?php esc_html_e('فایل‌های پیوست', 'evented-edu'); ?></span>
+									<span class="ee-files-label"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-folder"></use></svg> <?php esc_html_e('فایل‌های پیوست', 'evented-edu'); ?></span>
 									<?php foreach ($ee_media['files'] as $ee_file) : ?>
 										<a class="ee-file" href="<?php echo esc_url($ee_file['url']); ?>" download>
-											<span class="material-symbols-outlined ee-ic">download</span>
+											<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg>
 											<?php echo esc_html($ee_file['title'] ? $ee_file['title'] : __('دانلود فایل', 'evented-edu')); ?>
 										</a>
 									<?php endforeach; ?>
@@ -213,7 +239,7 @@ while (have_posts()) :
 						<div class="ee-quiz-cta">
 							<?php foreach ($ee_quizzes as $ee_quiz) : ?>
 								<a class="ee-quiz-btn" href="<?php echo esc_url(get_permalink($ee_quiz)); ?>">
-									<span class="material-symbols-outlined ee-ic">quiz</span>
+									<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-quiz"></use></svg>
 									<?php echo esc_html($ee_quiz->post_title ? $ee_quiz->post_title : __('آزمون', 'evented-edu')); ?>
 								</a>
 							<?php endforeach; ?>
@@ -235,7 +261,7 @@ while (have_posts()) :
 								data-course="<?php echo esc_attr($ee_course_id); ?>"
 								data-is-done="<?php echo $ee_is_done ? '1' : '0'; ?>"
 								aria-pressed="<?php echo $ee_is_done ? 'true' : 'false'; ?>">
-								<span class="material-symbols-outlined ee-ic"><?php echo $ee_is_done ? 'task_alt' : 'radio_button_unchecked'; ?></span>
+								<?php echo ee_icon($ee_is_done ? 'task_alt' : 'radio_button_unchecked'); // phpcs:ignore ?>
 								<span data-mark-label><?php echo $ee_is_done ? esc_html__('تکمیل شد', 'evented-edu') : esc_html__('علامت‌گذاری به‌عنوان تکمیل‌شده', 'evented-edu'); ?></span>
 							</button>
 							<span class="ee-mark-msg" role="status" aria-live="polite"></span>
@@ -245,27 +271,30 @@ while (have_posts()) :
 				<?php endif; ?>
 
 				<!-- ناوبری قبلی / بعدی -->
-				<nav class="ee-step-nav" aria-label="<?php esc_attr_e('ناوبری بین درس‌ها', 'evented-edu'); ?>">
-					<?php if (!empty($ee_adjacent['next']) && $ee_adjacent['next'] instanceof WP_Post) : ?>
-						<a class="ee-step-btn is-next" href="<?php echo esc_url(get_permalink($ee_adjacent['next'])); ?>">
-							<span><?php esc_html_e('بعدی', 'evented-edu'); ?></span>
-							<span class="ee-step-name"><?php echo esc_html(get_the_title($ee_adjacent['next'])); ?></span>
-							<span class="material-symbols-outlined ee-ic">arrow_forward</span>
+				<nav class="ee-step-nav v2" aria-label="<?php esc_attr_e('ناوبری بین درس‌ها', 'evented-edu'); ?>">
+					<?php if (!empty($ee_adjacent['prev']) && $ee_adjacent['prev'] instanceof WP_Post) : ?>
+						<a class="ee-step-btn is-prev" href="<?php echo esc_url(get_permalink($ee_adjacent['prev'])); ?>">
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_forward"></use></svg>
+							<span class="ee-step-lbl"><small><?php esc_html_e('درس قبلی', 'evented-edu'); ?></small><span class="ee-step-name"><?php echo esc_html(get_the_title($ee_adjacent['prev'])); ?></span></span>
+						</a>
+					<?php elseif ($ee_course_post instanceof WP_Post) : ?>
+						<a class="ee-step-btn is-back" href="<?php echo esc_url(get_permalink($ee_course_post)); ?>">
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_forward"></use></svg>
+							<span class="ee-step-lbl"><small><?php esc_html_e('بازگشت', 'evented-edu'); ?></small><span class="ee-step-name"><?php esc_html_e('صفحهٔ دوره', 'evented-edu'); ?></span></span>
 						</a>
 					<?php else : ?>
 						<span class="ee-step-btn is-empty" aria-hidden="true"></span>
 					<?php endif; ?>
 
-					<?php if (!empty($ee_adjacent['prev']) && $ee_adjacent['prev'] instanceof WP_Post) : ?>
-						<a class="ee-step-btn is-prev" href="<?php echo esc_url(get_permalink($ee_adjacent['prev'])); ?>">
-							<span class="material-symbols-outlined ee-ic">arrow_back</span>
-							<span class="ee-step-name"><?php echo esc_html(get_the_title($ee_adjacent['prev'])); ?></span>
-							<span><?php esc_html_e('قبلی', 'evented-edu'); ?></span>
+					<?php if (!empty($ee_adjacent['next']) && $ee_adjacent['next'] instanceof WP_Post) : ?>
+						<a class="ee-step-btn is-next" href="<?php echo esc_url(get_permalink($ee_adjacent['next'])); ?>">
+							<span class="ee-step-lbl"><small><?php esc_html_e('درس بعدی', 'evented-edu'); ?></small><span class="ee-step-name"><?php echo esc_html(get_the_title($ee_adjacent['next'])); ?></span></span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>
 						</a>
 					<?php elseif ($ee_course_post instanceof WP_Post) : ?>
-						<a class="ee-step-btn is-back" href="<?php echo esc_url(get_permalink($ee_course_post)); ?>">
-							<span class="material-symbols-outlined ee-ic">arrow_back</span>
-							<span><?php esc_html_e('بازگشت به دوره', 'evented-edu'); ?></span>
+						<a class="ee-step-btn is-next is-finish" href="<?php echo esc_url(get_permalink($ee_course_post)); ?>">
+							<span class="ee-step-lbl"><small><?php esc_html_e('پایان درس‌ها', 'evented-edu'); ?></small><span class="ee-step-name"><?php esc_html_e('بازگشت به دوره', 'evented-edu'); ?></span></span>
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-task_alt"></use></svg>
 						</a>
 					<?php endif; ?>
 				</nav>

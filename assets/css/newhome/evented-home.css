@@ -18,6 +18,50 @@
 .ee-hero-feat > .ee-slider,
 .ee-hero-feat > .ee-feature { flex: 1 1 auto; }
 
+/* اسلایدر هیرو: اسلایدها روی هم (grid stack) + سوایپ */
+.ee-slider { display: grid; position: relative; touch-action: pan-y; user-select: none; -webkit-user-select: none; border-radius: var(--ee-r-3xl); }
+.ee-slider.is-dragging { cursor: grabbing; }
+.ee-slider.is-dragging .ee-slide { transition: none; }
+.ee-slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity .45s ease, transform .45s ease; pointer-events: none; }
+.ee-slide.is-active { opacity: 1; visibility: visible; pointer-events: auto; z-index: 1; }
+.ee-slide.is-dragging { transition: none; }
+
+/* کنترل‌های اسلایدر: فلش‌ها روی تصویر (چپ/راست)، نقطه‌ها پایین */
+.ee-slider-controls { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.ee-slide-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%); pointer-events: auto;
+    width: 2.4rem; height: 2.4rem; border-radius: 999px; border: 1px solid rgb(255 255 255 / .35);
+    background: rgb(15 23 42 / .35); color: #fff; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    cursor: pointer; transition: background .15s, opacity .2s; box-shadow: 0 4px 14px rgb(0 0 0 / .18);
+    opacity: .75;
+}
+.ee-slide-arrow-prev { right: .8rem; }
+.ee-slide-arrow-next { left: .8rem; }
+.ee-slider:hover .ee-slide-arrow, .ee-slide-arrow:focus-visible { opacity: 1; }
+.ee-slide-arrow:hover { background: var(--ee-tealP); border-color: var(--ee-tealP); }
+.ee-slider-dots { position: absolute; bottom: .75rem; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: .35rem; pointer-events: auto; padding: .3rem .55rem; border-radius: 999px; background: rgb(15 23 42 / .28); backdrop-filter: blur(6px); }
+.ee-slide-dot {
+    width: .45rem; height: .45rem; border-radius: 999px; border: 0; padding: 0;
+    background: rgb(255 255 255 / .55); cursor: pointer; transition: all .25s;
+}
+.ee-slide-dot.is-active { width: 1.3rem; background: #fff; }
+@media (max-width: 639.98px) {
+    .ee-slide-arrow { width: 2rem; height: 2rem; font-size: 1rem; opacity: .9; }
+    .ee-slide-arrow-prev { right: .5rem; } .ee-slide-arrow-next { left: .5rem; }
+}
+
+/* اسلاید بدون متن: فقط تصویر با لینک */
+.ee-feature .feat-link { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+.ee-feature .feat-link:focus-visible { outline: 3px solid var(--ee-amberA); outline-offset: -3px; }
+.ee-feature.is-bare { background: var(--ee-tealL); }
+.ee-feature .feat-body { padding-bottom: 2.4rem; }
+.ee-feature .feat-body .ee-btn { position: relative; z-index: 2; }
+.ee-btn-glass { background: rgb(255 255 255 / .16); color: #fff; border: 1px solid rgb(255 255 255 / .45); backdrop-filter: blur(6px); }
+.ee-btn-glass:hover { background: rgb(255 255 255 / .92); color: var(--ee-tealP); }
+
+.ee-feature { flex: 1 1 auto; }
+
 /* اسلایدر هیرو: اسلایدها روی هم (grid stack) */
 .ee-slider { display: grid; }
 .ee-slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity .45s ease; pointer-events: none; }
@@ -49,7 +93,7 @@
 }
 .ee-feature .feat-media { position: absolute; inset: 0; }
 .ee-feature .feat-media img { width: 100%; height: 100%; object-fit: cover; }
-.ee-feature .feat-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgb(15 23 42 / .78), rgb(15 23 42 / .25) 45%, transparent); }
+.ee-feature .feat-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgb(15 23 42 / .82), rgb(15 23 42 / .35) 45%, rgb(15 23 42 / .05)); }
 .ee-feature .feat-tags { position: absolute; top: .9rem; right: 1rem; display: flex; gap: .5rem; z-index: 2; }
 .ee-chip { font-size: .7rem; font-weight: 800; padding: .3rem .8rem; border-radius: 999px; }
 .ee-chip-amber { background: var(--ee-amberA); color: #fff; }
@@ -303,3 +347,64 @@
 .ee-instr .av-wrap .noimg { font-size: 1.6rem; color: var(--ee-tealP); }
 .ee-instr strong { font-size: .82rem; margin-top: .5rem; color: var(--ee-ink); }
 .ee-instr .ee-role { font-size: .68rem; color: var(--ee-tealP); }
+
+/* ---------- تب‌های مقالات (۵ دستهٔ تصادفی) ---------- */
+.ee-art-tabs { margin-bottom: .6rem; }
+.ee-art-tabs .ee-chip-btn { display: inline-flex; align-items: center; white-space: nowrap; }
+.ee-art-tabs .ee-chip-btn[aria-selected="true"] { background: #7e22ce; border-color: #7e22ce; color: #fff; }
+.ee-art-tabs .ee-chip-btn:hover:not([aria-selected="true"]) { background: var(--ee-lavL); color: #7e22ce; }
+.ee-art-tabs .ee-chip-btn:focus-visible { outline: 2px solid #d8b4fe; outline-offset: 2px; }
+.ee-art-panel[hidden] { display: none; }
+.ee-art-panel { animation: eeFadeUp .3s ease both; }
+.ee-art-panel-foot { display: flex; justify-content: center; margin-top: .9rem; }
+.ee-art-panel-foot .ee-btn { background: var(--ee-lavL); color: #7e22ce; border-color: #ead5ff; }
+.ee-art-panel-foot .ee-btn:hover { background: #ead5ff; }
+
+/* چیپ‌های دسته‌بندی دوره‌ها (لینک واقعی به آرشیو دسته) */
+.ee-chips a.ee-chip-btn { display: inline-flex; align-items: center; white-space: nowrap; }
+
+/* ---------- تب‌های دسته‌بندی دوره‌ها (صفحهٔ اصلی) ---------- */
+.ee-crs-tabs { gap: .45rem; padding-bottom: .9rem; }
+.ee-crs-tabs .ee-chip-btn { display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap; cursor: pointer; font-family: inherit; }
+.ee-crs-tabs .ee-chip-btn .ee-chip-n { font-size: .62rem; font-weight: 800; min-width: 1.25rem; height: 1.25rem; padding: 0 .35rem; border-radius: 999px; background: rgb(0 0 0 / .08); display: inline-flex; align-items: center; justify-content: center; }
+.ee-crs-tabs .ee-chip-btn.ee-on .ee-chip-n { background: rgb(255 255 255 / .25); color: #fff; }
+.ee-crs-tabs .ee-chip-btn:focus-visible { outline: 2px solid var(--ee-tealP); outline-offset: 2px; }
+.ee-crs-panel { animation: eeCrsIn .35s ease both; }
+.ee-crs-panel[hidden] { display: none; }
+@keyframes eeCrsIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ee-crs-more { display: flex; justify-content: center; margin-top: 1rem; }
+.ee-crs-more .ee-btn { gap: .4rem; }
+
+/* ---------- کارت «رادیو شمیم» (زیر آخرین مقالات) ---------- */
+.ee-radio-card {
+    position: relative; display: flex; align-items: center; gap: .85rem; overflow: hidden;
+    padding: .95rem 1rem; border-radius: var(--ee-r-3xl); color: #fff; text-decoration: none;
+    background: linear-gradient(135deg, #0f766e 0%, #0d9488 45%, #115e59 100%);
+    border: 1px solid rgb(45 212 191 / .35); box-shadow: 0 12px 30px -12px rgb(13 148 136 / .6);
+    isolation: isolate; transition: transform .2s ease, box-shadow .2s ease;
+}
+.ee-radio-card:hover { transform: translateY(-2px); box-shadow: 0 18px 36px -14px rgb(13 148 136 / .75); color: #fff; }
+.ee-radio-glow { position: absolute; inset: -40% auto auto -20%; width: 70%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, rgb(255 255 255 / .22), transparent 70%); animation: eeRadioGlow 6s ease-in-out infinite alternate; z-index: -1; }
+@keyframes eeRadioGlow { from { transform: translate(0, 0) scale(1); } to { transform: translate(30%, 25%) scale(1.25); } }
+.ee-radio-ic { position: relative; flex: 0 0 auto; width: 3rem; height: 3rem; border-radius: 1rem; background: rgb(255 255 255 / .16); backdrop-filter: blur(4px); display: grid; place-items: center; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .25); }
+.ee-radio-ic .ee-ic { font-size: 1.55rem; color: #fff; }
+.ee-radio-rings { position: absolute; right: 1rem; top: 50%; width: 3rem; height: 3rem; transform: translateY(-50%); pointer-events: none; }
+.ee-radio-rings i { position: absolute; inset: 0; border-radius: 1rem; border: 1.5px solid rgb(255 255 255 / .45); animation: eeRadioRing 2.6s ease-out infinite; }
+.ee-radio-rings i:nth-child(2) { animation-delay: .85s; } .ee-radio-rings i:nth-child(3) { animation-delay: 1.7s; }
+@keyframes eeRadioRing { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(1.75); opacity: 0; border-radius: 50%; } }
+.ee-radio-body { display: flex; flex-direction: column; gap: .15rem; min-width: 0; flex: 1 1 auto; }
+.ee-home .ee-radio-card, .ee-home .ee-radio-card * { color: #fff; }
+.ee-radio-title { display: flex; align-items: center; gap: .5rem; font-size: .98rem; font-weight: 900; letter-spacing: -.01em; text-shadow: 0 1px 2px rgb(0 0 0 / .15); }
+.ee-radio-live { display: inline-flex; align-items: center; gap: .3rem; font-size: .58rem; font-weight: 800; padding: .1rem .5rem .1rem .4rem; border-radius: 999px; background: rgb(255 255 255 / .18); border: 1px solid rgb(255 255 255 / .35); }
+.ee-radio-live i { width: .45rem; height: .45rem; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 0 0 rgb(251 191 36 / .7); animation: eeRadioDot 1.6s infinite; }
+@keyframes eeRadioDot { 0% { box-shadow: 0 0 0 0 rgb(251 191 36 / .7); } 70% { box-shadow: 0 0 0 .45rem rgb(251 191 36 / 0); } 100% { box-shadow: 0 0 0 0 rgb(251 191 36 / 0); } }
+.ee-home .ee-radio-card .ee-radio-sub { font-size: .7rem; color: rgb(204 251 241 / .95); line-height: 1.6; }
+.ee-radio-eq { display: flex; align-items: flex-end; gap: .2rem; height: 1.5rem; flex: 0 0 auto; }
+.ee-radio-eq i { width: .22rem; border-radius: 999px; background: linear-gradient(to top, #fbbf24, #fde68a); animation: eeRadioEq 1.1s ease-in-out infinite; transform-origin: bottom; height: 100%; }
+.ee-radio-eq i:nth-child(1) { animation-delay: 0s; } .ee-radio-eq i:nth-child(2) { animation-delay: .18s; } .ee-radio-eq i:nth-child(3) { animation-delay: .36s; } .ee-radio-eq i:nth-child(4) { animation-delay: .12s; } .ee-radio-eq i:nth-child(5) { animation-delay: .3s; }
+@keyframes eeRadioEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+.ee-home .ee-radio-card .ee-radio-play, .ee-home .ee-radio-card .ee-radio-play * { color: #0f766e; }
+.ee-radio-play { flex: 0 0 auto; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: #fff; color: #0f766e; display: grid; place-items: center; box-shadow: 0 6px 14px -4px rgb(0 0 0 / .35); transition: transform .2s; }
+.ee-radio-play .ee-ic { font-size: 1.3rem; margin-inline-start: -.1rem; }
+.ee-radio-card:hover .ee-radio-play { transform: scale(1.08); }
+@media (prefers-reduced-motion: reduce) { .ee-radio-glow, .ee-radio-rings i, .ee-radio-live i, .ee-radio-eq i { animation: none; } }
