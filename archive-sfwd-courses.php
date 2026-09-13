@@ -22,7 +22,7 @@ $ee_title  = '' !== $ee_search
 ?>
 
 <main class="ee-list-main">
-	<div class="ee-wrap ee-list-grid">
+	<div class="ee-wrap ee-list-grid is-filter">
 
 		<div class="ee-list-col">
 
@@ -46,7 +46,7 @@ $ee_title  = '' !== $ee_search
 				</div>
 			</header>
 
-			<?php if (function_exists('evented_course_filter_bar')) { evented_course_filter_bar($ee_total); } ?>
+			<?php if (function_exists('evented_course_filter_chips')) { evented_course_filter_chips(); } ?>
 
 			<?php
 			get_template_part('template-parts/lms/course', 'grid', array(
@@ -59,7 +59,7 @@ $ee_title  = '' !== $ee_search
 
 		</div>
 
-		<?php get_template_part('template-parts/lms/courses', 'sidebar'); ?>
+		<?php get_template_part('template-parts/lms/filter', 'sidebar', array('ee_total' => $ee_total)); ?>
 
 	</div>
 </main>

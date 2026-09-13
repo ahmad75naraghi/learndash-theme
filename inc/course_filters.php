@@ -304,3 +304,24 @@ function evented_course_filter_bar($total = null)
 	</form>
 	<?php
 }
+
+/**
+ * فقط چیپ‌های فیلترهای فعال (بالای گرید؛ سایدبار فیلتر جداست).
+ */
+function evented_course_filter_chips()
+{
+	if (!evented_course_filters_active()) {
+		return;
+	}
+	$defs = evented_course_filter_defs();
+	$vals = evented_course_filter_values();
+	echo '<div class="ee-cf-chips is-standalone">';
+	foreach ($vals as $k => $v) {
+		if ('' === $v || ('orderby' === $k && 'newest' === $v)) {
+			continue;
+		}
+		$label = isset($defs[$k]['options'][$v]) ? $defs[$k]['options'][$v] : $v;
+		echo '<a class="ee-cf-chip" href="' . esc_url(remove_query_arg($k)) . '" title="حذف این فیلتر">' . esc_html($defs[$k]['label'] . ': ' . $label) . ' ' . ee_icon('close') . '</a>'; // phpcs:ignore
+	}
+	echo '</div>';
+}

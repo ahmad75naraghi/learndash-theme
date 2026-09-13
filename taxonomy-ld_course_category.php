@@ -44,7 +44,7 @@ $ee_total  = isset($wp_query->found_posts) ? (int) $wp_query->found_posts : coun
 ?>
 
 <main class="ee-list-main">
-	<div class="ee-wrap ee-list-grid">
+	<div class="ee-wrap ee-list-grid is-filter">
 
 		<div class="ee-list-col">
 
@@ -95,7 +95,7 @@ $ee_total  = isset($wp_query->found_posts) ? (int) $wp_query->found_posts : coun
 			<?php endif; ?>
 
 			<!-- گرید دوره‌ها -->
-			<?php if (function_exists('evented_course_filter_bar')) { evented_course_filter_bar($ee_total); } ?>
+			<?php if (function_exists('evented_course_filter_chips')) { evented_course_filter_chips(); } ?>
 
 			<?php
 			get_template_part('template-parts/lms/course', 'grid', array(
@@ -124,7 +124,7 @@ $ee_total  = isset($wp_query->found_posts) ? (int) $wp_query->found_posts : coun
 
 		</div>
 
-		<?php get_template_part('template-parts/lms/courses', 'sidebar', array('ee_current_term' => $ee_term_id)); ?>
+		<?php get_template_part('template-parts/lms/filter', 'sidebar', array('ee_current_term' => $ee_term_id, 'ee_total' => $ee_total)); ?>
 
 	</div>
 </main>

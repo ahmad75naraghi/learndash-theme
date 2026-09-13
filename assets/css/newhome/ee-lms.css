@@ -698,7 +698,9 @@ a.ee-cur-item:hover .ee-cur-title { color: var(--ee-tealP); }
 .ee-qz-course-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--ee-tealP), var(--ee-teal)); border-radius: inherit; }
 .ee-qz-course-tx em { font-style: normal; font-size: .64rem; color: var(--ee-tealP); font-weight: 700; }
 
-/* --- پوستهٔ عمومی برای اجزای موتور آزمون (ProQuiz و LD 3/4) --- */
+/* --- پوستهٔ موتور آزمون (WpProQuiz + LD 3/4) ---
+   نکته: در ProQuiz، ‎.wpProQuiz_listItem‎ کانتینر «هر سوال» است (نه گزینه)؛
+   گزینه‌ها ‎.wpProQuiz_questionListItem‎ هستند. */
 .ee-quiz-body .wpProQuiz_content,
 .ee-quiz-body .ld-quiz,
 .ee-quiz-body .ld-quiz-content,
@@ -707,122 +709,225 @@ a.ee-cur-item:hover .ee-cur-title { color: var(--ee-tealP); }
     font-family: inherit; font-size: .88rem; color: #334155;
     background: transparent; border: 0; padding: 0; margin: 0; width: 100%;
 }
+.ee-quiz-body .wpProQuiz_content p { margin: 0 0 .6rem; line-height: 2; }
+.ee-quiz-body .wpProQuiz_content p:last-child { margin-bottom: 0; }
+.ee-quiz-body .wpProQuiz_description { font-size: .84rem; color: #475569; line-height: 2; margin-bottom: .9rem; }
 
-/* سربرگ و عنوان آزمون */
-.ee-quiz-body .wpProQuiz_header,
-.ee-quiz-body .wpProQuiz_quiz_title,
-.ee-quiz-body .ld-quiz-title,
-.ee-quiz-body .ld-quiz-header {
-    font-size: 1rem; font-weight: 900; color: #0f172a;
-    background: var(--ee-tealL); border: 1px solid rgb(209 250 229);
-    border-radius: 1rem; padding: .7rem .9rem; margin: 0 0 1rem;
-    display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
-}
+/* صفحهٔ شروع */
+.ee-quiz-body .wpProQuiz_text { text-align: center; padding: .2rem 0; }
+.ee-quiz-body .wpProQuiz_text > div { display: flex; justify-content: center; }
+.ee-quiz-body .wpProQuiz_text .wpProQuiz_button { font-size: .92rem; padding: .75rem 2.2rem; }
 
-/* بلاک سوال */
-.ee-quiz-body .wpProQuiz_question,
-.ee-quiz-body .wpProQuiz_question_page,
-.ee-quiz-body .ld-quiz-question,
-.ee-quiz-body .ld-quiz-question-container {
-    background: #fff; border: 1px solid #eef2f6;
-    border-radius: 1.1rem; box-shadow: var(--ee-sh-sm);
-    padding: .9rem 1rem; margin: 0 0 1rem; width: auto;
-}
-.ee-quiz-body .wpProQuiz_question_text,
-.ee-quiz-body .wpProQuiz_question_header,
-.ee-quiz-body .ld-quiz-question-content,
-.ee-quiz-body .ld-quiz-question-label {
-    font-size: .92rem; font-weight: 800; color: #0f172a;
-    line-height: 2; margin: 0 0 .7rem;
-}
-
-/* فهرست گزینه‌ها */
-.ee-quiz-body .wpProQuiz_list,
-.ee-quiz-body .wpProQuiz_question_list,
-.ee-quiz-body .ld-quiz-answers,
-.ee-quiz-body .ld-quiz-answer-list {
-    list-style: none; margin: 0; padding: 0;
-    display: flex; flex-direction: column; gap: .45rem;
-}
+/* ترتیب و فاصلهٔ سوال‌ها */
+.ee-quiz-body ol.wpProQuiz_list,
+.ee-quiz-body .wpProQuiz_quiz > ol { list-style: none; margin: 0; padding: 0; }
 .ee-quiz-body .wpProQuiz_listItem,
-.ee-quiz-body .wpProQuiz_answer,
-.ee-quiz-body .ld-quiz-answer {
-    display: flex; align-items: flex-start; gap: .55rem;
-    background: #f8fafc; border: 1px solid #f1f5f9;
-    border-radius: .9rem; padding: .6rem .75rem;
-    transition: all .15s; margin: 0;
+.ee-quiz-body .ld-quiz-question-container {
+    display: block; position: relative;
+    background: #fff; border: 1px solid #e6edf3;
+    border-radius: 1.25rem; box-shadow: 0 14px 30px -24px rgb(15 23 42 / .35);
+    padding: 1.1rem 1.15rem 1rem; margin: 0 0 1rem;
 }
-.ee-quiz-body .wpProQuiz_listItem:hover,
-.ee-quiz-body .ld-quiz-answer:hover {
-    background: var(--ee-mint); border-color: rgb(209 250 229);
+.ee-quiz-body .wpProQuiz_listItem::before {
+    content: ""; position: absolute; inset-inline-start: 0; top: 1.25rem; bottom: 1.25rem;
+    width: 4px; border-radius: 0 4px 4px 0; background: linear-gradient(var(--ee-teal), var(--ee-tealP));
 }
-.ee-quiz-body .wpProQuiz_listItem label,
-.ee-quiz-body .ld-quiz-answer label,
-.ee-quiz-body .wpProQuiz_answer label {
-    display: block; font-size: .84rem; line-height: 2; color: #334155; cursor: pointer; margin: 0;
+
+
+/* «سوال ۱ از ۵» + عنوان سوال */
+.ee-quiz-body .wpProQuiz_question_page {
+    display: inline-flex; align-items: center; gap: .25rem;
+    font-size: .7rem; font-weight: 800; color: var(--ee-tealP);
+    background: var(--ee-tealL); border-radius: 999px; padding: .2rem .7rem; margin: 0 0 .6rem;
 }
-.ee-quiz-body input[type="radio"],
-.ee-quiz-body input[type="checkbox"] {
-    accent-color: var(--ee-tealP); width: 1.05rem; height: 1.05rem;
-    margin: .45rem 0 0; flex-shrink: 0; cursor: pointer;
+.ee-quiz-body .wpProQuiz_question_page span { font-weight: 900; }
+.ee-quiz-body .wpProQuiz_header,
+.ee-quiz-body .ld-quiz-question-label {
+    display: flex; align-items: baseline; gap: .4rem;
+    font-size: .9rem; font-weight: 900; color: #0f172a;
+    background: none; border: 0; padding: 0; margin: 0 0 .7rem; line-height: 1.9;
 }
+.ee-quiz-body .wpProQuiz_header > span:first-child {
+    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 1.55rem; height: 1.55rem; border-radius: .55rem; font-size: .74rem;
+    color: #fff; background: var(--ee-tealP); align-self: center;
+}
+.ee-quiz-body .wpProQuiz_header > span:first-child::after { content: none; }
+.ee-quiz-body .wpProQuiz_question { padding: 0; margin: 0; border: 0; background: none; }
+.ee-quiz-body .wpProQuiz_question_text,
+.ee-quiz-body .ld-quiz-question-content {
+    font-size: .92rem; font-weight: 700; color: #1e293b; line-height: 2.1; margin: 0 0 .85rem;
+}
+.ee-quiz-body .wpProQuiz_question_text img { max-width: 100%; height: auto; border-radius: .8rem; }
+
+/* فهرست گزینه‌ها (تک‌گزینه‌ای/چندگزینه‌ای) */
+.ee-quiz-body ul.wpProQuiz_questionList,
+.ee-quiz-body .ld-quiz-answers { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .45rem; }
+.ee-quiz-body .wpProQuiz_questionListItem,
+.ee-quiz-body .ld-quiz-answer { margin: 0; padding: 0; background: none; border: 0; }
+.ee-quiz-body .wpProQuiz_questionListItem > label,
+.ee-quiz-body .ld-quiz-answer > label {
+    display: flex; align-items: flex-start; gap: .65rem; width: 100%; box-sizing: border-box;
+    font-size: .86rem; line-height: 1.9; color: #334155; cursor: pointer; margin: 0;
+    background: #f8fafc; border: 1px solid #e8eef4; border-radius: .95rem; padding: .62rem .85rem;
+    transition: background .15s, border-color .15s, box-shadow .15s, transform .15s;
+}
+.ee-quiz-body .wpProQuiz_questionListItem > label:hover { background: #fff; border-color: var(--ee-teal); box-shadow: 0 6px 14px -10px rgb(0 137 123 / .6); }
+.ee-quiz-body .wpProQuiz_questionListItem > label:has(input:checked) {
+    background: var(--ee-tealL); border-color: var(--ee-teal); color: #0f172a; font-weight: 800;
+    box-shadow: 0 0 0 3px rgb(0 137 123 / .12);
+}
+.ee-quiz-body .wpProQuiz_questionListItem > label:has(input:focus-visible) { outline: 2px solid var(--ee-teal); outline-offset: 2px; }
+.ee-quiz-body .wpProQuiz_questionListItem input[type="radio"],
+.ee-quiz-body .wpProQuiz_questionListItem input[type="checkbox"],
+.ee-quiz-body .ld-quiz-answer input[type="radio"],
+.ee-quiz-body .ld-quiz-answer input[type="checkbox"] {
+    appearance: none; -webkit-appearance: none; flex-shrink: 0; margin: .38rem 0 0; cursor: pointer;
+    width: 1.15rem; height: 1.15rem; border: 2px solid #94a3b8; background: #fff; border-radius: 50%;
+    display: inline-grid; place-content: center; transition: all .15s;
+}
+.ee-quiz-body .wpProQuiz_questionListItem input[type="checkbox"] { border-radius: .35rem; }
+.ee-quiz-body .wpProQuiz_questionListItem input[type="radio"]::before {
+    content: ""; width: .55rem; height: .55rem; border-radius: 50%; background: var(--ee-tealP); transform: scale(0); transition: transform .15s;
+}
+.ee-quiz-body .wpProQuiz_questionListItem input[type="checkbox"]::before {
+    content: ""; width: .55rem; height: .32rem; border: solid #fff; border-width: 0 0 2.5px 2.5px; transform: rotate(-45deg) scale(0) translate(1px,-1px); transition: transform .15s;
+}
+.ee-quiz-body .wpProQuiz_questionListItem input[type="radio"]:checked { border-color: var(--ee-tealP); }
+.ee-quiz-body .wpProQuiz_questionListItem input[type="radio"]:checked::before { transform: scale(1); }
+.ee-quiz-body .wpProQuiz_questionListItem input[type="checkbox"]:checked { border-color: var(--ee-tealP); background: var(--ee-tealP); }
+.ee-quiz-body .wpProQuiz_questionListItem input[type="checkbox"]:checked::before { transform: rotate(-45deg) scale(1) translate(1px,-1px); }
+.ee-quiz-body .wpProQuiz_questionListItem input:disabled { opacity: .6; cursor: default; }
+/* وضعیت درست/نادرست بعد از بررسی */
+.ee-quiz-body .wpProQuiz_questionListItem.wpProQuiz_answerCorrect > label,
+.ee-quiz-body .wpProQuiz_questionListItem.wpProQuiz_answerCorrect > label:has(input:checked) { box-shadow: none; background: var(--ee-mint); border-color: var(--ee-mintMd); color: var(--ee-mintDk); }
+.ee-quiz-body .wpProQuiz_questionListItem.wpProQuiz_answerIncorrect > label,
+.ee-quiz-body .wpProQuiz_questionListItem.wpProQuiz_answerIncorrect > label:has(input:checked) { box-shadow: none; background: var(--ee-roseL); border-color: var(--ee-rose); color: #9f1239; }
+.ee-quiz-body .wpProQuiz_questionListItem.wpProQuiz_answerIncorrect input[type="checkbox"]:checked { background: #e11d48; border-color: #e11d48; }
+.ee-quiz-body .wpProQuiz_questionListItem.wpProQuiz_answerIncorrect input[type="radio"]:checked { border-color: #e11d48; }
+.ee-quiz-body .wpProQuiz_questionListItem.wpProQuiz_answerIncorrect input[type="radio"]:checked::before { background: #e11d48; }
+.ee-quiz-body .wpProQuiz_questionListItem.wpProQuiz_answerCorrect input:checked { background: #059669; border-color: #059669; }
+.ee-quiz-body .wpProQuiz_questionListItem.wpProQuiz_answerCorrect input[type="radio"]:checked { background: #fff; }
+.ee-quiz-body .wpProQuiz_questionListItem.wpProQuiz_answerCorrect input[type="radio"]:checked::before { background: #059669; }
+.ee-quiz-body .wpProQuiz_questionListItem.wpProQuiz_answerCorrectIncomplete > label { background: var(--ee-amber); border-color: var(--ee-peachMd); }
+
+/* پاسخ کوتاه، جای خالی و تشریحی */
+.ee-quiz-body input[type="text"].wpProQuiz_questionInput,
 .ee-quiz-body input[type="text"],
 .ee-quiz-body input[type="email"],
+.ee-quiz-body input[type="number"],
 .ee-quiz-body textarea,
 .ee-quiz-body select {
-    width: 100%; font-family: inherit; font-size: .84rem; color: var(--ee-ink);
-    background: #fff; border: 1px solid var(--ee-line);
-    border-radius: .8rem; padding: .55rem .8rem; outline: none;
+    width: 100%; max-width: 100%; box-sizing: border-box; font-family: inherit; font-size: .86rem; color: var(--ee-ink);
+    background: #f8fafc; border: 1px solid #dbe4ee; border-radius: .9rem; padding: .65rem .9rem; outline: none;
+    transition: border-color .15s, box-shadow .15s, background .15s;
 }
+.ee-quiz-body textarea { min-height: 8rem; line-height: 1.9; resize: vertical; }
 .ee-quiz-body input[type="text"]:focus,
+.ee-quiz-body input[type="number"]:focus,
 .ee-quiz-body textarea:focus,
-.ee-quiz-body select:focus { border-color: var(--ee-teal); box-shadow: 0 0 0 3px var(--ee-tealL); }
+.ee-quiz-body select:focus { background: #fff; border-color: var(--ee-teal); box-shadow: 0 0 0 3px var(--ee-tealL); }
+.ee-quiz-body .wpProQuiz_cloze input,
+.ee-quiz-body .wpProQuiz_question_text input[type="text"] {
+    display: inline-block; width: auto; min-width: 7rem; padding: .25rem .6rem; margin: 0 .2rem;
+    border-radius: .5rem; border-width: 0 0 2px; border-color: var(--ee-teal); background: var(--ee-tealL);
+}
+.ee-quiz-body .wpProQuiz_questionEssay { margin-top: .5rem; }
+.ee-quiz-body .wpProQuiz_questionEssay input[type="file"] { font-size: .8rem; }
 
-/* نتیجهٔ پاسخ (درست/نادرست) */
+/* مرتب‌سازی و ماتریس */
+.ee-quiz-body ul.wpProQuiz_sortStringList,
+.ee-quiz-body .wpProQuiz_sortable ~ .wpProQuiz_questionListItem { list-style: none; padding: 0; }
+.ee-quiz-body .wpProQuiz_questionList[data-type="sort_answer"] .wpProQuiz_questionListItem,
+.ee-quiz-body .wpProQuiz_sortStringItem,
+.ee-quiz-body .wpProQuiz_sortable {
+    display: flex; align-items: center; gap: .6rem; font-size: .84rem;
+    background: #fff; border: 1px dashed var(--ee-teal); border-radius: .9rem; padding: .55rem .85rem; cursor: grab;
+}
+.ee-quiz-body .wpProQuiz_sortStringItem:active, .ee-quiz-body .wpProQuiz_sortable:active { cursor: grabbing; box-shadow: var(--ee-sh-sm); }
+.ee-quiz-body .wpProQuiz_sortStringList { display: flex; flex-wrap: wrap; gap: .45rem; margin: 0 0 .8rem; }
+.ee-quiz-body table.wpProQuiz_matrixSortString,
+.ee-quiz-body .wpProQuiz_questionList table { width: 100%; border-collapse: separate; border-spacing: 0 .45rem; font-size: .82rem; }
+.ee-quiz-body .wpProQuiz_questionList td { vertical-align: middle; padding: .45rem .6rem; background: #f8fafc; }
+.ee-quiz-body .wpProQuiz_questionList td:first-child { border-radius: 0 .8rem .8rem 0; font-weight: 700; color: #0f172a; width: 45%; }
+.ee-quiz-body .wpProQuiz_questionList td:last-child { border-radius: .8rem 0 0 .8rem; }
+.ee-quiz-body .wpProQuiz_maxtrixSortCriterion { background: #fff; border: 1px dashed var(--ee-teal); border-radius: .7rem; padding: .35rem .6rem; cursor: grab; display: inline-block; }
+.ee-quiz-body .wpProQuiz_maxtrixSortText { min-height: 2.4rem; border: 1px dashed #cbd5e1; border-radius: .7rem; padding: .3rem; }
+
+/* بازخورد پس از بررسی */
+.ee-quiz-body .wpProQuiz_response { margin-top: .8rem; background: none; border: 0; padding: 0; color: inherit; }
 .ee-quiz-body .wpProQuiz_correct,
 .ee-quiz-body .ld-quiz-correct,
 .ee-quiz-body .ld-quiz-answer-correct {
-    background: var(--ee-mint); border: 1px solid var(--ee-mintMd);
-    border-radius: .9rem; padding: .6rem .8rem; font-size: .8rem; color: var(--ee-mintDk);
+    background: var(--ee-mint); border: 1px solid var(--ee-mintMd); border-inline-start: 4px solid #059669;
+    border-radius: .9rem; padding: .65rem .9rem; font-size: .82rem; color: var(--ee-mintDk); line-height: 1.9;
 }
 .ee-quiz-body .wpProQuiz_incorrect,
 .ee-quiz-body .ld-quiz-incorrect,
 .ee-quiz-body .ld-quiz-answer-incorrect {
-    background: var(--ee-roseL); border: 1px solid var(--ee-rose);
-    border-radius: .9rem; padding: .6rem .8rem; font-size: .8rem; color: #9d174d;
+    background: var(--ee-roseL); border: 1px solid var(--ee-rose); border-inline-start: 4px solid #e11d48;
+    border-radius: .9rem; padding: .65rem .9rem; font-size: .82rem; color: #9f1239; line-height: 1.9;
 }
-.ee-quiz-body .wpProQuiz_response,
-.ee-quiz-body .ld-quiz-response {
-    background: var(--ee-amber); border: 1px solid var(--ee-peachMd);
-    border-radius: .9rem; padding: .6rem .8rem; font-size: .8rem; color: #7c2d12;
-    margin-top: .6rem;
-}
+.ee-quiz-body .wpProQuiz_correct_answer, .ee-quiz-body .wpProQuiz_incorrect_answer { font-weight: 900; display: block; margin-bottom: .2rem; }
+.ee-quiz-body .wpProQuiz_response_points { font-size: .74rem; font-weight: 800; opacity: .85; }
+.ee-quiz-body .wpProQuiz_AnswerMessage { font-size: .8rem; }
+.ee-quiz-body .wpProQuiz_tipp { margin: .6rem 0; }
+.ee-quiz-body .wpProQuiz_tipp > div { background: var(--ee-amber); border: 1px solid var(--ee-peachMd); border-radius: .9rem; padding: .6rem .9rem; font-size: .8rem; color: #7c2d12; }
 
-/* دکمه‌ها */
+/* دکمه‌ها (شروع، بررسی، سوال بعدی/قبلی، پایان آزمون، راهنما، بازبینی، شروع دوباره) */
 .ee-quiz-body .wpProQuiz_button,
 .ee-quiz-body .wpProQuiz_button2,
+.ee-quiz-body .wpProQuiz_QuestionButton,
 .ee-quiz-body .ld-quiz-button,
 .ee-quiz-body .ld-button,
 .ee-quiz-body button[type="submit"],
 .ee-quiz-body input[type="submit"],
 .ee-quiz-body .ld-quiz-nav button {
     display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
-    font-family: inherit; font-size: .82rem; font-weight: 800;
-    color: #fff; background: var(--ee-tealP);
-    border: 1px solid var(--ee-tealP); border-radius: 999px;
-    padding: .55rem 1.3rem; cursor: pointer; text-decoration: none;
-    box-shadow: none; transition: all .15s; margin: .2rem .25rem .2rem 0;
+    font-family: inherit; font-size: .82rem; font-weight: 800; line-height: 1.4;
+    color: #fff; background: var(--ee-tealP); border: 1px solid var(--ee-tealP); border-radius: 999px;
+    padding: .6rem 1.4rem; cursor: pointer; text-decoration: none; float: none !important;
+    box-shadow: 0 8px 16px -10px rgb(0 105 92 / .8); transition: all .15s; margin: .25rem .3rem .25rem 0; width: auto;
 }
 .ee-quiz-body .wpProQuiz_button:hover,
+.ee-quiz-body .wpProQuiz_QuestionButton:hover,
 .ee-quiz-body .wpProQuiz_button2:hover,
 .ee-quiz-body .ld-quiz-button:hover,
 .ee-quiz-body .ld-button:hover,
 .ee-quiz-body button[type="submit"]:hover,
-.ee-quiz-body input[type="submit"]:hover { background: #00796b; border-color: #00796b; }
+.ee-quiz-body input[type="submit"]:hover { background: #00796b; border-color: #00796b; transform: translateY(-1px); }
+.ee-quiz-body .wpProQuiz_button:active, .ee-quiz-body .wpProQuiz_QuestionButton:active { transform: translateY(0); }
+/* دکمه‌های ثانویه: قبلی، راهنما، بازبینی، رد کردن */
+.ee-quiz-body input[name="back"],
+.ee-quiz-body input[name="tip"],
+.ee-quiz-body input[name="review"],
+.ee-quiz-body input[name="skip"],
+.ee-quiz-body input[name="reShowQuestion"],
+.ee-quiz-body input[name="printResults"] { color: var(--ee-tealP); background: #fff; border-color: #cfe7e3; box-shadow: none; }
+.ee-quiz-body input[name="back"]:hover,
+.ee-quiz-body input[name="tip"]:hover,
+.ee-quiz-body input[name="review"]:hover,
+.ee-quiz-body input[name="skip"]:hover,
+.ee-quiz-body input[name="reShowQuestion"]:hover,
+.ee-quiz-body input[name="printResults"]:hover { background: var(--ee-tealL); border-color: var(--ee-teal); color: var(--ee-tealP); }
+/* «پایان آزمون»: تأکیدی */
+.ee-quiz-body input[name="endQuizSummary"],
+.ee-quiz-body input[name="endQuiz"] { background: linear-gradient(135deg, #f97316, #ea580c); border-color: #ea580c; box-shadow: 0 10px 18px -10px rgb(234 88 12 / .8); }
+.ee-quiz-body input[name="endQuizSummary"]:hover,
+.ee-quiz-body input[name="endQuiz"]:hover { background: #ea580c; border-color: #c2410c; }
 .ee-quiz-body .wpProQuiz_button[disabled],
-.ee-quiz-body .ld-quiz-button[disabled] { opacity: .55; cursor: not-allowed; }
+.ee-quiz-body .wpProQuiz_QuestionButton[disabled],
+.ee-quiz-body .ld-quiz-button[disabled] { opacity: .5; cursor: not-allowed; transform: none !important; box-shadow: none; }
+/* ردیف دکمه‌های داخل سوال (next/back/check بعد از response) */
+.ee-quiz-body .wpProQuiz_listItem > input.wpProQuiz_QuestionButton { margin-top: .9rem; }
+.ee-quiz-body .wpProQuiz_listItem > input.wpProQuiz_QuestionButton[name="next"],
+.ee-quiz-body .wpProQuiz_listItem > input.wpProQuiz_QuestionButton[name="check"] { margin-inline-end: 0; }
+.ee-quiz-body .wpProQuiz_listItem::after { content: ""; display: table; clear: both; }
+@media (max-width: 480px) {
+    .ee-quiz-body .wpProQuiz_button, .ee-quiz-body .wpProQuiz_QuestionButton { width: 100%; margin: .25rem 0; }
+}
 
-/* ناوبری و صفحه‌بندی آزمون */
+/* ناوبری و صفحه‌بندی */
 .ee-quiz-body .wpProQuiz_pager,
 .ee-quiz-body .ld-quiz-nav,
 .ee-quiz-body .ld-quiz-buttons {
@@ -830,71 +935,271 @@ a.ee-cur-item:hover .ee-cur-title { color: var(--ee-tealP); }
     padding-top: .8rem; margin-top: .8rem; border-top: 1px solid #eef2f6;
 }
 
-/* نوار پیشرفت و تایمر */
-.ee-quiz-body .wpProQuiz_time_limit,
-.ee-quiz-body .ld-quiz-progress,
-.ee-quiz-body .ld-progress-bar-container {
-    background: #f1f5f9; border-radius: 999px; height: .55rem;
-    overflow: hidden; margin: .5rem 0 .9rem; border: 0;
+/* تایمر و نوار پیشرفت */
+.ee-quiz-body .wpProQuiz_time_limit {
+    position: relative; overflow: hidden; margin: 0 0 1rem; padding: .55rem .9rem .8rem;
+    background: var(--ee-amber); border: 1px solid var(--ee-peachMd); border-radius: 1rem; height: auto;
 }
-.ee-quiz-body .wpProQuiz_time_limit .wpProQuiz_progress,
-.ee-quiz-body .ld-quiz-progress-bar,
-.ee-quiz-body .ld-progress-bar {
-    background: linear-gradient(to left, var(--ee-teal), var(--ee-tealP));
-    height: 100%; border-radius: 999px;
-}
-.ee-quiz-body .wpProQuiz_timer,
-.ee-quiz-body .ld-quiz-timer {
-    display: inline-flex; align-items: center; gap: .35rem;
-    font-size: .78rem; font-weight: 800; color: var(--ee-peachDk);
-    background: var(--ee-amber); border: 1px solid var(--ee-peachMd);
-    border-radius: 999px; padding: .3rem .8rem;
-}
+.ee-quiz-body .wpProQuiz_time_limit .time { font-size: .8rem; font-weight: 900; color: var(--ee-peachDk); margin-bottom: .4rem; }
+.ee-quiz-body .wpProQuiz_time_limit .wpProQuiz_progress { position: static; height: .4rem; border-radius: 999px; background: linear-gradient(to left, #fb923c, #ea580c); }
+.ee-quiz-body .ld-quiz-progress, .ee-quiz-body .ld-progress-bar-container { background: #f1f5f9; border-radius: 999px; height: .55rem; overflow: hidden; margin: .5rem 0 .9rem; }
+.ee-quiz-body .ld-quiz-progress-bar, .ee-quiz-body .ld-progress-bar { background: linear-gradient(to left, var(--ee-teal), var(--ee-tealP)); height: 100%; border-radius: 999px; }
 
-/* جمع‌بندی و نتایج */
+/* صفحهٔ بازبینی و خلاصه قبل از پایان */
+.ee-quiz-body .wpProQuiz_checkPage,
+.ee-quiz-body .wpProQuiz_reviewDiv,
+.ee-quiz-body .wpProQuiz_lock,
+.ee-quiz-body .wpProQuiz_loadQuiz,
+.ee-quiz-body .wpProQuiz_startOnlyRegisteredUser,
+.ee-quiz-body .wpProQuiz_prerequisite,
+.ee-quiz-body .wpProQuiz_sending {
+    background: #f8fafc; border: 1px solid #e6edf3; border-radius: 1.1rem; padding: 1rem 1.1rem; margin: 0 0 1rem;
+}
+.ee-quiz-body .wpProQuiz_checkPage h4, .ee-quiz-body .wpProQuiz_results h4 { font-size: 1rem; font-weight: 900; color: #0f172a; margin: 0 0 .6rem; }
+.ee-quiz-body .wpProQuiz_reviewDiv { display: flex; flex-direction: column; gap: .6rem; }
+.ee-quiz-body .wpProQuiz_reviewQuestion { position: static !important; width: auto !important; }
+.ee-quiz-body .wpProQuiz_reviewQuestion ol { display: flex; flex-wrap: wrap; gap: .4rem; list-style: none; margin: 0; padding: 0; }
+.ee-quiz-body .wpProQuiz_reviewQuestion li {
+    width: 2.1rem; height: 2.1rem; display: inline-flex; align-items: center; justify-content: center;
+    font-size: .78rem; font-weight: 800; color: #475569; background: #fff; border: 1px solid #dbe4ee; border-radius: .6rem; cursor: pointer; transition: all .15s;
+}
+.ee-quiz-body .wpProQuiz_reviewQuestion li:hover { border-color: var(--ee-teal); color: var(--ee-tealP); }
+.ee-quiz-body .wpProQuiz_reviewQuestion li.wpProQuiz_reviewQuestionTarget { border-color: var(--ee-tealP); box-shadow: 0 0 0 3px var(--ee-tealL); color: var(--ee-tealP); }
+.ee-quiz-body .wpProQuiz_reviewQuestion li.wpProQuiz_reviewQuestionSolved { background: var(--ee-tealP); color: #fff; border-color: var(--ee-tealP); }
+.ee-quiz-body .wpProQuiz_reviewQuestion li.wpProQuiz_reviewQuestionReview { background: #fde68a; border-color: #f59e0b; color: #78350f; }
+.ee-quiz-body .wpProQuiz_reviewQuestion li.wpProQuiz_reviewQuestionSolved.wpProQuiz_reviewQuestionReview { background: var(--ee-amber); }
+.ee-quiz-body .wpProQuiz_reviewLegend { display: flex; flex-wrap: wrap; gap: .8rem; font-size: .72rem; color: var(--ee-soft); }
+.ee-quiz-body .wpProQuiz_reviewLegend li { list-style: none; display: inline-flex; align-items: center; gap: .3rem; }
+.ee-quiz-body .wpProQuiz_reviewLegend ol { display: contents; }
+.ee-quiz-body .wpProQuiz_reviewColor { width: .9rem; height: .9rem; border-radius: .3rem; display: inline-block; border: 1px solid #dbe4ee; }
+.ee-quiz-body .wpProQuiz_reviewColor_Answer { background: var(--ee-tealP); }
+.ee-quiz-body .wpProQuiz_reviewColor_Review { background: #fde68a; }
+.ee-quiz-body .wpProQuiz_reviewColor_AnswerAndReview { background: var(--ee-amber); }
+.ee-quiz-body .wpProQuiz_reviewColor_Current { border-color: var(--ee-tealP); box-shadow: 0 0 0 2px var(--ee-tealL); }
+.ee-quiz-body .wpProQuiz_reviewDiv > div:last-child { display: flex; flex-wrap: wrap; gap: .3rem; }
+.ee-quiz-body .wpProQuiz_reviewButtons { display: flex; flex-wrap: wrap; gap: .3rem; }
+
+/* نتایج */
 .ee-quiz-body .wpProQuiz_results,
 .ee-quiz-body .wpProQuiz_quiz_summary,
 .ee-quiz-body .ld-quiz-results,
 .ee-quiz-body .ld-quiz-summary {
-    background: #f8fafc; border: 1px solid #eef2f6;
-    border-radius: 1.1rem; padding: 1rem; margin-top: 1rem;
+    background: #fff; border: 1px solid #e6edf3; border-radius: 1.25rem; padding: 1.1rem; margin-top: 1rem; box-shadow: var(--ee-sh-sm);
 }
-.ee-quiz-body .wpProQuiz_results table,
-.ee-quiz-body .ld-quiz-results table { width: 100%; border-collapse: collapse; font-size: .8rem; }
-.ee-quiz-body .wpProQuiz_results th,
-.ee-quiz-body .wpProQuiz_results td,
-.ee-quiz-body .ld-quiz-results th,
-.ee-quiz-body .ld-quiz-results td {
-    border-bottom: 1px solid #eef2f6; padding: .5rem .4rem; text-align: right;
+.ee-quiz-body .wpProQuiz_results p { font-size: .84rem; }
+.ee-quiz-body .wpProQuiz_points, .ee-quiz-body .wpProQuiz_graded_points, .ee-quiz-body .wpProQuiz_quiz_time {
+    display: block; font-size: .84rem; font-weight: 800; color: #0f172a; margin: 0 0 .5rem;
+    background: var(--ee-tealL); border-radius: .9rem; padding: .6rem .9rem;
 }
-.ee-quiz-body .wpProQuiz_results th,
-.ee-quiz-body .ld-quiz-results th { color: #0f172a; font-weight: 800; }
-.ee-quiz-body .wpProQuiz_result_name,
-.ee-quiz-body .ld-quiz-result-title { font-weight: 800; color: #0f172a; }
-.ee-quiz-body .wpProQuiz_result_value,
-.ee-quiz-body .ld-quiz-result-value { font-weight: 900; color: var(--ee-tealP); }
-
-/* دسته‌بندی و مرتب‌سازی (سوالات matrix/categorization) */
-.ee-quiz-body .wpProQuiz_matrixSort,
-.ee-quiz-body .wpProQuiz_catOverview,
-.ee-quiz-body .ld-quiz-matrix {
-    display: flex; flex-wrap: wrap; gap: .5rem; margin: .6rem 0;
-}
-.ee-quiz-body .wpProQuiz_sort_string,
-.ee-quiz-body .wpProQuiz_maxtrixSortCriterion,
-.ee-quiz-body .ld-quiz-sort-item {
-    background: #fff; border: 1px dashed var(--ee-teal);
-    border-radius: .8rem; padding: .45rem .7rem; font-size: .8rem; cursor: grab;
-}
-
-/* گواهینامه */
-.ee-quiz-body .ld-quiz-certificate,
+.ee-quiz-body .wpProQuiz_points span, .ee-quiz-body .wpProQuiz_quiz_time span { color: var(--ee-tealP); font-weight: 900; }
+.ee-quiz-body .wpProQuiz_resultsList { margin-bottom: .8rem; }
+.ee-quiz-body .wpProQuiz_resultsList li { list-style: none; font-size: .84rem; line-height: 2; color: #334155; }
 .ee-quiz-body .wpProQuiz_certificate {
-    margin-top: 1rem; padding: .8rem .9rem;
-    background: var(--ee-lavL); border: 1px solid var(--ee-lavS);
-    border-radius: 1rem; font-size: .82rem; color: var(--ee-lavD);
+    margin-top: .8rem; padding: .8rem .9rem; background: var(--ee-lavL); border: 1px solid var(--ee-lavS); border-radius: 1rem; font-size: .82rem; color: var(--ee-lavD);
 }
-.ee-quiz-body .ld-quiz-certificate a { color: var(--ee-lavD); font-weight: 800; }
+.ee-quiz-body .wpProQuiz_certificate a, .ee-quiz-body .ld-quiz-certificate a { color: var(--ee-lavD); font-weight: 800; }
+.ee-quiz-body .wpProQuiz_results table, .ee-quiz-body .ld-quiz-results table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.ee-quiz-body .wpProQuiz_results th, .ee-quiz-body .wpProQuiz_results td,
+.ee-quiz-body .ld-quiz-results th, .ee-quiz-body .ld-quiz-results td { border-bottom: 1px solid #eef2f6; padding: .5rem .4rem; text-align: right; }
+.ee-quiz-body .wpProQuiz_results th, .ee-quiz-body .ld-quiz-results th { color: #0f172a; font-weight: 800; }
+.ee-quiz-body .wpProQuiz_result_name, .ee-quiz-body .ld-quiz-result-title { font-weight: 800; color: #0f172a; }
+.ee-quiz-body .wpProQuiz_result_value, .ee-quiz-body .ld-quiz-result-value { font-weight: 900; color: var(--ee-tealP); }
+.ee-quiz-body .wpProQuiz_catOverview { margin: .6rem 0; }
+.ee-quiz-body .wpProQuiz_catOverview li { list-style: none; display: flex; justify-content: space-between; gap: .5rem; padding: .45rem .6rem; border-bottom: 1px dashed #e6edf3; font-size: .8rem; }
+.ee-quiz-body .wpProQuiz_catName { font-weight: 800; color: #0f172a; }
+.ee-quiz-body .wpProQuiz_catPercent { color: var(--ee-tealP); font-weight: 900; }
+.ee-quiz-body .wpProQuiz_toplistTable, .ee-quiz-body .wpProQuiz_toplistTable th, .ee-quiz-body .wpProQuiz_toplistTable td { border-color: #eef2f6; }
+
+/* گواهینامه (LD) و اسپینر */
+.ee-quiz-body .ld-quiz-certificate { margin-top: 1rem; padding: .8rem .9rem; background: var(--ee-lavL); border: 1px solid var(--ee-lavS); border-radius: 1rem; font-size: .82rem; color: var(--ee-lavD); }
+.ee-quiz-body .wpProQuiz_spinner { margin: 1rem auto; }
+
+/* ========================================================================
+   صفحهٔ درس
+   ======================================================================== */
+.ee-lesson-main { min-width: 0; }
+
+.ee-lesson-title { font-size: 1.3rem; font-weight: 900; color: #0f172a; line-height: 1.9; margin: 0 0 .5rem; }
+@media (min-width: 640px) { .ee-lesson-title { font-size: 1.55rem; } }
+@media (min-width: 1024px) { .ee-lesson-title { font-size: 1.75rem; } }
+
+.ee-lesson-meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .7rem;
+    font-size: .72rem; color: var(--ee-soft); padding-bottom: .55rem;
+    border-bottom: 1px solid #eef2f6; margin-bottom: .7rem;
+}
+
+.ee-lesson-ribbon { display: flex; flex-wrap: wrap; align-items: stretch; gap: .35rem; margin-bottom: 1rem; }
+.ee-lr-state {
+    display: inline-flex; align-items: center; font-size: .68rem; font-weight: 800; letter-spacing: .02em;
+    color: #fff; background: var(--ee-tealP); border-radius: .55rem .55rem 0 0; padding: .25rem .65rem;
+}
+.ee-lr-state.is-complete { background: var(--ee-mintDk); }
+.ee-lr-state.is-locked { background: #64748b; }
+.ee-lr-state.is-sample { background: var(--ee-amberA); }
+.ee-lr-crumb {
+    flex: 1; display: flex; align-items: center; gap: .3rem; flex-wrap: wrap;
+    font-size: .7rem; color: var(--ee-soft); background: #f8fafc;
+    border: 1px solid #eef2f6; border-radius: 0 0 .55rem .55rem; padding: .35rem .65rem;
+}
+.ee-lr-crumb a:hover { color: var(--ee-tealP); }
+.ee-lr-crumb .ee-ic { font-size: .95rem; opacity: .55; }
+.ee-lr-current { color: #1e293b; font-weight: 700; }
+
+/* درس قفل‌شده */
+.ee-locked {
+    text-align: center; background: #f8fafc; border: 1px dashed var(--ee-line);
+    border-radius: 1rem; padding: 1.6rem 1rem; margin-bottom: 1rem;
+}
+.ee-locked .ee-ic { font-size: 2rem; color: var(--ee-soft); }
+.ee-locked h2 { font-size: 1rem; font-weight: 800; color: #0f172a; margin: .4rem 0 .3rem; }
+.ee-locked p { font-size: .8rem; color: var(--ee-soft); margin: 0 0 .8rem; }
+.ee-btn-solid {
+    display: inline-flex; align-items: center; gap: .35rem; font-size: .8rem; font-weight: 800;
+    color: #fff; background: var(--ee-tealP); border-radius: 999px; padding: .55rem 1.2rem; text-decoration: none;
+}
+.ee-btn-solid:hover { background: #00796b; }
+
+/* پخش‌کننده ------------------------------------------------------------- */
+.ee-player { position: relative; background: #0b1220; border-radius: .9rem; overflow: hidden; aspect-ratio: 16 / 9; }
+.ee-player .ee-video, .ee-player .ee-embed { width: 100%; height: 100%; display: block; border: 0; }
+
+.ee-player-actions { display: flex; justify-content: center; margin-top: .7rem; }
+.ee-player-actions .ee-btn { font-size: .8rem; font-weight: 800; }
+
+.ee-audio-row { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.ee-audio-row .ee-ic { color: var(--ee-tealP); }
+.ee-audio-row .ee-audio { flex: 1; min-width: 14rem; }
+.ee-dl {
+    font-size: .72rem; font-weight: 700; color: var(--ee-tealP);
+    border: 1px solid rgb(209 250 229); background: var(--ee-mint);
+    border-radius: 999px; padding: .3rem .8rem; text-decoration: none;
+}
+.ee-dl:hover { background: var(--ee-tealP); color: #fff; }
+
+/* فایل‌های پیوست */
+.ee-files { margin-top: 1rem; padding-top: .8rem; border-top: 1px dashed #eef2f6; }
+.ee-files-label { display: flex; align-items: center; gap: .3rem; font-size: .75rem; font-weight: 700; color: var(--ee-soft); margin-bottom: .45rem; }
+.ee-file {
+    display: inline-flex; align-items: center; gap: .35rem; font-size: .75rem; color: #475569;
+    background: #f8fafc; border: 1px solid #f1f5f9; border-radius: .7rem;
+    padding: .45rem .7rem; margin-inline-end: .4rem; margin-bottom: .4rem; text-decoration: none;
+}
+.ee-file:hover { color: var(--ee-tealP); border-color: var(--ee-teal); }
+.ee-file .ee-ic { color: var(--ee-tealP); }
+
+/* آزمون ----------------------------------------------------------------- */
+.ee-quiz-cta { display: grid; gap: .5rem; margin: .9rem 0; }
+.ee-quiz-btn {
+    display: flex; align-items: center; justify-content: center; gap: .4rem;
+    font-size: .95rem; font-weight: 900; color: #fff; background: var(--ee-tealP);
+    border-radius: .8rem; padding: .8rem; text-decoration: none; transition: background .15s;
+}
+.ee-quiz-btn:hover { background: #00796b; }
+.ee-quiz-btn .ee-ic { font-size: 1.2rem; }
+
+/* ثبت تکمیل درس --------------------------------------------------------- */
+.ee-mark { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin: .4rem 0 1rem; }
+.ee-mark-btn {
+    display: inline-flex; align-items: center; gap: .4rem; font-family: inherit;
+    font-size: .8rem; font-weight: 800; cursor: pointer;
+    color: var(--ee-tealP); background: var(--ee-mint); border: 1px solid rgb(209 250 229);
+    border-radius: 999px; padding: .55rem 1.1rem; transition: all .15s;
+}
+.ee-mark-btn:hover { background: rgb(209 250 229); }
+.ee-mark-btn.is-done { background: var(--ee-mintDk); border-color: var(--ee-mintDk); color: #fff; cursor: default; }
+.ee-mark-btn.is-done:hover { background: var(--ee-mintDk); }
+.ee-mark-btn[disabled] { opacity: .65; cursor: progress; }
+
+/* ناوبری گام‌ها */
+.ee-step-nav { display: flex; align-items: stretch; justify-content: space-between; gap: .6rem; padding-top: 1rem; border-top: 1px solid #eef2f6; margin-top: .5rem; }
+.ee-step-btn {
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: .35rem;
+    font-size: .72rem; color: var(--ee-tealP); text-decoration: none;
+    background: #f8fafc; border: 1px solid #eef2f6; border-radius: .8rem; padding: .55rem .7rem;
+    transition: all .15s;
+}
+.ee-step-btn:hover { background: var(--ee-mint); border-color: rgb(209 250 229); }
+.ee-step-btn.is-next { justify-content: flex-start; }
+.ee-step-btn.is-prev, .ee-step-btn.is-back { justify-content: flex-end; }
+.ee-step-btn.is-empty { visibility: hidden; }
+.ee-step-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ========================================================================
+   فهرست درس‌ها در سایدبار درس
+   ======================================================================== */
+.ee-ln {
+    background: #fff; border: 1px solid rgb(209 250 229 / .9); border-radius: 1rem;
+    box-shadow: var(--ee-sh-sm); padding: .8rem;
+}
+@media (min-width: 1024px) { .ee-side-lesson { position: sticky; top: 1rem; } }
+
+.ee-ln-head { display: flex; align-items: center; gap: .45rem; padding-bottom: .55rem; border-bottom: 1px solid #f1f5f9; }
+.ee-ln-home { display: inline-flex; align-items: center; gap: .25rem; font-size: .72rem; font-weight: 700; color: #475569; text-decoration: none; }
+.ee-ln-home:hover { color: var(--ee-tealP); }
+.ee-ln-home .ee-ic { font-size: .95rem; color: var(--ee-tealP); }
+.ee-ln-expand {
+    margin-inline-start: auto; font-family: inherit; font-size: .65rem; font-weight: 800; cursor: pointer;
+    color: var(--ee-tealP); background: #fff; border: 1px solid rgb(209 250 229);
+    border-radius: 999px; padding: .2rem .6rem; transition: all .15s;
+}
+.ee-ln-expand:hover { background: var(--ee-mint); }
+.ee-ln-dot { width: .55rem; height: .55rem; border-radius: 999px; background: var(--ee-mintDk); flex-shrink: 0; }
+
+.ee-ln-progress { display: flex; align-items: center; gap: .5rem; padding: .55rem 0; border-bottom: 1px solid #f1f5f9; }
+.ee-ln-bar { flex: 1; height: .35rem; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+.ee-ln-bar span { display: block; height: 100%; background: linear-gradient(to left, var(--ee-tealP), var(--ee-teal)); border-radius: 999px; transition: width .35s; }
+.ee-ln-count { font-size: .65rem; color: var(--ee-soft); font-weight: 700; white-space: nowrap; }
+
+.ee-ln-list { padding: .45rem 0; max-height: 34rem; overflow-y: auto; }
+.ee-ln-group { border-bottom: 1px solid #f8fafc; }
+.ee-ln-group:last-child { border-bottom: 0; }
+.ee-ln-group-head {
+    width: 100%; display: flex; align-items: center; gap: .4rem; background: none; border: 0;
+    padding: .45rem .2rem; cursor: pointer; text-align: right;
+    font-family: inherit; font-size: .78rem; font-weight: 800; color: #0f172a;
+}
+.ee-ln-group-head .ee-ic { margin-inline-start: .2rem; color: var(--ee-tealP); font-size: 1.1rem; transition: transform .2s; }
+.ee-ln-group.is-open .ee-ln-group-head .ee-ic { transform: rotate(180deg); }
+.ee-ln-group-count {
+    margin-inline-start: auto; font-size: .62rem; font-weight: 800; color: var(--ee-tealP);
+    background: var(--ee-tealL); border-radius: 999px; padding: .05rem .45rem;
+}
+.ee-ln-items { list-style: none; margin: 0; padding: 0; display: none; flex-direction: column; gap: .1rem; }
+.ee-ln-group.is-open .ee-ln-items { display: flex; }
+.ee-ln-items.is-flat { display: flex; }
+
+.ee-ln-link { display: flex; align-items: flex-start; gap: .45rem; padding: .4rem .35rem; border-radius: .6rem; text-decoration: none; transition: background .15s; }
+.ee-ln-link:hover { background: #f0fdf9; }
+.ee-ln-link.is-disabled { cursor: default; opacity: .6; }
+.ee-ln-link.is-disabled:hover { background: none; }
+.ee-ln-item.is-current .ee-ln-link { background: rgb(232 245 233 / .7); }
+
+.ee-ln-ic {
+    flex-shrink: 0; width: 1.15rem; height: 1.15rem; margin-top: .2rem; border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1.5px solid #cbd5e1; color: transparent; font-size: .8rem;
+}
+.ee-ln-ic.is-complete { background: var(--ee-mintDk); border-color: var(--ee-mintDk); color: #fff; }
+.ee-ln-ic.is-active { border-color: var(--ee-tealP); box-shadow: 0 0 0 3px var(--ee-tealL); }
+.ee-ln-ic.is-locked { color: #94a3b8; }
+.ee-ln-ic.is-sample { border-color: var(--ee-amberA); }
+
+.ee-ln-txt { min-width: 0; }
+.ee-ln-title { display: block; font-size: .78rem; font-weight: 700; color: #334155; line-height: 1.85; }
+.ee-ln-item.is-current .ee-ln-title { color: var(--ee-mintDk); }
+.ee-ln-link:hover .ee-ln-title { color: var(--ee-tealP); }
+.ee-ln-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; font-size: .66rem; color: var(--ee-tealP); margin-top: .1rem; }
+.ee-ln-meta .ee-ic { font-size: .8rem; }
+.ee-ln-sample { color: #b45309; background: var(--ee-amber); border-radius: 999px; padding: .05rem .4rem; font-weight: 700; }
+
+.ee-ln-back {
+    display: flex; align-items: center; gap: .35rem; margin-top: .5rem;
+    padding-top: .55rem; border-top: 1px solid #f1f5f9;
+    font-size: .74rem; font-weight: 700; color: var(--ee-tealP); text-decoration: none;
+}
+.ee-ln-back:hover { text-decoration: underline; }
+.ee-ln-back-txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ========================================================================
    صفحهٔ درس — بازبینی عرض و فاصله‌ها

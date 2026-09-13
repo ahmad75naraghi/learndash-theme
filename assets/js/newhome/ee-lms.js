@@ -268,3 +268,55 @@
         scrollToCurrent();
     });
 }());
+
+/* ---- سایدبار فیلتر دوره‌ها: باز/بسته در موبایل، ارسال خودکار، دسته‌های بیشتر ---- */
+(function () {
+    'use strict';
+    var side = document.querySelector('[data-ee-fside]');
+    if (!side) { return; }
+    var toggle = side.querySelector('[data-ee-fside-toggle]');
+    var form = side.querySelector('[data-ee-fside-form]');
+    var more = side.querySelector('[data-ee-fside-more]');
+
+    if (toggle) {
+        toggle.addEventListener('click', function () {
+            var open = !side.classList.contains('is-open');
+            side.classList.toggle('is-open', open);
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    }
+    if (more) {
+        more.addEventListener('click', function () {
+            var list = side.querySelector('.ee-fside-cats');
+            var open = !list.classList.contains('is-expanded');
+            list.classList.toggle('is-expanded', open);
+            more.classList.toggle('is-open', open);
+            more.querySelector('span').textContent = open ? 'نمایش کمتر' : 'نمایش همهٔ دسته‌ها';
+        });
+    }
+    if (form) {
+        side.classList.add('is-auto');
+        var t;
+        var submit = function () {
+            clearTimeout(t);
+            t = setTimeout(function () {
+                /* پارامترهای خالی ارسال نشوند تا آدرس تمیز بماند */
+                Array.prototype.forEach.call(form.querySelectorAll('input[type="radio"]:checked, select, input[type="search"]'), function (el) {
+                    el.disabled = ('' === el.value) || (el.name === 'orderby' && el.value === 'newest');
+                });
+                form.submit();
+            }, 120);
+        };
+        form.addEventListener('change', function (e) {
+            if (e.target.matches('input[type="radio"], select')) {
+                form.querySelectorAll('.ee-fside-chip').forEach(function (c) { c.classList.toggle('is-on', c.querySelector('input').checked); });
+                submit();
+            }
+        });
+        form.addEventListener('submit', function () {
+            Array.prototype.forEach.call(form.querySelectorAll('input[type="radio"]:checked, select, input[type="search"]'), function (el) {
+                el.disabled = ('' === el.value) || (el.name === 'orderby' && el.value === 'newest');
+            });
+        });
+    }
+})();

@@ -37,13 +37,17 @@ add_action('wp_enqueue_scripts', function () {
         wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.0.0');
     } elseif (is_singular(array('sfwd-courses', 'sfwd-lessons', 'sfwd-topic', 'sfwd-quiz'))) {
         // دوره، درس و آزمون: استایل + رفتارها (آکاردئون، دیدگاه، تکمیل درس، علاقه‌مندی)
-        wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.1.0');
-        wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.0.0', true);
+        wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.2.0');
+        wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.1.0', true);
         wp_localize_script('ee-lms', 'eeLms', array('ajax_url' => admin_url('admin-ajax.php')));
 
         if (is_singular('sfwd-quiz')) {
             // سایدبار آزمون کارت دوره و گرید دوره‌ها را نشان می‌دهد.
-            wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.0.0');
+            wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.1.0');
+        if (is_post_type_archive('sfwd-courses') || is_tax('ld_course_category')) {
+            // سایدبار فیلتر دوره‌ها (باز/بسته در موبایل، ارسال خودکار)
+            wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.1.0', true);
+        }
         }
     } elseif (
         is_post_type_archive('sfwd-courses')
@@ -54,7 +58,11 @@ add_action('wp_enqueue_scripts', function () {
     ) {
         // فهرست‌ها: بایگانی/دستهٔ دوره، برگهٔ دوره‌ها، اساتید، پروفایل مدرس،
         // برگهٔ عمومی و صفحهٔ ۴۰۴.
-        wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.0.0');
+        wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.1.0');
+        if (is_post_type_archive('sfwd-courses') || is_tax('ld_course_category')) {
+            // سایدبار فیلتر دوره‌ها (باز/بسته در موبایل، ارسال خودکار)
+            wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.1.0', true);
+        }
     } elseif (is_home() || is_archive() || is_search()) {
         wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.0.0');
     }
