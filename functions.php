@@ -26,7 +26,7 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('ee-fonts', PATH_DIR_URL . '/assets/css/newhome/ee-fonts.css', array(), '1.0.0');
 
     // پوستهٔ مشترک: توکن‌ها، هدر، فوتر، نوار موبایل و ویجت‌های سایدبار
-    wp_enqueue_style('ee-shell', PATH_DIR_URL . '/assets/css/newhome/ee-shell.css', array('ee-fonts'), '1.5.1');
+    wp_enqueue_style('ee-shell', PATH_DIR_URL . '/assets/css/newhome/ee-shell.css', array('ee-fonts'), '1.5.2');
 
     // رفتارها: منوی موبایل، اسلایدر هیرو، کپی لینک اشتراک‌گذاری
     wp_enqueue_script('ee-home-js', PATH_DIR_URL . '/assets/js/newhome/evented-home.js', array(), '1.3.0', true);

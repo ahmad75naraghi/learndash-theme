@@ -1,3 +1,4 @@
+/* panel.css — استایل‌های اختصاصی پنل کاربری (v2.2: پالت به توکن‌های ee-* در ee-shell.css نگاشت شد؛ سرمه‌ای→teal، نارنجی→amber) */
 /* Top Stats */
 
 .top-stats {
@@ -5,8 +6,8 @@
     align-items: center;
     justify-content: space-between;
     background-color: transparent;
-    border: 1px solid #DADADA;
-    border-radius: 8px;
+    border: 1px solid var(--ee-line);
+    border-radius: 12px;
     padding: 1rem;
 }
 
@@ -16,7 +17,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    color: #444;
+    color: var(--ee-ink);
     font-weight: 500;
     font-size: 14px;
     line-height: 22px;
@@ -41,7 +42,7 @@
     font-weight: 600;
     margin-bottom: 24px;
     line-height: 20px;
-    color: #333;
+    color: var(--ee-ink);
 }
 
 /* Course Grid Vertical */
@@ -55,7 +56,7 @@
 .course-card {
     background-color: var(--white);
     border-radius: 12px;
-    border: 1px solid #DADADA;
+    border: 1px solid var(--ee-line);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -87,7 +88,7 @@
     width: 100%;
     position: relative;
     height: 160px;
-    border-radius: 18px;
+    border-radius: 16px;
     padding: 12px;
 }
 
@@ -103,13 +104,13 @@
     font-size: 16px;
     font-weight: 600;
     line-height: 21px;
-    color: #000;
+    color: #0f172a;
     min-height: 42px;
 }
 
 .card-author {
     font-size: 12px;
-    color: #000;
+    color: #0f172a;
     line-height: 20px;
     font-weight: 400;
 }
@@ -124,18 +125,18 @@
 .cat-badge {
     padding: 5px 8px;
     border-radius: 12px;
-    color: #000;
+    color: #0f172a;
     font-size: 12px;
     line-height: 16px;
     font-weight: 400;
 }
 
 .cat-badge:nth-child(2n) {
-    background-color: #BDAAFF;
+    background-color: var(--ee-lavS);
 }
 
 .cat-badge:nth-child(2n + 1) {
-    background-color: #FFEAC6;
+    background-color: var(--ee-amber);
 }
 
 .card-price {
@@ -157,7 +158,7 @@
 
 .course-grid .no-exist-notice p {
     margin-bottom: 8px;
-    color: #696969;
+    color: var(--ee-soft);
     font-size: 16px;
     line-height: 32px;
 }
@@ -170,12 +171,12 @@
 
 .search-bar {
     background-color: var(--white);
-    border: 1px solid #DADADA;
-    border-radius: 8px;
+    border: 1px solid var(--ee-line);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     padding: 0.75rem 1rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 6px 20px rgb(15 23 42 / .06);
 }
 
 .search-bar svg {
@@ -192,11 +193,11 @@
     background: transparent;
     font-family: inherit;
     font-size: 0.875rem;
-    color: #444;
+    color: var(--ee-ink);
 }
 
 .search-bar input::placeholder {
-    color: #444;
+    color: var(--ee-ink);
     font-size: 14px;
     line-height: 22px;
     font-weight: 500;
@@ -214,7 +215,7 @@
     background-color: var(--white);
     border-radius: 1rem;
     border: 1px solid var(--gray-100);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 6px 20px rgb(15 23 42 / .06);
     padding: 22px 16px;
     display: flex;
     flex-direction: column;
@@ -238,7 +239,7 @@
     width: 40%;
     height: 100%;
     background-color: var(--indigo-50);
-    border-radius: 8px;
+    border-radius: 12px;
     position: relative;
     flex-shrink: 0;
     display: flex;
@@ -269,7 +270,7 @@
 }
 
 .progress-fill {
-    background-color: #FFC155;
+    background-color: var(--ee-amberA);
     height: 100%;
     border-radius: 9999px;
 }
@@ -282,7 +283,7 @@
 
 .progress-desc {
     font-size: 12px;
-    color: #000;
+    color: #0f172a;
     line-height: 16px;
     font-weight: 400;
 }
@@ -297,10 +298,10 @@
 }
 
 .get-certificate {
-    background-color: #FFA200;
-    color: #000;
+    background-color: var(--ee-amberA);
+    color: #0f172a;
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 14px;
     line-height: 16px;
     font-weight: 600;
@@ -309,7 +310,7 @@
 }
 
 .get-certificate:hover {
-    background-color: #FFAC1C;
+    background-color: #FB8C00;
 }
 
 .final-course-actions {
@@ -318,10 +319,10 @@
 
 .submit-comment-btn {
     background-color: transparent;
-    border: 1px solid #082B4C;
-    color: #082B4C;
+    border: 1px solid var(--ee-tealP);
+    color: var(--ee-tealP);
     padding: 8px 28px;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 14px;
     line-height: 16px;
     font-weight: 600;
@@ -329,15 +330,15 @@
 }
 
 .submit-comment-btn:hover {
-    background-color: #082B4C;
+    background-color: var(--ee-tealP);
     color: #fff;
 }
 
 .start-course-btn {
-    background-color: #082B4C;
+    background-color: var(--ee-tealP);
     color: #fff;
     padding: 8px 28px;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 14px;
     line-height: 16px;
     font-weight: 500;
@@ -345,7 +346,7 @@
 }
 
 .start-course-btn:hover {
-    background-color: #072541;
+    background-color: #00796B;
 }
 
 .suggested-courses-section .course-grid {
@@ -362,7 +363,7 @@
     padding: 0 20px 15px 20px;
     font-size: 16px;
     font-weight: 500;
-    color: #444444;
+    color: var(--ee-ink);
     text-align: center;
 }
 
@@ -370,19 +371,19 @@
     display: grid;
     grid-template-columns: 2.5fr 1fr 1.5fr 1fr 1.5fr 1fr;
     align-items: center;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
+    border: 1px solid var(--ee-line);
+    border-radius: 12px;
     padding: 15px 20px;
     margin-bottom: 12px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 6px 20px rgb(15 23 42 / .06);
     font-size: 0.85rem;
-    color: #374151;
+    color: var(--ee-ink);
     text-align: center;
 }
 
 .btn-receipt {
     padding: 8px 15px;
-    border-radius: 10px;
+    border-radius: 12px;
     border: none;
     font-weight: 500;
     font-size: 14px;
@@ -393,24 +394,24 @@
 }
 
 .btn-receipt.active {
-    background-color: #f59e0b;
-    color: #000000;
+    background-color: var(--ee-amberA);
+    color: #0f172a;
 }
 
 .btn-receipt.active:hover {
-    background-color: #FFAC1C;
+    background-color: #FB8C00;
 }
 
 .btn-receipt.disabled {
-    background-color: #e5e7eb;
-    color: #9ca3af;
+    background-color: var(--ee-line);
+    color: #94a3b8;
     cursor: not-allowed;
 }
 
 .table-row div {
     font-size: 16px;
     font-weight: 500;
-    color: #444444;
+    color: var(--ee-ink);
 }
 
 /* Modal */
@@ -429,13 +430,13 @@
 }
 
 .status-success {
-    color: #10b981 !important;
+    color: var(--ee-mintDk) !important;
     font-weight: 500;
     font-size: 16px;
 }
 
 .status-fail {
-    color: #ef4444 !important;
+    color: #dc2626 !important;
     font-weight: 500;
     font-size: 16px;
 }
@@ -452,7 +453,7 @@
     width: 420px;
     max-width: 90%;
     padding: 25px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 20px rgb(15 23 42 / .06);
     display: flex;
     flex-direction: column;
 }
@@ -467,7 +468,7 @@
 .modal-title {
     font-size: 1rem;
     font-weight: bold;
-    color: #1f2937;
+    color: #0f172a;
 }
 
 .btn-close {
@@ -475,47 +476,47 @@
     border: none;
     font-size: 1.2rem;
     cursor: pointer;
-    color: #6b7280;
+    color: var(--ee-soft);
 }
 
 .invoice-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border: 1px solid var(--ee-line);
+    border-radius: 12px;
     overflow: hidden;
-    outline: 1px solid #DADADA;
+    outline: 1px solid var(--ee-line);
 }
 
 .invoice-table td {
     padding: 12px 15px;
-    border: 1px solid #DADADA;
+    border: 1px solid var(--ee-line);
     font-size: 14px;
 }
 
 .invoice-table td:first-child {
     font-weight: bold;
-    color: #4b5563;
+    color: var(--ee-ink);
     width: 35%;
     text-align: right;
 }
 
 .invoice-table td:last-child {
-    color: #374151;
+    color: var(--ee-ink);
     text-align: right;
 }
 
 .price-text {
-    color: #045EB2 !important;
+    color: var(--ee-tealP) !important;
     font-weight: 500;
 }
 
 .btn-download-full {
-    background-color: #f59e0b;
-    color: #000;
+    background-color: var(--ee-amberA);
+    color: #0f172a;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 12px;
     font-weight: 500;
     font-size: 0.95rem;
@@ -526,17 +527,17 @@
 }
 
 .btn-download-full:hover {
-    background-color: #FFAC1C;
+    background-color: #FB8C00;
 }
 
 .support-text {
     text-align: right;
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--ee-soft);
 }
 
 .support-text a {
-    color: #045EB2;
+    color: var(--ee-tealP);
     text-decoration: none;
     direction: ltr;
     display: inline-block;
@@ -556,13 +557,13 @@
 
 .certificates-container .card {
     background: #fff;
-    border: 1px solid #DADADA;
+    border: 1px solid var(--ee-line);
     border-radius: 12px;
     padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 6px 20px rgb(15 23 42 / .06);
     width: 50%;
 }
 
@@ -577,14 +578,14 @@
 
 .certificates-container .card .card-title {
     font-size: 16px;
-    color: #000;
+    color: #0f172a;
     margin-bottom: 6px;
     font-weight: 600;
 }
 
 .certificates-container .card .card-subtitle {
     font-size: 14px;
-    color: #000;
+    color: #0f172a;
     margin-bottom: 12px;
     font-weight: 500;
 }
@@ -596,10 +597,10 @@
 }
 
 .certificates-container .card .btn-download {
-    background-color: #f59e0b;
-    color: #000;
+    background-color: var(--ee-amberA);
+    color: #0f172a;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 11px 20px;
     font-weight: 600;
     font-size: 0.9rem;
@@ -610,7 +611,7 @@
 }
 
 .certificates-container .card .btn-download:hover {
-    background-color: #FFAC1C;
+    background-color: #FB8C00;
 }
 
 .certificates-container p {
@@ -623,10 +624,10 @@
     justify-content: center;
     width: 42px;
     height: 42px;
-    border: 2px solid #8b5cf6;
-    border-radius: 10px;
+    border: 2px solid var(--ee-lavD);
+    border-radius: 12px;
     background: #fff;
-    color: #8b5cf6;
+    color: var(--ee-lavD);
     font-weight: bold;
     font-size: 1.2rem;
     cursor: pointer;
@@ -635,12 +636,12 @@
 }
 
 .certificates-container .card .btn-linkedin:hover {
-    background-color: #f3f0ff;
+    background-color: var(--ee-lavL);
 }
 
 .certificates-container .card .certificate-thumb {
     width: 40%;
-    border-radius: 8px;
+    border-radius: 12px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -671,7 +672,7 @@
 .profile-panel .form-group label {
     font-size: 0.85rem;
     font-weight: bold;
-    color: #4b5563;
+    color: var(--ee-ink);
     margin-bottom: 8px;
     text-align: right;
 }
@@ -679,20 +680,20 @@
 .profile-panel .form-control {
     width: 100%;
     padding: 12px 15px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    border: 1px solid var(--ee-line);
+    border-radius: 12px;
     font-size: 0.85rem;
-    color: #374151;
+    color: var(--ee-ink);
     background: #fff;
     outline: none;
 }
 
 .profile-panel .form-control::placeholder {
-    color: #9ca3af;
+    color: #94a3b8;
 }
 
 .profile-panel .form-control:focus {
-    border-color: #3b82f6;
+    border-color: var(--ee-tealP);
 }
 
 .profile-panel select.form-control {
@@ -712,10 +713,10 @@
 
 .profile-panel .btn-submit,
 .settings-panel .btn-submit {
-    background-color: #0f172a;
+    background-color: var(--ee-tealP);
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 12px 35px;
     font-weight: bold;
     font-size: 0.9rem;
@@ -724,21 +725,21 @@
 }
 
 .profile-panel .btn-submit:hover {
-    background-color: #1e293b;
+    background-color: #00796B;
 }
 
 .profile-panel .info-alert {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #4b5563;
+    color: var(--ee-ink);
     font-size: 0.85rem;
 }
 
 .profile-panel .info-alert svg {
     width: 18px;
     height: 18px;
-    color: #10b981;
+    color: var(--ee-mintDk);
 }
 
 .settings-panel .settings-grid {
@@ -763,14 +764,14 @@
 .settings-panel .input-label {
     font-size: 0.85rem;
     font-weight: bold;
-    color: #4b5563;
+    color: var(--ee-ink);
 }
 
 .settings-panel .badge-verified {
     display: flex;
     align-items: center;
     gap: 4px;
-    color: #10b981;
+    color: var(--ee-mintDk);
     font-size: 0.75rem;
     font-weight: bold;
 }
@@ -789,10 +790,10 @@
 .settings-panel .form-control {
     width: 100%;
     padding: 12px 15px 12px 40px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    border: 1px solid var(--ee-line);
+    border-radius: 12px;
     font-size: 0.9rem;
-    color: #374151;
+    color: var(--ee-ink);
     background: #fff;
     outline: none;
 }
@@ -800,7 +801,7 @@
 .settings-panel .icon-edit {
     position: absolute;
     left: 12px;
-    color: #9ca3af;
+    color: #94a3b8;
     width: 18px;
     height: 18px;
     cursor: pointer;
@@ -808,7 +809,7 @@
 
 .settings-panel .input-hint {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: #94a3b8;
     margin-top: 8px;
     text-align: right;
 }
@@ -841,14 +842,14 @@
 /* متن خطا */
 
 input:focus {
-    border-color: #b0b0b0;
+    border-color: #94a3b8;
 }
 
 input[type="password"] {
     width: 100%;
     padding: 14px 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
+    border: 1px solid var(--ee-line);
+    border-radius: 12px;
     font-size: 15px;
     outline: none;
     transition: all 0.2s;
@@ -857,7 +858,7 @@ input[type="password"] {
 
 h2 {
     font-size: 20px;
-    color: #000;
+    color: #0f172a;
     text-align: center;
     margin-bottom: 12px;
     font-weight: 600;
@@ -869,9 +870,9 @@ h2 {
     width: 100%;
     padding: 14px;
     border: none;
-    border-radius: 10px;
-    background-color: #fca326;
-    color: #000;
+    border-radius: 12px;
+    background-color: var(--ee-amberA);
+    color: #0f172a;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
@@ -879,7 +880,7 @@ h2 {
 }
 
 .btn-submit:disabled {
-    background-color: #fca326;
+    background-color: var(--ee-amberA);
     color: #fff;
     cursor: not-allowed;
 }
@@ -921,11 +922,11 @@ h2 {
         display: flex;
         flex-direction: column;
         background: #fff;
-        border: 1px solid #e0e0e0;
+        border: 1px solid var(--ee-line);
         border-radius: 12px;
         padding: 16px;
         margin-bottom: 16px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 6px 20px rgb(15 23 42 / .06);
     }
 
     /* تنظیم لایه‌بندی آیتم‌های داخل کارت (عنوان سمت راست، مقدار سمت چپ) */
@@ -936,7 +937,7 @@ h2 {
         align-items: center;
         padding: 8px 0;
         font-size: 14px;
-        color: #333;
+        color: var(--ee-ink);
         WIDTH: 100%;
     }
 
@@ -944,7 +945,7 @@ h2 {
 
     .transaction-content .table-row > div::before {
         font-weight: 500;
-        color: #666;
+        color: var(--ee-soft);
     }
 
     .transaction-content .table-row > div:nth-child(1)::before {
@@ -984,7 +985,7 @@ h2 {
     .transaction-content .btn-receipt {
         width: 100%;
         padding: 10px;
-        border-radius: 8px;
+        border-radius: 12px;
         border: none;
         font-weight: bold;
         cursor: pointer;
@@ -994,28 +995,28 @@ h2 {
     /* استایل دکمه فعال (نارنجی) */
 
     .transaction-content .btn-receipt.active {
-        background-color: #ffa500;
-        color: #000;
+        background-color: var(--ee-amberA);
+        color: #0f172a;
     }
 
     /* استایل دکمه غیرفعال/ناموفق (خاکستری) */
 
     .transaction-content .btn-receipt.disabled,
     .transaction-content .btn-receipt:disabled {
-        background-color: #e0e0e0;
-        color: #a0a0a0;
+        background-color: var(--ee-line);
+        color: #94a3b8;
         cursor: not-allowed;
     }
 
     /* استایل رنگ وضعیت‌ها */
 
     .status-success {
-        color: #2e7d32;
+        color: var(--ee-mintDk);
         font-weight: bold;
     }
 
     .status-fail {
-        color: #d32f2f;
+        color: #dc2626;
         font-weight: bold;
     }
 
@@ -1058,7 +1059,7 @@ h2 {
         flex-shrink: 0;
         background-size: cover;
         background-position: center;
-        border-radius: 8px;
+        border-radius: 12px;
     }
 
     .card-title {
@@ -1159,7 +1160,7 @@ h2 {
 
     .invoice-table td:first-child {
         font-weight: 500;
-        color: #000000;
+        color: #0f172a;
     }
 
     .close {
@@ -1193,7 +1194,7 @@ h2 {
     #profile-form .form-group label {
         font-size: 14px;
         font-weight: 600;
-        color: #333333;
+        color: var(--ee-ink);
         text-align: right;
     }
 
@@ -1203,21 +1204,21 @@ h2 {
         width: 100%;
         height: 48px;
         padding: 0 16px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--ee-line);
         border-radius: 12px;
         background-color: #ffffff;
         font-size: 14px;
-        color: #333333;
+        color: var(--ee-ink);
         outline: none;
         box-sizing: border-box;
     }
 
     #profile-form .form-control::placeholder {
-        color: #9ca3af;
+        color: #94a3b8;
     }
 
     #profile-form .form-control:focus {
-        border-color: #0b2545;
+        border-color: var(--ee-tealP);
     }
 
     /* جابجایی ترتیب دکمه و باکس پیام alert */
@@ -1234,10 +1235,10 @@ h2 {
     #profile-form .btn-submit {
         width: 100%;
         height: 40px;
-        background-color: #0b2545;
+        background-color: var(--ee-tealP);
         color: #ffffff;
         border: none;
-        border-radius: 8px;
+        border-radius: 12px;
         font-size: 14px;
         font-weight: 400;
         cursor: pointer;
@@ -1245,7 +1246,7 @@ h2 {
     }
 
     #profile-form .btn-submit:hover {
-        background-color: #13345c;
+        background-color: #00796B;
     }
 
     /* استایل باکس هشدار/توضیحات زیر دکمه */
@@ -1258,7 +1259,7 @@ h2 {
         background: transparent;
         padding: 0;
         font-size: 13px;
-        color: #333333;
+        color: var(--ee-ink);
     }
 
     #profile-form .info-alert svg {
@@ -1272,7 +1273,7 @@ h2 {
         font-weight: 600;
         margin-bottom: 20px;
         text-align: right;
-        color: #333333;
+        color: var(--ee-ink);
     }
 
     .settings-panel .settings-grid {
@@ -1289,23 +1290,23 @@ h2 {
     .settings-panel .input-label {
         font-size: 12px;
         font-weight: 500;
-        color: #333;
+        color: var(--ee-ink);
     }
 
     .settings-panel .badge-verified {
         display: flex;
         align-items: center;
         gap: 4px;
-        color: #10b981;
+        color: var(--ee-mintDk);
         font-size: 10px;
         font-weight: 400;
     }
 
     .settings-panel .btn-submit {
-        background-color: #0f172a;
+        background-color: var(--ee-tealP);
         color: #fff;
         border: none;
-        border-radius: 8px;
+        border-radius: 12px;
         padding: 12px 35px;
         font-weight: 500;
         font-size: 14px;
@@ -1320,7 +1321,7 @@ h2 {
     .settings-panel .icon-edit {
         position: absolute;
         right: 12px;
-        color: #9ca3af;
+        color: #94a3b8;
         width: 18px;
         height: 18px;
         cursor: pointer;
@@ -1349,10 +1350,10 @@ h2 {
 
 .no-exist-notice .btn-primary {
     display: inline-block;
-    background-color: #082B4C;
+    background-color: var(--ee-tealP);
     color: #fff;
     padding: 10px 32px;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 14px;
     line-height: 18px;
     text-decoration: none;
@@ -1361,7 +1362,7 @@ h2 {
 }
 
 .no-exist-notice .btn-primary:hover {
-    background-color: #072541;
+    background-color: #00796B;
 }
 
 /* --- ردیف دکمه‌های کارت دوره در «دوره‌های من» --- */

@@ -421,24 +421,24 @@ $ee_slider_mode  = $ee_slide_count > 1;
                     <div class="ee-step">
                         <div>
                             <div class="st-top"><span class="st-num">۱</span><svg class="st-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-how_to_reg"></use></svg></div>
-                            <h5 class="ee-u-mt6">عضویت کاملاً رایگان</h5>
-                            <p>ثبت‌نام سریع تنها با یک شماره همراه، بدون نیاز به مدارک پیچیده</p>
+                            <h5 class="ee-u-mt6"><?php echo esc_html($ee_opt('step1_title')); ?></h5>
+                            <p><?php echo esc_html($ee_opt('step1_text')); ?></p>
                         </div>
                         <div class="st-foot"><span>شروع سریع</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></div>
                     </div>
                     <div class="ee-step st2">
                         <div>
                             <div class="st-top"><span class="st-num">۲</span><svg class="st-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-checklist_rtl"></use></svg></div>
-                            <h5 class="ee-u-mt6">انتخاب دورهٔ دلخواه</h5>
-                            <p>فعال‌سازی دوره‌های شبکه، سرور، امنیت و مجازی‌سازی متناسب با سطح خود</p>
+                            <h5 class="ee-u-mt6"><?php echo esc_html($ee_opt('step2_title')); ?></h5>
+                            <p><?php echo esc_html($ee_opt('step2_text')); ?></p>
                         </div>
                         <div class="st-foot"><span>انتخاب مبحث</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></div>
                     </div>
                     <div class="ee-step st3">
                         <div>
                             <div class="st-top"><span class="st-num">۳</span><svg class="st-ic ee-ic" aria-hidden="true" focusable="false"><use href="#i-all_inclusive"></use></svg></div>
-                            <h5 class="ee-u-mt6">دسترسی نامحدود و دائمی</h5>
-                            <p>مشاهدهٔ ویدیوها، دریافت جزوات و شرکت در آزمون در هر زمان و مکان</p>
+                            <h5 class="ee-u-mt6"><?php echo esc_html($ee_opt('step3_title')); ?></h5>
+                            <p><?php echo esc_html($ee_opt('step3_text')); ?></p>
                         </div>
                         <div class="st-foot"><span>مشاهده دوره‌ها</span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></div>
                     </div>
@@ -599,7 +599,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
         <!-- ======= اساتید ======= -->
         <section class="ee-instructors" id="ee-instructors">
             <div class="ee-wrap">
-                <h3 class="ee-sec-title" style="justify-content:center;"><span class="bar"></span> <?php echo esc_html($ee_opt('instr_title')); ?></h3>
+                <h3 class="ee-sec-title ee-u-center"><span class="bar"></span> <?php echo esc_html($ee_opt('instr_title')); ?></h3>
                 <p class="sec-sub"><?php echo esc_html($ee_opt('instr_sub')); ?></p>
                 <div class="ee-instr-row">
                     <?php if (!empty($ee_instructors)) : foreach ($ee_instructors as $ins) :

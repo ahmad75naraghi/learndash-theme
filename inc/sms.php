@@ -26,8 +26,15 @@ function send_pattern_sms($mobile, $code, $template_id = 0): bool
     }
 
     try {
+        // timeout کوتاه تا در صورت down بودن سرویس پیامک، صفحهٔ ورود قفل نشود
+        $prev_timeout = ini_get('default_socket_timeout');
+        @ini_set('default_socket_timeout', '8');
         $client = new SoapClient("https://api.payamak-panel.com/post/Send.asmx?wsdl", [
-            'encoding' => 'UTF-8'
+            'encoding'           => 'UTF-8',
+            'connection_timeout' => 8,
+            'exceptions'         => true,
+            'cache_wsdl'         => defined('WSDL_CACHE_DISK') ? WSDL_CACHE_DISK : 1,
+            'stream_context'     => stream_context_create(array('http' => array('timeout' => 8))),
         ]);
 
         $params = [
@@ -39,13 +46,20 @@ function send_pattern_sms($mobile, $code, $template_id = 0): bool
         ];
 
         $response = $client->SendByBaseNumber($params);
+        if ($prev_timeout !== false) {
+            @ini_set('default_socket_timeout', (string) $prev_timeout);
+        }
         // بررسی پاسخ API - استفاده از SendByBaseNumberResult
         if (isset($response->SendByBaseNumberResult) && $response->SendByBaseNumberResult > 0) {
             return true;
         }
-
+        error_log('evented-edu: SMS API returned ' . (isset($response->SendByBaseNumberResult) ? $response->SendByBaseNumberResult : 'no result'));
         return false;
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
+        if (isset($prev_timeout) && $prev_timeout !== false) {
+            @ini_set('default_socket_timeout', (string) $prev_timeout);
+        }
+        error_log('evented-edu: SMS send failed — ' . $e->getMessage());
         return false;
     }
 }

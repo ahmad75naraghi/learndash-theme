@@ -130,13 +130,13 @@ function handle_toggle_course_wishlist() {
     $course_id = isset($_POST['course_id']) ? intval($_POST['course_id']) : 0;
     $user_id = get_current_user_id();
 
-    if (!$course_id || !$user_id) {
+    if (!$course_id || !$user_id || 'sfwd-courses' !== get_post_type($course_id)) {
         wp_send_json_error('درخواست نامعتبر');
     }
 
-    // دریافت لیست فعلی از متای کاربر
-    $fav_courses_str = get_user_meta($user_id, 'fav_courses', true);
-    $fav_courses = $fav_courses_str ? explode(',', $fav_courses_str) : array();
+    // دریافت لیست فعلی از متای کاربر (فقط شناسه‌های عددی معتبر)
+    $fav_courses_str = (string) get_user_meta($user_id, 'fav_courses', true);
+    $fav_courses = $fav_courses_str ? array_map('intval', explode(',', $fav_courses_str)) : array();
 
     $status = '';
     
@@ -149,8 +149,8 @@ function handle_toggle_course_wishlist() {
         $status = 'added';
     }
 
-    // تمیز کردن آرایه و تبدیل مجدد به رشته با کاما
-    $fav_courses = array_unique(array_filter($fav_courses));
+    // تمیز کردن آرایه و تبدیل مجدد به رشته با کاما (سقف ۲۰۰ مورد)
+    $fav_courses = array_slice(array_values(array_unique(array_filter($fav_courses))), -200);
     update_user_meta($user_id, 'fav_courses', implode(',', $fav_courses));
 
     // ارسال موفقیت‌آمیز وضعیت جدید به فرانت‌اند
@@ -173,9 +173,10 @@ function handle_save_user_profile() {
         'last_name_fa'  => $only_fa($_POST['last_name_fa'] ?? ''),
         'first_name_en' => $only_en($_POST['first_name_en'] ?? ''),
         'last_name_en'  => $only_en($_POST['last_name_en'] ?? ''),
-        'gender'        => sanitize_text_field($_POST['gender'] ?? ''),
-        'birth_date'    => sanitize_text_field($_POST['birth_date'] ?? ''),
+        'gender'        => in_array($_POST['gender'] ?? '', array('male', 'female', 'other', ''), true) ? (string) $_POST['gender'] : '',
+        'birth_date'    => preg_match('/^\d{4}\/\d{2}\/\d{2}$/', (string) ($_POST['birth_date'] ?? '')) ? (string) $_POST['birth_date'] : '',
     ];
+    // فیلدهای بالا تنها متاهای قابل‌نوشتن از سمت کاربر هستند (whitelist).
 
     foreach ($fields as $key => $value) {
         update_user_meta($user_id, $key, $value);
@@ -208,8 +209,13 @@ function handle_save_account_settings() {
         }
     }
 
-    // بررسی و تغییر رمز عبور
+    // بررسی و تغییر رمز عبور — اگر رمز فعلی ارسال شده باشد باید درست باشد
     if (!empty($_POST['user_password']) && $_POST['user_password'] !== '..........') {
+        $current_user_obj = wp_get_current_user();
+        if (isset($_POST['current_password']) && '' !== (string) $_POST['current_password']
+            && !wp_check_password((string) wp_unslash($_POST['current_password']), $current_user_obj->user_pass, $user_id)) {
+            wp_send_json_error('رمز عبور فعلی صحیح نیست.');
+        }
         $pass  = (string) wp_unslash($_POST['user_password']);
         $pass2 = isset($_POST['user_password2']) ? (string) wp_unslash($_POST['user_password2']) : $pass;
         if ($pass !== $pass2) {

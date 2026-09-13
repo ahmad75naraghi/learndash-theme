@@ -18,6 +18,17 @@
 ## [Unreleased]
 
 ### Added
+- متاباکس «رسانه و پیوست‌های درس» (`inc/lesson_meta.php`) برای sfwd-lessons/sfwd-topic — کلیدهای `_lesson_audio_url` و `_lesson_attachments` اکنون از ادمین قابل تنظیم‌اند (همان‌هایی که `evented_lesson_media()` می‌خواند).
+- تنظیمات متن هر سه گام بخش «۳ گام» (`step1..3_title/text`) در تنظیمات قالب.
+- `bin/dev-playground.sh` برای بالا آوردن وردپرس لوکال (WP Playground) با قالب جهت تست.
+
+### Changed
+- `panel.css` v2.2: پالت به توکن‌های `ee-*` نگاشت شد (سرمه‌ای→teal، نارنجی→amber، خاکستری‌ها→`--ee-ink/soft/line`)، شعاع‌ها یکدست ۱۲px.
+- متن‌های پیش‌فرض صفحهٔ اصلی (شعار، دسترسی سریع، ۳ گام، اساتید، مقالات) از «شبکه/سرور/امنیت» به حوزهٔ سایت (خانواده، سواد رسانه، معارف) تغییر کرد.
+- کلاینت پیامک (`inc/sms.php`): timeout ۸ ثانیه، لاگ خطا، گرفتن `Throwable`.
+
+### Security
+- whitelist سخت‌گیرانه در ذخیرهٔ پروفایل (`gender` فقط مقادیر مجاز، `birth_date` فقط الگوی `YYYY/MM/DD`)؛ علاقه‌مندی‌ها فقط شناسهٔ دورهٔ معتبر و سقف ۲۰۰؛ تغییر رمز در صورت ارسال `current_password` آن را بررسی می‌کند.
 - CI: `.github/workflows/lint.yml` + `bin/lint.sh` (php -l در PHP 7.4/8.1/8.3، `node --check`، توازن آکولاد CSS، منع دامنهٔ قدیمی و تگ‌های خارجی).
 - `screenshot.png` واقعی ۱۲۰۰×۹۰۰ برای پوسته.
 - کلاس‌های ابزاری `ee-u-*` در `ee-shell.css` (جایگزین استایل‌های inline).

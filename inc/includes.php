@@ -18,6 +18,7 @@ require_once get_stylesheet_directory() . '/inc/resume.php';
 require_once get_stylesheet_directory() . '/inc/pwa.php';
 require_once get_stylesheet_directory() . '/inc/notifications.php';
 require_once get_stylesheet_directory() . '/inc/meta_functions.php';
+require_once get_stylesheet_directory() . '/inc/lesson_meta.php';
 require_once get_stylesheet_directory() . '/inc/theme_options.php';
 require_once get_stylesheet_directory() . '/inc/theme_settings.php';
 require_once get_stylesheet_directory() . '/inc/ajax_functions.php';
