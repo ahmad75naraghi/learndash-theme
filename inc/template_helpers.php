@@ -80,7 +80,11 @@ function evented_current_url()
 	}
 
 	if (is_post_type_archive()) {
-		return (string) get_post_type_archive_link((string) get_query_var('post_type'));
+		$pt = get_query_var('post_type');
+		if (is_array($pt)) {
+			$pt = (string) reset($pt);
+		}
+		return (string) get_post_type_archive_link((string) $pt);
 	}
 
 	if (is_author()) {

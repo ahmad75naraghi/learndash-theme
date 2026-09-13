@@ -494,7 +494,7 @@ html.no-js .ee-rv, .ee-rv.is-in { opacity: 1; transform: none; }
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible { outline: 2px solid var(--ee-tealP); outline-offset: 2px; border-radius: .4rem; }
 :where(.ee-btn, .ee-chip-btn, .ee-fside-chip span, .ee-cat-go, .ee-pager-btn):focus-visible { outline-offset: 3px; border-radius: 999px; }
 :where(input, select, textarea):focus-visible { outline-offset: 0; }
-.ee-home a[aria-current="page"] { color: var(--ee-tealP); }
+.ee-home a[aria-current="page"]:not(.ee-active) { color: var(--ee-tealP); }
 :root { --ee-soft: #5B6B7F; } /* کنتراست ≥ 4.5:1 روی سفید و #F8FAFC */
 
 /* ========================================================================
@@ -522,6 +522,7 @@ html.no-js .ee-rv, .ee-rv.is-in { opacity: 1; transform: none; }
 .ee-home .ee-u-fs1 { font-size: 1rem; }
 .ee-home .ee-u-min0 { min-width: 0; }
 .ee-home .ee-u-mt6 { margin: .6rem 0 .2rem; }
+.ee-home .ee-u-mt-2 { margin-top: .5rem; }
 .ee-home .ee-u-mint { background: var(--ee-mint); color: #065f46; }
 .ee-home .ee-u-bg-green { background: #10b981; }
 .ee-home .ee-u-bg-amber { background: #f59e0b; }

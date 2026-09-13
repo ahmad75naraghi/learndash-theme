@@ -518,13 +518,28 @@ add_action('admin_init', function () {
  *
  * @return string
  */
+/**
+ * آیا جستجوی جاری بدون محدودیت نوع پست است؟ (post_type ممکن است رشته یا آرایه باشد)
+ *
+ * @return bool
+ */
+function evented_nav_search_scope_is_default()
+{
+	$pt = get_query_var('post_type');
+	if (is_array($pt)) {
+		$pt = array_filter(array_map('strval', $pt));
+		return empty($pt) || in_array('any', $pt, true);
+	}
+	return '' === (string) $pt || 'any' === $pt;
+}
+
 function evented_nav_current_key()
 {
 	if (is_front_page()) {
 		return 'home';
 	}
 
-	if (is_singular('post') || is_home() || is_category() || is_tag() || (is_search() && '' === (string) get_query_var('post_type'))) {
+	if (is_singular('post') || is_home() || is_category() || is_tag() || (is_search() && evented_nav_search_scope_is_default())) {
 		return 'articles';
 	}
 

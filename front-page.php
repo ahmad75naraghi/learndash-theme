@@ -413,7 +413,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                 <div class="ee-steps-top">
                     <div>
                         <span class="st-badge"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-route"></use></svg> مسیر آسان و گام‌به‌گام آموزش</span>
-                        <h3 style="margin-top:.5rem;"><?php echo esc_html($ee_opt('steps_title')); ?></h3>
+                        <h3 class="ee-u-mt-2"><?php echo esc_html($ee_opt('steps_title')); ?></h3>
                         <p><?php echo esc_html($ee_opt('steps_sub')); ?></p>
                     </div>
                 </div>

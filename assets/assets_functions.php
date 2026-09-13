@@ -44,7 +44,7 @@ function theme_enqueue()
 
     wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.0.0');
     wp_enqueue_style('ee-panel', PATH_DIR_URL . '/assets/css/newhome/ee-panel.css', array('ee-shell'), '1.0.0');
-    wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', array('ee-panel'), '2.1.0');
+    wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', array('ee-panel'), '2.1.1');
 
     wp_enqueue_style('jalalidatepicker-css', PATH_DIR_URL . '/assets/css/jalalidatepicker.min.css', array(), '1.0.0');
     wp_enqueue_script('jalalidatepicker-js', PATH_DIR_URL . '/assets/js/jalalidatepicker.min.js', array(), '1.0.0', true);

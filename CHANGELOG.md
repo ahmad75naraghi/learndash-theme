@@ -25,6 +25,11 @@
 - `panel.css` هرس شد (۱۶۸۸ → ۱۳۷۵ خط)؛ نسخه‌ها: ee-shell 1.5.0، panel-css 2.1.0، ee-panel.js 1.1.0.
 - `ee-panel.js` پیام‌های flash را با ویژگی `hidden` هم پنهان/آشکار می‌کند.
 
+### Fixed
+- هشدار «Array to string conversion» در `inc/navigation.php` وقتی `post_type` جستجو آرایه باشد (و همان الگو در `template_helpers.php`).
+- متن آیتم فعال منوی دسکتاپ (پیل سبز) نامرئی بود — قانون a11y `aria-current` آن را override می‌کرد.
+- هم‌پوشانی آیکون قفل/مداد با متن ورودی‌های صفحهٔ «حساب کاربری» پنل.
+
 ### Removed
 - کد مردهٔ `captcha_verify()` از `inc/login.php`.
 
