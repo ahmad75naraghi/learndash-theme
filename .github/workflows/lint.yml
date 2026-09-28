@@ -49,23 +49,23 @@ jobs:
           cache: npm
           cache-dependency-path: bin/dev-playground.sh
 
-      - name: Start WordPress Playground
-        run: bash bin/dev-playground.sh
-
-      - name: Test public, panel, AJAX and admin routes
+      # Playground و درخواست‌ها در یک step می‌مانند تا runner پردازش orphan را بین stepها پاک نکند.
+      - name: Test WordPress routes, AJAX and a real theme replacement
         env:
           SMOKE_WRITE_PROFILE: '1'
         run: |
+          set -o pipefail
+          bash bin/dev-playground.sh
           set +e
-          bash bin/smoke-test.sh http://127.0.0.1:9400 /tmp/wp/site/debug.log 2>&1 | tee /tmp/smoke-output.log
+          {
+            bash bin/smoke-test.sh http://127.0.0.1:9400 /tmp/wp/site/debug.log
+            bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site
+          } 2>&1 | tee /tmp/smoke-output.log
           status=${PIPESTATUS[0]}
           {
-            echo '### WordPress smoke output'
+            echo '### WordPress runtime output'
             echo '```text'
             cat /tmp/smoke-output.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           exit "$status"
-
-      - name: Test a real theme replacement
-        run: bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site
