@@ -31,7 +31,7 @@ if (function_exists('learndash_user_get_enrolled_courses') && function_exists('l
             }
 
             // پاکسازی تگ‌های احتمالی HTML در صورتی که نسخه لرندش رشته <a> برگرداند
-            if (str_starts_with($cert_link, '<a') && preg_match('/href=[\'"]([^\'"]+)[\'"]/', $cert_link, $matches)) {
+            if (0 === strpos($cert_link, '<a') && preg_match('/href=[\'"]([^\'"]+)[\'"]/', $cert_link, $matches)) {
                 $cert_link = $matches[1];
             }
 
@@ -85,13 +85,13 @@ if (function_exists('learndash_get_certificate_link')) {
             }
 
             // پاکسازی ساختار احتمالی تگ HTML
-            if (str_starts_with($cert_url, '<a') && preg_match('/href=[\'"]([^\'"]+)[\'"]/', $cert_url, $matches)) {
+            if (0 === strpos($cert_url, '<a') && preg_match('/href=[\'"]([^\'"]+)[\'"]/', $cert_url, $matches)) {
                 $cert_url = $matches[1];
             }
 
             // افزودن پارامتر زمان آزمون جهت اعتبارسنجی تمپلیت خروجی PDF
             $attempt_time = ! empty($attempt['time']) ? (int) $attempt['time'] : 0;
-            if ($attempt_time > 0 && ! str_contains($cert_url, 'time=')) {
+            if ($attempt_time > 0 && false === strpos($cert_url, 'time=')) {
                 $cert_url = add_query_arg('time', $attempt_time, $cert_url);
             }
 

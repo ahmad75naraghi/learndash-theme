@@ -9,9 +9,9 @@ function handle_submit_course_review() {
     // بررسی امنیت (Nonce)
     check_ajax_referer('course_review_nonce', 'security');
 
-    $course_id = intval($_POST['course_id']);
-    $rating    = intval($_POST['rating']);
-    $content   = sanitize_textarea_field($_POST['content']);
+    $course_id = isset($_POST['course_id']) ? absint($_POST['course_id']) : 0;
+    $rating    = isset($_POST['rating']) ? absint($_POST['rating']) : 0;
+    $content   = isset($_POST['content']) ? sanitize_textarea_field(wp_unslash($_POST['content'])) : '';
 
     // بررسی خالی نبودن مقادیر
     if (!$course_id || !$rating || empty($content)) {
@@ -67,53 +67,38 @@ function handle_custom_mark_lesson_complete() {
     }
     
     $user_id = get_current_user_id();
-    
-    if ($lesson_id && $user_id && $course_id) {
-        
-        // ۱. دور زدن قفل ویدیوی لرن‌دش (شبیه‌سازی تماشای کامل ویدیو)
-        if ( function_exists('learndash_video_complete_for_step') ) {
-            learndash_video_complete_for_step( $course_id, $lesson_id, $user_id );
-        } else {
-            update_user_meta( $user_id, 'learndash_video_complete_' . $lesson_id, time() );
-        }
-        
-        // ۲. دور زدن قفل زمانی (اگر درس تایمر داشته باشد)
-        update_user_meta( $user_id, 'learndash_timer_complete_' . $lesson_id, time() );
 
-        // ۳. درخواست تیک خوردن رسمی از هسته لرن‌دش
-        if (function_exists('learndash_process_mark_complete')) {
-            learndash_process_mark_complete($user_id, $lesson_id, false, $course_id);
-        }
-
-        // ۴. اقدام اجباری: اگر لرن‌دش باز هم لج‌بازی کرد، متای پیشرفت کاربر را خودمان در دیتابیس می‌نویسیم!
-        $course_progress = get_user_meta( $user_id, '_sfwd-course_progress', true );
-        if ( empty( $course_progress ) ) $course_progress = array();
-        if ( ! isset( $course_progress[$course_id] ) ) $course_progress[$course_id] = array( 'lessons' => array(), 'topics'  => array() );
-        
-        if ( ! isset( $course_progress[$course_id]['lessons'][$lesson_id] ) ) {
-            $course_progress[$course_id]['lessons'][$lesson_id] = 1;
-            update_user_meta( $user_id, '_sfwd-course_progress', $course_progress );
-            
-            if ( function_exists('learndash_update_user_activity') ) {
-                learndash_update_user_activity( array(
-                    'course_id' => $course_id, 'post_id' => $lesson_id, 'user_id' => $user_id,
-                    'activity_type' => 'lesson', 'activity_action' => 'insert', 'activity_status' => true,
-                    'activity_started' => time(), 'activity_completed' => time(),
-                ) );
-            }
-        }
-
-        // ۵. دریافت اطلاعات جدید پیشرفت برای ارسال به صفحه
-        if (function_exists('learndash_course_progress')) {
-            $progress_data = learndash_course_progress(array(
-                'user_id'   => $user_id,
-                'course_id' => $course_id,
-                'array'     => true
-            ));
-            wp_send_json_success($progress_data);
-        }
+    if (!$lesson_id || !$course_id || !$user_id) {
+        wp_send_json_error('درخواست نامعتبر است.');
     }
-    wp_send_json_error('خطا در سیستم پردازش');
+    if ('sfwd-courses' !== get_post_type($course_id) || !in_array(get_post_type($lesson_id), array('sfwd-lessons', 'sfwd-topic'), true)) {
+        wp_send_json_error('دوره یا درس نامعتبر است.');
+    }
+
+    $actual_course_id = function_exists('learndash_get_course_id') ? (int) learndash_get_course_id($lesson_id) : 0;
+    if ($actual_course_id !== $course_id) {
+        wp_send_json_error('این درس متعلق به دورهٔ انتخاب‌شده نیست.');
+    }
+    if (!function_exists('sfwd_lms_has_access') || !sfwd_lms_has_access($course_id, $user_id)) {
+        wp_send_json_error('برای تکمیل این درس باید در دوره ثبت‌نام کرده باشید.');
+    }
+    if (!function_exists('learndash_process_mark_complete')) {
+        wp_send_json_error('سرویس پیشرفت LearnDash در دسترس نیست.');
+    }
+
+    // فقط API عمومی LearnDash؛ قفل ویدیو/تایمر یا متای پیشرفت مستقیماً دستکاری نمی‌شود.
+    learndash_process_mark_complete($user_id, $lesson_id, false, $course_id);
+
+    if (function_exists('learndash_course_progress')) {
+        $progress_data = learndash_course_progress(array(
+            'user_id'   => $user_id,
+            'course_id' => $course_id,
+            'array'     => true,
+        ));
+        wp_send_json_success($progress_data);
+    }
+
+    wp_send_json_error('امکان دریافت پیشرفت به‌روز وجود ندارد.');
 }
 
 
@@ -209,11 +194,11 @@ function handle_save_account_settings() {
         }
     }
 
-    // بررسی و تغییر رمز عبور — اگر رمز فعلی ارسال شده باشد باید درست باشد
+    // بررسی و تغییر رمز عبور — رمز فعلی برای هر تغییر الزامی است
     if (!empty($_POST['user_password']) && $_POST['user_password'] !== '..........') {
         $current_user_obj = wp_get_current_user();
-        if (isset($_POST['current_password']) && '' !== (string) $_POST['current_password']
-            && !wp_check_password((string) wp_unslash($_POST['current_password']), $current_user_obj->user_pass, $user_id)) {
+        $current_password = isset($_POST['current_password']) ? (string) wp_unslash($_POST['current_password']) : '';
+        if ('' === $current_password || !wp_check_password($current_password, $current_user_obj->user_pass, $user_id)) {
             wp_send_json_error('رمز عبور فعلی صحیح نیست.');
         }
         $pass  = (string) wp_unslash($_POST['user_password']);
@@ -221,8 +206,11 @@ function handle_save_account_settings() {
         if ($pass !== $pass2) {
             wp_send_json_error('تکرار رمز عبور با رمز جدید یکسان نیست.');
         }
-        if (mb_strlen($pass) < 8 || !preg_match('/\d/', $pass) || !preg_match('/[A-Za-z\x{0600}-\x{06FF}]/u', $pass)) {
-            wp_send_json_error('رمز عبور باید حداقل ۸ کاراکتر و شامل حرف و عدد باشد.');
+        $password_error = function_exists('evented_auth_password_error')
+            ? evented_auth_password_error($pass)
+            : (strlen($pass) < 8 ? 'رمز عبور باید حداقل ۸ کاراکتر باشد.' : '');
+        if ('' !== $password_error) {
+            wp_send_json_error($password_error);
         }
         $userdata['user_pass'] = $pass;
     }

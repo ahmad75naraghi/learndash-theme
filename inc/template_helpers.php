@@ -1300,6 +1300,12 @@ function evented_instructor_data($user)
 		return array();
 	}
 
+	$cache_key = 'evented_instructor_' . $user_id;
+	$cached    = get_transient($cache_key);
+	if (is_array($cached)) {
+		return $cached;
+	}
+
 	$course_count = function_exists('count_user_posts') ? (int) count_user_posts($user_id, 'sfwd-courses') : 0;
 
 	/* تعداد دانشجویان یکتا در همهٔ دوره‌های این مدرس */
@@ -1316,7 +1322,7 @@ function evented_instructor_data($user)
 		if (!empty($course_ids)) {
 			$unique = array();
 			foreach ($course_ids as $course_id) {
-				$user_query = learndash_get_users_for_course((int) $course_id, array(), false);
+				$user_query = learndash_get_users_for_course((int) $course_id, array('fields' => 'ID'), false);
 				if ($user_query instanceof WP_User_Query) {
 					foreach ((array) $user_query->get_results() as $student) {
 						$student_id             = is_object($student) ? (int) $student->ID : (int) $student;
@@ -1328,7 +1334,7 @@ function evented_instructor_data($user)
 		}
 	}
 
-	return array(
+	$data = array(
 		'id'           => $user_id,
 		'name'         => (string) get_the_author_meta('display_name', $user_id),
 		'bio'          => (string) get_the_author_meta('description', $user_id),
@@ -1345,7 +1351,26 @@ function evented_instructor_data($user)
 			'facebook'  => (string) get_user_meta($user_id, 'facebook', true),
 		),
 	);
+
+	set_transient($cache_key, $data, 15 * MINUTE_IN_SECONDS);
+	return $data;
 }
+
+/** پاک‌سازی کش کارت/آمار مدرس در تغییرات مرتبط. */
+function evented_instructor_cache_flush($user_id)
+{
+	$user_id = (int) $user_id;
+	if ($user_id > 0) {
+		delete_transient('evented_instructor_' . $user_id);
+	}
+}
+add_action('profile_update', 'evented_instructor_cache_flush');
+add_action('save_post_sfwd-courses', static function ($post_id) {
+	evented_instructor_cache_flush((int) get_post_field('post_author', $post_id));
+}, 20);
+add_action('learndash_update_course_access', static function ($user_id, $course_id) {
+	evented_instructor_cache_flush((int) get_post_field('post_author', $course_id));
+}, 20, 2);
 
 /**
  * فهرست اساتید (نقش group_leader) با صفحه‌بندی.

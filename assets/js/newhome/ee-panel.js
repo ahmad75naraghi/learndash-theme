@@ -139,21 +139,20 @@
     }
     var passForm = $('#eePassForm');
     if (passForm) {
-        var p1 = $('#eeNewPass'), p2 = $('#eeNewPass2'), submit = passForm.querySelector('[type=submit]');
+        var currentPass = $('#eeCurrentPass'), p1 = $('#eeNewPass'), p2 = $('#eeNewPass2'), submit = passForm.querySelector('[type=submit]');
         var bars = $$('.ee-strength i', passForm), rules = {};
         $$('.ee-pass-rules li', passForm).forEach(function (li) { rules[li.getAttribute('data-rule')] = li; });
         function evalPass() {
             var v = p1.value || '';
-            var ok = { length: v.length >= 8, number: /\d/.test(v), letter: /[A-Za-z\u0600-\u06FF]/.test(v), mix: (/[a-z]/.test(v) && /[A-Z]/.test(v)) || /[^A-Za-z0-9]/.test(v) };
+            var ok = { length: v.length >= 8, number: /\d/.test(v), letter: /[a-z]/.test(v) && /[A-Z]/.test(v), mix: /[^A-Za-z0-9\s]/.test(v) };
             var score = 0; Object.keys(ok).forEach(function (k) { if (rules[k]) { rules[k].classList.toggle('is-ok', ok[k]); } if (ok[k]) { score++; } });
-            if (v.length >= 12) { score = Math.min(4, score + 1); }
             bars.forEach(function (b, i) { b.className = i < score ? (score <= 2 ? 'is-weak' : score === 3 ? 'is-mid' : 'is-strong') : ''; });
-            var valid = ok.length && ok.number && ok.letter && p2.value === v && v !== '';
+            var valid = currentPass.value !== '' && ok.length && ok.number && ok.letter && ok.mix && p2.value === v && v !== '';
             submit.disabled = !valid;
             if (p2.value && p2.value !== v) { p2.setCustomValidity('x'); } else { p2.setCustomValidity(''); }
             return valid;
         }
-        p1.addEventListener('input', evalPass); p2.addEventListener('input', evalPass);
+        currentPass.addEventListener('input', evalPass); p1.addEventListener('input', evalPass); p2.addEventListener('input', evalPass);
         $$('.ee-eye', passForm).forEach(function (b) {
             b.addEventListener('click', function () { var t = document.getElementById(b.getAttribute('data-ee-eye')); if (t) { t.type = t.type === 'password' ? 'text' : 'password'; } });
         });
@@ -161,10 +160,10 @@
             e.preventDefault();
             if (!evalPass()) { modalMsg(passForm, p2.value !== p1.value ? 'تکرار رمز با رمز جدید یکسان نیست.' : 'رمز عبور شرایط لازم را ندارد.', false); return; }
             var old = submit.textContent; submit.disabled = true; submit.textContent = 'در حال ذخیره...';
-            post({ action: 'save_account_settings', user_password: p1.value, user_password2: p2.value, security: ($('#settings_nonce') || {}).value || '' }).then(function (res) {
+            post({ action: 'save_account_settings', current_password: currentPass.value, user_password: p1.value, user_password2: p2.value, security: ($('#settings_nonce') || {}).value || '' }).then(function (res) {
                 var ok = !!(res && res.success);
                 modalMsg(passForm, ok ? 'رمز عبور تغییر کرد.' : ((res && res.data) || 'خطایی رخ داد!'), ok);
-                if (ok) { setTimeout(function () { closeModal($('#eePassModal')); p1.value = ''; p2.value = ''; evalPass(); modalMsg(passForm, '', true); flash($('#settings-msg'), 'رمز عبور با موفقیت تغییر کرد.', true); }, 900); }
+                if (ok) { setTimeout(function () { closeModal($('#eePassModal')); currentPass.value = ''; p1.value = ''; p2.value = ''; evalPass(); modalMsg(passForm, '', true); flash($('#settings-msg'), 'رمز عبور با موفقیت تغییر کرد.', true); }, 900); }
             }).catch(function () { modalMsg(passForm, 'خطای ارتباط با سرور', false); })
               .then(function () { submit.textContent = old; evalPass(); });
         });

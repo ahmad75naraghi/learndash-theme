@@ -77,14 +77,24 @@ $ee_blog_url = $ee_nav('articles', get_permalink(get_option('page_for_posts')) ?
 /* ۴٫۱) بلاگ ویژه — نوشته‌های چسبان و در ادامه آخرین نوشته‌ها */
 $ee_blog_feature = function_exists('evented_featured_posts') ? evented_featured_posts(4) : array();
 
-/* ۵) اساتید: کاربران دارای نقش group_leader */
+/* ۵) تجربهٔ دانشجویان: آخرین دیدگاه‌های تأییدشدهٔ دارای امتیاز روی دوره‌ها */
+$ee_testimonials = get_comments(array(
+    'status'    => 'approve',
+    'post_type' => 'sfwd-courses',
+    'number'    => 4,
+    'orderby'   => 'comment_date_gmt',
+    'order'     => 'DESC',
+    'meta_key'  => 'review_rating', // phpcs:ignore WordPress.DB.SlowDBQuery
+));
+
+/* ۶) اساتید: کاربران دارای نقش group_leader */
 $ee_instructors = get_users(array(
     'role'    => 'group_leader',
     'number'  => 8,
     'orderby' => 'display_name',
 ));
 
-/* ۶) آمار سادهٔ دوره‌ها */
+/* ۷) آمار سادهٔ دوره‌ها */
 $ee_course_count = wp_count_posts('sfwd-courses');
 $ee_course_count = isset($ee_course_count->publish) ? (int) $ee_course_count->publish : 0;
 
@@ -295,107 +305,6 @@ $ee_slider_mode  = $ee_slide_count > 1;
         </div>
     </section>
 
-    <?php if (false) { ?>
-        <!-- ======= دوره‌های تخصصی ======= -->
-        <section class="ee-courses" id="ee-courses">
-            <div class="ee-wrap">
-                <div class="ee-courses-head">
-                    <div>
-                        <div class="ch2"><span class="dot"></span> <?php echo esc_html($ee_opt('courses_title')); ?></div>
-                        <small><?php echo esc_html($ee_opt('courses_sub')); ?></small>
-                    </div>
-                    <span class="ee-count-badge"><?php echo esc_html($ee_course_count); ?> دوره فعال</span>
-                </div>
-
-                <?php if (count($ee_course_tabs) > 1) : ?>
-                    <div class="ee-chips ee-crs-tabs" id="eeCrsTabs" role="tablist" aria-label="دسته‌بندی دوره‌ها">
-                        <?php foreach ($ee_course_tabs as $ee_ti => $ee_tab) : ?>
-                            <button type="button" class="ee-chip-btn<?php echo 0 === $ee_ti ? ' ee-on' : ''; ?>" role="tab" id="eeCrsTab-<?php echo esc_attr($ee_tab['key']); ?>" aria-controls="eeCrsPanel-<?php echo esc_attr($ee_tab['key']); ?>" aria-selected="<?php echo 0 === $ee_ti ? 'true' : 'false'; ?>" tabindex="<?php echo 0 === $ee_ti ? '0' : '-1'; ?>">
-                                <?php echo esc_html($ee_tab['name']); ?>
-                                <?php if (!empty($ee_tab['count'])) : ?><span class="ee-chip-n"><?php echo esc_html($ee_tab['count']); ?></span><?php endif; ?>
-                            </button>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-
-                <?php foreach ($ee_course_tabs as $ee_ti => $ee_tab) :
-                    $ee_tab_courses = array_filter(array_map('get_post', $ee_tab['ids']));
-                    $ee_more_link   = $ee_tab['link'] ? $ee_tab['link'] : $ee_nav('courses');
-                ?>
-                    <div class="ee-crs-panel" id="eeCrsPanel-<?php echo esc_attr($ee_tab['key']); ?>" role="tabpanel" aria-labelledby="eeCrsTab-<?php echo esc_attr($ee_tab['key']); ?>" <?php echo 0 === $ee_ti ? '' : ' hidden'; ?>>
-                        <div class="ee-cgrid">
-                            <?php if (!empty($ee_tab_courses)) : foreach ($ee_tab_courses as $c) :
-                                    $ee_thumb = get_the_post_thumbnail_url($c->ID, 'medium');
-                                    $ee_price = get_post_meta($c->ID, '_sfwd-courses', true);
-                                    $ee_ptype = isset($ee_price['sfwd-courses_course_price_type']) ? $ee_price['sfwd-courses_course_price_type'] : '';
-                                    $ee_amount = isset($ee_price['sfwd-courses_course_price']) ? $ee_price['sfwd-courses_course_price'] : '';
-                                    $ee_free = ($ee_ptype === 'free' || empty($ee_amount));
-                                    $ee_author = get_userdata((int) $c->post_author);
-                                    $ee_cat_terms = wp_get_post_terms($c->ID, 'ld_course_category', array('fields' => 'names'));
-                            ?>
-                                    <article class="ee-course-card">
-                                        <a class="cc-thumb" href="<?php echo esc_url(get_permalink($c)); ?>">
-                                            <?php if ($ee_thumb) : ?>
-                                                <img src="<?php echo esc_url($ee_thumb); ?>" alt="<?php echo esc_attr(get_the_title($c)); ?>" loading="lazy">
-                                            <?php else : ?>
-                                                <svg class="ee-ic ee-u-cover-ic" aria-hidden="true" focusable="false">
-                                                    <use href="#i-school"></use>
-                                                </svg>
-                                            <?php endif; ?>
-                                            <?php if ($ee_free) : ?>
-                                                <span class="cc-badge free">رایگان</span>
-                                            <?php else : ?>
-                                                <span class="cc-badge hot">ویژه</span>
-                                            <?php endif; ?>
-                                        </a>
-                                        <div class="cc-body">
-                                            <h3 class="cc-title"><a href="<?php echo esc_url(get_permalink($c)); ?>"><?php echo esc_html(get_the_title($c)); ?></a></h3>
-                                            <div class="cc-instructor"><svg class="ee-ic" aria-hidden="true" focusable="false">
-                                                    <use href="#i-school"></use>
-                                                </svg> <?php echo $ee_author ? esc_html($ee_author->display_name) : 'نامشخص'; ?>
-                                                <?php echo function_exists('evented_rating_badge_html') ? evented_rating_badge_html($c->ID) : ''; // phpcs:ignore 
-                                                ?>
-                                            </div>
-                                            <div class="cc-foot">
-                                                <span class="cc-lessons"><?php echo $ee_cat_terms && !is_wp_error($ee_cat_terms) ? esc_html(implode('، ', array_slice($ee_cat_terms, 0, 2))) : 'دوره تخصصی'; ?></span>
-                                                <span class="cc-price <?php echo $ee_free ? '' : 'amber'; ?>"><?php echo $ee_free ? 'رایگان' : esc_html(number_format((float) $ee_amount) . ' تومان'); ?></span>
-                                            </div>
-                                        </div>
-                                    </article>
-                                <?php endforeach;
-                            else : ?>
-                                <div class="ee-empty">هنوز دوره‌ای ثبت نشده است. به‌زودی دوره‌های تخصصی اضافه می‌شوند.</div>
-                            <?php endif; ?>
-                        </div>
-                        <?php if (!empty($ee_tab_courses)) : ?>
-                            <div class="ee-crs-more">
-                                <a class="ee-btn ee-btn-ghost" href="<?php echo esc_url($ee_more_link); ?>">
-                                    <?php echo 'all' === $ee_tab['key'] ? 'مشاهدهٔ همهٔ دوره‌ها' : 'همهٔ دوره‌های ' . esc_html($ee_tab['name']); ?>
-                                    <svg class="ee-ic" aria-hidden="true" focusable="false">
-                                        <use href="#i-arrow_back"></use>
-                                    </svg>
-                                </a>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
-
-                <!-- نوار CTA کهربایی -->
-                <div class="ee-cta-amber">
-                    <div class="cta-text">
-                        <svg class="cta-ic ee-ic" aria-hidden="true" focusable="false">
-                            <use href="#i-workspace_premium"></use>
-                        </svg>
-                        <div>
-                            <h4><?php echo esc_html($ee_opt('cta_title')); ?></h4>
-                            <p><?php echo esc_html($ee_opt('cta_sub')); ?></p>
-                        </div>
-                    </div>
-                    <a class="ee-btn-amber" href="<?php echo is_user_logged_in() ? esc_url(home_url('/panel')) : esc_url(home_url('/login')); ?>"><?php echo esc_html($ee_opt('cta_btn')); ?></a>
-                </div>
-            </div>
-        </section>
-    <?php } ?>
     <!-- ======= کاتالوگ همهٔ دوره‌ها (تب دسته‌ها + بارگذاری بیشتر) ======= -->
     <?php
     $ee_ct_tabs  = function_exists('evented_catalog_tabs') ? evented_catalog_tabs() : array();
@@ -705,6 +614,41 @@ $ee_slider_mode  = $ee_slide_count > 1;
             <?php endif; ?>
         </div>
     </section>
+
+    <?php if (!empty($ee_testimonials)) : ?>
+        <!-- ======= تجربهٔ دانشجویان (دیدگاه‌های واقعی دوره‌ها) ======= -->
+        <section class="ee-testimonials" id="ee-testimonials">
+            <div class="ee-wrap">
+                <div class="ee-sec-head">
+                    <div>
+                        <h3 class="ee-sec-title"><span class="bar"></span> <?php echo esc_html($ee_opt('reviews_title')); ?></h3>
+                        <p class="sec-sub"><?php echo esc_html($ee_opt('reviews_sub')); ?></p>
+                    </div>
+                </div>
+                <div class="ee-testimonial-grid">
+                    <?php foreach ($ee_testimonials as $ee_review) :
+                        $ee_review_rating = max(1, min(5, (int) get_comment_meta($ee_review->comment_ID, 'review_rating', true)));
+                        $ee_review_course = get_post($ee_review->comment_post_ID);
+                        if (!$ee_review_course) {
+                            continue;
+                        }
+                        ?>
+                        <article class="ee-testimonial-card">
+                            <div class="ee-testimonial-head">
+                                <?php echo get_avatar($ee_review, 48, '', $ee_review->comment_author, array('loading' => 'lazy')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                                <div>
+                                    <strong><?php echo esc_html($ee_review->comment_author); ?></strong>
+                                    <a href="<?php echo esc_url(get_permalink($ee_review_course)); ?>"><?php echo esc_html(get_the_title($ee_review_course)); ?></a>
+                                </div>
+                                <span class="ee-testimonial-rating" aria-label="<?php echo esc_attr($ee_review_rating . ' از ۵'); ?>">★ <?php echo esc_html($ee_review_rating); ?></span>
+                            </div>
+                            <blockquote><?php echo esc_html(wp_trim_words(wp_strip_all_tags($ee_review->comment_content), 28)); ?></blockquote>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </section>
+    <?php endif; ?>
 
     <!-- ======= اساتید ======= -->
     <section class="ee-instructors" id="ee-instructors">

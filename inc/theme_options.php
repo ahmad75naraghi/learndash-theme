@@ -86,7 +86,7 @@ function is_current_path($path)
 {
     $current_path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
     $target_path = trim($path, '/');
-    return $current_path === $target_path || str_starts_with($current_path, $target_path . '/');
+    return $current_path === $target_path || 0 === strpos($current_path, $target_path . '/');
 }
 
 

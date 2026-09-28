@@ -23,40 +23,41 @@
 |---|---|---|
 | CMS | وردپرس (نسخهٔ ۶+، به‌روز) | فارسی، RTL |
 | LMS | **LearnDash** (نسخهٔ 3.6+) | پست‌تایپ `sfwd-courses`، درس، سکشن، گواهینامه، پرداخت |
-| زبان/سمت‌سرور | PHP 8.x (سازگار با 7.4) | استفاده از `str_starts_with()` و `??` |
+| زبان/سمت‌سرور | PHP 8.x (سازگار با 7.4) | بدون وابستگی به توابع معرفی‌شده در PHP 8 |
 | فرانت‌اند | فقط Vanilla JS (بدون jQuery/Owl/Plyr) | همهٔ اسکریپت‌ها در `assets/js/newhome/`؛ فقط `jalalidatepicker` (محلی) به‌عنوان vendor |
 | فونت/آیکن | **Vazirmatn متغیر** (`assets/fonts/Vazirmatn-Variable.woff2`, OFL) + «دانا» به‌عنوان fallback؛ آیکن‌ها اسپرایت SVG محلی (`assets/icons/ee-icons.svg`, Material Symbols) | `assets/css/newhome/ee-fonts.css` — **هیچ درخواست خارجی** (`inc/no_external.php` بقیه را هم مسدود می‌کند) |
 | پیامک OTP/اعلان | SOAP پنل پیامک (payamak-panel) | `inc/sms.php` — اعتبارنامه از **تنظیمات قالب → پیامک** یا ثابت‌های `EVENTED_SMS_*` |
 | پیام‌رسان | ربات بله — تابع `evented_send_otp_with_bale()` | قالب یک wrapper محافظت‌شده دارد؛ ارسال واقعی به mu-plugin/افزونه (هم‌نام یا legacy با نام `falnic_send_otp_with_bale`) واگذار می‌شود |
 | پایگاه‌دادهٔ تراکنش | جدول سفارشی `{wp}_evented_transactions` | ⚠️ سازندهٔ جدول در این قالب نیست؛ نصب‌های قدیمی باید جدول را تغییر نام دهند (migration) |
-| تست | ندارد (در این مرحله) | بخش ۷ را ببینید |
+| تست | lint خودکار PHP/JS/CSS در GitHub Actions | تست یکپارچهٔ LearnDash روی staging لازم است |
 
 ## ۳. ساختار دایرکتوری‌ها
 
 ```
 learndash-theme/                  (در سرور: wp-content/themes/<نام-پوشه> — کد از get_template_directory_uri() می‌خواند)
-├── style.css / functions.php     هدر قالب + بوت‌استرپ (PATH_DIR* + require ها)
+├── style.css / functions.php     هدر قالب + بوت‌استرپ و enqueue پوسته
 ├── README.md / ARCHITECTURE.md / CHANGELOG.md / CONTRIBUTING.md / AI.md
 ├── ROADMAP.md / TODO.md / TECH_DEBT.md
-├── front-page.php                صفحهٔ اصلی (بخش‌های داینامیک/استاتیک — رجوع: ARCHITECTURE §5)
+├── front-page.php                صفحهٔ اصلی داینامیک — رجوع: ARCHITECTURE §5
 ├── single.php                    تک‌نوشته (پوستهٔ ee-*؛ مقاله + سایدبار + دیدگاه)
 ├── archive.php / home.php / search.php   آرشیو نوشته‌ها، برگهٔ نوشته‌ها، نتایج جستجو
 ├── comments.php                  فهرست دیدگاه‌ها + فرم دیدگاه (فارسی)
 ├── template-parts/               ee-head · ee-header · ee-footer · ee-sidebar · ee-archive-main · lms/* (enroll-card، curriculum، course-sidebar، lesson-list، course-grid، category-grid، courses-sidebar)
 ├── single-sfwd-courses.php       صفحهٔ دوره (پوستهٔ ee-*: سرفصل‌ها، آکاردئون‌ها، نظرات، سایدبار ثبت‌نام)
 ├── single-sfwd-lessons.php       صفحهٔ درس (کلیپ/پادکست/متن، آزمون، تکمیل درس، فهرست درس‌ها)
-├── single-sfwd-quizzes.php       صفحهٔ آزمون (فکت‌های آزمون + بدنهٔ لرن‌دش + فهرست درس‌ها)
+├── single-sfwd-quiz.php          صفحهٔ آزمون (فکت‌های آزمون + بدنهٔ لرن‌دش + فهرست درس‌ها)
 ├── taxonomy-ld_course_category.php  آرشیو دستهٔ دوره (سربرگ دسته + گرید دوره‌ها + سوالات متداول)
 ├── archive-sfwd-courses.php      بایگانی همهٔ دوره‌ها (پوستهٔ ee-*)
 ├── author.php                    پروفایل مدرس  |  template-instructors.php  لیست اساتید
 ├── page-login.php                صفحهٔ ورود/OTP (HTML مستقل، بدون wp_head)
-├── page-panel.php                برگهٔ /panel → پیشخوان پنل (روی پوستهٔ ee-*)
+├── page-panel.php                برگهٔ /panel → پیشخوان پنل
 ├── page.php / page-courses.php / page-courses-cat.php / 404.php   برگهٔ عمومی · فهرست دوره‌ها · دسته‌بندی‌ها · ۴۰۴ (همه با پوستهٔ ee-*)
 ├── index.php                     قالب بازگشتی عمومی (fallback) برای انواع پست بدون قالب اختصاصی
 ├── assets/
 │   ├── assets_functions.php      enqueue دارایی‌های پنل کاربری (بقیه در functions.php)
-│   ├── css/  single-post · archive-post · panel (محتوای پنل) · jalalidatepicker
+│   ├── css/  login · single-post · archive-post · panel (محتوای پنل) · jalalidatepicker
 │   ├── css/newhome/  ee-fonts (فونت/آیکن محلی) · ee-shell (پوستهٔ مشترک) · evented-home · ee-lms · ee-courses (+ نوار فیلتر) · ee-panel · ee-live-search · ee-notify
+│   ├── js/login.js                رفتار صفحهٔ ورود/OTP مستقل
 │   ├── js/newhome/evented-home.js  کشوی منوی موبایل · زیرمنوها · جستجوی موبایل · تب‌های مقالات · اسلایدر هیرو · کپی لینک
 │   ├── js/newhome/ee-lms.js        آکاردئون · گروه درس‌ها · دیدگاه/امتیاز · تکمیل درس · علاقه‌مندی
 │   ├── js/newhome/ee-live-search.js  جستجوی زندهٔ هدر  |  ee-notify.js  زنگولهٔ اعلان‌ها  |  ee-panel.js  رفتارهای پنل
@@ -76,14 +77,14 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 │   ├── pwa.php                   PWA: manifest، سرویس‌ورکر (/ee-sw.js)، صفحهٔ آفلاین، دکمهٔ نصب
 │   ├── notifications.php         اعلان‌ها: جدول {wp}_evented_notifications، REST، رویدادها، پیامک اختیاری
 │   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها) + هلپرهای LMS
+│   ├── certificates.php          تولید PDF گواهینامه با mPDF (autoload اختیاری Composer)
 │   ├── navigation.php            منوی استاتیک هدر/فوتر/کشوی موبایل (کش هفتگی) + فیلتر بخش جستجو + تب‌های مقالات خانه
-│   ├── login.php                 کلاس FalnicAuthHandler (OTP/ورود) + captcha_verify
+│   ├── login.php                 کلاس EventedAuthHandler + نشست امن OTP/ورود
 │   ├── sms.php                   send_pattern_sms (SOAP)
 │   ├── meta_functions.php        متاباکس دوره/دسته/کاربر + فیلتر آواتار
 │   ├── theme_options.php         MIME ها، گارد subscriber، is_current_path()
 │   ├── theme_settings.php        صفحهٔ «تنظیمات قالب» تب‌دار: اسلایدر، عمومی/تماس، شبکه‌ها، متن‌های خانه، پیامک، سئو، اعلان‌ها
-│   ├── ajax_functions.php        ۵ اکشن AJAX (نظر/تکمیل درس/علاقه‌مندی/پروفایل/تنظیمات)
-│   └── ajax_functions.php
+│   └── ajax_functions.php        ۵ اکشن AJAX (نظر/تکمیل درس/علاقه‌مندی/پروفایل/تنظیمات)
 ├── template-parts/panel/         shell-open.php / shell-close.php (سایدبار پنل + مودال خروج روی هدر/فوتر ee-*)
 └── panel/                        تمپلیت‌های پنل (Template Name: Panel - …)
     ├── dashboard.php و my-courses.php و certificates.php
@@ -99,7 +100,7 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 | `/ld_course_category/<slug>/` | `taxonomy-ld_course_category.php` | آرشیو دستهٔ دوره + سوالات متداول دسته |
 | `/courses/<slug>/` | `single-sfwd-courses.php` | صفحهٔ دوره |
 | `/lessons/<slug>/` | `single-sfwd-lessons.php` | صفحهٔ درس (کلیپ/پادکست/متن + فهرست درس‌ها) |
-| آزمون (`sfwd-quizzes`) | `single-sfwd-quizzes.php` | صفحهٔ آزمون (فکت‌ها + بدنهٔ لرن‌دش) |
+| آزمون (`sfwd-quiz`) | `single-sfwd-quiz.php` | صفحهٔ آزمون (فکت‌ها + بدنهٔ لرن‌دش) |
 | برگهٔ «دوره‌ها» | `page-courses.php` | گرید همهٔ دوره‌ها با صفحه‌بندی |
 | `/<post-slug>/` | `single.php` | تک‌نوشته (مقاله + سایدبار + دیدگاه) |
 | برگهٔ «نوشته‌ها» (is_home) | `home.php` | آرشیو همهٔ نوشته‌ها |
@@ -119,17 +120,18 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 
 | مورد | نسخه/شرط |
 |---|---|
-| PHP | 8.x با افزونهٔ `soap`، `gd`، `dom`/`libxml` |
+| PHP | 7.4+ (ترجیحاً 8.x) با افزونهٔ `soap`، `gd`، `dom`/`libxml` و `mbstring` |
 | وردپرس | 6.x |
 | LearnDash | نسخهٔ فعال (با Course Builder) |
-| فونت TTF برای captcha | `DanaVF.ttf` در `assets/fonts/` — در ریپو **نیست** (اختیاری تا زمان فعال‌سازی captcha) |
+| Composer/mPDF | اجرای `composer install --no-dev --optimize-autoloader`؛ `vendor/` در Git نگهداری نمی‌شود |
 | جدول `{wp}_evented_transactions` | باید ساخته شود (DDL در `ARCHITECTURE.md` §3) |
 | تابع بله | اختیاری: `evented_send_otp_with_bale()` یا legacy `falnic_send_otp_with_bale()` در mu-plugin (بدون آن، فقط پیامک ارسال می‌شود) |
 
 ### ۵.۲ نصب (لوکال)
 
 ```bash
-# ۱) قالب را در مسیر تم‌ها قرار دهید:
+# ۱) وابستگی PHP را نصب و قالب را در مسیر تم‌ها قرار دهید:
+composer install --no-dev --optimize-autoloader
 wp-content/themes/<theme-folder>/
 
 # ۲) در پیشخوان: نمایش ← پوسته‌ها ← فعال‌سازی «evented-edu»

@@ -132,23 +132,6 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                     </span>
                 </div>
 
-                <?php if (false) { ?>
-                    <!-- نویسنده -->
-                    <div class="ee-post-authorline">
-                        <span class="ee-av"><?php echo get_avatar($ee_author_id, 44); ?></span>
-                        <span class="ee-al-txt">
-                            <strong><?php the_author(); ?></strong>
-                            <span><?php echo esc_html(get_the_author_meta('description') ? wp_trim_words(get_the_author_meta('description'), 12) : __('نویسندهٔ پایگاه', 'evented-edu')); ?></span>
-                        </span>
-                        <a class="ee-al-link" href="<?php echo esc_url(get_author_posts_url($ee_author_id)); ?>">
-                            <?php esc_html_e('همهٔ نوشته‌ها', 'evented-edu'); ?>
-                            <svg class="ee-ic" aria-hidden="true" focusable="false">
-                                <use href="#i-arrow_back"></use>
-                            </svg>
-                        </a>
-                    </div>
-                <?php } ?>
-
                 <!-- متن مقاله -->
                 <div class="ee-post-body">
                     <?php

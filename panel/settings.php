@@ -14,7 +14,7 @@ $user_phone = get_user_meta($current_user->ID, 'billing_phone', true);
 // ایمیل‌های placeholder تولیدشده هنگام ثبت‌نام با موبایل (با «09…» شروع می‌شوند) را
 // به‌جای مقدار جعلی نمایش نده؛ کاربر باید ایمیل واقعی خود را در همین بخش ثبت کند.
 $user_email     = (string) $current_user->user_email;
-$has_real_email = is_email($user_email) && !str_starts_with($user_email, '09');
+$has_real_email = is_email($user_email) && 0 !== strpos($user_email, '09');
 if (!$has_real_email) {
     $user_email = '';
 }
@@ -103,7 +103,12 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
         <button type="button" class="ee-modal-x" data-ee-modal-close aria-label="بستن"><?php echo function_exists('ee_icon') ? ee_icon('close') : '×'; // phpcs:ignore ?></button>
         <div class="ee-modal-ic"><?php echo function_exists('ee_icon') ? ee_icon('lock') : ''; // phpcs:ignore ?></div>
         <h3 id="eePassTitle">تغییر رمز عبور</h3>
-        <p>رمز جدید باید حداقل ۸ کاراکتر و ترکیبی از حروف و عدد باشد.</p>
+        <p>برای امنیت حساب، رمز فعلی را وارد کنید. رمز جدید باید حداقل ۸ کاراکتر و شامل حرف کوچک، حرف بزرگ، عدد و علامت باشد.</p>
+        <label class="ee-field ee-field-pass">
+            <span>رمز عبور فعلی</span>
+            <input type="password" name="current_password" id="eeCurrentPass" dir="ltr" autocomplete="current-password" required>
+            <button type="button" class="ee-eye" data-ee-eye="eeCurrentPass" aria-label="نمایش رمز فعلی"><?php echo function_exists('ee_icon') ? ee_icon('visibility') : '👁'; // phpcs:ignore ?></button>
+        </label>
         <label class="ee-field ee-field-pass">
             <span>رمز عبور جدید</span>
             <input type="password" name="user_password" id="eeNewPass" dir="ltr" autocomplete="new-password" minlength="8" required>
@@ -113,8 +118,8 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
         <ul class="ee-pass-rules">
             <li data-rule="length">حداقل ۸ کاراکتر</li>
             <li data-rule="number">شامل عدد</li>
-            <li data-rule="letter">شامل حرف</li>
-            <li data-rule="mix">حرف بزرگ و کوچک یا علامت (پیشنهادی)</li>
+            <li data-rule="letter">شامل حرف کوچک و بزرگ انگلیسی</li>
+            <li data-rule="mix">شامل حداقل یک علامت</li>
         </ul>
         <label class="ee-field ee-field-pass">
             <span>تکرار رمز عبور</span>

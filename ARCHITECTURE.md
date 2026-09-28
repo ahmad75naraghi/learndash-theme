@@ -32,7 +32,7 @@ flowchart TD
 
 نکات:
 - `EventedAuthHandler` با `add_action('init', fn => new EventedAuthHandler())` نمونه‌سازی می‌شود.
-- کپچا: `inc/captcha.php` و `captcha_verify()` حذف شده‌اند (ورود از طریق افزونهٔ جداگانه انجام می‌شود؛ کد ورود قالب دست‌نخورده باقی مانده).
+- کپچا حذف شده است؛ ورود قالب با OTP/رمز و کنترل‌های نشست امن انجام می‌شود.
 - هوک‌های ریدایرکت: `login_url` → `/login/` و `logout_redirect` → خانه (هر دو در `inc/login.php`)؛ `login_redirect` برای نقش subscriber → `/panel` (در `inc/theme_options.php`).
 
 ## ۳. ساختار پایگاه‌داده (Data Structures)
@@ -140,9 +140,9 @@ CREATE TABLE IF NOT EXISTS {wp}_evented_transactions (
 
 | کلید | معنا |
 |---|---|
-| سشن: `fl_otp` / `fl_mobile` / `fl_otp_time` / `fl_otp_purpose` / `fl_otp_verified` / `fl_otp_verified_for` | وضعیت OTP |
-| سشن: `captcha_code` | (برای captcha — غیرفعال) |
-| ترنزینت: `otp_limit_{mobile}` (۶۰ ثانیه) | محدودیت نرخ ارسال کد |
+| سشن: `evented_otp` / `evented_mobile` / `evented_otp_time` / `evented_otp_purpose` / `evented_otp_verified` / `evented_otp_verified_for` / `evented_otp_attempts` | وضعیت OTP، هدف تأیید و شمارندهٔ حدس کد |
+| ترنزینت: `otp_limit_{mobile}` (قابل تنظیم؛ پیش‌فرض ۶۰ ثانیه) | محدودیت نرخ ارسال کد |
+| ترنزینت: `evented_login_fail_{hash}` (۱۵ دقیقه) | محدودیت ورود با رمز برای ترکیب شماره و IP |
 
 ---
 
@@ -172,7 +172,7 @@ sequenceDiagram
 
     U->>P: enters OTP
     P->>A: POST evented_verify_otp
-    A->>S: handle_verify_otp (compare session fl_otp)
+    A->>S: handle_verify_otp (compare session evented_otp)
     alt purpose = reset_password
         S-->>P: {result:reset_password} -> new-password step
     else new user (not found)
@@ -184,32 +184,30 @@ sequenceDiagram
 
 مسیرهای تکمیلی (خلاصه): ثبت‌نام نهایی = `save_user_register_name` (ساخت کاربر: login=موبایل، ایمیل `{mobile}@evented-edu.user`) سپس `evented_register_user` (ست رمز + لاگین). ورود با رمز = `evented_login_user`. بازیابی رمز = `evented_send_otp(purpose=reset_password)` → `evented_verify_otp` → `evented_reset_password`.
 
-> ✅ این دو «خط طلایی» رفع شده‌اند: `save_user_register_name` فقط با OTP تأییدشدهٔ همان شماره کاربر می‌سازد و `handle_register_user` با `$user->ID` (نه خروجی void تابع `wp_set_password`) لاگین خودکار را انجام می‌دهد.
+> نشست OTP با نام اختصاصی، strict mode، کوکی `HttpOnly`/`SameSite=Lax` و `Secure` روی HTTPS آغاز می‌شود. پس از تأیید، شناسهٔ نشست regenerate می‌شود؛ مراحل ساخت حساب و بازیابی علاوه بر شماره و هدف، تازه‌بودن OTP را دوباره کنترل می‌کنند و دادهٔ یک‌بارمصرف پس از مصرف پاک می‌شود. ورود با رمز نیز برای ترکیب شماره و IP rate-limit دارد و پاسخ کاربر موجود/ناموجود یکسان است.
 
-### ۴.۲ تکمیل درس (دور زدن قفل ویدیو/تایمر)
+### ۴.۲ تکمیل درس
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant U as "User (enrolled)"
-    participant M as "lesson modal (single-courses.js)"
+    participant P as "ee-lms.js"
     participant A as "admin-ajax.php"
     participant S as "inc/ajax_functions.php"
     participant LD as "LearnDash"
 
-    U->>M: click "next video" / "finish lesson"
-    M->>A: POST custom_mark_lesson_complete (security=mark_complete_nonce_lessonId)
+    U->>P: click "تکمیل درس"
+    P->>A: POST custom_mark_lesson_complete (security=mark_complete_nonce_lessonId)
     A->>S: handle_custom_mark_lesson_complete
-    S->>LD: learndash_video_complete_for_step(..) / fallback meta
-    S->>LD: update_user_meta(learndash_timer_complete_lessonId)
-    S->>LD: learndash_process_mark_complete(..)
-    alt still not saved
-        S->>S: force write _sfwd-course_progress[courseId][lessons][id]=1
-        S->>LD: learndash_update_user_activity(..)
-    end
+    S->>S: validate nonce, post types and lesson-course relation
+    S->>LD: sfwd_lms_has_access(course,user)
+    S->>LD: learndash_process_mark_complete(user,lesson,false,course)
     S->>LD: learndash_course_progress(array=true)
-    S-->>M: progress data -> updateProgressUI(bar %)
+    S-->>P: progress data -> updateProgressUI(bar %)
 ```
+
+قالب قفل ویدیو/تایمر یا `_sfwd-course-progress` را مستقیماً تغییر نمی‌دهد. اگر LearnDash تکمیل را طبق تنظیمات دوره نپذیرد، قالب نیز آن محدودیت را دور نمی‌زند.
 
 ### ۴.۳ نظر / علاقه‌مندی (کوتاه)
 
@@ -230,7 +228,7 @@ flowchart TD
     SLESS["is_singular sfwd-lessons"] --> SL["single-sfwd-lessons.php"]
     ARCH["is_post_type_archive sfwd-courses"] --> AX["archive-sfwd-courses.php"]
     TAXT["is_tax ld_course_category"] --> TAX["taxonomy-ld_course_category.php"]
-    QUIZ["is_singular sfwd-quizzes"] --> SQ["single-sfwd-quizzes.php"]
+    QUIZ["is_singular sfwd-quiz"] --> SQ["single-sfwd-quiz.php"]
     PGC["page slug = courses"] --> PGCourses["page-courses.php"]
     PGCC["page slug = courses-cat"] --> PGCats["page-courses-cat.php"]
     TINSTR["Template Name: اساتید"] --> TI["template-instructors.php"]
@@ -264,7 +262,7 @@ flowchart TD
 بایگانی/دستهٔ دوره، برگهٔ دوره‌ها/دسته‌ها، پروفایل مدرس، فهرست اساتید، برگهٔ عمومی، fallback
 و ۴۰۴ سند HTML کامل را خودشان چاپ می‌کنند (`get_header()`/`get_footer()` قدیمی را صدا نمی‌زنند)
 و از قطعه‌های مشترک زیر استفاده می‌کنند. تنها استثناء `page-login.php`، `page-panel.php` و
-قالب‌های `panel/*` هستند که طراحی مستقل خودشان را دارند (`evented_is_standalone_page()`).
+قالب‌های `panel/*` هستند که طراحی مستقل خودشان را دارند (`evented_is_standalone_page()`). صفحهٔ ورود CSS/JS خود را از `assets/css/login.css` و `assets/js/login.js` بارگذاری می‌کند و پیکربندی امن آن با `wp_json_encode` در صفحه قرار می‌گیرد.
 
 | قطعه | نقش |
 | --- | --- |
@@ -339,7 +337,7 @@ flowchart TD
     B1 -- yes --> EEH["evented-home.css"]
     B1 -- no --> B2{"is_singular post?"}
     B2 -- yes --> SPC["single-post.css"]
-    B2 -- no --> B4{"is_singular sfwd-courses، sfwd-lessons یا sfwd-quizzes?"}
+    B2 -- no --> B4{"is_singular sfwd-courses، sfwd-lessons، sfwd-topic یا sfwd-quiz?"}
     B4 -- yes --> LMSC["ee-lms.css + ee-lms.js + localize eeLms.ajax_url (+ ee-courses.css برای آزمون)"]
     B4 -- no --> B5{"بایگانی/دستهٔ دوره، is_author، is_404 یا is_page?"}
     B5 -- yes --> CCSS["ee-courses.css"]

@@ -100,6 +100,8 @@ function evented_options_schema()
 				'step3_title'     => array('label' => 'گام ۳ — عنوان', 'type' => 'text', 'default' => 'دسترسی نامحدود و دائمی'),
 				'step3_text'      => array('label' => 'گام ۳ — توضیح', 'type' => 'text', 'default' => 'مشاهدهٔ ویدیوها، دریافت جزوات و شرکت در آزمون در هر زمان و مکان'),
 				'articles_title'  => array('label' => 'عنوان بخش مقالات', 'type' => 'text', 'default' => 'گزیدهٔ مقالات و دانستنی‌ها'),
+				'reviews_title'   => array('label' => 'عنوان بخش تجربهٔ دانشجویان', 'type' => 'text', 'default' => 'تجربهٔ دانشجویان'),
+				'reviews_sub'     => array('label' => 'زیرعنوان تجربهٔ دانشجویان', 'type' => 'text', 'default' => 'نظرهای واقعی شرکت‌کنندگان دوره‌ها'),
 				'blog_feat_title' => array('label' => 'عنوان بلاگ ویژه', 'type' => 'text', 'default' => 'بلاگ ویژه'),
 				'blog_feat_sub'   => array('label' => 'زیرعنوان بلاگ ویژه', 'type' => 'text', 'default' => 'منتخبی از نوشته‌های تیم آموزشی؛ تازه‌ترین تجربه‌ها و راهنماهای کاربردی'),
 				'instr_title'     => array('label' => 'عنوان بخش اساتید', 'type' => 'text', 'default' => 'اساتید و متخصصان برجسته'),
