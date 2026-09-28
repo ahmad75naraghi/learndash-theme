@@ -72,6 +72,9 @@ $ee_nav = static function ($key, $fallback = '') {
 $ee_opt = static function ($k, $d = '') {
     return function_exists('evented_opt') ? evented_opt($k, $d) : $d;
 };
+$ee_meta_on = static function ($key) {
+    return !function_exists('evented_post_meta_visible') || evented_post_meta_visible($key);
+};
 $ee_blog_url = $ee_nav('articles', get_permalink(get_option('page_for_posts')) ?: home_url('/'));
 
 /* ۴٫۱) بلاگ ویژه — نوشته‌های چسبان و در ادامه آخرین نوشته‌ها */
@@ -468,7 +471,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                         <use href="#i-auto_stories"></use>
                                     </svg></span>
                             <?php endif; ?>
-                            <span class="bf-hero-chip"><?php echo esc_html($ee_bf_hcat); ?></span>
+                            <?php if ($ee_meta_on('category')) : ?><span class="bf-hero-chip"><?php echo esc_html($ee_bf_hcat); ?></span><?php endif; ?>
                         </a>
                         <div class="bf-hero-body">
                             <span class="bf-hero-badge"><svg class="ee-ic" aria-hidden="true" focusable="false">
@@ -477,21 +480,14 @@ $ee_slider_mode  = $ee_slide_count > 1;
                             <h4><a href="<?php echo esc_url(get_permalink($ee_bf_hero)); ?>"><?php echo esc_html(get_the_title($ee_bf_hero)); ?></a></h4>
                             <p><?php echo esc_html(wp_trim_words(get_the_excerpt($ee_bf_hero), 26)); ?></p>
                             <div class="bf-hero-foot">
-                                <span class="bf-by">
-                                    <svg class="ee-ic" aria-hidden="true" focusable="false">
-                                        <use href="#i-person"></use>
-                                    </svg>
-                                    <?php echo esc_html(get_the_author_meta('display_name', (int) $ee_bf_hero->post_author)); ?>
+                                <span class="ee-article-meta-list">
+                                    <?php if ($ee_meta_on('author')) : ?><span class="bf-by"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg><?php echo esc_html(get_the_author_meta('display_name', (int) $ee_bf_hero->post_author)); ?></span><?php endif; ?>
+                                    <?php if ($ee_meta_on('date')) : ?><span class="bf-date"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg><?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($ee_bf_hero) : get_the_date('', $ee_bf_hero)); ?></span><?php endif; ?>
+                                    <?php if ($ee_meta_on('reading')) : ?><span title="<?php esc_attr_e('زمان مطالعه', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg><?php echo esc_html(number_format_i18n(function_exists('evented_reading_time') ? evented_reading_time($ee_bf_hero->ID) : 1)); ?></span><?php endif; ?>
+                                    <?php if ($ee_meta_on('views')) : ?><span title="<?php esc_attr_e('بازدید', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg><?php echo esc_html(number_format_i18n(function_exists('evented_get_post_views') ? evented_get_post_views($ee_bf_hero->ID) : 0)); ?></span><?php endif; ?>
+                                    <?php if ($ee_meta_on('comments')) : ?><span title="<?php esc_attr_e('دیدگاه', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg><?php echo esc_html(number_format_i18n((int) get_comments_number($ee_bf_hero->ID))); ?></span><?php endif; ?>
                                 </span>
-                                <span class="bf-date">
-                                    <svg class="ee-ic" aria-hidden="true" focusable="false">
-                                        <use href="#i-calendar_month"></use>
-                                    </svg>
-                                    <?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($ee_bf_hero) : get_the_date('', $ee_bf_hero)); ?>
-                                </span>
-                                <a class="bf-read" href="<?php echo esc_url(get_permalink($ee_bf_hero)); ?>">مطالعه <svg class="ee-ic" aria-hidden="true" focusable="false">
-                                        <use href="#i-arrow_back"></use>
-                                    </svg></a>
+                                <a class="bf-read" href="<?php echo esc_url(get_permalink($ee_bf_hero)); ?>">مطالعه <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                             </div>
                         </div>
                     </article>
@@ -512,13 +508,14 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                         <?php endif; ?>
                                     </span>
                                     <span class="bf-row-txt">
-                                        <span class="bf-row-cat"><?php echo esc_html((is_array($ee_bf_cat) && !empty($ee_bf_cat)) ? $ee_bf_cat[0]->name : __('مقالات', 'evented-edu')); ?></span>
+                                        <?php if ($ee_meta_on('category')) : ?><span class="bf-row-cat"><?php echo esc_html((is_array($ee_bf_cat) && !empty($ee_bf_cat)) ? $ee_bf_cat[0]->name : __('مقالات', 'evented-edu')); ?></span><?php endif; ?>
                                         <strong><?php echo esc_html(get_the_title($ee_bf)); ?></strong>
-                                        <span class="bf-row-meta">
-                                            <svg class="ee-ic" aria-hidden="true" focusable="false">
-                                                <use href="#i-calendar_month"></use>
-                                            </svg>
-                                            <?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($ee_bf) : get_the_date('', $ee_bf)); ?>
+                                        <span class="bf-row-meta ee-article-meta-list">
+                                            <?php if ($ee_meta_on('author')) : ?><span title="<?php esc_attr_e('نویسنده', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg><?php echo esc_html(get_the_author_meta('display_name', (int) $ee_bf->post_author)); ?></span><?php endif; ?>
+                                            <?php if ($ee_meta_on('date')) : ?><span title="<?php esc_attr_e('تاریخ انتشار', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg><?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($ee_bf) : get_the_date('', $ee_bf)); ?></span><?php endif; ?>
+                                            <?php if ($ee_meta_on('reading')) : ?><span title="<?php esc_attr_e('زمان مطالعه', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg><?php echo esc_html(number_format_i18n(function_exists('evented_reading_time') ? evented_reading_time($ee_bf->ID) : 1)); ?></span><?php endif; ?>
+                                            <?php if ($ee_meta_on('views')) : ?><span title="<?php esc_attr_e('بازدید', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg><?php echo esc_html(number_format_i18n(function_exists('evented_get_post_views') ? evented_get_post_views($ee_bf->ID) : 0)); ?></span><?php endif; ?>
+                                            <?php if ($ee_meta_on('comments')) : ?><span title="<?php esc_attr_e('دیدگاه', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg><?php echo esc_html(number_format_i18n((int) get_comments_number($ee_bf->ID))); ?></span><?php endif; ?>
                                         </span>
                                     </span>
                                 </a>
@@ -544,7 +541,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
 
             <?php
             /* رندر یک کارت مقاله (برای تب‌ها و حالت بدون دسته) */
-            $ee_render_article = static function ($a) {
+            $ee_render_article = static function ($a) use ($ee_meta_on) {
                 $ee_pcat      = get_the_category($a->ID);
                 $ee_pcat_name = $ee_pcat ? $ee_pcat[0]->name : 'مقالات';
             ?>
@@ -559,16 +556,20 @@ $ee_slider_mode  = $ee_slide_count > 1;
                         <?php endif; ?>
                     </a>
                     <div>
-                        <span class="art-tag ee-u-mint"><?php echo esc_html($ee_pcat_name); ?></span>
+                        <?php if ($ee_meta_on('category')) : ?><span class="art-tag ee-u-mint"><?php echo esc_html($ee_pcat_name); ?></span><?php endif; ?>
                         <h4><a href="<?php echo esc_url(get_permalink($a)); ?>"><?php echo esc_html(get_the_title($a)); ?></a></h4>
                         <p><?php echo esc_html(wp_trim_words(get_the_excerpt($a), 16)); ?></p>
                     </div>
                     <div class="art-foot">
-                        <span><?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($a) : get_the_date('', $a)); ?> <?php echo function_exists('evented_rating_badge_html') ? evented_rating_badge_html($a->ID) : ''; // phpcs:ignore 
-                                                                                                                                            ?></span>
-                        <a class="read" href="<?php echo esc_url(get_permalink($a)); ?>">مطالعه کامل <svg class="ee-ic" aria-hidden="true" focusable="false">
-                                <use href="#i-arrow_back"></use>
-                            </svg></a>
+                        <span class="ee-article-meta-list">
+                            <?php if ($ee_meta_on('author')) : ?><span title="<?php esc_attr_e('نویسنده', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg><?php echo esc_html(get_the_author_meta('display_name', (int) $a->post_author)); ?></span><?php endif; ?>
+                            <?php if ($ee_meta_on('date')) : ?><span title="<?php esc_attr_e('تاریخ انتشار', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-calendar_month"></use></svg><?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($a) : get_the_date('', $a)); ?></span><?php endif; ?>
+                            <?php if ($ee_meta_on('reading')) : ?><span title="<?php esc_attr_e('زمان مطالعه', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg><?php echo esc_html(number_format_i18n(function_exists('evented_reading_time') ? evented_reading_time($a->ID) : 1)); ?></span><?php endif; ?>
+                            <?php if ($ee_meta_on('views')) : ?><span title="<?php esc_attr_e('بازدید', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg><?php echo esc_html(number_format_i18n(function_exists('evented_get_post_views') ? evented_get_post_views($a->ID) : 0)); ?></span><?php endif; ?>
+                            <?php if ($ee_meta_on('comments')) : ?><span title="<?php esc_attr_e('دیدگاه', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg><?php echo esc_html(number_format_i18n((int) get_comments_number($a->ID))); ?></span><?php endif; ?>
+                            <?php echo function_exists('evented_rating_badge_html') ? evented_rating_badge_html($a->ID) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </span>
+                        <a class="read" href="<?php echo esc_url(get_permalink($a)); ?>">مطالعه کامل <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                     </div>
                 </article>
             <?php

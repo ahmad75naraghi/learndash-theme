@@ -32,7 +32,7 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_script('ee-home-js', PATH_DIR_URL . '/assets/js/newhome/evented-home.js', array(), '1.3.0', true);
 
     if (is_front_page()) {
-        wp_enqueue_style('ee-home', PATH_DIR_URL . '/assets/css/newhome/evented-home.css', array('ee-shell'), '1.2.0');
+        wp_enqueue_style('ee-home', PATH_DIR_URL . '/assets/css/newhome/evented-home.css', array('ee-shell'), '1.3.0');
     } elseif (is_page_template('page-videos.php')) {
         // برگهٔ /videos/ از کارت‌ها و شبکهٔ آرشیو برای WP_Query اختصاصی clip استفاده می‌کند.
         wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.2.0');
@@ -61,6 +61,6 @@ add_action('wp_enqueue_scripts', function () {
         // سایدبار فیلتر دوره‌ها و نوار مرتب‌سازی (باز/بسته در موبایل، ارسال خودکار)
         wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.2.0', true);
     } elseif (is_home() || is_archive() || is_search()) {
-        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.1.0');
+        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.2.0');
     }
 }, 20);

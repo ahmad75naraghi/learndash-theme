@@ -182,8 +182,9 @@ wp-content/themes/<theme-folder>/
 | تب | کلیدهای مهم |
 |---|---|
 | عمومی/تماس | `site_tagline_fa`, `license_text`, `phone`, `phone_hours`, `email`, `address`, `copyright`, `terms_url` |
-| شبکه‌ها | `channel_id` (ایتا/بله/روبیکا/سروش) یا URL کامل هرکدام، `telegram_url`, `instagram_url`, `youtube_url`, `linkedin_url` |
+| شبکه‌ها | `channel_id` (ایتا/بله/روبیکا/آی‌گپ/سروش) یا URL کامل هرکدام، `telegram_url`, `instagram_url`, `youtube_url`, `linkedin_url` |
 | صفحهٔ اصلی | عنوان/زیرعنوان بخش‌ها، `tabs_count`, `tabs_per` |
+| نمایش اطلاعات نوشته‌ها | `post_meta_author`, `post_meta_date`, `post_meta_views`, `post_meta_reading`, `post_meta_comments`, `post_meta_category`؛ روی نوشتهٔ تکی، آرشیو/جستجو و کارت‌های صفحهٔ اصلی |
 | پیامک | `sms_username`, `sms_password`, `sms_body_id`, `sms_notify_body_id`, `otp_ttl`, `otp_rate` |
 | سئو | `seo_enabled`, `seo_home_title`, `seo_home_desc`, `seo_default_img`, `org_name`, `org_logo` |
 | اعلان‌ها | `notify_enabled`, `notify_new_lesson`, `notify_comment`, `notify_sms`, `notify_keep_days` + فرم «ارسال اعلان دستی» |

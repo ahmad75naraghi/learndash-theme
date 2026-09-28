@@ -38,6 +38,9 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
         $ee_cat_first = !empty($ee_cats) ? $ee_cats[0] : null;
         $ee_tags      = get_the_tags($ee_post_id);
         $ee_author_id = (int) get_the_author_meta('ID');
+        $ee_meta_on   = static function ($key) {
+            return !function_exists('evented_post_meta_visible') || evented_post_meta_visible($key);
+        };
         $ee_shares    = function_exists('evented_share_links') ? evented_share_links((string) get_permalink($ee_post_id), (string) get_the_title($ee_post_id)) : array();
         $ee_related   = function_exists('evented_related_posts') ? evented_related_posts($ee_post_id, 3) : array();
     ?>
@@ -72,7 +75,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
 
                 <!-- نوار اطلاعات -->
                 <div class="ee-post-meta">
-                    <?php if ($ee_cat_first instanceof WP_Term) : ?>
+                    <?php if ($ee_meta_on('category') && $ee_cat_first instanceof WP_Term) : ?>
                         <a class="ee-meta-cat" href="<?php echo esc_url(get_term_link($ee_cat_first)); ?>">
                             <svg class="ee-ic" aria-hidden="true" focusable="false">
                                 <use href="#i-sell"></use>
@@ -80,6 +83,14 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                         </a>
                     <?php endif; ?>
 
+                    <?php if ($ee_meta_on('author')) : ?>
+                        <a class="ee-meta-item" href="<?php echo esc_url(get_author_posts_url($ee_author_id)); ?>" title="<?php esc_attr_e('نویسنده', 'evented-edu'); ?>">
+                            <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg>
+                            <?php echo esc_html(get_the_author()); ?>
+                        </a>
+                    <?php endif; ?>
+
+                    <?php if ($ee_meta_on('date')) : ?>
                     <span class="ee-meta-item" title="<?php esc_attr_e('تاریخ انتشار', 'evented-edu'); ?>">
                         <svg class="ee-ic" aria-hidden="true" focusable="false">
                             <use href="#i-calendar_month"></use>
@@ -91,7 +102,9 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                             <use href="#i-schedule"></use>
                         </svg><?php echo esc_html($ee_time); ?>
                     </span>
+                    <?php endif; ?>
 
+                    <?php if ($ee_meta_on('reading')) : ?>
                     <span class="ee-meta-item" title="<?php esc_attr_e('زمان مطالعه', 'evented-edu'); ?>">
                         <svg class="ee-ic" aria-hidden="true" focusable="false">
                             <use href="#i-menu_book"></use>
@@ -101,12 +114,14 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                         echo esc_html(sprintf(_n('%s دقیقه مطالعه', '%s دقیقه مطالعه', $ee_reading, 'evented-edu'), number_format_i18n($ee_reading)));
                         ?>
                     </span>
+                    <?php endif; ?>
 
                     <?php if (function_exists('evented_course_rating') && evented_course_rating(get_the_ID())['count'] > 0) : $ee_r = evented_course_rating(get_the_ID()); ?>
                         <a class="ee-meta-item ee-meta-rating" href="#ee-comments" title="<?php esc_attr_e('امتیاز خوانندگان', 'evented-edu'); ?>"><?php echo evented_rating_stars_html($ee_r['avg']); // phpcs:ignore 
                                                                                                                                                     ?><b><?php echo esc_html(number_format_i18n($ee_r['avg'], 1)); ?></b><span>(<?php echo esc_html(number_format_i18n($ee_r['count'])); ?>)</span></a>
                     <?php endif; ?>
 
+                    <?php if ($ee_meta_on('comments')) : ?>
                     <a class="ee-meta-item" href="#ee-comments" title="<?php esc_attr_e('دیدگاه‌ها', 'evented-edu'); ?>">
                         <svg class="ee-ic" aria-hidden="true" focusable="false">
                             <use href="#i-forum"></use>
@@ -120,7 +135,9 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                         }
                         ?>
                     </a>
+                    <?php endif; ?>
 
+                    <?php if ($ee_meta_on('views')) : ?>
                     <span class="ee-meta-item ee-meta-views" title="<?php esc_attr_e('تعداد بازدید', 'evented-edu'); ?>">
                         <svg class="ee-ic" aria-hidden="true" focusable="false">
                             <use href="#i-visibility"></use>
@@ -130,6 +147,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                         echo esc_html(sprintf(__('تعداد بازدید %s نفر', 'evented-edu'), number_format_i18n($ee_views)));
                         ?>
                     </span>
+                    <?php endif; ?>
                 </div>
 
                 <!-- متن مقاله -->
@@ -213,6 +231,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                 </nav>
 
                 <!-- دربارهٔ نویسنده -->
+                <?php if ($ee_meta_on('author')) : ?>
                 <div class="ee-author-box">
                     <span class="ee-ab-av"><?php echo get_avatar($ee_author_id, 72); ?></span>
                     <div class="ee-ab-txt">
@@ -226,6 +245,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                         </a>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <!-- نوشته‌های مرتبط -->
                 <?php if (!empty($ee_related)) : ?>
@@ -250,7 +270,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                                     </span>
                                     <span class="ee-rc-txt">
                                         <strong><?php echo esc_html(get_the_title($ee_rp)); ?></strong>
-                                        <em><?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($ee_rp, 'Y/m/d') : get_the_date('', $ee_rp)); ?></em>
+                                        <?php if ($ee_meta_on('date')) : ?><em><?php echo esc_html(function_exists('evented_post_date') ? evented_post_date($ee_rp, 'Y/m/d') : get_the_date('', $ee_rp)); ?></em><?php endif; ?>
                                     </span>
                                 </a>
                             <?php endforeach; ?>

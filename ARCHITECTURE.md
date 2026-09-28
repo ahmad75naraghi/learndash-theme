@@ -285,6 +285,7 @@ flowchart TD
 `evented_reading_time()`، `evented_get_post_views()`/`evented_track_post_view()`
 (متای `evented_post_views`)، `evented_share_links()`/`evented_channel_links()` (فیلترپذیر) و
 `evented_related_posts()` و `evented_channel_icon_html()` (نشان‌های برند از `assets/images/social/`).
+نمایش متادیتای مقاله با `evented_post_meta_visible()` و شش گزینهٔ `post_meta_*` کنترل می‌شود؛ این قرارداد در نوشتهٔ تکی، آرشیو/جستجو و هر دو نوع کارت مقالهٔ صفحهٔ اصلی مشترک است. خاموش‌کردن بازدید یا دیدگاه فقط خروجی شمارنده را پنهان می‌کند و رفتار ثبت بازدید/دیدگاه را تغییر نمی‌دهد.
 منوی دسته‌ها در `inc/navigation.php` از تمام ترم‌های taxonomy درخت می‌سازد؛ count والد مجموع محتوای مستقیم و همهٔ descendants است و همان درخت به‌صورت عمق‌دار در منوی hover دسکتاپ و آکاردئون موبایل نمایش داده می‌شود. دیدگاه‌ها از `comments.php` قالب با لیبل‌های فارسی و
 `comment_form()` استایل‌خورده نمایش داده می‌شوند.
 

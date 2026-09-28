@@ -111,6 +111,18 @@ function evented_options_schema()
 				'tabs_per'        => array('label' => 'تعداد مقاله در هر تب', 'type' => 'number', 'default' => 3, 'min' => 2, 'max' => 6),
 			),
 		),
+		'content_display' => array(
+			'title'  => 'نمایش اطلاعات نوشته‌ها',
+			'icon'   => 'dashicons-visibility',
+			'fields' => array(
+				'post_meta_author'   => array('label' => 'نمایش نام نویسنده', 'type' => 'checkbox', 'default' => 1, 'desc' => 'در صفحهٔ نوشته، کارت‌های آرشیو و کارت‌های مقالات صفحهٔ اصلی.'),
+				'post_meta_date'     => array('label' => 'نمایش تاریخ انتشار', 'type' => 'checkbox', 'default' => 1),
+				'post_meta_views'    => array('label' => 'نمایش تعداد بازدید', 'type' => 'checkbox', 'default' => 1, 'desc' => 'خاموش‌کردن این گزینه فقط عدد را پنهان می‌کند و ثبت بازدید ادامه دارد.'),
+				'post_meta_reading'  => array('label' => 'نمایش زمان مطالعه', 'type' => 'checkbox', 'default' => 1),
+				'post_meta_comments' => array('label' => 'نمایش تعداد دیدگاه‌ها', 'type' => 'checkbox', 'default' => 1, 'desc' => 'فرم و فهرست دیدگاه‌ها غیرفعال نمی‌شوند؛ فقط شمارنده پنهان می‌شود.'),
+				'post_meta_category' => array('label' => 'نمایش دسته‌بندی نوشته', 'type' => 'checkbox', 'default' => 1),
+			),
+		),
 		'sms' => array(
 			'title'  => 'پیامک و ورود',
 			'icon'   => 'dashicons-smartphone',
@@ -201,6 +213,22 @@ function evented_opt($key, $fallback = null)
 		return $all[$key];
 	}
 	return null !== $fallback ? $fallback : ($all[$key] ?? '');
+}
+
+/**
+ * آیا یکی از اطلاعات نمایشی نوشته باید در فرانت‌اند دیده شود؟
+ *
+ * @param string $key author|date|views|reading|comments|category.
+ * @return bool
+ */
+function evented_post_meta_visible($key)
+{
+	$allowed = array('author', 'date', 'views', 'reading', 'comments', 'category');
+	$key     = sanitize_key($key);
+	if (!in_array($key, $allowed, true)) {
+		return false;
+	}
+	return (bool) evented_opt('post_meta_' . $key, 1);
 }
 
 /**

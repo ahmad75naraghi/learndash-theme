@@ -17,6 +17,9 @@ defined('ABSPATH') || exit;
 /* ---------- عنوان و توضیح سربرگ ---------- */
 $ee_arch_title    = isset($args['ee_title']) ? $args['ee_title'] : '';
 $ee_arch_subtitle = isset($args['ee_subtitle']) ? $args['ee_subtitle'] : '';
+$ee_meta_on       = static function ($key) {
+	return !function_exists('evented_post_meta_visible') || evented_post_meta_visible($key);
+};
 
 if ('' === $ee_arch_title) {
 	if (is_search()) {
@@ -159,7 +162,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 					$ee_id       = get_the_ID();
 					$ee_p_cats   = get_the_category($ee_id);
 					$ee_p_cat    = !empty($ee_p_cats) ? $ee_p_cats[0] : null;
-					$ee_p_tag    = $ee_p_cat instanceof WP_Term ? $ee_p_cat->name : '';
+					$ee_p_tag    = $ee_meta_on('category') && $ee_p_cat instanceof WP_Term ? $ee_p_cat->name : '';
 					if ('' === $ee_p_tag && 'post' !== get_post_type($ee_id)) {
 						$ee_pto   = get_post_type_object(get_post_type($ee_id));
 						$ee_p_tag = $ee_pto ? (string) $ee_pto->labels->singular_name : '';
@@ -168,6 +171,9 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 					$ee_p_date   = function_exists('evented_post_date') ? evented_post_date($ee_id, 'Y/m/d') : get_the_date();
 					$ee_p_views  = function_exists('evented_get_post_views') ? evented_get_post_views($ee_id) : 0;
 					$ee_p_cmts   = (int) get_comments_number($ee_id);
+					$ee_p_author  = (string) get_the_author_meta('display_name', (int) get_post_field('post_author', $ee_id));
+					$ee_p_rating  = function_exists('evented_rating_badge_html') ? evented_rating_badge_html($ee_id) : '';
+					$ee_has_stats = '' !== $ee_p_rating || $ee_meta_on('author') || $ee_meta_on('reading') || $ee_meta_on('views') || $ee_meta_on('comments');
 					?>
 					<article id="post-<?php echo esc_attr($ee_id); ?>" <?php post_class('ee-arch-card'); ?>>
 						<a class="ee-ac-thumb" href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true">
@@ -185,24 +191,20 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 							<h2 class="ee-ac-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
 							<p class="ee-ac-excerpt"><?php echo esc_html(wp_trim_words(get_the_excerpt(), 22)); ?></p>
 
+							<?php if ($ee_meta_on('date') || $ee_has_stats) : ?>
 							<div class="ee-ac-foot">
-								<span class="ee-ac-date"><?php echo esc_html($ee_p_date); ?></span>
+								<?php if ($ee_meta_on('date')) : ?><span class="ee-ac-date"><?php echo esc_html($ee_p_date); ?></span><?php endif; ?>
+								<?php if ($ee_has_stats) : ?>
 								<span class="ee-ac-stats">
-									<?php echo function_exists('evented_rating_badge_html') ? evented_rating_badge_html($ee_id) : ''; // phpcs:ignore ?>
-									<span title="<?php esc_attr_e('زمان مطالعه', 'evented-edu'); ?>">
-										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg>
-										<?php echo esc_html(number_format_i18n($ee_p_read)); ?>
-									</span>
-									<span title="<?php esc_attr_e('بازدید', 'evented-edu'); ?>">
-										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg>
-										<?php echo esc_html(number_format_i18n($ee_p_views)); ?>
-									</span>
-									<span title="<?php esc_attr_e('دیدگاه', 'evented-edu'); ?>">
-										<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg>
-										<?php echo esc_html(number_format_i18n($ee_p_cmts)); ?>
-									</span>
+									<?php echo $ee_p_rating; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+									<?php if ($ee_meta_on('author')) : ?><span class="ee-ac-author" title="<?php esc_attr_e('نویسنده', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-person"></use></svg><?php echo esc_html($ee_p_author); ?></span><?php endif; ?>
+									<?php if ($ee_meta_on('reading')) : ?><span title="<?php esc_attr_e('زمان مطالعه', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg><?php echo esc_html(number_format_i18n($ee_p_read)); ?></span><?php endif; ?>
+									<?php if ($ee_meta_on('views')) : ?><span title="<?php esc_attr_e('بازدید', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-visibility"></use></svg><?php echo esc_html(number_format_i18n($ee_p_views)); ?></span><?php endif; ?>
+									<?php if ($ee_meta_on('comments')) : ?><span title="<?php esc_attr_e('دیدگاه', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-forum"></use></svg><?php echo esc_html(number_format_i18n($ee_p_cmts)); ?></span><?php endif; ?>
 								</span>
+								<?php endif; ?>
 							</div>
+							<?php endif; ?>
 
 							<a class="ee-ac-more" href="<?php the_permalink(); ?>">
 								<?php esc_html_e('ادامه مطلب', 'evented-edu'); ?>
