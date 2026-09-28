@@ -255,72 +255,82 @@ function evented_nav_build_cpt_item($key, $title, $icon, $page_slugs)
  *
  * @return array<int, array>
  */
-function evented_nav_build_items()
-{
-	$items = array();
+function evented_nav_build_items(): array {
+    $items = [];
 
-	/* صفحه اصلی */
-	$items[] = array(
-		'key' => 'home', 'title' => 'صفحه اصلی', 'url' => (string) home_url('/'),
-		'icon' => 'home', 'post_type' => '', 'page_id' => 0, 'children' => array(),
-	);
+    // صفحه اصلی
+    $items[] = [
+        'key'       => 'home',
+        'title'     => 'صفحه اصلی',
+        'url'       => (string) home_url('/'),
+        'icon'      => 'home',
+        'post_type' => '',
+        'page_id'   => 0,
+        'children'  => [],
+    ];
 
-	/* مقالات → برگهٔ نوشته‌ها + دسته‌بندی‌های وبلاگ */
-	$posts_page = (int) get_option('page_for_posts');
-	$blog_url   = evented_nav_manual_url('articles');
-	if ('' === $blog_url) {
-		$blog_url = $posts_page ? (string) get_permalink($posts_page) : '';
-	}
-	if ('' === $blog_url) {
-		$resolved = evented_nav_page_url(array('blogs', 'blog', 'articles', 'maghalat'), 'blogs');
-		$blog_url = $resolved['url'];
-	}
-	$items[] = array(
-		'key' => 'articles', 'title' => 'مقالات', 'url' => $blog_url, 'icon' => 'article',
-		'post_type' => 'post', 'page_id' => $posts_page, 'children' => evented_nav_term_children('category'),
-	);
+    // مقالات
+    $posts_page = (int) get_option('page_for_posts');
+    $blog_url   = evented_nav_manual_url('articles') ?: ($posts_page ? (string) get_permalink($posts_page) : '');
+    $blog_url   = $blog_url ?: evented_nav_page_url(['blogs', 'blog', 'articles', 'maghalat'], 'blogs')['url'];
+    
+    $items[] = [
+        'key'       => 'articles',
+        'title'     => 'مقالات',
+        'url'       => $blog_url,
+        'icon'      => 'article',
+        'post_type' => 'post',
+        'page_id'   => $posts_page,
+        'children'  => evented_nav_term_children('category'), // این تابع باید آرایه درختی برگرداند
+    ];
 
-	/* اسلاگ‌های واقعی shamiim.ir در اولویت، سپس اسلاگ‌های رایج */
-	$items[] = evented_nav_build_cpt_item('library', 'کتابخانه', 'local_library', array('lib', 'library', 'کتابخانه', 'books', 'ketabkhaneh'));
-	$items[] = evented_nav_build_cpt_item('gallery', 'گالری', 'photo_library', array('gallery', 'گالری-مناسبتی', 'گالری-موضوعی', 'galleries'));
-	$items[] = evented_nav_build_cpt_item('video', 'ویدیو', 'smart_display', array('videos', 'video'));
-	$items[] = evented_nav_build_cpt_item('downloads', 'دانلودها', 'download_for_offline', array('download', 'downloads'));
+    // CPT ها
+    $items[] = evented_nav_build_cpt_item('library', 'کتابخانه', 'local_library', ['lib', 'library', 'کتابخانه', 'books', 'ketabkhaneh']);
+    $items[] = evented_nav_build_cpt_item('gallery', 'گالری', 'photo_library', ['gallery', 'گالری-مناسبتی', 'گالری-موضوعی', 'galleries']);
+    $items[] = evented_nav_build_cpt_item('video', 'ویدیو', 'smart_display', ['videos', 'video']);
+    $items[] = evented_nav_build_cpt_item('downloads', 'دانلودها', 'download_for_offline', ['download', 'downloads']);
 
-	/* دوره‌ها → بایگانی لرن‌دش /courses/ + دسته‌های دوره */
-	$courses_url = evented_nav_manual_url('courses');
-	if ('' === $courses_url && post_type_exists('sfwd-courses')) {
-		$courses_url = (string) get_post_type_archive_link('sfwd-courses');
-	}
-	if ('' === $courses_url) {
-		$resolved    = evented_nav_page_url(array('courses', 'all-courses-2', 'all-courses'), 'courses');
-		$courses_url = $resolved['url'];
-	}
-	$items[] = array(
-		'key' => 'courses', 'title' => 'دوره‌ها', 'url' => $courses_url, 'icon' => 'school',
-		'post_type' => post_type_exists('sfwd-courses') ? 'sfwd-courses' : '', 'page_id' => 0,
-		'children' => post_type_exists('sfwd-courses') ? evented_nav_term_children('ld_course_category') : array(),
-	);
+    // دوره‌ها
+    $has_courses = post_type_exists('sfwd-courses');
+    $courses_url = evented_nav_manual_url('courses') ?: ($has_courses ? (string) get_post_type_archive_link('sfwd-courses') : '');
+    $courses_url = $courses_url ?: evented_nav_page_url(['courses', 'all-courses-2', 'all-courses'], 'courses')['url'];
+    
+    $items[] = [
+        'key'       => 'courses',
+        'title'     => 'دوره‌ها',
+        'url'       => $courses_url,
+        'icon'      => 'school',
+        'post_type' => $has_courses ? 'sfwd-courses' : '',
+        'page_id'   => 0,
+        'children'  => $has_courses ? evented_nav_term_children('ld_course_category') : [],
+    ];
 
-	$items[] = evented_nav_build_cpt_item('podcast', 'پادکست', 'podcasts', array('podcast', 'player', 'podcasts'));
+    $items[] = evented_nav_build_cpt_item('podcast', 'پادکست', 'podcasts', ['podcast', 'player', 'podcasts']);
 
-	/* برگه‌های ثابت */
-	$static = array(
-		array('ramadan',  'ویژه رمضان',   'nights_stay',    array('ویژه-رمضان', 'ramezan', 'ramadan', 'ramazan', 'ramadan-special')),
-		array('contests', 'مسابقات',      'emoji_events',   array('match', 'competitions', 'contests', 'contest', 'competition')),
-		array('about',    'معرفی سایت',   'info',           array('درباره-ما', 'about-2', 'about', 'about-us', 'introduction')),
-		array('contact',  'ارتباط با ما', 'support_agent',  array('contact', 'contact-us', 'ertebat', 'tamas')),
-	);
-	foreach ($static as $row) {
-		list($key, $title, $icon, $slugs) = $row;
-		$manual   = evented_nav_manual_url($key);
-		$resolved = $manual ? array('url' => $manual, 'page_id' => 0) : evented_nav_page_url($slugs, $slugs[0]);
-		$items[]  = array(
-			'key' => $key, 'title' => $title, 'url' => $resolved['url'], 'icon' => $icon,
-			'post_type' => '', 'page_id' => $resolved['page_id'], 'children' => array(),
-		);
-	}
+    // برگه‌های ثابت
+    $static_pages = [
+        ['ramadan',  'ویژه رمضان',   'nights_stay',   ['ویژه-رمضان', 'ramezan', 'ramadan', 'ramazan', 'ramadan-special']],
+        ['contests', 'مسابقات',      'emoji_events',  ['match', 'competitions', 'contests', 'contest', 'competition']],
+        ['about',    'معرفی سایت',   'info',          ['درباره-ما', 'about-2', 'about', 'about-us', 'introduction']],
+        ['contact',  'ارتباط با ما', 'support_agent', ['contact', 'contact-us', 'ertebat', 'tamas']],
+    ];
 
-	return $items;
+    foreach ($static_pages as [$key, $title, $icon, $slugs]) {
+        $manual   = evented_nav_manual_url($key);
+        $resolved = $manual ? ['url' => $manual, 'page_id' => 0] : evented_nav_page_url($slugs, $slugs[0]);
+        
+        $items[] = [
+            'key'       => $key,
+            'title'     => $title,
+            'url'       => $resolved['url'],
+            'icon'      => $icon,
+            'post_type' => '',
+            'page_id'   => $resolved['page_id'],
+            'children'  => [], // اگر نیاز به زیربرگه دارند، اینجا باید کوئری زده شود
+        ];
+    }
+
+    return $items;
 }
 
 /**

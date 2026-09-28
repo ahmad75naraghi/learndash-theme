@@ -76,7 +76,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 		<header class="ee-arch-head">
 			<h1 class="ee-arch-title">
 				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-newspaper"></use></svg>
-				<?php echo esc_html($ee_arch_title); ?>
+				<?php echo $ee_arch_title; ?>
 			</h1>
 			<?php if ('' !== trim((string) $ee_arch_subtitle)) : ?>
 				<p class="ee-arch-desc"><?php echo esc_html(wp_trim_words($ee_arch_subtitle, 40)); ?></p>

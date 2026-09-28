@@ -1,4 +1,5 @@
 <?php
+
 /**
  * هلپرهای مشترک قالب‌های «ee-*» (تک‌نوشته، آرشیو نوشته‌ها و پوستهٔ مشترک)
  *
@@ -366,32 +367,46 @@ function evented_share_links($url, $title)
 	$title = (string) $title;
 
 	$links = array(
+		// Eitaa (ایتا)
 		array(
 			'key'   => 'eitaa',
 			'label' => 'ایتا',
 			'url'   => 'https://eitaa.com/share/url?url=' . rawurlencode($url),
-			'color' => '#f97316',
+			'color' => '#f97316', // Orange
+			'svg'   => '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" role="img"><path d="M5.968 23.942a6.624 6.624 0 0 1-2.332-.83c-1.62-.929-2.829-2.593-3.217-4.426-.151-.717-.17-1.623-.15-7.207C.288 5.47.274 5.78.56 4.79c.142-.493.537-1.34.823-1.767C2.438 1.453 3.99.445 5.913.08c.384-.073.94-.08 6.056-.08 6.251 0 6.045-.009 7.066.314a6.807 6.807 0 0 1 4.314 4.184c.33.937.346 1.087.369 3.555l.02 2.23-.391.268c-.558.381-1.29 1.06-2.316 2.15-1.182 1.256-2.376 2.42-2.982 2.907-1.309 1.051-2.508 1.651-3.726 1.864-.634.11-1.682.067-2.302-.095-.553-.144-.517-.168-.726.464a6.355 6.355 0 0 0-.318 1.546l-.031.407-.146-.03c-1.215-.241-2.419-1.285-2.884-2.5a3.583 3.583 0 0 1-.26-1.219l-.016-.34-.309-.284c-.644-.59-1.063-1.312-1.195-2.061-.212-1.193.34-2.542 1.538-3.756 1.264-1.283 3.127-2.29 4.953-2.68.658-.14 1.818-.177 2.403-.075 1.138.198 2.067.773 2.645 1.639.182.271.195.31.177.555a.812.812 0 0 1-.183.493c-.465.651-1.848 1.348-3.336 1.68-2.625.585-4.294-.142-4.033-1.759.026-.163.04-.304.031-.313-.032-.032-.293.104-.575.3-.479.334-.903.984-1.05 1.607-.036.156-.05.406-.034.65.02.331.053.454.192.736.092.186.275.45.408.589l.24.251-.096.122a4.845 4.845 0 0 0-.677 1.217 3.635 3.635 0 0 0-.105 1.815c.103.461.421 1.095.739 1.468.242.285.797.764.886.764.024 0 .044-.048.044-.106.001-.23.184-.973.326-1.327.423-1.058 1.351-1.96 2.82-2.74.245-.13.952-.47 1.572-.757 1.36-.63 2.103-1.015 2.511-1.305 1.176-.833 1.903-2.065 2.14-3.625.086-.57.086-1.634 0-2.207-.368-2.438-2.195-4.096-4.818-4.37-2.925-.307-6.648 1.953-8.942 5.427-1.116 1.69-1.87 3.565-2.187 5.443-.123.728-.169 2.08-.093 2.75.193 1.704.822 3.078 1.903 4.156a6.531 6.531 0 0 0 1.87 1.313c2.368 1.13 4.99 1.155 7.295.071.996-.469 1.974-1.196 3.023-2.25 1.02-1.025 1.71-1.88 3.592-4.458 1.04-1.423 1.864-2.368 2.272-2.605l.15-.086-.019 3.091c-.018 2.993-.022 3.107-.123 3.561-.6 2.678-2.54 4.636-5.195 5.242l-.468.107-5.775.01c-4.734.008-5.85-.002-6.19-.056z"/></svg>'
 		),
+		// Bale (بله)
 		array(
-			'key'   => 'telegram',
-			'label' => 'تلگرام',
-			'url'   => 'https://t.me/share/url?url=' . rawurlencode($url) . '&text=' . rawurlencode($title),
-			'color' => '#0ea5e9',
+			'key'   => 'bale',
+			'label' => 'بله',
+			'url'   => 'https://ble.ir/share?text=' . rawurlencode($title . ' ' . $url),
+			'color' => '#10b981', // Green
+			'svg'   => '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" role="img"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 3.01 1 4.28L2 22l5.72-1c1.27.64 2.74 1 4.28 1 5.52 0 10-4.48 10-10S17.52 2 12 2zm-1.16 13.5l-3.34-3.34 1.42-1.42 1.92 1.92 5.34-5.34 1.42 1.42-6.76 6.76z"/></svg>'
 		),
+		// Soroush (سروش)
 		array(
-			'key'   => 'whatsapp',
-			'label' => 'واتس‌اپ',
-			'url'   => 'https://api.whatsapp.com/send?text=' . rawurlencode($title . ' ' . $url),
-			'color' => '#22c55e',
+			'key'   => 'soroush',
+			'label' => 'سروش',
+			'url'   => 'https://splus.ir/share?url=' . rawurlencode($url) . '&text=' . rawurlencode($title),
+			'color' => '#3b82f6', // Blue
+			'svg'   => '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" role="img"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>'
+		),
+		// Rubika (روبیکا)
+		array(
+			'key'   => 'rubika',
+			'label' => 'روبیکا',
+			'url'   => 'https://rubika.ir/share?text=' . rawurlencode($title . ' ' . $url),
+			'color' => '#ec4899', // Pink / Magenta
+			'svg'   => '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" role="img"><path d="M18.69 5.88c-2.4 0-4.72 1.52-6.69 4.38-1.97-2.86-4.29-4.38-6.69-4.38-3.07 0-5.31 2.37-5.31 5.5S2.24 16.88 5.31 16.88c2.4 0 4.72-1.52 6.69-4.38 1.97 2.86 4.29 4.38 6.69 4.38 3.07 0 5.31-2.37 5.31-5.5s-2.24-5.5-5.31-5.5zm0 9c-2.06 0-3.95-1.58-5.38-3.5 1.43-1.92 3.32-3.5 5.38-3.5 1.96 0 3.31 1.57 3.31 3.5s-1.35 3.5-3.31 3.5zm-13.38 0c-1.96 0-3.31-1.57-3.31-3.5s1.35-3.5 3.31-3.5c2.06 0 3.95 1.58 5.38 3.5-1.43 1.92-3.32 3.5-5.38 3.5z"/></svg>'
 		),
 	);
 
 	/**
-	 * فیلتر لینک‌های اشتراک‌گذاری.
+	 * Filters the share links array.
 	 *
-	 * @param array  $links فهرست لینک‌ها.
-	 * @param string $url   آدرس صفحه.
-	 * @param string $title عنوان صفحه.
+	 * @param array  $links The list of share links.
+	 * @param string $url   The URL to share.
+	 * @param string $title The title to share.
 	 */
 	return (array) apply_filters('evented_share_links', $links, $url, $title);
 }
@@ -1435,8 +1450,9 @@ function evented_comment_callback($comment, $args, $depth)
 	$date      = function_exists('evented_format_jalali') ? evented_format_jalali((int) $ts, 'j F Y') : get_comment_date('', $comment);
 	$time      = get_comment_time('H:i', false, false, $comment);
 	$is_author = (int) $comment->user_id && (int) $comment->user_id === (int) get_post_field('post_author', $comment->comment_post_ID);
-	?>
-	<<?php echo $tag; // phpcs:ignore ?> id="comment-<?php comment_ID(); ?>" <?php comment_class($comment->has_children ? 'parent' : '', $comment); ?>>
+?>
+	<<?php echo $tag; // phpcs:ignore 
+		?> id="comment-<?php comment_ID(); ?>" <?php comment_class($comment->has_children ? 'parent' : '', $comment); ?>>
 		<article id="div-comment-<?php comment_ID(); ?>" class="comment-body">
 			<footer class="comment-meta">
 				<div class="comment-author vcard">

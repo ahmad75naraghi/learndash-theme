@@ -121,11 +121,10 @@ $ee_copyright = (string) $ee_opt('copyright', '');
                     <div class="ee-fmeta">
                         <?php if ('' !== $ee_phone) : ?><div><span class="mk"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-call"></use></svg> تلفن</span><a class="mv" href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $ee_phone)); ?>"><?php echo esc_html($ee_phone); ?></a></div><?php endif; ?>
                         <?php if ('' !== (string) $ee_opt('phone_hours')) : ?><div><span class="mk"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-schedule"></use></svg> پاسخگویی</span><span class="mv"><?php echo esc_html($ee_opt('phone_hours')); ?></span></div><?php endif; ?>
-                        <div><span class="mk"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-mail"></use></svg> ایمیل</span><a class="mv" href="mailto:<?php echo esc_attr($ee_email); ?>"><?php echo esc_html($ee_email); ?></a></div>
+                        <div><span class="mk"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-mail"></use></svg> ایمیل</span><a class="mv" href="mailto:info@shamiim.ir">info@shamiim.ir</a></div>
                         <?php if ('' !== (string) $ee_opt('address')) : ?><div><span class="mk"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-location_on"></use></svg> آدرس</span><span class="mv"><?php echo esc_html($ee_opt('address')); ?></span></div><?php endif; ?>
                     </div>
                     <div class="ee-ftrust">
-                        <span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-verified_user"></use></svg> پرداخت امن</span>
                         <span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-workspace_premium"></use></svg> گواهینامهٔ معتبر</span>
                         <span><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-support_agent"></use></svg> پشتیبانی پاسخگو</span>
                     </div>

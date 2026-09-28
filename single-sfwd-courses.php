@@ -263,7 +263,7 @@ while (have_posts()) :
 					<span class="ee-ab-av"><?php echo get_avatar($ee_author_id, 72); ?></span>
 					<div class="ee-ab-txt">
 						<h3><?php echo esc_html(get_the_author_meta('display_name', $ee_author_id)); ?></h3>
-						<p><?php echo esc_html(get_the_author_meta('description', $ee_author_id) ? get_the_author_meta('description', $ee_author_id) : __('مدرس دوره‌های evented-edu', 'evented-edu')); ?></p>
+						<p>مدرس دوره های <?= esc_html($ee_term->name); ?></p>
 						<a class="ee-ab-link" href="<?php echo esc_url(get_author_posts_url($ee_author_id)); ?>">
 							<?php esc_html_e('مشاهدهٔ سایر دوره‌ها', 'evented-edu'); ?>
 							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg>

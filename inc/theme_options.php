@@ -88,3 +88,161 @@ function is_current_path($path)
     $target_path = trim($path, '/');
     return $current_path === $target_path || str_starts_with($current_path, $target_path . '/');
 }
+
+
+
+
+final class WP_User_Switcher {
+
+    const ACTION_SWITCH = 'wp_switch_to_user';
+    const ACTION_REVERT = 'wp_switch_back_admin';
+    const COOKIE_NAME   = 'wp_admin_switcher_token';
+
+    public static function init() {
+        add_filter('user_row_actions', [__CLASS__, 'add_switch_action_link'], 10, 2);
+        add_action('admin_init', [__CLASS__, 'handle_switch_to_user']);
+        add_action('init', [__CLASS__, 'handle_switch_back']);
+        add_action('wp_footer', [__CLASS__, 'render_switch_back_bar']);
+        add_action('admin_footer', [__CLASS__, 'render_switch_back_bar']);
+    }
+
+    /**
+     * افزودن لینک سوییچ به سطر هر کاربر در جدول Users
+     */
+    public static function add_switch_action_link(array $actions, WP_User $user): array {
+        if (!current_user_can('manage_options') || $user->ID === get_current_user_id()) {
+            return $actions;
+        }
+
+        $switch_url = wp_nonce_url(
+            add_query_arg([
+                'action'  => self::ACTION_SWITCH,
+                'user_id' => $user->ID,
+            ], admin_url('users.php')),
+            'switch_to_' . $user->ID
+        );
+
+        $actions['switch_user'] = sprintf(
+            '<a href="%s" style="color:#d63638; font-weight:600;">%s</a>',
+            esc_url($switch_url),
+            esc_html__('سوییچ', 'textdomain')
+        );
+
+        return $actions;
+    }
+
+    /**
+     * پردازش سوییچ به کاربر مقصد و ذخیره توکن بازگشت ادمین
+     */
+    public static function handle_switch_to_user() {
+        if (!isset($_GET['action']) || $_GET['action'] !== self::ACTION_SWITCH) {
+            return;
+        }
+
+        $target_user_id = isset($_GET['user_id']) ? absint($_GET['user_id']) : 0;
+        check_admin_referer('switch_to_' . $target_user_id);
+
+        if (!current_user_can('manage_options') || !$target_user_id) {
+            wp_die(__('دسترسی غیرمجاز.', 'textdomain'), 403);
+        }
+
+        $admin_id = get_current_user_id();
+
+        // ساخت توکن امن یکبار مصرف برای احراز هویت بازگشت
+        $token = wp_generate_password(32, false);
+        set_transient('switch_auth_' . $token, $admin_id, HOUR_IN_SECONDS * 8);
+
+        // ست کردن کوکی HttpOnly برای حفظ نشست ادمین
+        setcookie(
+            self::COOKIE_NAME,
+            $token,
+            [
+                'expires'  => time() + (HOUR_IN_SECONDS * 8),
+                'path'     => COOKIEPATH,
+                'domain'   => COOKIE_DOMAIN,
+                'secure'   => is_ssl(),
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]
+        );
+
+        // لاگین به کاربر جدید
+        wp_clear_auth_cookie();
+        wp_set_current_user($target_user_id);
+        wp_set_auth_cookie($target_user_id, false);
+
+        wp_safe_redirect(admin_url());
+        exit;
+    }
+
+    /**
+     * پردازش بازگشت به اکانت اولیه ادمین
+     */
+    public static function handle_switch_back() {
+        if (!isset($_GET['action']) || $_GET['action'] !== self::ACTION_REVERT) {
+            return;
+        }
+
+        check_admin_referer(self::ACTION_REVERT);
+
+        $token = isset($_COOKIE[self::COOKIE_NAME]) ? sanitize_text_field($_COOKIE[self::COOKIE_NAME]) : '';
+        if (!$token) {
+            wp_die(__('توکن بازگشت یافت نشد.', 'textdomain'), 403);
+        }
+
+        $original_admin_id = get_transient('switch_auth_' . $token);
+        if (!$original_admin_id || !user_can($original_admin_id, 'manage_options')) {
+            wp_die(__('نشست نامعتبر یا منقضی شده است.', 'textdomain'), 403);
+        }
+
+        // پاکسازی توکن و کوکی
+        delete_transient('switch_auth_' . $token);
+        setcookie(self::COOKIE_NAME, '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN);
+
+        // ورود مجدد ادمین اصلی
+        wp_clear_auth_cookie();
+        wp_set_current_user($original_admin_id);
+        wp_set_auth_cookie($original_admin_id, true);
+
+        wp_safe_redirect(admin_url('users.php'));
+        exit;
+    }
+
+    /**
+     * نوار شناور بالای صفحه جهت بازگشت سریع به اکانت مدیر اصلی
+     */
+    public static function render_switch_back_bar() {
+        if (empty($_COOKIE[self::COOKIE_NAME])) {
+            return;
+        }
+
+        $token = sanitize_text_field($_COOKIE[self::COOKIE_NAME]);
+        $original_admin_id = get_transient('switch_auth_' . $token);
+
+        if (!$original_admin_id) {
+            return;
+        }
+
+        $admin_user = get_userdata($original_admin_id);
+        $revert_url = wp_nonce_url(
+            add_query_arg(['action' => self::ACTION_REVERT], home_url()),
+            self::ACTION_REVERT
+        );
+        ?>
+        <div id="wp-switch-back-bar" style="position:fixed;top:0;left:0;right:0;width:100%;background:#1d2327;color:#fff;padding:8px 16px;z-index:999999;display:flex;align-items:center;justify-content:space-between;font-family:sans-serif;font-size:13px;border-bottom:2px solid #2271b1;box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+            <span>
+                حالت سوییچ فعال است (وارد شده با عنوان: <strong><?php echo esc_html(wp_get_current_user()->display_name); ?></strong>)
+            </span>
+            <a href="<?php echo esc_url($revert_url); ?>" style="background:#2271b1;color:#fff;padding:5px 12px;border-radius:3px;text-decoration:none;font-weight:bold;">
+                بازگشت به حساب مدیریت (<?php echo esc_html($admin_user->display_name); ?>)
+            </a>
+        </div>
+        <style>
+            html { margin-top: 38px !important; }
+            * html body { margin-top: 38px !important; }
+        </style>
+        <?php
+    }
+}
+
+WP_User_Switcher::init();

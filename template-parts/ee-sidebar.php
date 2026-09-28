@@ -130,7 +130,7 @@ $ee_mini_row = static function ($post_id, $meta = '', $icon = 'article') {
 				<div class="ee-share-row">
 					<?php foreach ($ee_side_shares as $ee_share) : ?>
 						<a class="ee-share-btn" style="background:<?php echo esc_attr($ee_share['color']); ?>;" href="<?php echo esc_url($ee_share['url']); ?>" target="_blank" rel="noopener nofollow" title="<?php echo esc_attr($ee_share['label']); ?>">
-							<span><?php echo esc_html(mb_substr($ee_share['label'], 0, 1)); ?></span>
+							<span><?php echo $ee_share['svg']; ?></span>
 						</a>
 					<?php endforeach; ?>
 					<button type="button" class="ee-share-btn ee-share-copy" data-copy="<?php echo esc_attr($ee_side_url); ?>" title="<?php esc_attr_e('کپی لینک', 'evented-edu'); ?>">
