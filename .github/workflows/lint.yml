@@ -59,15 +59,16 @@ jobs:
           set -o pipefail
           bash bin/dev-playground.sh
           set +e
-          {
-            bash bin/smoke-test.sh http://127.0.0.1:9400 /tmp/wp/site/debug.log
-            bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site
-          } 2>&1 | tee /tmp/smoke-output.log
-          status=${PIPESTATUS[0]}
+          bash bin/smoke-test.sh http://127.0.0.1:9400 /tmp/wp/site/debug.log > /tmp/runtime-output.log 2>&1
+          smoke_status=$?
+          bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site >> /tmp/runtime-output.log 2>&1
+          update_status=$?
+          cat /tmp/runtime-output.log
           {
             echo '### WordPress runtime output'
             echo '```text'
-            cat /tmp/smoke-output.log
+            cat /tmp/runtime-output.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          exit "$status"
+          if (( update_status != 0 )); then echo '::error title=WordPress updater integration::Theme_Upgrader integration failed'; fi
+          if (( smoke_status != 0 || update_status != 0 )); then exit 1; fi
