@@ -28,3 +28,8 @@ jobs:
 
       - name: Run lint script
         run: bash bin/lint.sh
+
+      - name: Test GitHub theme updater
+        run: |
+          php tests/theme-updater-test.php
+          bash bin/build-theme-release.sh /tmp/evented-edu.zip

@@ -121,3 +121,15 @@
 .evented-inline-notice-x:hover,
 .evented-inline-notice-x:focus { color: #1d2327; }
 .evented-slide-2col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0 12px; }
+
+/* --- وضعیت به‌روزرسانی GitHub --- */
+.evented-update-card {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    max-width: 1100px; margin: 12px 0 18px; padding: 12px 14px;
+    background: #fff; border: 1px solid #c3c4c7; border-inline-start: 4px solid #2271b1;
+    border-radius: 5px; box-shadow: 0 1px 2px rgb(0 0 0 / .04);
+}
+.evented-update-card > .dashicons { width: 28px; height: 28px; font-size: 28px; color: #2271b1; }
+.evented-update-card > div:not(.evented-update-actions) { flex: 1 1 360px; }
+.evented-update-card p { margin: 4px 0 0; color: #50575e; }
+.evented-update-actions { display: flex; align-items: center; gap: 7px; margin-inline-start: auto; }

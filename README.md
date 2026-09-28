@@ -81,6 +81,7 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 │   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها) + هلپرهای LMS
 │   ├── certificates.php          تولید PDF گواهینامه با mPDF (autoload اختیاری Composer)
 │   ├── navigation.php            منوی استاتیک هدر/فوتر/کشوی موبایل (کش هفتگی) + فیلتر بخش جستجو + تب‌های مقالات خانه
+│   ├── theme_updater.php         به‌روزرسان امن قالب از GitHub Releases + نرمال‌سازی zipball
 │   ├── login.php                 کلاس EventedAuthHandler + نشست امن OTP/ورود
 │   ├── sms.php                   send_pattern_sms (SOAP)
 │   ├── meta_functions.php        متاباکس دوره/دسته/کاربر + فیلتر آواتار
@@ -177,7 +178,7 @@ wp-content/themes/<theme-folder>/
 
 ## ۶. پیکربندی
 
-همهٔ تنظیمات از **نمایش → تنظیمات قالب** خوانده می‌شوند (آپشن `evented_theme_options`، دسترسی با `evented_opt('key')`):
+همهٔ تنظیمات از منوی اصلی **تنظیمات قالب** (بلافاصله زیر «پیشخوان») خوانده می‌شوند؛ داده‌ها در آپشن `evented_theme_options` می‌مانند و با `evented_opt('key')` در دسترس‌اند:
 
 | تب | کلیدهای مهم |
 |---|---|
@@ -201,17 +202,34 @@ define('EVENTED_SMS_BODY_ID', 12345);
 
 **سیاست «بدون درخواست خارجی»:** فونت‌ها، آیکن‌ها و همهٔ اسکریپت‌ها محلی‌اند و `inc/no_external.php` هر استایل/اسکریپت ثبت‌شده از دامنهٔ دیگر را روی فرانت‌اند حذف می‌کند (استثنا با فیلتر `evented_allowed_external_hosts`).
 
+### ۶.۱ به‌روزرسانی خودکار از GitHub
+
+`inc/theme_updater.php` هر شش ساعت آخرین **GitHub Release** عمومی مخزن `ahmad75naraghi/learndash-theme` را بررسی می‌کند. بررسی دستی از کارت «به‌روزرسانی قالب» در بالای صفحهٔ تنظیمات در دسترس است. فقط نسخهٔ پایدار با شمارهٔ SemVer بالاتر و بسته‌ای از میزبان‌های رسمی GitHub پذیرفته می‌شود؛ Draft و prerelease نادیده گرفته می‌شوند.
+
+فرایند انتشار:
+
+1. مقدار `Version` در `style.css` افزایش یابد.
+2. بعد از merge، بسته با `bash bin/build-theme-release.sh /tmp/evented-edu.zip` ساخته شود.
+3. GitHub Release با tag هم‌نسخه (مثلاً `v2.2.0`) ساخته و فایل `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به آن پیوست شود.
+4. در پیشخوان «تنظیمات قالب → بررسی دوباره» زده شود و نصب از صفحهٔ به‌روزرسانی‌های وردپرس انجام گیرد.
+
+در نبود asset استاندارد، zipball رسمی Release نیز پشتیبانی می‌شود و ریشهٔ تصادفی بسته پیش از نصب به `evented-edu` تغییر نام می‌دهد. تنظیمات، نوشته‌ها و محتوای سایت در دیتابیس‌اند و با جایگزینی فایل‌های قالب حذف نمی‌شوند.
+
 ## ۷. تست‌ها
 
-- **وضعیت فعلی:** هیچ فریم‌ورک تست خودکار در ریپو وجود ندارد. تست‌ها دستی/اسموک هستند.
+- GitHub Actions روی PHP 7.4/8.1/8.3، JavaScript و CSS اجرا می‌شود.
+- `tests/theme-updater-test.php` parsing امن Release، جلوگیری از downgrade/prerelease/host ناشناس و نرمال‌سازی پوشهٔ zipball را آزمایش می‌کند.
+- `bin/build-theme-release.sh` ساختار ZIP، فایل‌های الزامی، نسخه و `Update URI` را اعتبارسنجی می‌کند.
 - دستورهای پیشنهادی برای بررسی سلامت کد:
 
 ```bash
 # لینت PHP (همهٔ فایل‌ها)
 find . -name "*.php" -not -path "./node_modules/*" -print0 | xargs -0 -n1 php -l
 
-# بررسی سینتکس JS (در صورت نصب node)
-node --check assets/js/main.js
+# lint کامل + تست updater + ساخت بستهٔ انتشار
+bash bin/lint.sh
+php tests/theme-updater-test.php
+bash bin/build-theme-release.sh /tmp/evented-edu.zip
 
 # بررسی tag های ناقص HTML (در صورت نصب tidy) برای هر صفحهٔ کلیدی
 ```

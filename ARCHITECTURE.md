@@ -34,6 +34,8 @@ flowchart TD
 - `EventedAuthHandler` با `add_action('init', fn => new EventedAuthHandler())` نمونه‌سازی می‌شود.
 - کپچا حذف شده است؛ ورود قالب با OTP/رمز و کنترل‌های نشست امن انجام می‌شود.
 - هوک‌های ریدایرکت: `login_url` → `/login/` و `logout_redirect` → خانه (هر دو در `inc/login.php`)؛ `login_redirect` برای نقش subscriber → `/panel` (در `inc/theme_options.php`).
+- «تنظیمات قالب» با `add_menu_page()` در موقعیت ۲٫۱، بلافاصله زیر پیشخوان، ثبت می‌شود؛ URL پایدار آن `admin.php?page=evented-theme-settings` است.
+- `inc/theme_updater.php` آخرین GitHub Release پایدار را با site-transient شش‌ساعته می‌خواند، پاسخ `update_themes` می‌سازد و ریشهٔ zipball را در `upgrader_source_selection` به slug ثابت قالب تبدیل می‌کند. Draft/prerelease، downgrade و URL خارج از میزبان‌های رسمی GitHub رد می‌شوند.
 
 ## ۳. ساختار پایگاه‌داده (Data Structures)
 
