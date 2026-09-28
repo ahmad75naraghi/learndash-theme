@@ -378,6 +378,7 @@ flowchart TD
   `custom_mark_lesson_complete` (پاسخ = خروجی `learndash_course_progress`؛ نوارهای پیشرفت و
   شمارندهٔ درس‌ها بدون رفرش به‌روز می‌شوند) و `toggle_course_wishlist`.
 - `inc/performance.php` ایموجی وردپرس را حذف، فونت محلی اصلی را preload و اسکریپت‌های مستقل قالب را defer می‌کند؛ تصویر نخست هیرو نیز preload و `fetchpriority=high` دارد.
+- `bin/dev-playground.sh` یک WordPress disposable می‌سازد؛ `bin/smoke-test.sh` مسیرها/AJAX/asset/debug log و `bin/test-wordpress-update.sh` جایگزینی واقعی فایل‌های قالب با `Theme_Upgrader` را کنترل می‌کنند.
 - پنل: `ee-courses.css` + `ee-panel.css` + `panel.css` + `assets/js/newhome/ee-panel.js` (با `eePanel` localize) فقط روی مسیرهای پنل بارگذاری می‌شوند. Jalali Date Picker به‌طور شرطی فقط در بخش پروفایل بارگذاری می‌شود. سایدبار دسکتاپ در موبایل به select بومی قابل‌دسترسی تبدیل می‌شود.
 - دادهٔ پنل با `inc/panel_helpers.php` prime/page‌بندی می‌شود: دوره‌های من ۱۰تایی و تراکنش‌ها ۲۰تایی‌اند؛ dashboard فقط چهار کارت را رندر می‌کند.
 - کلاس‌های ابزاری `ee-u-*` (در انتهای `ee-shell.css`) جایگزین استایل‌های inline ایستا در قالب‌ها هستند؛ `[hidden]{display:none!important}` هم آنجا تعریف شده.

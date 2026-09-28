@@ -235,6 +235,11 @@ php tests/panel-helpers-test.php
 python3 tests/static-audit.py
 bash bin/build-theme-release.sh /tmp/evented-edu.zip
 
+# integration واقعی روی WordPress Playground
+bash bin/dev-playground.sh
+SMOKE_WRITE_PROFILE=1 bash bin/smoke-test.sh http://127.0.0.1:9400 /tmp/wp/site/debug.log
+bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site
+
 # بررسی tag های ناقص HTML (در صورت نصب tidy) برای هر صفحهٔ کلیدی
 ```
 

@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 # راه‌اندازی وردپرس لوکال (WP Playground, بدون MySQL) با این قالب برای تست دستی/خودکار.
 # نیازمندی: node 18+. استفاده: bash bin/dev-playground.sh  →  http://127.0.0.1:9400
-set -e
+set -euo pipefail
 THEME_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 WORK="${PLAYGROUND_DIR:-/tmp/wp}"; TOOLS="${TOOLS_DIR:-$HOME/.cache/tools}"
 mkdir -p "$WORK" "$TOOLS"
 cd "$TOOLS"; [ -d node_modules/@wp-playground/cli ] || npm i --silent @wp-playground/cli
 if [ ! -f "$WORK/wp.zip" ]; then curl -sL -o "$WORK/wp.zip" https://codeload.github.com/WordPress/WordPress/zip/refs/tags/6.7.1; fi
 if [ ! -d "$WORK/site" ]; then (cd "$WORK" && python3 -c "import zipfile;zipfile.ZipFile('wp.zip').extractall('.')" && mv WordPress-6.7.1 site); fi
-rm -rf "$WORK/site/wp-content/themes/evented-edu"; cp -r "$THEME_DIR" "$WORK/site/wp-content/themes/evented-edu"
+rm -rf "$WORK/site/wp-content/themes/evented-edu"
+mkdir -p "$WORK/site/wp-content/themes/evented-edu"
+# کپی working tree بدون .git/cache؛ تغییرات commit‌نشده نیز برای توسعه دیده می‌شوند.
+tar -C "$THEME_DIR" --exclude=.git --exclude=.playground --exclude=node_modules --exclude=vendor -cf - . \
+  | tar -C "$WORK/site/wp-content/themes/evented-edu" -xf -
 cat > "$WORK/bp.json" <<'JSON'
 {"login":true,"steps":[
 {"step":"defineWpConfigConsts","consts":{"WP_DEBUG":true,"WP_DEBUG_LOG":"/wordpress/debug.log","WP_DEBUG_DISPLAY":false}},
@@ -27,4 +31,5 @@ process.argv=['node','cli','server','--wp=6.7.1','--mount-before-install='+proce
 import('./node_modules/@wp-playground/cli/cli.js');
 JS
 echo "starting…"; WORK="$WORK" nohup node "$TOOLS/runpg.mjs" > "$WORK/pg.log" 2>&1 &
+echo $! > "$WORK/pg.pid"
 for i in $(seq 1 90); do sleep 2; grep -q "Ready" "$WORK/pg.log" && break; done; tail -2 "$WORK/pg.log"

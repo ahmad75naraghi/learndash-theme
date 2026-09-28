@@ -53,6 +53,7 @@
 - [x] صفحه‌بندی دوره‌ها و تراکنش‌ها، prime کردن object cache و نمایش وضعیت‌های کامل تراکنش.
 - [x] ناوبری موبایل پنل و breakpointهای 320 تا 1440 با target لمسی و مودال واکنش‌گرا.
 - [x] تست static و چک‌لیست QA/Lighthouse/staging/rollback در `docs/QA-RELEASE-CHECKLIST.md`.
+- [x] smoke test واقعی WordPress برای مسیرها/AJAX و integration واقعی `Theme_Upgrader` روی Playground disposable.
 
 ## ۶. مستندات و انتشار
 

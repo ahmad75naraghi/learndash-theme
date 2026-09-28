@@ -10,6 +10,9 @@ php tests/theme-updater-test.php
 php tests/panel-helpers-test.php
 python3 tests/static-audit.py
 bash bin/build-theme-release.sh /tmp/evented-edu.zip
+bash bin/dev-playground.sh
+SMOKE_WRITE_PROFILE=1 bash bin/smoke-test.sh http://127.0.0.1:9400 /tmp/wp/site/debug.log
+bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site
 ```
 
 - [ ] PHP روی 7.4، 8.1 و 8.3 بدون خطای syntax است.
@@ -17,6 +20,9 @@ bash bin/build-theme-release.sh /tmp/evented-edu.zip
 - [ ] ارجاع asset محلی شکسته وجود ندارد.
 - [ ] ZIP فقط یک ریشهٔ `evented-edu/` دارد و Version/Update URI صحیح است.
 - [ ] updater، جلوگیری از downgrade/prerelease و نرمال‌سازی zipball پاس است.
+- [ ] smoke test واقعی WordPress مسیر خانه، هفت مسیر پنل، تنظیمات مدیریت و assetها را بدون خطای قالب باز می‌کند.
+- [ ] AJAX پروفایل ارقام فارسی را ذخیره و تاریخ نامعتبر را رد می‌کند.
+- [ ] `Theme_Upgrader` نسخهٔ قدیمی شبیه‌سازی‌شده را جایگزین می‌کند؛ قالب فعال، optionها و slug حفظ و فایل منسوخ حذف می‌شود.
 
 ## ۲) ماتریس واکنش‌گرایی
 

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# تست واقعی جایگزینی قالب با WordPress Theme_Upgrader روی Playground disposable.
+# استفاده: bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site
+set -euo pipefail
+
+base="${1:-http://127.0.0.1:9400}"; base="${base%/}"
+site="${2:-/tmp/wp/site}"
+root=$(cd "$(dirname "$0")/.." && pwd)
+package="$site/evented-edu-update-test.zip"
+runner="$site/evented-update-integration.php"
+cookie=$(mktemp)
+response=$(mktemp)
+cleanup() { rm -f "$cookie" "$response" "$package" "$runner"; }
+trap cleanup EXIT
+
+[[ -f "$site/wp-load.php" ]] || { echo "WordPress root not found: $site" >&2; exit 1; }
+[[ -d "$site/wp-content/themes/evented-edu" ]] || { echo 'evented-edu theme copy not found.' >&2; exit 1; }
+
+bash "$root/bin/build-theme-release.sh" "$package"
+cp "$root/tests/wp-theme-update-integration.php" "$runner"
+
+# cookie ورود خودکار Playground + nonce واقعی صفحهٔ تنظیمات قالب.
+curl -sS --max-time 30 --max-redirs 10 -c "$cookie" -b "$cookie" -L "$base/wp-admin/admin.php?page=evented-theme-settings" -o "$response"
+nonce=$(python3 - "$response" <<'PY'
+import html, re, sys
+text = html.unescape(open(sys.argv[1], encoding='utf-8').read())
+match = re.search(r'admin-post\.php\?action=evented_check_theme_update&_wpnonce=([A-Za-z0-9_-]+)', text)
+print(match.group(1) if match else '')
+PY
+)
+[[ -n "$nonce" ]] || { echo 'Could not extract authenticated updater nonce.' >&2; exit 1; }
+
+code=$(curl -sS --max-time 120 -c "$cookie" -b "$cookie" -o "$response" -w '%{http_code}' "$base/evented-update-integration.php?_wpnonce=$nonce")
+cat "$response"
+printf '\n'
+[[ "$code" == 200 ]] || { echo "Theme_Upgrader integration returned HTTP $code" >&2; exit 1; }
+python3 - "$response" <<'PY'
+import json, sys
+payload = json.load(open(sys.argv[1], encoding='utf-8'))
+if not payload.get('success'):
+    raise SystemExit('Theme update checks failed: ' + repr(payload))
+failed = [key for key, value in payload.get('checks', {}).items() if not value]
+if failed:
+    raise SystemExit('Failed update checks: ' + ', '.join(failed))
+print('WordPress Theme_Upgrader integration passed (' + ', '.join(payload['checks']) + ').')
+PY

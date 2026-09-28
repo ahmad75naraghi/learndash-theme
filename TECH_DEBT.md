@@ -32,7 +32,7 @@
 
 ## ۵. تست و مشاهده‌پذیری
 
-- lint نحوی، تست pure-PHP updater/panel helpers و static QA در CI وجود دارد، اما تست یکپارچهٔ WordPress و LearnDash هنوز وجود ندارد.
+- lint نحوی، تست pure-PHP، static QA و integration واقعی WordPress/Theme_Upgrader در CI وجود دارد؛ integration خود LearnDash، درگاه و SMS همچنان به staging دارای افزونه‌ها و providerها نیاز دارد.
 - سناریوهای OTP باید با mock پیامک و نشست واقعی مرورگر تست خودکار شوند.
 - مسیر تکمیل درس، خرید، گواهینامه، اعلان و PWA نیازمند smoke test روی staging دارای LearnDash واقعی است.
 - خطاهای provider پیامک و بله فعلاً از `error_log` استفاده می‌کنند؛ اتصال به logger ساختاریافته در مقیاس تولید پیشنهاد می‌شود.

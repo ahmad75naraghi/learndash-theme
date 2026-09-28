@@ -14,7 +14,7 @@ jobs:
       matrix:
         php: ['7.4', '8.1', '8.3']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -22,9 +22,9 @@ jobs:
           coverage: none
           tools: none
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Run lint script
         run: bash bin/lint.sh
@@ -35,3 +35,27 @@ jobs:
           php tests/panel-helpers-test.php
           python3 tests/static-audit.py
           bash bin/build-theme-release.sh /tmp/evented-edu.zip
+
+  wordpress-smoke:
+    name: WordPress runtime smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: bin/dev-playground.sh
+
+      - name: Start WordPress Playground
+        run: bash bin/dev-playground.sh
+
+      - name: Test public, panel, AJAX and admin routes
+        env:
+          SMOKE_WRITE_PROFILE: '1'
+        run: bash bin/smoke-test.sh http://127.0.0.1:9400 /tmp/wp/site/debug.log
+
+      - name: Test a real theme replacement
+        run: bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site
