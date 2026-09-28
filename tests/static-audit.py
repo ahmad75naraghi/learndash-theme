@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""Fast repository QA checks that do not require a WordPress database."""
+from pathlib import Path
+import re
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+errors = []
+checked = 0
+
+# Local assets referenced through PATH_DIR_URL/get_template_directory_uri must exist.
+asset_re = re.compile(r"(?:PATH_DIR_URL|get_template_directory_uri\(\))\s*\.\s*['\"](/assets/[^'\"?#]+)")
+for path in list(ROOT.rglob("*.php")) + list(ROOT.rglob("*.js")):
+    if any(part in {".git", "vendor", "node_modules"} for part in path.parts):
+        continue
+    text = path.read_text(encoding="utf-8")
+    for match in asset_re.finditer(text):
+        checked += 1
+        reference = match.group(1)
+        # A trailing slash is a dynamic directory prefix, not a complete asset path.
+        if reference.endswith("/"):
+            continue
+        target = ROOT / reference.lstrip("/")
+        if not target.is_file():
+            errors.append(f"missing local asset: {path.relative_to(ROOT)} -> {reference}")
+
+# Every static panel image must have alt text and lazy loading (panel has no above-fold LCP image).
+# PHP close tags contain `>`; panel image elements are intentionally kept on one source line.
+for path in (ROOT / "panel").glob("*.php"):
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if "<img" not in line.lower():
+            continue
+        checked += 1
+        if not re.search(r"\balt\s*=", line, flags=re.I):
+            errors.append(f"panel image missing alt: {path.relative_to(ROOT)}")
+        if not re.search(r"\bloading\s*=\s*['\"]lazy['\"]", line, flags=re.I):
+            errors.append(f"panel image missing lazy loading: {path.relative_to(ROOT)}")
+
+required_snippets = {
+    "assets/assets_functions.php": ["'profile' === $panel_section", "jalalidatepicker-js"],
+    "assets/css/panel.css": ["@media (max-width: 359.98px)", ".ee-panel-pager"],
+    "panel/payments.php": ["LIMIT %d OFFSET %d", "evented_panel_pagination"],
+    "panel/my-courses.php": ["$courses_per_page", "'no_found_rows'"],
+    "inc/performance.php": ["Vazirmatn-Variable.woff2", "print_emoji_detection_script"],
+}
+for rel, snippets in required_snippets.items():
+    text = (ROOT / rel).read_text(encoding="utf-8")
+    for snippet in snippets:
+        checked += 1
+        if snippet not in text:
+            errors.append(f"required QA contract missing in {rel}: {snippet}")
+
+if errors:
+    for error in errors:
+        print(f"FAIL: {error}", file=sys.stderr)
+    sys.exit(1)
+print(f"Static QA passed ({checked} asset, accessibility and performance contracts).")

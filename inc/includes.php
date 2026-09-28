@@ -4,6 +4,7 @@
 require_once get_stylesheet_directory() . '/inc/icons.php';
 require_once get_stylesheet_directory() . '/inc/seo.php';
 require_once get_stylesheet_directory() . '/inc/no_external.php';
+require_once get_stylesheet_directory() . '/inc/performance.php';
 require_once get_stylesheet_directory() . '/inc/theme_options_store.php';
 require_once get_stylesheet_directory() . '/inc/login.php';
 require_once get_stylesheet_directory() . '/inc/sms.php';
@@ -11,6 +12,7 @@ require_once get_stylesheet_directory() . '/inc/template_helpers.php';
 require_once get_stylesheet_directory() . '/inc/certificates.php';
 require_once get_stylesheet_directory() . '/inc/navigation.php';
 require_once get_stylesheet_directory() . '/inc/theme_updater.php';
+require_once get_stylesheet_directory() . '/inc/panel_helpers.php';
 require_once get_stylesheet_directory() . '/inc/panel_router.php';
 require_once get_stylesheet_directory() . '/inc/live_search.php';
 require_once get_stylesheet_directory() . '/inc/course_filters.php';

@@ -29,7 +29,9 @@ jobs:
       - name: Run lint script
         run: bash bin/lint.sh
 
-      - name: Test GitHub theme updater
+      - name: Test updater, panel helpers and static QA
         run: |
           php tests/theme-updater-test.php
+          php tests/panel-helpers-test.php
+          python3 tests/static-audit.py
           bash bin/build-theme-release.sh /tmp/evented-edu.zip

@@ -80,22 +80,34 @@ $ee_blog_url = $ee_nav('articles', get_permalink(get_option('page_for_posts')) ?
 /* ۴٫۱) بلاگ ویژه — نوشته‌های چسبان و در ادامه آخرین نوشته‌ها */
 $ee_blog_feature = function_exists('evented_featured_posts') ? evented_featured_posts(4) : array();
 
-/* ۵) تجربهٔ دانشجویان: آخرین دیدگاه‌های تأییدشدهٔ دارای امتیاز روی دوره‌ها */
-$ee_testimonials = get_comments(array(
-    'status'    => 'approve',
-    'post_type' => 'sfwd-courses',
-    'number'    => 4,
-    'orderby'   => 'comment_date_gmt',
-    'order'     => 'DESC',
-    'meta_key'  => 'review_rating', // phpcs:ignore WordPress.DB.SlowDBQuery
-));
+/* ۵) تجربهٔ دانشجویان: query متای دیدگاه فقط هر ۳۰ دقیقه اجرا می‌شود. */
+$ee_testimonial_ids = get_transient('evented_home_testimonial_ids_v1');
+if (!is_array($ee_testimonial_ids)) {
+    $ee_testimonial_ids = get_comments(array(
+        'status'    => 'approve',
+        'post_type' => 'sfwd-courses',
+        'number'    => 4,
+        'orderby'   => 'comment_date_gmt',
+        'order'     => 'DESC',
+        'meta_key'  => 'review_rating', // phpcs:ignore WordPress.DB.SlowDBQuery
+        'fields'    => 'ids',
+    ));
+    set_transient('evented_home_testimonial_ids_v1', $ee_testimonial_ids, 30 * MINUTE_IN_SECONDS);
+}
+$ee_testimonials = array_filter(array_map('get_comment', array_map('absint', $ee_testimonial_ids)));
 
-/* ۶) اساتید: کاربران دارای نقش group_leader */
-$ee_instructors = get_users(array(
-    'role'    => 'group_leader',
-    'number'  => 8,
-    'orderby' => 'display_name',
-));
+/* ۶) اساتید: فهرست شناسه‌ها ۱۲ ساعت cache و جزئیات از object cache وردپرس خوانده می‌شود. */
+$ee_instructor_ids = get_transient('evented_home_instructor_ids_v1');
+if (!is_array($ee_instructor_ids)) {
+    $ee_instructor_ids = get_users(array(
+        'role'    => 'group_leader',
+        'number'  => 8,
+        'orderby' => 'display_name',
+        'fields'  => 'ID',
+    ));
+    set_transient('evented_home_instructor_ids_v1', $ee_instructor_ids, 12 * HOUR_IN_SECONDS);
+}
+$ee_instructors = array_filter(array_map('get_userdata', array_map('absint', $ee_instructor_ids)));
 
 /* ۷) آمار سادهٔ دوره‌ها */
 $ee_course_count = wp_count_posts('sfwd-courses');
@@ -109,12 +121,12 @@ $ee_saved_slides = function_exists('evented_get_home_slides') ? evented_get_home
 
 foreach ($ee_saved_slides as $s) {
     // اول سایز میانه (large) پیوست؛ اگر نبود همان URL ذخیره‌شده
-    $slide_img = wp_get_attachment_image_url(absint($s['id']), 'large');
-    if (!$slide_img) {
-        $slide_img = $s['image'];
-    }
+    $slide_src = wp_get_attachment_image_src(absint($s['id']), 'large');
+    $slide_img = $slide_src ? $slide_src[0] : $s['image'];
     $ee_feature_slides[] = array(
         'img'       => $slide_img,
+        'width'     => $slide_src ? (int) $slide_src[1] : 0,
+        'height'    => $slide_src ? (int) $slide_src[2] : 0,
         'badge'     => !empty($s['badge']) ? $s['badge'] : '',
         'title'     => !empty($s['title']) ? $s['title'] : '',
         'desc'      => !empty($s['desc']) ? $s['desc'] : '',
@@ -127,6 +139,14 @@ foreach ($ee_saved_slides as $s) {
 
 $ee_slide_count  = count($ee_feature_slides);
 $ee_slider_mode  = $ee_slide_count > 1;
+
+/* تصویر LCP اسلاید نخست پیش از CSS کشف و دریافت شود. */
+if (!empty($ee_feature_slides[0]['img'])) {
+    $ee_lcp_image = (string) $ee_feature_slides[0]['img'];
+    add_action('wp_head', static function () use ($ee_lcp_image) {
+        echo '<link rel="preload" as="image" href="' . esc_url($ee_lcp_image) . '" fetchpriority="high">' . "\n";
+    }, 1);
+}
 
 ?>
 <?php get_template_part('template-parts/ee', 'head'); ?>
@@ -158,7 +178,7 @@ $ee_slider_mode  = $ee_slide_count > 1;
                                 <a class="feat-link" href="<?php echo esc_url($ee_s['link']); ?>" aria-label="<?php echo esc_attr($ee_alt); ?>"></a>
                             <?php endif; ?>
                             <div class="feat-media">
-                                <img src="<?php echo esc_url($ee_s['img']); ?>" alt="<?php echo esc_attr($ee_alt); ?>" loading="<?php echo $ee_i === 0 ? 'eager' : 'lazy'; ?>" draggable="false">
+                                <img src="<?php echo esc_url($ee_s['img']); ?>" alt="<?php echo esc_attr($ee_alt); ?>" loading="<?php echo $ee_i === 0 ? 'eager' : 'lazy'; ?>" decoding="async"<?php echo 0 === $ee_i ? ' fetchpriority="high"' : ''; ?><?php echo !empty($ee_s['width']) ? ' width="' . esc_attr($ee_s['width']) . '" height="' . esc_attr($ee_s['height']) . '"' : ''; ?> draggable="false">
                                 <?php if ($ee_has_body) : ?><div class="feat-shade"></div><?php endif; ?>
                             </div>
                             <?php if (!empty($ee_s['badge'])) : ?>

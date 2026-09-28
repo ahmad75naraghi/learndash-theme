@@ -153,13 +153,22 @@ function handle_save_user_profile() {
     // لیست فیلدها و کلیدهای متا
     $only_fa = function ($v) { return trim(preg_replace('/[^\x{0600}-\x{06FF}\x{0750}-\x{077F}\x{FB50}-\x{FDFF}\x{FE70}-\x{FEFF}\s\x{200C}]/u', '', sanitize_text_field(wp_unslash((string) $v)))); };
     $only_en = function ($v) { return trim(preg_replace("/[^A-Za-z\s.\-']/", '', sanitize_text_field(wp_unslash((string) $v)))); };
+    $birth_date = sanitize_text_field(wp_unslash((string) ($_POST['birth_date'] ?? '')));
+    $birth_date = function_exists('evented_normalize_digits') ? evented_normalize_digits($birth_date) : $birth_date;
+    if ('' !== $birth_date) {
+        if (!preg_match('/^(\d{4})\/(\d{2})\/(\d{2})$/', $birth_date, $birth_parts)
+            || (int) $birth_parts[2] < 1 || (int) $birth_parts[2] > 12
+            || (int) $birth_parts[3] < 1 || (int) $birth_parts[3] > 31) {
+            wp_send_json_error('تاریخ تولد معتبر نیست؛ نمونهٔ صحیح: ۱۳۷۰/۰۱/۰۱');
+        }
+    }
     $fields = [
         'first_name_fa' => $only_fa($_POST['first_name_fa'] ?? ''),
         'last_name_fa'  => $only_fa($_POST['last_name_fa'] ?? ''),
         'first_name_en' => $only_en($_POST['first_name_en'] ?? ''),
         'last_name_en'  => $only_en($_POST['last_name_en'] ?? ''),
         'gender'        => in_array($_POST['gender'] ?? '', array('male', 'female', 'other', ''), true) ? (string) $_POST['gender'] : '',
-        'birth_date'    => preg_match('/^\d{4}\/\d{2}\/\d{2}$/', (string) ($_POST['birth_date'] ?? '')) ? (string) $_POST['birth_date'] : '',
+        'birth_date'    => $birth_date,
     ];
     // فیلدهای بالا تنها متاهای قابل‌نوشتن از سمت کاربر هستند (whitelist).
 

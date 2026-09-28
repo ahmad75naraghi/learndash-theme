@@ -560,3 +560,18 @@ html.no-js .ee-rv, .ee-rv.is-in { opacity: 1; transform: none; }
 .ee-home .ee-u-msg.is-box { border-radius: 8px; padding: 10px; }
 .ee-home .ee-u-remove-fab { position: absolute; top: 10px; left: 10px; z-index: 10; background: rgb(255 255 255 / .85); border: 0; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; color: #ff4757; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgb(0 0 0 / .1); }
 [hidden] { display: none !important; }
+
+/* تکمیل نمایشگرهای باریک و ورودی لمسی */
+.ee-home :where(h1, h2, h3, h4, p, a, td, th) { overflow-wrap: anywhere; }
+.ee-home :where(input, select, textarea, button) { max-width: 100%; }
+@media (max-width: 479.98px) {
+    .ee-wrap { padding-inline: .75rem; }
+    .ee-header-in { padding-block: .55rem; }
+    .ee-logo .ee-logo-img { max-width: 8.5rem; height: 38px; }
+    .ee-logo img, .ee-logo .logo-fallback { height: 38px; }
+    .ee-drawer { width: min(21rem, calc(100vw - 1rem)); }
+    .ee-footer ul.ee-f-2col { grid-template-columns: 1fr; }
+}
+@media (hover: none) and (pointer: coarse) {
+    .ee-home button, .ee-home select, .ee-home input[type="submit"], .ee-home input[type="button"] { min-height: 44px; }
+}

@@ -46,7 +46,15 @@
 - [x] syntax فایل‌های JS و توازن آکولاد CSS بررسی شد.
 - [x] CI روی PHP 7.4/8.1/8.3، JS و CSS در `.github/workflows/lint.yml` فعال است.
 
-## ۵. مستندات و انتشار
+## ۵. کارایی، واکنش‌گرایی و پنل — انجام‌شده در کد
+
+- [x] preload فونت/LCP، defer اسکریپت‌ها، حذف emoji و cache داده‌های سنگین صفحهٔ اصلی.
+- [x] بارگذاری Jalali Date Picker فقط در پروفایل، حذف `ORDER BY RAND()` و محدودسازی رندر dashboard.
+- [x] صفحه‌بندی دوره‌ها و تراکنش‌ها، prime کردن object cache و نمایش وضعیت‌های کامل تراکنش.
+- [x] ناوبری موبایل پنل و breakpointهای 320 تا 1440 با target لمسی و مودال واکنش‌گرا.
+- [x] تست static و چک‌لیست QA/Lighthouse/staging/rollback در `docs/QA-RELEASE-CHECKLIST.md`.
+
+## ۶. مستندات و انتشار
 
 - [x] `README.md`، `ARCHITECTURE.md`، `TECH_DEBT.md`، `TODO.md` و `CHANGELOG.md` با وضعیت کد هماهنگ شدند.
 - [x] PR شمارهٔ ۲ قبلاً در `main` ادغام شده است.

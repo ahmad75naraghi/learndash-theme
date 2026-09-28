@@ -352,7 +352,7 @@ flowchart TD
 ```
 
 - **پوستهٔ ee-***: `functions.php` با اولویت ۲۰ و شرط `evented_is_ee_view()` بارگذاری می‌کند:
-  فونت وزیرمتن + Material Symbols + `assets/css/newhome/ee-shell.css` (توکن‌ها، هدر/فوتر،
+  فونت وزیرمتن + sprite آیکن SVG محلی + `assets/css/newhome/ee-shell.css` (توکن‌ها، هدر/فوتر،
   نوار موبایل، ویجت‌های سایدبار) + `assets/js/newhome/evented-home.js` (منوی موبایل،
   اسلایدر هیرو، کپی لینک اشتراک). سپس بسته به صفحه یکی از `evented-home.css`،
   `single-post.css` یا `archive-post.css` (هر سه با وابستگی به `ee-shell`).
@@ -377,10 +377,11 @@ flowchart TD
 - `ee-lms.js` بدون jQuery است و سه قرارداد AJAX موجود را مصرف می‌کند: `submit_course_review`،
   `custom_mark_lesson_complete` (پاسخ = خروجی `learndash_course_progress`؛ نوارهای پیشرفت و
   شمارندهٔ درس‌ها بدون رفرش به‌روز می‌شوند) و `toggle_course_wishlist`.
-- `main.js` لوکال‌سازی: `ajax_object = {ajax_url, nonce}` — nonce مربوط به `notification_nonce` است و استفاده نمی‌شود؛ اسکریپت‌های واقعی nonce را از `data-nonce` می‌خوانند.
-- پنل: `ee-courses.css` + `ee-panel.css` + `panel.css` (هرس‌شده، v2.1.0) + `jalalidatepicker` + `assets/js/newhome/ee-panel.js` (v1.1.0، با `eePanel` localize) وقتی برگه، خودِ `panel` یا زیرمجموعهٔ آن باشد. سایدبار/شل پنل در `template-parts/panel/shell-open.php` و `shell-close.php` است.
+- `inc/performance.php` ایموجی وردپرس را حذف، فونت محلی اصلی را preload و اسکریپت‌های مستقل قالب را defer می‌کند؛ تصویر نخست هیرو نیز preload و `fetchpriority=high` دارد.
+- پنل: `ee-courses.css` + `ee-panel.css` + `panel.css` + `assets/js/newhome/ee-panel.js` (با `eePanel` localize) فقط روی مسیرهای پنل بارگذاری می‌شوند. Jalali Date Picker به‌طور شرطی فقط در بخش پروفایل بارگذاری می‌شود. سایدبار دسکتاپ در موبایل به select بومی قابل‌دسترسی تبدیل می‌شود.
+- دادهٔ پنل با `inc/panel_helpers.php` prime/page‌بندی می‌شود: دوره‌های من ۱۰تایی و تراکنش‌ها ۲۰تایی‌اند؛ dashboard فقط چهار کارت را رندر می‌کند.
 - کلاس‌های ابزاری `ee-u-*` (در انتهای `ee-shell.css`) جایگزین استایل‌های inline ایستا در قالب‌ها هستند؛ `[hidden]{display:none!important}` هم آنجا تعریف شده.
-- کتابخانه‌ها: Owl Carousel (سراسری)، Plyr (دیگر enqueue نمی‌شود)، Jalali Date Picker (پنل)، PhotoSwipe (enqueue نشده — بدون استفاده)، Font Awesome (یک آیکن در `author.php` بدون لودر!).
+- کتابخانه‌های مردهٔ Owl، Plyr، PhotoSwipe، Font Awesome و jQuery فرانت بارگذاری نمی‌شوند؛ Jalali Date Picker تنها کتابخانهٔ رابط پنل و محدود به پروفایل است.
 
 ## ۷. قراردادهای AJAX (Inventory)
 
@@ -406,5 +407,5 @@ flowchart TD
 - **Hook-driven**: همهٔ منطق از طریق `add_action/add_filter` به وردپرس وصل می‌شود؛ هیچ routing دستی‌ای نیست.
 - **Template Name**: صفحات پنل با هدر `Template Name: Panel - …` (وردپرس 4.7+ تمپلیت‌های زیرپوشهٔ سطح اول را خودکار پیدا می‌کند).
 - **توابع کمکی متمرکز** در برخی صفحات (مثل helpers قیمت/تصویر در `panel/my-courses.php`) — ⚠️ تکرار شده در چند فایل (رجوع: `TECH_DEBT.md`).
-- **خروجی RTL فارسی**: همهٔ قالب‌ها `dir="rtl"`؛ اسکریپت‌های Owl با `rtl: true`.
+- **خروجی RTL فارسی**: همهٔ قالب‌ها `dir="rtl"` و چیدمان‌ها با logical properties و breakpointهای 320 تا 1440 پیکسل سازگارند.
 - **امنیت پایه**: `check_ajax_referer`، `sanitize_text_field`، `esc_html/esc_url` در اکثر نقاط؛ استثناها در `TECH_DEBT.md`/`TODO.md`.

@@ -21,6 +21,16 @@ $enrolled_course_ids = function_exists('learndash_user_get_enrolled_courses')
 if (! is_array($enrolled_course_ids)) {
     $enrolled_course_ids = array();
 }
+$enrolled_course_ids = array_values(array_unique(array_filter(array_map('absint', $enrolled_course_ids))));
+$courses_per_page    = 10;
+$courses_page        = max(1, isset($_GET['courses_page']) ? absint($_GET['courses_page']) : 1); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- فقط صفحه‌بندی نمایشی.
+$courses_total       = count($enrolled_course_ids);
+$courses_pages       = max(1, (int) ceil($courses_total / $courses_per_page));
+$courses_page        = min($courses_page, $courses_pages);
+$visible_course_ids  = array_slice($enrolled_course_ids, ($courses_page - 1) * $courses_per_page, $courses_per_page);
+if (function_exists('evented_panel_prime_courses')) {
+    evented_panel_prime_courses($visible_course_ids);
+}
 
 /**
  * تابع کمکی: گرفتن دسته‌بندی‌های یک دوره
@@ -49,6 +59,9 @@ function evented_get_course_instructor($course_id)
  */
 function evented_get_course_price_label($course_id)
 {
+    if (!function_exists('learndash_get_course_meta_setting')) {
+        return 'رایگان';
+    }
     $price_type = learndash_get_course_meta_setting($course_id, 'course_price_type');
 
     if ($price_type === 'free' || empty($price_type)) {
@@ -86,7 +99,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
 
         <!-- Search Bar -->
         <div class="search-bar">
-            <input type="text" id="my-courses-search" placeholder="جستجو دوره ها">
+            <input type="search" id="my-courses-search" placeholder="جستجو در دوره‌های این صفحه" aria-label="جستجو در دوره‌های من">
             <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7.92037 15.8407C3.55451 15.8407 0 12.2862 0 7.92037C0 3.55451 3.55451 0 7.92037 0C12.2862 0 15.8407 3.55451 15.8407 7.92037C15.8407 12.2862 12.2862 15.8407 7.92037 15.8407ZM7.92037 1.15908C4.18814 1.15908 1.15908 4.19586 1.15908 7.92037C1.15908 11.6449 4.18814 14.6817 7.92037 14.6817C11.6526 14.6817 14.6817 11.6449 14.6817 7.92037C14.6817 4.19586 11.6526 1.15908 7.92037 1.15908Z" fill="#444444"/>
                 <path d="M16.0342 16.6134C15.8874 16.6134 15.7405 16.5593 15.6246 16.4434L14.0792 14.8979C13.8551 14.6738 13.8551 14.3029 14.0792 14.0788C14.3033 13.8547 14.6742 13.8547 14.8983 14.0788L16.4437 15.6243C16.6678 15.8484 16.6678 16.2193 16.4437 16.4434C16.3278 16.5593 16.181 16.6134 16.0342 16.6134Z" fill="#444444"/>
@@ -99,12 +112,12 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
 
             <div class="horizontal-grid">
 
-                <?php if (empty($enrolled_course_ids)) : ?>
+                <?php if (empty($visible_course_ids)) : ?>
 
                     <p>شما هنوز در هیچ دوره‌ای ثبت‌نام نکرده‌اید.</p>
 
                 <?php else :
-                    foreach ($enrolled_course_ids as $course_id) :
+                    foreach ($visible_course_ids as $course_id) :
 
                         $course_title      = get_the_title($course_id);
                         $course_link       = get_permalink($course_id);
@@ -120,7 +133,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                                 'array'     => true,
                             )
                         );
-                        $percentage = isset($progress['percentage']) ? (int) $progress['percentage'] : 0;
+                        $percentage = isset($progress['percentage']) ? max(0, min(100, (int) $progress['percentage'])) : 0;
 
                         // آیا دوره تکمیل شده؟
                         $is_complete = learndash_course_completed($user_id, $course_id);
@@ -134,7 +147,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                         <!-- Horizontal Card -->
                         <div class="horizontal-card" data-course-title="<?php echo esc_attr($course_title); ?>">
                             <div class="horizontal-card-top">
-                                <div class="horizontal-card-image"<?php echo $course_image ? ' style="background-image:url(\'' . esc_url($course_image) . '\');"' : ''; ?>>
+                                <div class="horizontal-card-image" role="img" aria-label="<?php echo esc_attr($course_title); ?>"<?php echo $course_image ? ' style="background-image:url(\'' . esc_url($course_image) . '\');"' : ''; ?>>
                                 </div>
                                 <div class="horizontal-card-info">
                                     <h3 class="card-title"><?php echo esc_html($course_title); ?></h3>
@@ -186,6 +199,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                 endif; ?>
 
             </div>
+            <?php echo function_exists('evented_panel_pagination') ? evented_panel_pagination($courses_page, $courses_pages, 'courses_page') : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
         </div>
 
         <!-- Suggested Courses Section -->
@@ -197,9 +211,13 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                 $suggested_query = new WP_Query(
                     array(
                         'post_type'      => 'sfwd-courses',
-                        'posts_per_page' => 3,
-                        'post__not_in'   => $enrolled_course_ids,
-                        'orderby'        => 'rand',
+                        'posts_per_page'      => 3,
+                        'post__not_in'         => $enrolled_course_ids,
+                        'post_status'          => 'publish',
+                        'orderby'              => 'date',
+                        'order'                => 'DESC',
+                        'no_found_rows'        => true,
+                        'ignore_sticky_posts'  => true,
                     )
                 );
 

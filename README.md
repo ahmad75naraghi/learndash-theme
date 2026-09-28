@@ -219,7 +219,9 @@ define('EVENTED_SMS_BODY_ID', 12345);
 
 - GitHub Actions روی PHP 7.4/8.1/8.3، JavaScript و CSS اجرا می‌شود.
 - `tests/theme-updater-test.php` parsing امن Release، جلوگیری از downgrade/prerelease/host ناشناس و نرمال‌سازی پوشهٔ zipball را آزمایش می‌کند.
+- `tests/panel-helpers-test.php` نرمال‌سازی ارقام فارسی/عربی پنل و `tests/static-audit.py` قراردادهای asset، دسترس‌پذیری تصاویر، صفحه‌بندی و کارایی را بررسی می‌کنند.
 - `bin/build-theme-release.sh` ساختار ZIP، فایل‌های الزامی، نسخه و `Update URI` را اعتبارسنجی می‌کند.
+- ماتریس کامل موبایل، بودجهٔ Lighthouse، سناریوهای پنل و rollback در `docs/QA-RELEASE-CHECKLIST.md` است.
 - دستورهای پیشنهادی برای بررسی سلامت کد:
 
 ```bash
@@ -229,6 +231,8 @@ find . -name "*.php" -not -path "./node_modules/*" -print0 | xargs -0 -n1 php -l
 # lint کامل + تست updater + ساخت بستهٔ انتشار
 bash bin/lint.sh
 php tests/theme-updater-test.php
+php tests/panel-helpers-test.php
+python3 tests/static-audit.py
 bash bin/build-theme-release.sh /tmp/evented-edu.zip
 
 # بررسی tag های ناقص HTML (در صورت نصب tidy) برای هر صفحهٔ کلیدی
@@ -253,6 +257,7 @@ bash bin/build-theme-release.sh /tmp/evented-edu.zip
 | `ROADMAP.md` | نقشهٔ راه نسخه‌ها و ویژگی‌های برنامه‌ریزی‌شده |
 | `TODO.md` | تسک‌های معلق، باگ‌های شناخته‌شده (چک‌لیست) |
 | `TECH_DEBT.md` | بدهی فنی، کدهای نیازمند ریفکتور، تنگناهای عملکرد |
+| `docs/QA-RELEASE-CHECKLIST.md` | ماتریس واکنش‌گرایی، بودجهٔ سرعت، تست پنل، staging و rollback |
 
 ---
 

@@ -138,7 +138,7 @@ get_template_part('template-parts/panel/shell', 'open', [
             ?>
                 <div class="card">
                     <div class="certificate-thumb">
-                        <img src="<?= esc_url(get_template_directory_uri() . '/assets/img/panel/certificate-thumb.png'); ?>" alt="تصویر گواهینامه" />
+                        <img src="<?= esc_url(get_template_directory_uri() . '/assets/img/panel/certificate-thumb.png'); ?>" alt="تصویر گواهینامه" width="181" height="121" loading="lazy" decoding="async">
                     </div>
                     <div class="card-content">
                         <div>
@@ -174,7 +174,7 @@ get_template_part('template-parts/panel/shell', 'open', [
         <?php else : ?>
             <div class="no-exist-notice">
                 <div>
-                    <img src="<?= esc_url(get_template_directory_uri() . '/assets/img/panel/certificate-sample.png'); ?>" alt="بدون گواهینامه" />
+                    <img src="<?= esc_url(get_template_directory_uri() . '/assets/img/panel/certificate-sample.png'); ?>" alt="بدون گواهینامه" width="111" height="78" loading="lazy" decoding="async">
                 </div>
                 <p>هنوز دوره‌ای شرکت نکردی!!</p>
                 <p>با تکمیل هر دوره و قبولی در آزمون، گواهینامهٔ آن همین‌جا قابل دریافت است.</p>

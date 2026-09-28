@@ -42,6 +42,17 @@ $ee_panel_menu = apply_filters('evented_panel_menu', $ee_panel_menu);
 					<span><?php echo esc_html($ee_user->user_login); ?></span>
 				</div>
 			</div>
+			<label class="ee-panel-mobile-select">
+				<span>بخش پنل</span>
+				<select data-ee-panel-nav aria-label="انتخاب بخش پنل کاربری">
+					<?php foreach ($ee_panel_menu as $ee_k => $ee_m) : ?>
+						<option value="<?php echo esc_url($ee_m[2]); ?>"<?php selected($ee_k, $ee_panel_current); ?>><?php echo esc_html($ee_m[0]); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</label>
+			<button type="button" class="ee-panel-mobile-logout" data-ee-logout="<?php echo esc_url(wp_logout_url(home_url('/login'))); ?>">
+				<?php echo ee_icon('logout'); // phpcs:ignore ?> <span>خروج</span>
+			</button>
 			<nav class="ee-panel-nav">
 				<?php foreach ($ee_panel_menu as $ee_k => $ee_m) : ?>
 					<a href="<?php echo esc_url($ee_m[2]); ?>" class="ee-panel-nav-item<?php echo $ee_k === $ee_panel_current ? ' is-active' : ''; ?>"<?php echo $ee_k === $ee_panel_current ? ' aria-current="page"' : ''; ?>>
