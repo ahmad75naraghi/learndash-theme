@@ -41,6 +41,7 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 ├── front-page.php                صفحهٔ اصلی داینامیک — رجوع: ARCHITECTURE §5
 ├── single.php                    تک‌نوشته (پوستهٔ ee-*؛ مقاله + سایدبار + دیدگاه)
 ├── archive.php / home.php / search.php   آرشیو نوشته‌ها، برگهٔ نوشته‌ها، نتایج جستجو
+├── page-videos.php              برگهٔ /videos/ با WP_Query صفحه‌بندی‌شده روی CPT خارجی clip
 ├── comments.php                  فهرست دیدگاه‌ها + فرم دیدگاه (فارسی)
 ├── template-parts/               ee-head · ee-header · ee-footer · ee-sidebar · ee-archive-main · lms/* (enroll-card، curriculum، course-sidebar، lesson-list، course-grid، category-grid، courses-sidebar)
 ├── single-sfwd-courses.php       صفحهٔ دوره (پوستهٔ ee-*: سرفصل‌ها، آکاردئون‌ها، نظرات، سایدبار ثبت‌نام)
@@ -62,6 +63,7 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 │   ├── js/newhome/ee-lms.js        آکاردئون · گروه درس‌ها · دیدگاه/امتیاز · تکمیل درس · علاقه‌مندی
 │   ├── js/newhome/ee-live-search.js  جستجوی زندهٔ هدر  |  ee-notify.js  زنگولهٔ اعلان‌ها  |  ee-panel.js  رفتارهای پنل
 │   ├── icons/ee-icons.svg        اسپرایت SVG آیکن‌ها (با `ee_icon('name')` استفاده می‌شود)
+│   ├── images/social/            نشان‌های محلی ایتا، بله، روبیکا، آی‌گپ و سروش
 │   ├── fonts/  Vazirmatn-Variable.woff2 · evented-edu-font.woff2 (دانا)
 │   └── img/  front-page (۲۳) · single-page (۸) · panel (۲)
 ├── inc/
@@ -101,6 +103,7 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 | `/courses/<slug>/` | `single-sfwd-courses.php` | صفحهٔ دوره |
 | `/lessons/<slug>/` | `single-sfwd-lessons.php` | صفحهٔ درس (کلیپ/پادکست/متن + فهرست درس‌ها) |
 | آزمون (`sfwd-quiz`) | `single-sfwd-quiz.php` | صفحهٔ آزمون (فکت‌ها + بدنهٔ لرن‌دش) |
+| برگهٔ `/videos/` | `page-videos.php` | کوئری صفحه‌بندی‌شدهٔ `clip`؛ مستقل از `has_archive` و بدون نیاز اجباری به taxonomy |
 | برگهٔ «دوره‌ها» | `page-courses.php` | گرید همهٔ دوره‌ها با صفحه‌بندی |
 | `/<post-slug>/` | `single.php` | تک‌نوشته (مقاله + سایدبار + دیدگاه) |
 | برگهٔ «نوشته‌ها» (is_home) | `home.php` | آرشیو همهٔ نوشته‌ها |

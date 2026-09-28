@@ -69,6 +69,7 @@ function evented_options_schema()
 				'bale_url'    => array('label' => 'بله', 'type' => 'url', 'default' => '', 'dir' => 'ltr', 'placeholder' => 'https://ble.ir/...'),
 				'eitaa_url'   => array('label' => 'ایتا', 'type' => 'url', 'default' => '', 'dir' => 'ltr', 'placeholder' => 'https://eitaa.com/...'),
 				'rubika_url'  => array('label' => 'روبیکا', 'type' => 'url', 'default' => '', 'dir' => 'ltr', 'placeholder' => 'https://rubika.ir/...'),
+				'igap_url'    => array('label' => 'آی‌گپ', 'type' => 'url', 'default' => '', 'dir' => 'ltr', 'placeholder' => 'https://profile.igap.net/...'),
 				'soroush_url' => array('label' => 'سروش', 'type' => 'url', 'default' => '', 'dir' => 'ltr', 'placeholder' => 'https://splus.ir/...'),
 				'telegram_url'  => array('label' => 'تلگرام', 'type' => 'url', 'default' => '', 'dir' => 'ltr'),
 				'instagram_url' => array('label' => 'اینستاگرام', 'type' => 'url', 'default' => '', 'dir' => 'ltr'),
@@ -265,8 +266,9 @@ add_filter('evented_channel_links', function ($channels) {
 	$map = array(
 		'eitaa'   => array('ایتا',   'eitaa_url',   'https://eitaa.com/',  '#f97316'),
 		'bale'    => array('بله',    'bale_url',    'https://ble.ir/',     '#3b82f6'),
-		'rubika'  => array('روبیکا', 'rubika_url',  'https://rubika.ir/',  '#06b6d4'),
-		'soroush' => array('سروش',   'soroush_url', 'https://splus.ir/',   '#10b981'),
+		'rubika'  => array('روبیکا', 'rubika_url',  'https://rubika.ir/',       '#06b6d4'),
+		'igap'    => array('آی‌گپ',  'igap_url',    'https://profile.igap.net/', '#84cc16'),
+		'soroush' => array('سروش',   'soroush_url', 'https://splus.ir/',        '#10b981'),
 		'telegram'=> array('تلگرام', 'telegram_url', '',                   '#0ea5e9'),
 	);
 	$out = array();

@@ -113,7 +113,7 @@ $ee_channels = function_exists('evented_channel_links') ? evented_channel_links(
 			<div class="ee-follow-row">
 				<?php foreach ($ee_channels as $ee_ch) : ?>
 					<a class="ee-follow-dot" style="background:<?php echo esc_attr($ee_ch['color']); ?>;" href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" title="<?php echo esc_attr($ee_ch['label']); ?>">
-						<?php echo esc_html(mb_substr($ee_ch['label'], 0, 1)); ?>
+						<?php echo function_exists('evented_channel_icon_html') ? evented_channel_icon_html($ee_ch, 'ee-channel-icon-follow') : esc_html(mb_substr($ee_ch['label'], 0, 1)); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</a>
 				<?php endforeach; ?>
 			</div>

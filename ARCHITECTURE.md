@@ -260,7 +260,7 @@ flowchart TD
 
 قالب‌های صفحهٔ اصلی، تک‌نوشته، آرشیو/برگهٔ نوشته‌ها، جستجو، تک‌دوره، تک‌درس، تک‌آزمون،
 بایگانی/دستهٔ دوره، برگهٔ دوره‌ها/دسته‌ها، پروفایل مدرس، فهرست اساتید، برگهٔ عمومی، fallback
-و ۴۰۴ سند HTML کامل را خودشان چاپ می‌کنند (`get_header()`/`get_footer()` قدیمی را صدا نمی‌زنند)
+برگهٔ ویدئوها (`page-videos.php`) و ۴۰۴ سند HTML کامل را خودشان چاپ می‌کنند (`get_header()`/`get_footer()` قدیمی را صدا نمی‌زنند)
 و از قطعه‌های مشترک زیر استفاده می‌کنند. تنها استثناء `page-login.php`، `page-panel.php` و
 قالب‌های `panel/*` هستند که طراحی مستقل خودشان را دارند (`evented_is_standalone_page()`). صفحهٔ ورود CSS/JS خود را از `assets/css/login.css` و `assets/js/login.js` بارگذاری می‌کند و پیکربندی امن آن با `wp_json_encode` در صفحه قرار می‌گیرد.
 
@@ -284,7 +284,8 @@ flowchart TD
 فقط وقتی افزونهٔ شمسی‌ساز فعال نباشد)، `evented_post_date()`/`evented_post_time()`،
 `evented_reading_time()`، `evented_get_post_views()`/`evented_track_post_view()`
 (متای `evented_post_views`)، `evented_share_links()`/`evented_channel_links()` (فیلترپذیر) و
-`evented_related_posts()`. دیدگاه‌ها از `comments.php` قالب با لیبل‌های فارسی و
+`evented_related_posts()` و `evented_channel_icon_html()` (نشان‌های برند از `assets/images/social/`).
+منوی دسته‌ها در `inc/navigation.php` از تمام ترم‌های taxonomy درخت می‌سازد؛ count والد مجموع محتوای مستقیم و همهٔ descendants است و همان درخت به‌صورت عمق‌دار در منوی hover دسکتاپ و آکاردئون موبایل نمایش داده می‌شود. دیدگاه‌ها از `comments.php` قالب با لیبل‌های فارسی و
 `comment_form()` استایل‌خورده نمایش داده می‌شوند.
 
 ### ۵.۲ صفحهٔ دوره و درس (LMS)
@@ -335,7 +336,9 @@ flowchart TD
     EE -- yes --> SHELL["ee-shell.css + ee-home-js + وزیرمتن + Material Symbols"]
     SHELL --> B1{"is_front_page?"}
     B1 -- yes --> EEH["evented-home.css"]
-    B1 -- no --> B2{"is_singular post?"}
+    B1 -- no --> BV{"is_page_template page-videos.php?"}
+    BV -- yes --> VP["archive-post.css (گرید clip)"]
+    BV -- no --> B2{"is_singular post?"}
     B2 -- yes --> SPC["single-post.css"]
     B2 -- no --> B4{"is_singular sfwd-courses، sfwd-lessons، sfwd-topic یا sfwd-quiz?"}
     B4 -- yes --> LMSC["ee-lms.css + ee-lms.js + localize eeLms.ajax_url (+ ee-courses.css برای آزمون)"]

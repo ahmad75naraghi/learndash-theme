@@ -440,6 +440,12 @@ function evented_channel_links()
 			'color' => '#06b6d4',
 		),
 		array(
+			'key'   => 'igap',
+			'label' => 'آی‌گپ',
+			'url'   => 'https://profile.igap.net/' . $id,
+			'color' => '#84cc16',
+		),
+		array(
 			'key'   => 'soroush',
 			'label' => 'سروش',
 			'url'   => 'https://splus.ir/' . $id,
@@ -453,6 +459,38 @@ function evented_channel_links()
 	 * @param array $channels فهرست کانال‌ها.
 	 */
 	return (array) apply_filters('evented_channel_links', $channels);
+}
+
+/**
+ * نشان محلی و واقعی پیام‌رسان را برای هدر، فوتر و سایدبار می‌سازد.
+ *
+ * @param array  $channel دادهٔ خروجی evented_channel_links().
+ * @param string $class   کلاس اختیاری wrapper.
+ * @return string HTML امن یا رشتهٔ خالی برای کلید ناشناخته.
+ */
+function evented_channel_icon_html($channel, $class = '')
+{
+	$key = isset($channel['key']) ? sanitize_key($channel['key']) : '';
+	$assets = array(
+		'eitaa'   => 'eitaa.svg',
+		'bale'    => 'bale.svg',
+		'rubika'  => 'rubika.svg',
+		'igap'    => 'igap.png',
+		'soroush' => 'soroush.svg',
+	);
+	$classes = trim('ee-channel-icon ee-channel-icon-' . ($key ? $key : 'generic') . ' ' . sanitize_html_class($class));
+	$color   = isset($channel['color']) ? sanitize_hex_color($channel['color']) : '';
+	$style   = $color ? ' style="--ee-channel-color:' . esc_attr($color) . '"' : '';
+	if (!isset($assets[$key])) {
+		$label = isset($channel['label']) ? (string) $channel['label'] : '';
+		$first = function_exists('mb_substr') ? mb_substr($label, 0, 1) : substr($label, 0, 1);
+		return '<span class="' . esc_attr($classes . ' ee-channel-icon-fallback') . '"' . $style . ' aria-hidden="true">' . esc_html($first) . '</span>';
+	}
+
+	$src = get_template_directory_uri() . '/assets/images/social/' . $assets[$key];
+	return '<span class="' . esc_attr($classes) . '"' . $style . ' aria-hidden="true">'
+		. '<img src="' . esc_url($src) . '" alt="" width="20" height="20" decoding="async">'
+		. '</span>';
 }
 
 /**

@@ -40,6 +40,23 @@ $ee_today = function_exists('evented_today_label') ? evented_today_label() : dat
 
 /* پیام‌رسان‌ها (فیلتر evented_channel_links در template_helpers) */
 $ee_channels = function_exists('evented_channel_links') ? (array) evented_channel_links() : array();
+
+/* زیرمنوی درختی برای نمایش خوانا در دسکتاپ و موبایل به فهرست عمق‌دار تبدیل می‌شود. */
+$ee_flatten_children = static function ($children, $depth = 0) use (&$ee_flatten_children) {
+	$flat = array();
+	foreach ((array) $children as $child) {
+		if (empty($child['title']) || empty($child['url'])) {
+			continue;
+		}
+		$child['depth']        = (int) $depth;
+		$child['has_children'] = !empty($child['children']);
+		$flat[]                = $child;
+		if (!empty($child['children'])) {
+			$flat = array_merge($flat, $ee_flatten_children($child['children'], $depth + 1));
+		}
+	}
+	return $flat;
+};
 ?>
     <!-- ======= نوار ابزار بالایی (فقط دسکتاپ) ======= -->
     <div class="ee-topbar">
@@ -52,7 +69,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                 <span class="ee-tb-sep">|</span>
                 <span class="ee-tb-item"><span class="ee-tb-label">کانال‌های رسمی:</span></span>
                 <?php if (!empty($ee_channels)) : foreach ($ee_channels as $ee_ch) : ?>
-                    <a class="ee-tb-item" href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="color:<?php echo esc_attr($ee_ch['color']); ?>;font-weight:600;"><span class="dot" style="background:<?php echo esc_attr($ee_ch['color']); ?>;"></span><?php echo esc_html($ee_ch['label']); ?></a>
+                    <a class="ee-tb-item" href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="color:<?php echo esc_attr($ee_ch['color']); ?>;font-weight:600;"><?php echo function_exists('evented_channel_icon_html') ? evented_channel_icon_html($ee_ch, 'ee-channel-icon-topbar') : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php echo esc_html($ee_ch['label']); ?></a>
                 <?php endforeach; else : ?>
                     <a class="ee-tb-item ee-u-teal ee-u-b" href="<?php echo esc_url($ee_url_bale); ?>"><span class="dot ee-u-bg-green"></span>بله</a>
                     <a class="ee-tb-item ee-u-amber ee-u-b" href="<?php echo esc_url($ee_url_eitaa); ?>"><span class="dot ee-u-bg-amber"></span>ایتا</a>
@@ -164,9 +181,10 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                             </div>
                         <?php elseif ($ee_has_sub) : ?>
                             <div class="ee-sub" role="menu">
-                                <?php foreach ($ee_it['children'] as $ee_sub) : ?>
-                                    <a role="menuitem" href="<?php echo esc_url($ee_sub['url']); ?>">
-                                        <span><?php echo esc_html($ee_sub['title']); ?></span>
+                                <?php foreach ($ee_flatten_children($ee_it['children']) as $ee_sub) :
+                                    $ee_sub_depth = min(4, max(0, (int) $ee_sub['depth'])); ?>
+                                    <a class="ee-sub-depth-<?php echo (int) $ee_sub_depth; ?><?php echo !empty($ee_sub['has_children']) ? ' has-children' : ''; ?>" role="menuitem" href="<?php echo esc_url($ee_sub['url']); ?>">
+                                        <span><?php if ($ee_sub_depth > 0) : ?><svg class="ee-ic ee-sub-branch" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg><?php endif; ?><?php echo esc_html($ee_sub['title']); ?></span>
                                         <?php if (!empty($ee_sub['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $ee_sub['count'])); ?></small><?php endif; ?>
                                     </a>
                                 <?php endforeach; ?>
@@ -225,9 +243,10 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                     </div>
                     <?php if ($ee_has_sub) : ?>
                         <div class="ee-dn-sub" id="<?php echo esc_attr($ee_sub_id); ?>" hidden>
-                            <?php foreach ($ee_it['children'] as $ee_sub) : ?>
-                                <a href="<?php echo esc_url($ee_sub['url']); ?>">
-                                    <span><?php echo esc_html($ee_sub['title']); ?></span>
+                            <?php foreach ($ee_flatten_children($ee_it['children']) as $ee_sub) :
+                                $ee_sub_depth = min(4, max(0, (int) $ee_sub['depth'])); ?>
+                                <a class="ee-sub-depth-<?php echo (int) $ee_sub_depth; ?><?php echo !empty($ee_sub['has_children']) ? ' has-children' : ''; ?>" href="<?php echo esc_url($ee_sub['url']); ?>">
+                                    <span><?php if ($ee_sub_depth > 0) : ?><svg class="ee-ic ee-sub-branch" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg><?php endif; ?><?php echo esc_html($ee_sub['title']); ?></span>
                                     <?php if (!empty($ee_sub['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $ee_sub['count'])); ?></small><?php endif; ?>
                                 </a>
                             <?php endforeach; ?>
@@ -243,7 +262,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                 <span class="ee-drawer-foot-label">کانال‌های رسمی</span>
                 <div class="ee-drawer-chans">
                     <?php foreach ($ee_channels as $ee_ch) : ?>
-                        <a href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="--c:<?php echo esc_attr($ee_ch['color']); ?>;"><span class="dot"></span><?php echo esc_html($ee_ch['label']); ?></a>
+                        <a href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="--c:<?php echo esc_attr($ee_ch['color']); ?>;"><?php echo function_exists('evented_channel_icon_html') ? evented_channel_icon_html($ee_ch, 'ee-channel-icon-drawer') : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php echo esc_html($ee_ch['label']); ?></a>
                     <?php endforeach; ?>
                 </div>
             </div>
