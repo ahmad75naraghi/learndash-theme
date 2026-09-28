@@ -46,7 +46,7 @@ elif [[ -n "${SMOKE_USERNAME:-}" && -n "${SMOKE_PASSWORD:-}" ]]; then
 		--data-urlencode "log=$SMOKE_USERNAME" --data-urlencode "pwd=$SMOKE_PASSWORD" \
 		--data-urlencode 'wp-submit=Log In' --data-urlencode "redirect_to=$base/wp-admin/" \
 		--data-urlencode 'testcookie=1' "$base/wp-login.php" -o "$tmp/login.html"
-	grep -Fq 'wp-admin-bar-my-account' "$tmp/login.html" || fail 'explicit WordPress login failed'
+	grep -Fq 'wordpress_logged_in_' "$cookie" || fail 'explicit WordPress login failed'
 fi
 
 # درخواست اول cookie ورود خودکار Playground را می‌گیرد؛ روی staging باید cookie معتبر فراهم باشد.
