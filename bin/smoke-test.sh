@@ -35,8 +35,12 @@ reject_text() {
 	if grep -Fq "$2" "$1"; then fail "$3"; fi
 }
 
-# CI با ورود صریح پایدار است؛ بدون credential از auto-login خود Playground استفاده می‌شود.
-if [[ -n "${SMOKE_USERNAME:-}" && -n "${SMOKE_PASSWORD:-}" ]]; then
+# در CI ابتدا auto-login خود Playground را کامل می‌کنیم؛ staging می‌تواند credential صریح بدهد.
+if [[ "${SMOKE_PLAYGROUND_AUTO_LOGIN:-0}" == 1 ]]; then
+	curl -sS --max-time 30 --max-redirs 10 -L -c "$cookie" -b "$cookie" \
+		"$base/wp-admin/" -o "$tmp/login.html"
+	grep -Fq 'wp-admin-bar-my-account' "$tmp/login.html" || fail 'Playground auto-login failed'
+elif [[ -n "${SMOKE_USERNAME:-}" && -n "${SMOKE_PASSWORD:-}" ]]; then
 	curl -sS --max-time 30 -c "$cookie" "$base/wp-login.php" -o /dev/null
 	curl -sS --max-time 30 --max-redirs 10 -L -c "$cookie" -b "$cookie" \
 		--data-urlencode "log=$SMOKE_USERNAME" --data-urlencode "pwd=$SMOKE_PASSWORD" \
