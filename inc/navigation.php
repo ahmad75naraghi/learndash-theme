@@ -472,6 +472,7 @@ function evented_nav_flush_cache($tabs_too = true)
 function evented_flush_course_caches() {
 	delete_transient('evented_home_course_tabs');
 	delete_transient('evented_nav_course_mega');
+	delete_transient('evented_nav_course_mega_v2');
 }
 add_action('save_post_sfwd-courses', 'evented_flush_course_caches');
 add_action('deleted_post', function ($post_id) {
@@ -484,7 +485,7 @@ add_action('set_object_terms', function ($object_id) {
 });
 
 /**
- * دادهٔ مگامنوی «دوره‌ها»: هر دستهٔ دوره یک تب با حداکثر ۴ دوره (کش ۱۲ ساعته).
+ * دادهٔ مگامنوی «دوره‌ها»: هر دسته یک تب با حداکثر ۸ دوره در دو ردیف چهارتایی (کش ۱۲ ساعته).
  *
  * @return array<int,array{id:int,name:string,url:string,count:int,courses:array}>
  */
@@ -493,7 +494,8 @@ function evented_nav_course_mega()
 	if (!post_type_exists('sfwd-courses') || !taxonomy_exists('ld_course_category')) {
 		return array();
 	}
-	$cached = get_transient('evented_nav_course_mega');
+	$cache_key = 'evented_nav_course_mega_v2';
+	$cached    = get_transient($cache_key);
 	if (is_array($cached)) {
 		return $cached;
 	}
@@ -506,7 +508,7 @@ function evented_nav_course_mega()
 				continue;
 			}
 			$q = new WP_Query(array(
-				'post_type' => 'sfwd-courses', 'posts_per_page' => 4, 'no_found_rows' => true, 'ignore_sticky_posts' => true,
+				'post_type' => 'sfwd-courses', 'posts_per_page' => 8, 'no_found_rows' => true, 'ignore_sticky_posts' => true,
 				'tax_query' => array(array('taxonomy' => 'ld_course_category', 'field' => 'term_id', 'terms' => (int) $term->term_id)),
 			));
 			$courses = array();
@@ -533,7 +535,7 @@ function evented_nav_course_mega()
 			$tabs[] = array('id' => (int) $term->term_id, 'name' => (string) $term->name, 'url' => (string) $link, 'count' => (int) $term->count, 'courses' => $courses);
 		}
 	}
-	set_transient('evented_nav_course_mega', $tabs, 12 * HOUR_IN_SECONDS);
+	set_transient($cache_key, $tabs, 12 * HOUR_IN_SECONDS);
 	return $tabs;
 }
 
