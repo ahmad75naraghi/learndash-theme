@@ -12,7 +12,11 @@ cookie="$tmp/cookies.txt"
 failures=0
 requests=0
 
-fail() { printf 'FAIL: %s\n' "$*" >&2; failures=$((failures + 1)); }
+fail() {
+	printf 'FAIL: %s\n' "$*" >&2
+	if [[ "${GITHUB_ACTIONS:-}" == true ]]; then printf '::error title=WordPress smoke::%s\n' "$*"; fi
+	failures=$((failures + 1))
+}
 fetch() {
 	local path="$1" out="$2" code
 	code=$(curl -sS --max-time 30 --max-redirs 10 -c "$cookie" -b "$cookie" -L -o "$out" -w '%{http_code}' "$base$path") || {
