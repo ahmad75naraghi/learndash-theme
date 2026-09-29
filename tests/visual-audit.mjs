@@ -92,12 +92,12 @@ try {
         let response;
         // Playground occasionally restarts its lone PHP worker under the full 92-page audit.
         // Retry transient gateway failures, while keeping real route/application failures visible.
-        for (let attempt = 0; attempt < 3; attempt++) {
+        for (let attempt = 0; attempt < 5; attempt++) {
           response = await page.goto(`${base}${route}`, { waitUntil: 'load', timeout: 30_000 });
-          if (!response || ![502, 503, 504].includes(response.status()) || attempt === 2) break;
+          if (!response || ![500, 502, 503, 504].includes(response.status()) || attempt === 4) break;
           responseErrors.length = 0;
           consoleErrors.length = 0;
-          await page.waitForTimeout(750 * (attempt + 1));
+          await page.waitForTimeout(1_000 * (attempt + 1));
         }
         if (!response || response.status() >= 400 && slug !== 'not-found') {
           report('failure', viewportName, route, `HTTP ${response?.status() ?? 'no response'}`);
