@@ -99,7 +99,8 @@ try {
               const imageAlt = el.querySelector?.('img[alt]')?.getAttribute('alt')?.trim();
               const labelled = el.getAttribute('aria-labelledby');
               return !name && !imageAlt && !labelled;
-            }).length;
+            })
+            .map(el => `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${el.className && typeof el.className === 'string' ? `.${el.className.trim().split(/\\s+/).join('.')}` : ''}${el.getAttribute('href') ? `[href=${el.getAttribute('href')}]` : ''}`);
           const escaped = [...document.querySelectorAll('input, select, textarea, table')]
             .filter(el => el.offsetParent !== null)
             .filter(el => {
@@ -126,7 +127,7 @@ try {
         if (metrics.escaped) report('failure', viewportName, route, `${metrics.escaped} form/table element(s) escape viewport`);
         if (!metrics.title) report('failure', viewportName, route, 'document title is empty');
         if (!metrics.main) report('warning', viewportName, route, 'semantic main landmark is missing');
-        if (metrics.unnamed) report('warning', viewportName, route, `${metrics.unnamed} visible interactive element(s) have no accessible name`);
+        if (metrics.unnamed.length) report('warning', viewportName, route, `interactive elements without accessible names: ${metrics.unnamed.slice(0, 8).join(', ')}`);
         if (responseErrors.length) report('failure', viewportName, route, `local resource errors: ${[...new Set(responseErrors)].join(', ')}`);
         if (consoleErrors.length) report('failure', viewportName, route, `browser errors: ${[...new Set(consoleErrors)].slice(0, 3).join(' | ')}`);
 
