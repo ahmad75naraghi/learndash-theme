@@ -19,16 +19,19 @@ trap cleanup EXIT
 bash "$root/bin/build-theme-release.sh" "$package"
 cp "$root/tests/wp-theme-update-integration.php" "$runner"
 
+# ممیزی مرورگر می‌تواند worker تکی Playground را موقتاً restart کند؛ درخواست‌های مقدماتی retry می‌شوند.
+curl_retry=(--retry 5 --retry-delay 2 --retry-all-errors)
+
 # روی CI ورود صریح و در توسعه cookie ورود خودکار Playground؛ سپس nonce واقعی تنظیمات قالب.
 if [[ -n "${SMOKE_USERNAME:-}" && -n "${SMOKE_PASSWORD:-}" ]]; then
-	curl -sS --max-time 30 -c "$cookie" "$base/wp-login.php" -o /dev/null
-	curl -sS --max-time 30 --max-redirs 10 -L -c "$cookie" -b "$cookie" \
+	curl -sS "${curl_retry[@]}" --max-time 30 -c "$cookie" "$base/wp-login.php" -o /dev/null
+	curl -sS "${curl_retry[@]}" --max-time 30 --max-redirs 10 -L -c "$cookie" -b "$cookie" \
 		--data-urlencode "log=$SMOKE_USERNAME" --data-urlencode "pwd=$SMOKE_PASSWORD" \
 		--data-urlencode 'wp-submit=Log In' --data-urlencode "redirect_to=$base/wp-admin/" \
 		--data-urlencode 'testcookie=1' "$base/wp-login.php" -o /dev/null
 	grep -Fq 'wordpress_logged_in_' "$cookie" || { echo 'Explicit WordPress login failed.' >&2; exit 1; }
 fi
-curl -sS --max-time 30 --max-redirs 10 -c "$cookie" -b "$cookie" -L "$base/wp-admin/admin.php?page=evented-theme-settings" -o "$response"
+curl -sS "${curl_retry[@]}" --max-time 30 --max-redirs 10 -c "$cookie" -b "$cookie" -L "$base/wp-admin/admin.php?page=evented-theme-settings" -o "$response"
 nonce=$(python3 - "$response" <<'PY'
 import html, re, sys
 text = html.unescape(open(sys.argv[1], encoding='utf-8').read())
