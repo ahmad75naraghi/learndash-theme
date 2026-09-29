@@ -36,7 +36,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                         </span>
                     </div>
                     <div class="input-wrapper is-locked">
-                        <input type="text" class="form-control" value="<?php echo esc_attr($current_user->user_login); ?>" dir="ltr" readonly aria-readonly="true">
+                        <input type="text" class="form-control" value="<?php echo esc_attr($current_user->user_login); ?>" dir="ltr" readonly aria-readonly="true" aria-label="شماره همراه">
                         <svg class="ee-ic icon-lock" aria-hidden="true" focusable="false"><use href="#i-lock"></use></svg>
                     </div>
                     <div class="input-hint">شماره همراه شناسهٔ ورود شماست و قابل تغییر نیست.</div>
@@ -54,7 +54,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                         <?php endif; ?>
                     </div>
                     <div class="input-wrapper">
-                        <input type="email" id="eeEmailView" class="form-control email-input" value="<?php echo esc_attr($user_email); ?>" dir="ltr" placeholder="هنوز ایمیلی ثبت نشده" readonly>
+                        <input type="email" id="eeEmailView" class="form-control email-input" value="<?php echo esc_attr($user_email); ?>" dir="ltr" placeholder="هنوز ایمیلی ثبت نشده" readonly aria-label="آدرس ایمیل">
                         <button type="button" class="icon-edit ee-edit-btn" data-ee-modal-open="eeEmailModal" aria-label="ویرایش ایمیل" title="ویرایش ایمیل"><?php echo $ee_pencil; // phpcs:ignore ?></button>
                     </div>
                     <div class="input-hint">برای <?php echo $user_email ? 'تغییر' : 'افزودن'; ?> ایمیل روی مداد بزنید.</div>

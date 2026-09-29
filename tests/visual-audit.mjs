@@ -98,7 +98,8 @@ try {
               const name = (el.getAttribute('aria-label') || el.getAttribute('title') || el.textContent || '').trim();
               const imageAlt = el.querySelector?.('img[alt]')?.getAttribute('alt')?.trim();
               const labelled = el.getAttribute('aria-labelledby');
-              return !name && !imageAlt && !labelled;
+              const htmlLabel = el.labels && [...el.labels].some(label => label.textContent.trim());
+              return !name && !imageAlt && !labelled && !htmlLabel;
             })
             .map(el => `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${el.className && typeof el.className === 'string' ? `.${el.className.trim().split(/\\s+/).join('.')}` : ''}${el.getAttribute('href') ? `[href=${el.getAttribute('href')}]` : ''}`);
           const escaped = [...document.querySelectorAll('input, select, textarea, table')]

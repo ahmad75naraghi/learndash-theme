@@ -566,7 +566,7 @@ if (!empty($ee_feature_slides[0]['img'])) {
                 $ee_pcat_name = $ee_pcat ? $ee_pcat[0]->name : 'مقالات';
             ?>
                 <article class="ee-art-card">
-                    <a class="art-thumb" href="<?php echo esc_url(get_permalink($a)); ?>">
+                    <a class="art-thumb" href="<?php echo esc_url(get_permalink($a)); ?>" aria-label="<?php echo esc_attr(sprintf(__('مشاهده مقاله: %s', 'evented-edu'), get_the_title($a))); ?>">
                         <?php if (has_post_thumbnail($a)) : ?>
                             <img src="<?php echo esc_url(get_the_post_thumbnail_url($a, 'medium')); ?>" alt="<?php echo esc_attr(get_the_title($a)); ?>" loading="lazy">
                         <?php else : ?>
