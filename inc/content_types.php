@@ -134,6 +134,11 @@ function evented_register_migrated_content_types()
 			));
 		}
 
+		/* متای ثبت‌شدهٔ پلی‌لیست باید در REST و ویرایشگر Gutenberg در دسترس باشد. */
+		if ('clip' === $post_type && !post_type_supports('clip', 'custom-fields')) {
+			add_post_type_support('clip', 'custom-fields');
+		}
+
 		/* وقتی CPT UI فعال است، association ثبت‌شدهٔ همان افزونه حفظ/تکمیل می‌شود. */
 		foreach ($config['taxonomies'] as $taxonomy) {
 			if (taxonomy_exists($taxonomy)) {

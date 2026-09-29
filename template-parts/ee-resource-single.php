@@ -110,7 +110,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 					<section class="ee-resource-data" aria-labelledby="eeResourceDataTitle">
 						<header class="ee-resource-data-head">
 							<span class="ee-resource-data-icon"><svg class="ee-ic" aria-hidden="true"><use href="#i-smart_display"></use></svg></span>
-							<div><h2 id="eeResourceDataTitle"><?php esc_html_e('پخش ویدئو', 'evented-edu'); ?></h2><p><?php esc_html_e('قسمت موردنظر را از فهرست پخش انتخاب کنید.', 'evented-edu'); ?></p></div>
+							<div><h2 id="eeResourceDataTitle"><?php esc_html_e('پخش ویدئو', 'evented-edu'); ?></h2><p><?php echo esc_html($ee_video_playlist ? __('قسمت موردنظر را از فهرست پخش انتخاب کنید.', 'evented-edu') : __('فایل‌ها و اطلاعات بازیابی‌شدهٔ این ویدئو', 'evented-edu')); ?></p></div>
 						</header>
 
 						<?php if ($ee_primary_video) : ?>
@@ -138,8 +138,8 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 												<a href="<?php echo esc_url($ee_video_item['url']); ?>" target="_blank" rel="noopener nofollow">
 											<?php endif; ?>
 												<span class="ee-resource-playlist-number"><?php echo esc_html(number_format_i18n($ee_video_index + 1)); ?></span>
-												<?php if ($ee_video_item['poster']) : ?><img src="<?php echo esc_url($ee_video_item['poster']); ?>" alt="" loading="lazy" decoding="async"><?php endif; ?>
-												<strong><?php echo esc_html($ee_video_item['title']); ?></strong>
+												<?php if ($ee_video_item['poster']) : ?><img src="<?php echo esc_url($ee_video_item['poster']); ?>" alt="" loading="lazy" decoding="async"><?php else : ?><span class="ee-resource-playlist-placeholder" aria-hidden="true"><svg class="ee-ic"><use href="#i-smart_display"></use></svg></span><?php endif; ?>
+												<span class="ee-resource-playlist-copy"><strong><?php echo esc_html($ee_video_item['title']); ?></strong><?php if ($ee_video_item['description']) : ?><small><?php echo esc_html($ee_video_item['description']); ?></small><?php endif; ?></span>
 												<svg class="ee-ic" aria-hidden="true"><use href="#i-<?php echo $ee_video_item['direct'] ? 'play_arrow' : 'open_in_new'; ?>"></use></svg>
 											<?php echo $ee_video_item['direct'] ? '</button>' : '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 										</li>
@@ -148,7 +148,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 							</section>
 						<?php endif; ?>
 
-						<?php if (!empty($ee_resource_urls)) : ?>
+						<?php if (empty($ee_video_playlist) && !empty($ee_resource_urls)) : ?>
 							<div class="ee-resource-media-links">
 								<h3><?php esc_html_e('لینک‌های رسانه‌ای پیدا‌شده', 'evented-edu'); ?></h3>
 								<div class="ee-resource-media-grid">
@@ -168,6 +168,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 							</div>
 						<?php endif; ?>
 
+						<?php if (empty($ee_video_playlist)) : ?>
 						<details class="ee-resource-meta-details">
 							<summary><span><?php esc_html_e('اطلاعات فنی تکمیلی', 'evented-edu'); ?></span><small><?php echo esc_html(number_format_i18n(count($ee_resource_meta))); ?></small><svg class="ee-ic" aria-hidden="true"><use href="#i-expand_more"></use></svg></summary>
 							<?php if (!empty($ee_resource_meta)) : ?>
@@ -187,6 +188,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 								<p class="ee-empty-inline"><?php esc_html_e('برای این ویدئو متای قابل‌نمایشی ذخیره نشده است.', 'evented-edu'); ?></p>
 							<?php endif; ?>
 						</details>
+						<?php endif; ?>
 					</section>
 				<?php endif; ?>
 

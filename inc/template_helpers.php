@@ -1306,7 +1306,7 @@ function evented_resource_meta_urls($value)
  * بنابراین اجرای Elementor برای حفظ و نمایش داده‌های قبلی لازم نیست.
  *
  * @param int $post_id شناسهٔ ویدئو.
- * @return array<int,array{title:string,url:string,poster:string,direct:bool}>
+ * @return array<int,array{title:string,description:string,url:string,poster:string,thumbnail_id:int,direct:bool}>
  */
 function evented_clip_playlist($post_id)
 {
@@ -1317,7 +1317,7 @@ function evented_clip_playlist($post_id)
 		}
 		$external = isset($row['external_url']) && is_array($row['external_url']) ? $row['external_url'] : array();
 		$hosted   = isset($row['hosted_url']) && is_array($row['hosted_url']) ? $row['hosted_url'] : array();
-		$url      = (string) ($external['url'] ?? $hosted['url'] ?? $row['url'] ?? '');
+		$url      = (string) ($external['url'] ?? $hosted['url'] ?? $row['video_url'] ?? $row['url'] ?? '');
 		if ('' === $url) {
 			$type = isset($row['type']) ? sanitize_key($row['type']) : '';
 			$url  = 'youtube' === $type ? (string) ($row['youtube_url'] ?? '') : ('vimeo' === $type ? (string) ($row['vimeo_url'] ?? '') : '');
@@ -1327,13 +1327,19 @@ function evented_clip_playlist($post_id)
 			return;
 		}
 		$thumbnail = isset($row['thumbnail']) && is_array($row['thumbnail']) ? $row['thumbnail'] : array();
-		$poster    = esc_url_raw((string) ($thumbnail['url'] ?? $row['poster'] ?? ''));
+		$poster    = esc_url_raw((string) ($thumbnail['url'] ?? $row['thumbnail_url'] ?? $row['poster'] ?? ''));
+		if (!empty($row['thumbnail_id'])) {
+			$attachment_poster = wp_get_attachment_image_url(absint($row['thumbnail_id']), 'medium_large');
+			$poster = $attachment_poster ?: $poster;
+		}
 		$path      = (string) wp_parse_url($url, PHP_URL_PATH);
 		$items[]   = array(
-			'title'  => sanitize_text_field((string) ($row['title'] ?? '')),
-			'url'    => $url,
-			'poster' => $poster,
-			'direct' => (bool) preg_match('/\.(?:mp4|webm|ogv|ogg|m3u8)$/i', $path),
+			'title'       => sanitize_text_field((string) ($row['title'] ?? '')),
+			'description' => sanitize_textarea_field((string) ($row['description'] ?? '')),
+			'url'         => $url,
+			'poster'      => $poster,
+			'thumbnail_id'=> absint($thumbnail['id'] ?? $row['thumbnail_id'] ?? 0),
+			'direct'      => (bool) preg_match('/\.(?:mp4|webm|ogv|ogg|m3u8)$/i', $path),
 		);
 	};
 	$walk = static function ($node) use (&$walk, $add) {
@@ -1352,14 +1358,42 @@ function evented_clip_playlist($post_id)
 		}
 	};
 
-	foreach ((array) get_post_meta((int) $post_id, '_elementor_data', false) as $raw) {
-		$data = is_string($raw) ? json_decode($raw, true) : $raw;
-		if (is_array($data)) {
-			$walk($data);
+	$canonical = defined('EVENTED_VIDEO_PLAYLIST_META') ? get_post_meta((int) $post_id, EVENTED_VIDEO_PLAYLIST_META, true) : array();
+	if (is_array($canonical) && !empty($canonical)) {
+		foreach ($canonical as $row) {
+			$add($row);
 		}
-	}
-	foreach ((array) get_post_meta((int) $post_id, 'clip_playlist', true) as $row) {
-		$add($row);
+	} else {
+		foreach ((array) get_post_meta((int) $post_id, '_elementor_data', false) as $raw) {
+			$data = is_string($raw) ? json_decode($raw, true) : $raw;
+			if (is_array($data)) {
+				$walk($data);
+			}
+		}
+		foreach ((array) get_post_meta((int) $post_id, 'clip_playlist', true) as $row) {
+			$add($row);
+		}
+		/* آخرین fallback: URLهای مستقیم پراکنده نیز به یک پلی‌لیست استاندارد تبدیل‌پذیرند. */
+		if (!$items && function_exists('evented_resource_public_meta')) {
+			$legacy_urls = array();
+			foreach (evented_resource_public_meta((int) $post_id) as $meta_row) {
+				$legacy_urls = array_merge($legacy_urls, (array) $meta_row['urls']);
+			}
+			$legacy_urls = array_values(array_unique($legacy_urls));
+			$direct_index = 0;
+			foreach ($legacy_urls as $legacy_url) {
+				$legacy_path = (string) wp_parse_url($legacy_url, PHP_URL_PATH);
+				if (!preg_match('/\.(?:mp4|webm|ogv|ogg|m3u8)$/i', $legacy_path)) {
+					continue;
+				}
+				$add(array(
+					'title' => 0 === $direct_index ? get_the_title((int) $post_id) : sprintf(__('قسمت %s', 'evented-edu'), number_format_i18n($direct_index + 1)),
+					'url' => $legacy_url,
+					'thumbnail_id' => get_post_thumbnail_id((int) $post_id),
+				));
+				$direct_index++;
+			}
+		}
 	}
 	foreach ($items as $index => &$item) {
 		if ('' === $item['title']) {

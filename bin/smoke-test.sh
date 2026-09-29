@@ -77,19 +77,67 @@ fetch '/wp-json/wp/v2/types/clip' "$tmp/clip-rest-type.json"
 require_text "$tmp/clip-rest-type.json" '"slug":"clip"' 'clip REST type is missing'
 reject_text "$tmp/clip-rest-type.json" 'wpdmcategory' 'clip remains associated with the library category taxonomy'
 reject_text "$tmp/clip-rest-type.json" 'wpdmtag' 'clip remains associated with the library tag taxonomy'
+fetch '/wp-json/wp/v2/clip?slug=clip-item-1' "$tmp/clip-rest-item.json"
+require_text "$tmp/clip-rest-item.json" '"_evented_video_playlist"' 'canonical video playlist meta is missing from Gutenberg REST data'
+clip_id=$(python3 - "$tmp/clip-rest-item.json" <<'PY'
+import json, sys
+rows = json.load(open(sys.argv[1], encoding='utf-8'))
+print(rows[0]['id'] if rows else '')
+PY
+)
+if [[ -n "$clip_id" ]]; then
+	fetch "/wp-admin/post.php?post=$clip_id&action=edit" "$tmp/clip-editor.html"
+	require_text "$tmp/clip-editor.html" 'data-ee-video-editor' 'Gutenberg video playlist editor is missing'
+	require_text "$tmp/clip-editor.html" 'data-ee-video-add' 'video add button is missing from the editor'
+	require_text "$tmp/clip-editor.html" 'video-playlist.js?ver=1.0.0' 'video editor behavior was not enqueued'
+	require_text "$tmp/clip-editor.html" 'دشمن شناسی عاشورا ۲' 'legacy Elementor items were not prefilled in the editor'
+else
+	fail 'clip fixture ID was not returned by REST'
+fi
+fetch '/wp-admin/edit.php?post_type=clip&page=evented-video-migration' "$tmp/video-migration.html"
+require_text "$tmp/video-migration.html" 'شروع یکپارچه‌سازی امن' 'video migration tool is missing'
+migration_nonce=$(python3 - "$tmp/video-migration.html" <<'PY'
+from html.parser import HTMLParser
+import sys
+class NonceParser(HTMLParser):
+    value = ''
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == 'input' and attrs.get('name') == '_wpnonce': self.value = attrs.get('value', '')
+p = NonceParser(); p.feed(open(sys.argv[1], encoding='utf-8').read()); print(p.value)
+PY
+)
+if [[ -n "$migration_nonce" ]]; then
+	code=$(curl -sS --max-time 60 --max-redirs 10 -c "$cookie" -b "$cookie" -L \
+		--data-urlencode "_wpnonce=$migration_nonce" --data-urlencode 'evented_migrate_video_playlists=1' \
+		-o "$tmp/video-migration-result.html" -w '%{http_code}' "$base/wp-admin/edit.php?post_type=clip&page=evented-video-migration") || code=000
+	requests=$((requests + 1))
+	[[ "$code" == 200 ]] || fail "video migration returned HTTP $code"
+	if ! grep -Eq 'منتقل‌شده: 1|قبلاً استاندارد: 1' "$tmp/video-migration-result.html"; then fail 'legacy playlist was not migrated to the canonical meta'; fi
+	fetch '/wp-json/wp/v2/clip?slug=clip-item-1' "$tmp/clip-rest-migrated.json"
+	if ! python3 - "$tmp/clip-rest-migrated.json" <<'PY'
+import json, sys
+rows = json.load(open(sys.argv[1], encoding='utf-8'))
+playlist = rows[0].get('meta', {}).get('_evented_video_playlist', []) if rows else []
+raise SystemExit(0 if any(item.get('title') == 'دشمن شناسی عاشورا ۲' for item in playlist) else 1)
+PY
+	then fail 'migrated playlist is missing from REST meta'; fi
+else
+	fail 'video migration nonce is missing'
+fi
 require_text "$tmp/resource-lib-lib-item-1-.html" 'ee-resource-single' 'library single template did not render'
 require_text "$tmp/resource-clip-clip-item-1-.html" 'ee-resource-single' 'video single template did not render'
 reject_text "$tmp/resource-clip-clip-item-1-.html" 'class="ee-meta-cat"' 'video single must not render a taxonomy category'
 reject_text "$tmp/resource-clip-.html" 'class="ee-arch-chips"' 'video archive inherited library taxonomy filters'
 require_text "$tmp/resource-lib-.html" 'منابع کتابخانه' 'library taxonomy fixture did not render'
 require_text "$tmp/resource-clip-clip-item-1-.html" 'class="ee-resource-data"' 'video metadata section did not render'
-require_text "$tmp/resource-clip-clip-item-1-.html" '<code dir="ltr">_video_url</code>' 'legacy video meta key is missing'
+reject_text "$tmp/resource-clip-clip-item-1-.html" '<code dir="ltr">_video_url</code>' 'technical video meta should not be shown beside a recovered playlist'
 require_text "$tmp/resource-clip-clip-item-1-.html" '/wp-content/uploads/video-1.mp4' 'video URL was not recovered from post meta'
 require_text "$tmp/resource-clip-clip-item-1-.html" 'class="ee-resource-video-player"' 'direct video URL did not render a player'
 require_text "$tmp/resource-clip-clip-item-1-.html" 'class="ee-resource-playlist"' 'Elementor video playlist was not recovered'
 require_text "$tmp/resource-clip-clip-item-1-.html" 'دشمن شناسی عاشورا ۲' 'Elementor playlist titles are missing'
-require_text "$tmp/resource-clip-clip-item-1-.html" 'resource-video.js?ver=1.0.0' 'video playlist behavior was not enqueued'
-require_text "$tmp/resource-clip-clip-item-1-.html" 'clip_playlist' 'nested playlist metadata is missing'
+require_text "$tmp/resource-clip-clip-item-1-.html" 'resource-video.js?ver=1.1.0' 'video playlist behavior was not enqueued'
+reject_text "$tmp/resource-clip-clip-item-1-.html" 'clip_playlist' 'raw legacy playlist metadata must not be shown publicly'
 reject_text "$tmp/resource-clip-clip-item-1-.html" '_elementor_data' 'raw Elementor JSON must not be publicly rendered'
 reject_text "$tmp/resource-clip-clip-item-1-.html" '_edit_lock' 'internal editing metadata must not be publicly rendered'
 reject_text "$tmp/resource-clip-clip-item-1-.html" 'must-not-be-public' 'sensitive video metadata leaked publicly'
