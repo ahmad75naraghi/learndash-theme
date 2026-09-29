@@ -90,7 +90,17 @@ try {
         if (route.startsWith('/panel')) {
           const helpButton = page.locator('[data-ee-panel-help]');
           if (await helpButton.count()) {
-            await helpButton.click();
+            const clickability = await helpButton.evaluate(button => {
+              button.scrollIntoView({ block: 'center', inline: 'center' });
+              const rect = button.getBoundingClientRect();
+              const top = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+              return {
+                clear: top === button || button.contains(top),
+                blocker: top ? `${top.tagName.toLowerCase()}${top.id ? `#${top.id}` : ''}${typeof top.className === 'string' && top.className ? `.${top.className.trim().split(/\\s+/).join('.')}` : ''}` : 'unknown',
+              };
+            });
+            if (!clickability.clear) report('failure', viewportName, route, `section help is covered by ${clickability.blocker}`);
+            await helpButton.evaluate(button => button.click());
             const helpId = await helpButton.getAttribute('aria-controls');
             const helpState = await page.locator(`#${helpId}`).evaluate(el => ({ hidden: el.hidden, text: el.textContent.trim() }));
             if (helpState.hidden || !helpState.text || await helpButton.getAttribute('aria-expanded') !== 'true') {
