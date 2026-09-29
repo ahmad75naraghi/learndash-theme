@@ -34,13 +34,27 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 		$ee_original_image = $ee_thumb_id && function_exists('wp_get_original_image_url') ? wp_get_original_image_url($ee_thumb_id) : '';
 		if ($ee_thumb_id && !$ee_original_image) { $ee_original_image = wp_get_attachment_image_url($ee_thumb_id, 'full'); }
 		$ee_resource_meta = $ee_show_meta && function_exists('evented_resource_public_meta') ? evented_resource_public_meta($ee_id) : array();
+		$ee_video_playlist = 'clip' === $ee_type && function_exists('evented_clip_playlist') ? evented_clip_playlist($ee_id) : array();
 		$ee_resource_urls = array();
 		foreach ($ee_resource_meta as $ee_meta_row) { $ee_resource_urls = array_merge($ee_resource_urls, (array) $ee_meta_row['urls']); }
+		foreach ($ee_video_playlist as $ee_video_item) { $ee_resource_urls[] = $ee_video_item['url']; }
 		$ee_resource_urls = array_values(array_unique($ee_resource_urls));
 		$ee_primary_video = '';
-		foreach ($ee_resource_urls as $ee_resource_url) {
-			$ee_media_path = (string) wp_parse_url($ee_resource_url, PHP_URL_PATH);
-			if (preg_match('/\.(?:mp4|webm|ogv|ogg|m3u8)$/i', $ee_media_path)) { $ee_primary_video = $ee_resource_url; break; }
+		$ee_primary_poster = has_post_thumbnail() ? (string) get_the_post_thumbnail_url($ee_id, 'large') : '';
+		$ee_primary_title = get_the_title();
+		foreach ($ee_video_playlist as $ee_video_item) {
+			if (!empty($ee_video_item['direct'])) {
+				$ee_primary_video = $ee_video_item['url'];
+				$ee_primary_poster = $ee_video_item['poster'] ?: $ee_primary_poster;
+				$ee_primary_title = $ee_video_item['title'];
+				break;
+			}
+		}
+		if (!$ee_primary_video) {
+			foreach ($ee_resource_urls as $ee_resource_url) {
+				$ee_media_path = (string) wp_parse_url($ee_resource_url, PHP_URL_PATH);
+				if (preg_match('/\.(?:mp4|webm|ogv|ogg|m3u8)$/i', $ee_media_path)) { $ee_primary_video = $ee_resource_url; break; }
+			}
 		}
 		$ee_related_args = array(
 			'post_type' => $ee_type, 'post_status' => 'publish', 'posts_per_page' => 4, 'post__not_in' => array($ee_id),
@@ -96,16 +110,42 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 					<section class="ee-resource-data" aria-labelledby="eeResourceDataTitle">
 						<header class="ee-resource-data-head">
 							<span class="ee-resource-data-icon"><svg class="ee-ic" aria-hidden="true"><use href="#i-smart_display"></use></svg></span>
-							<div><h2 id="eeResourceDataTitle"><?php esc_html_e('اطلاعات و فایل‌های ویدئو', 'evented-edu'); ?></h2><p><?php esc_html_e('لینک‌های رسانه و تمام داده‌های ذخیره‌شدهٔ این ویدئو', 'evented-edu'); ?></p></div>
+							<div><h2 id="eeResourceDataTitle"><?php esc_html_e('پخش ویدئو', 'evented-edu'); ?></h2><p><?php esc_html_e('قسمت موردنظر را از فهرست پخش انتخاب کنید.', 'evented-edu'); ?></p></div>
 						</header>
 
 						<?php if ($ee_primary_video) : ?>
-							<div class="ee-resource-video-player">
-								<video controls preload="metadata"<?php echo has_post_thumbnail() ? ' poster="' . esc_url(get_the_post_thumbnail_url($ee_id, 'large')) . '"' : ''; ?>>
+							<div class="ee-resource-video-player" data-ee-video-player>
+								<video controls preload="metadata" playsinline<?php echo $ee_primary_poster ? ' poster="' . esc_url($ee_primary_poster) . '"' : ''; ?>>
 									<source src="<?php echo esc_url($ee_primary_video); ?>">
 									<?php esc_html_e('مرورگر شما پخش این ویدئو را پشتیبانی نمی‌کند.', 'evented-edu'); ?>
 								</video>
+								<p class="ee-resource-now-playing" aria-live="polite"><span><?php esc_html_e('در حال پخش', 'evented-edu'); ?></span><strong data-ee-video-title><?php echo esc_html($ee_primary_title); ?></strong></p>
 							</div>
+						<?php endif; ?>
+
+						<?php if (!empty($ee_video_playlist)) : ?>
+							<section class="ee-resource-playlist" aria-labelledby="eePlaylistTitle">
+								<div class="ee-resource-playlist-head"><h3 id="eePlaylistTitle"><?php esc_html_e('فهرست پخش', 'evented-edu'); ?></h3><span><?php echo esc_html(sprintf(__('%s قسمت', 'evented-edu'), number_format_i18n(count($ee_video_playlist)))); ?></span></div>
+								<ol>
+									<?php $ee_current_marked = false; foreach ($ee_video_playlist as $ee_video_index => $ee_video_item) :
+										$ee_is_current = !$ee_current_marked && $ee_video_item['url'] === $ee_primary_video;
+										$ee_current_marked = $ee_current_marked || $ee_is_current;
+										?>
+										<li>
+											<?php if ($ee_video_item['direct']) : ?>
+												<button type="button" data-ee-video-src="<?php echo esc_url($ee_video_item['url']); ?>" data-ee-video-poster="<?php echo esc_url($ee_video_item['poster']); ?>"<?php echo $ee_is_current ? ' aria-current="true"' : ''; ?>>
+											<?php else : ?>
+												<a href="<?php echo esc_url($ee_video_item['url']); ?>" target="_blank" rel="noopener nofollow">
+											<?php endif; ?>
+												<span class="ee-resource-playlist-number"><?php echo esc_html(number_format_i18n($ee_video_index + 1)); ?></span>
+												<?php if ($ee_video_item['poster']) : ?><img src="<?php echo esc_url($ee_video_item['poster']); ?>" alt="" loading="lazy" decoding="async"><?php endif; ?>
+												<strong><?php echo esc_html($ee_video_item['title']); ?></strong>
+												<svg class="ee-ic" aria-hidden="true"><use href="#i-<?php echo $ee_video_item['direct'] ? 'play_arrow' : 'open_in_new'; ?>"></use></svg>
+											<?php echo $ee_video_item['direct'] ? '</button>' : '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+										</li>
+									<?php endforeach; ?>
+								</ol>
+							</section>
 						<?php endif; ?>
 
 						<?php if (!empty($ee_resource_urls)) : ?>
@@ -128,8 +168,8 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 							</div>
 						<?php endif; ?>
 
-						<details class="ee-resource-meta-details" open>
-							<summary><span><?php esc_html_e('همهٔ متاهای ذخیره‌شده', 'evented-edu'); ?></span><small><?php echo esc_html(number_format_i18n(count($ee_resource_meta))); ?></small><svg class="ee-ic" aria-hidden="true"><use href="#i-expand_more"></use></svg></summary>
+						<details class="ee-resource-meta-details">
+							<summary><span><?php esc_html_e('اطلاعات فنی تکمیلی', 'evented-edu'); ?></span><small><?php echo esc_html(number_format_i18n(count($ee_resource_meta))); ?></small><svg class="ee-ic" aria-hidden="true"><use href="#i-expand_more"></use></svg></summary>
 							<?php if (!empty($ee_resource_meta)) : ?>
 								<div class="ee-resource-meta-grid">
 									<?php foreach ($ee_resource_meta as $ee_meta_row) : ?>

@@ -1300,6 +1300,78 @@ function evented_resource_meta_urls($value)
 }
 
 /**
+ * پلی‌لیست ویدئوی قدیمی را از دادهٔ Elementor یا متای ساختاریافته بازیابی می‌کند.
+ *
+ * ویجت Video Playlist المنتور فایل واقعی را داخل settings.tabs نگه می‌دارد؛
+ * بنابراین اجرای Elementor برای حفظ و نمایش داده‌های قبلی لازم نیست.
+ *
+ * @param int $post_id شناسهٔ ویدئو.
+ * @return array<int,array{title:string,url:string,poster:string,direct:bool}>
+ */
+function evented_clip_playlist($post_id)
+{
+	$items = array();
+	$add   = static function ($row) use (&$items) {
+		if (!is_array($row)) {
+			return;
+		}
+		$external = isset($row['external_url']) && is_array($row['external_url']) ? $row['external_url'] : array();
+		$hosted   = isset($row['hosted_url']) && is_array($row['hosted_url']) ? $row['hosted_url'] : array();
+		$url      = (string) ($external['url'] ?? $hosted['url'] ?? $row['url'] ?? '');
+		if ('' === $url) {
+			$type = isset($row['type']) ? sanitize_key($row['type']) : '';
+			$url  = 'youtube' === $type ? (string) ($row['youtube_url'] ?? '') : ('vimeo' === $type ? (string) ($row['vimeo_url'] ?? '') : '');
+		}
+		$url = esc_url_raw(str_replace('\\/', '/', html_entity_decode(trim($url), ENT_QUOTES, 'UTF-8')));
+		if (!in_array((string) wp_parse_url($url, PHP_URL_SCHEME), array('http', 'https'), true) || !wp_parse_url($url, PHP_URL_HOST)) {
+			return;
+		}
+		$thumbnail = isset($row['thumbnail']) && is_array($row['thumbnail']) ? $row['thumbnail'] : array();
+		$poster    = esc_url_raw((string) ($thumbnail['url'] ?? $row['poster'] ?? ''));
+		$path      = (string) wp_parse_url($url, PHP_URL_PATH);
+		$items[]   = array(
+			'title'  => sanitize_text_field((string) ($row['title'] ?? '')),
+			'url'    => $url,
+			'poster' => $poster,
+			'direct' => (bool) preg_match('/\.(?:mp4|webm|ogv|ogg|m3u8)$/i', $path),
+		);
+	};
+	$walk = static function ($node) use (&$walk, $add) {
+		if (!is_array($node)) {
+			return;
+		}
+		if (isset($node['tabs']) && is_array($node['tabs'])) {
+			foreach ($node['tabs'] as $tab) {
+				$add($tab);
+			}
+		}
+		foreach ($node as $child) {
+			if (is_array($child)) {
+				$walk($child);
+			}
+		}
+	};
+
+	foreach ((array) get_post_meta((int) $post_id, '_elementor_data', false) as $raw) {
+		$data = is_string($raw) ? json_decode($raw, true) : $raw;
+		if (is_array($data)) {
+			$walk($data);
+		}
+	}
+	foreach ((array) get_post_meta((int) $post_id, 'clip_playlist', true) as $row) {
+		$add($row);
+	}
+	foreach ($items as $index => &$item) {
+		if ('' === $item['title']) {
+			$item['title'] = sprintf(__('قسمت %s', 'evented-edu'), number_format_i18n($index + 1));
+		}
+	}
+	unset($item);
+
+	return (array) apply_filters('evented_clip_playlist', $items, (int) $post_id);
+}
+
+/**
  * متاهای قابل نمایش عمومی یک منبع را برمی‌گرداند.
  *
  * کلیدهای دارای نشانهٔ رمز، توکن، نشست یا اطلاعات تماس هرگز عمومی نمی‌شوند؛
@@ -1314,10 +1386,11 @@ function evented_resource_public_meta($post_id)
 	$all     = get_post_meta($post_id);
 	$output  = array();
 	$blocked = '/(?:pass(?:word|wd)?|secret|token|nonce|api[_-]?key|license|credential|session|cookie|e-?mail|phone|mobile|auth)/i';
+	$internal = '/^(?:_edit_|_wp_page_template$|_elementor_|_yoast_wpseo_|_astra_|_thumbnail_id$|_course_rating_|classic-editor-remember$|site-(?:sidebar-layout|content-layout|post-title)$|theme-transparent-header-meta$|stick-header-meta$|ast-|ekit_post_views_count$)/i';
 
 	foreach (array_keys((array) $all) as $key) {
 		$key = (string) $key;
-		if ('' === $key || preg_match($blocked, $key) || 0 === strpos($key, '_oembed_')) {
+		if ('' === $key || preg_match($blocked, $key) || preg_match($internal, $key) || 0 === strpos($key, '_oembed_')) {
 			continue;
 		}
 		$values = get_post_meta($post_id, $key, false);

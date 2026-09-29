@@ -40,7 +40,10 @@ add_action('wp_enqueue_scripts', function () {
         // هم Page Template انتخابی و هم page-{slug}.php باید asset کامل منابع را بگیرند.
         wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.6.0');
     } elseif (is_singular(array('post', 'lib', 'clip', 'gallery'))) {
-        wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.4.0');
+        wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.5.0');
+        if (is_singular('clip')) {
+            wp_enqueue_script('ee-resource-video', PATH_DIR_URL . '/assets/js/resource-video.js', array(), '1.0.0', true);
+        }
     } elseif (is_singular(array('sfwd-courses', 'sfwd-lessons', 'sfwd-topic', 'sfwd-quiz'))) {
         // دوره، درس و آزمون: استایل + رفتارها (آکاردئون، دیدگاه، تکمیل درس، علاقه‌مندی)
         wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.3.0');
