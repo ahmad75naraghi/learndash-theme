@@ -67,7 +67,8 @@ try {
       const consoleErrors = [];
       page.on('response', response => {
         const url = response.url();
-        if (url.startsWith(base) && response.status() >= 400 && !url.includes('favicon')) {
+        const expected404 = slug === 'not-found' && new URL(url).pathname === route;
+        if (url.startsWith(base) && response.status() >= 400 && !url.includes('favicon') && !expected404) {
           responseErrors.push(`${response.status()} ${new URL(url).pathname}`);
         }
       });
@@ -151,5 +152,8 @@ await fs.writeFile(path.join(outputDir, 'summary.json'), JSON.stringify(summary,
 console.log(`Visual audit: ${screenshots} screenshots, ${failures.length} failure(s), ${warnings.length} warning(s).`);
 if (process.env.GITHUB_ACTIONS === 'true') {
   for (const message of failures.slice(0, 9)) console.log(`::error title=Visual layout audit::${message}`);
+  if (!failures.length) {
+    for (const message of warnings.slice(0, 9)) console.log(`::warning title=Visual accessibility audit::${message}`);
+  }
 }
 if (failures.length) process.exit(1);

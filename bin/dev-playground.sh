@@ -17,7 +17,7 @@ cat > "$WORK/bp.json" <<'JSON'
 {"login":true,"steps":[
 {"step":"defineWpConfigConsts","consts":{"WP_DEBUG":true,"WP_DEBUG_LOG":"/wordpress/debug.log","WP_DEBUG_DISPLAY":false}},
 {"step":"activateTheme","themeFolderName":"evented-edu"},
-{"step":"runPHP","code":"<?php require '/wordpress/wp-load.php'; $admin=get_user_by('login','admin'); if($admin) wp_set_password('password',$admin->ID); $c=wp_insert_term('سواد رسانه','category'); for($i=1;$i<=6;$i++){ $id=wp_insert_post(['post_title'=>'مقالهٔ آزمایشی '.$i,'post_name'=>'post-'.$i,'post_content'=>str_repeat('متن آزمایشی برای بررسی صفحه. ',40),'post_status'=>'publish']); if(!is_wp_error($c)) wp_set_post_terms($id,[$c['term_id']],'category'); } foreach(['panel','login','courses'] as $s){ wp_insert_post(['post_title'=>$s,'post_name'=>$s,'post_type'=>'page','post_status'=>'publish']); } global $wp_rewrite; $wp_rewrite->set_permalink_structure('/%postname%/'); $wp_rewrite->flush_rules(true); echo 'seeded';"}
+{"step":"runPHP","code":"<?php require '/wordpress/wp-load.php'; $admin=get_user_by('login','admin'); if($admin) wp_set_password('password',$admin->ID); $c=wp_insert_term('سواد رسانه','category'); for($i=1;$i<=6;$i++){ $id=wp_insert_post(['post_title'=>'مقالهٔ آزمایشی '.$i,'post_name'=>'post-'.$i,'post_content'=>str_repeat('متن آزمایشی برای بررسی صفحه. ',40),'post_status'=>'publish']); if(!is_wp_error($c)) wp_set_post_terms($id,[$c['term_id']],'category'); } foreach(['panel','login','courses','videos'] as $s){ wp_insert_post(['post_title'=>$s,'post_name'=>$s,'post_type'=>'page','post_status'=>'publish']); } global $wp_rewrite; $wp_rewrite->set_permalink_structure('/%postname%/'); $wp_rewrite->flush_rules(true); echo 'seeded';"}
 ]}
 JSON
 cat > "$TOOLS/runpg.mjs" <<'JS'
