@@ -49,13 +49,13 @@ try {
   for (const [viewportName, viewport] of Object.entries(viewports)) {
     const context = await browser.newContext({ viewport, locale: 'fa-IR', colorScheme: 'light' });
     const login = await context.newPage();
-    await login.goto(`${base}/wp-login.php`, { waitUntil: 'networkidle' });
+    await login.goto(`${base}/wp-login.php`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
     const userInput = login.locator('#user_login');
     if (await userInput.count()) {
       await userInput.fill(username);
       await login.locator('#user_pass').fill(password);
       await Promise.all([
-        login.waitForLoadState('networkidle'),
+        login.waitForLoadState('domcontentloaded'),
         login.locator('#wp-submit').click(),
       ]);
     }
@@ -80,11 +80,12 @@ try {
       page.on('pageerror', error => consoleErrors.push(error.message));
 
       try {
-        const response = await page.goto(`${base}${route}`, { waitUntil: 'networkidle', timeout: 45_000 });
+        const response = await page.goto(`${base}${route}`, { waitUntil: 'load', timeout: 30_000 });
         if (!response || response.status() >= 400 && slug !== 'not-found') {
           report('failure', viewportName, route, `HTTP ${response?.status() ?? 'no response'}`);
         }
         await page.evaluate(() => document.fonts?.ready);
+        await page.waitForTimeout(250);
 
         if (route.startsWith('/panel')) {
           const helpButton = page.locator('[data-ee-panel-help]');
