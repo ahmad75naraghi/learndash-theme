@@ -52,8 +52,8 @@
     .ee-panel-user { align-items: flex-start; }
     .ee-panel-mobile-select { grid-template-columns: 1fr; gap: .3rem; margin-inline-end: 4.5rem; }
     .ee-panel-mobile-logout { left: .75rem; }
-    /* برای ردیف دوم انتخاب بخش جا رزرو می‌شود تا با عنوان صفحه هم‌پوشانی نداشته باشد. */
-    .ee-panel-side { padding-bottom: 4.25rem; }
+    /* ردیف دوم انتخاب بخش بلندتر است؛ عنوان صفحه باید پس از کارت ناوبری آغاز شود. */
+    .ee-panel-main { margin-top: 5rem; }
     .ee-panel-head .ee-crumb { overflow-x: auto; white-space: nowrap; padding-bottom: .2rem; }
 }
 
