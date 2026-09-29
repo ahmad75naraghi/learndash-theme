@@ -36,8 +36,8 @@ add_action('wp_enqueue_scripts', function () {
     } elseif (is_page_template('page-videos.php')) {
         // برگهٔ /videos/ از کارت‌ها و شبکهٔ آرشیو برای WP_Query اختصاصی clip استفاده می‌کند.
         wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.2.0');
-    } elseif (is_singular('post')) {
-        wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.0.0');
+    } elseif (is_singular(array('post', 'lib', 'clip', 'gallery'))) {
+        wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.1.0');
     } elseif (is_singular(array('sfwd-courses', 'sfwd-lessons', 'sfwd-topic', 'sfwd-quiz'))) {
         // دوره، درس و آزمون: استایل + رفتارها (آکاردئون، دیدگاه، تکمیل درس، علاقه‌مندی)
         wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.3.0');

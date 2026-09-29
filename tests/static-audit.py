@@ -45,6 +45,10 @@ required_snippets = {
     "template-parts/ee-header.php": ["ee_render_desktop_children", "ee-sub-flyout"],
     "assets/css/newhome/ee-shell.css": [".ee-sub-item:hover > .ee-sub-flyout", "right: calc(100% + .4rem)"],
     "assets/js/newhome/evented-home.js": ["ArrowLeft", "aria-expanded"],
+    "inc/content_types.php": ["register_post_type($post_type", "'lib' => array(", "'clip' => array(", "'gallery' => array(", "register_taxonomy('galery_cat'"],
+    "template-parts/ee-resource-single.php": ["ee-resource-single", "the_content()", "comments_template()"],
+    "archive-lib.php": ["ee_taxonomy' => 'wpdmcategory'"],
+    "archive-gallery.php": ["ee_taxonomy' => 'galery_cat'"],
 }
 for rel, snippets in required_snippets.items():
     text = (ROOT / rel).read_text(encoding="utf-8")

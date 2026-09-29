@@ -55,6 +55,17 @@ require_text "$tmp/home.html" 'id="ee-main"' 'home did not render the evented sh
 require_text "$tmp/home.html" ' defer src=' 'theme scripts are not deferred'
 require_text "$tmp/home.html" 'Vazirmatn-Variable.woff2' 'main font preload is missing'
 
+# CPTهای مهاجرت‌کرده بدون CPT UI باید آرشیو و نمای تکی سالم داشته باشند.
+resource_paths=('lib/' 'clip/' 'gallery/' 'galery_cat/%DA%AF%D8%B2%D8%A7%D8%B1%D8%B4-%D8%AA%D8%B5%D9%88%DB%8C%D8%B1%DB%8C/' 'lib/lib-item-1/' 'clip/clip-item-1/' 'gallery/gallery-item-1/')
+for path in "${resource_paths[@]}"; do
+	name=${path//\//-}
+	fetch "/$path" "$tmp/resource-$name.html"
+	require_text "$tmp/resource-$name.html" 'id="ee-main"' "custom content route did not render: /$path"
+done
+require_text "$tmp/resource-lib-lib-item-1-.html" 'ee-resource-single' 'library single template did not render'
+require_text "$tmp/resource-clip-clip-item-1-.html" 'ee-resource-single' 'video single template did not render'
+require_text "$tmp/resource-gallery-gallery-item-1-.html" 'ee-resource-single' 'gallery single template did not render'
+
 panel_paths=(panel panel/profile panel/my-courses panel/payments panel/wishlist panel/certificates panel/settings)
 for path in "${panel_paths[@]}"; do
 	name=${path//\//-}

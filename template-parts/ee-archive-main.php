@@ -17,6 +17,10 @@ defined('ABSPATH') || exit;
 /* ---------- عنوان و توضیح سربرگ ---------- */
 $ee_arch_title    = isset($args['ee_title']) ? $args['ee_title'] : '';
 $ee_arch_subtitle = isset($args['ee_subtitle']) ? $args['ee_subtitle'] : '';
+$ee_arch_taxonomy = isset($args['ee_taxonomy']) ? sanitize_key($args['ee_taxonomy']) : 'category';
+$ee_arch_icon     = isset($args['ee_icon']) ? sanitize_key($args['ee_icon']) : 'newspaper';
+$ee_item_label    = isset($args['ee_item_label']) ? (string) $args['ee_item_label'] : __('نوشته', 'evented-edu');
+$ee_all_url       = isset($args['ee_all_url']) ? (string) $args['ee_all_url'] : '';
 $ee_meta_on       = static function ($key) {
 	return !function_exists('evented_post_meta_visible') || evented_post_meta_visible($key);
 };
@@ -36,7 +40,7 @@ if ('' === $ee_arch_title) {
 }
 
 if ('' === $ee_arch_subtitle) {
-	if (is_category() || is_tag()) {
+	if (is_category() || is_tag() || is_tax()) {
 		$ee_queried     = get_queried_object();
 		$ee_arch_subtitle = ($ee_queried instanceof WP_Term && !empty($ee_queried->description))
 			? wp_strip_all_tags($ee_queried->description)
@@ -51,17 +55,25 @@ $ee_arch_title = preg_replace('/^(?:بایگانی|آرشیو|دسته|برچس�
 
 $ee_arch_count = isset($GLOBALS['wp_query']->found_posts) ? (int) $GLOBALS['wp_query']->found_posts : 0;
 
-/* ---------- چیپ‌های دسته‌بندی ---------- */
-$ee_arch_cats = get_categories(array(
+/* ---------- چیپ‌های taxonomy مرتبط با نمای جاری ---------- */
+$ee_arch_cats = taxonomy_exists($ee_arch_taxonomy) ? get_terms(array(
+	'taxonomy'   => $ee_arch_taxonomy,
 	'hide_empty' => true,
 	'number'     => 12,
 	'orderby'    => 'count',
 	'order'      => 'DESC',
-));
-$ee_arch_current = (is_category() && get_queried_object() instanceof WP_Term) ? (int) get_queried_object_id() : 0;
+)) : array();
+if (is_wp_error($ee_arch_cats)) {
+	$ee_arch_cats = array();
+}
+$ee_queried_term = get_queried_object();
+$ee_arch_current = ($ee_queried_term instanceof WP_Term && $ee_arch_taxonomy === $ee_queried_term->taxonomy) ? (int) $ee_queried_term->term_id : 0;
 
 $ee_posts_page_id = (int) get_option('page_for_posts');
 $ee_blog_url      = $ee_posts_page_id ? (string) get_permalink($ee_posts_page_id) : (string) home_url('/');
+if ('' === $ee_all_url) {
+	$ee_all_url = $ee_blog_url;
+}
 
 /* در نتایج جستجو: به‌جای دسته‌های وبلاگ، «بخش» جستجو (همه/مقالات/دوره‌ها/…) نمایش داده می‌شود */
 $ee_search_scopes = (is_search() && function_exists('evented_search_scopes')) ? evented_search_scopes() : array();
@@ -78,7 +90,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 		<!-- سربرگ بایگانی -->
 		<header class="ee-arch-head">
 			<h1 class="ee-arch-title">
-				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-newspaper"></use></svg>
+				<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-<?php echo esc_attr($ee_arch_icon); ?>"></use></svg>
 				<?php echo $ee_arch_title; ?>
 			</h1>
 			<?php if ('' !== trim((string) $ee_arch_subtitle)) : ?>
@@ -88,8 +100,8 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 				<span>
 					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-article"></use></svg>
 					<?php
-					/* translators: %s: تعداد نوشته */
-					echo esc_html(sprintf(_n('%s نوشته', '%s نوشته', $ee_arch_count, 'evented-edu'), number_format_i18n($ee_arch_count)));
+					/* translators: 1: تعداد، 2: نام نوع محتوا */
+					echo esc_html(sprintf(__('%1$s %2$s', 'evented-edu'), number_format_i18n($ee_arch_count), $ee_item_label));
 					?>
 				</span>
 				<?php
@@ -131,7 +143,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 		<?php elseif (!empty($ee_arch_cats)) : ?>
 			<!-- چیپ‌های دسته‌بندی -->
 			<nav class="ee-arch-chips" aria-label="<?php esc_attr_e('فیلتر دسته‌بندی', 'evented-edu'); ?>">
-				<a class="ee-chip-btn<?php echo 0 === $ee_arch_current ? ' ee-on' : ''; ?>" href="<?php echo esc_url($ee_blog_url); ?>">
+				<a class="ee-chip-btn<?php echo 0 === $ee_arch_current ? ' ee-on' : ''; ?>" href="<?php echo esc_url($ee_all_url); ?>">
 					<?php esc_html_e('همه', 'evented-edu'); ?>
 				</a>
 				<?php foreach ($ee_arch_cats as $ee_cat) : ?>
@@ -160,7 +172,8 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 					}
 
 					$ee_id       = get_the_ID();
-					$ee_p_cats   = get_the_category($ee_id);
+					$ee_p_cats   = 'category' === $ee_arch_taxonomy ? get_the_category($ee_id) : get_the_terms($ee_id, $ee_arch_taxonomy);
+					$ee_p_cats   = is_wp_error($ee_p_cats) ? array() : (array) $ee_p_cats;
 					$ee_p_cat    = !empty($ee_p_cats) ? $ee_p_cats[0] : null;
 					$ee_p_tag    = $ee_meta_on('category') && $ee_p_cat instanceof WP_Term ? $ee_p_cat->name : '';
 					if ('' === $ee_p_tag && 'post' !== get_post_type($ee_id)) {

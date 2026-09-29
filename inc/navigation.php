@@ -22,7 +22,7 @@ defined('ABSPATH') || exit;
 
 /* نسخهٔ ساختار کش — با تغییر ساختار آرایه‌ها این عدد را بالا ببرید تا کش قدیمی نادیده گرفته شود. */
 if (!defined('EVENTED_NAV_CACHE_VER')) {
-	define('EVENTED_NAV_CACHE_VER', '5');
+	define('EVENTED_NAV_CACHE_VER', '6');
 }
 
 /**
@@ -43,7 +43,7 @@ function evented_nav_cache_ttl()
 function evented_nav_post_type_candidates()
 {
 	$map = array(
-		'library'   => array('library', 'book', 'books', 'ebook', 'ebooks', 'ketab', 'ketabkhaneh', 'wp_library'),
+		'library'   => array('lib', 'library', 'book', 'books', 'ebook', 'ebooks', 'ketab', 'ketabkhaneh', 'wp_library'),
 		'gallery'   => array('gallery', 'galleries', 'photo', 'photos', 'album', 'albums', 'envira', 'foogallery'),
 		'video'     => array('video', 'videos', 'clip', 'clips', 'film', 'movie'),
 		'downloads' => array('download', 'downloads', 'dlm_download', 'edd_download', 'file', 'files', 'attachment_file'),
