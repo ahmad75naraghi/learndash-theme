@@ -1270,6 +1270,110 @@ function evented_empty_state($args = array())
 }
 
 /**
+ * استخراج URLها از مقدار متا (scalar، آرایه یا آبجکت).
+ *
+ * @param mixed $value مقدار متا.
+ * @return string[]
+ */
+function evented_resource_meta_urls($value)
+{
+	$urls = array();
+	if (is_array($value) || is_object($value)) {
+		foreach ((array) $value as $item) {
+			$urls = array_merge($urls, evented_resource_meta_urls($item));
+		}
+		return array_values(array_unique($urls));
+	}
+	if (!is_scalar($value) || is_bool($value)) {
+		return $urls;
+	}
+	$text = str_replace('\\/', '/', html_entity_decode((string) $value, ENT_QUOTES, 'UTF-8'));
+	if (preg_match_all('~https?://[^\s<>"\']+~iu', $text, $matches)) {
+		foreach ($matches[0] as $url) {
+			$url = rtrim($url, '.,;:!?)]}');
+			if (wp_http_validate_url($url)) {
+				$urls[] = esc_url_raw($url);
+			}
+		}
+	}
+	return array_values(array_unique($urls));
+}
+
+/**
+ * متاهای قابل نمایش عمومی یک منبع را برمی‌گرداند.
+ *
+ * کلیدهای دارای نشانهٔ رمز، توکن، نشست یا اطلاعات تماس هرگز عمومی نمی‌شوند؛
+ * بقیهٔ کلیدها (از جمله کلیدهای قدیمی افزونهٔ ویدئو) برای بازیابی داده حفظ می‌شوند.
+ *
+ * @param int $post_id شناسه نوشته.
+ * @return array<int, array{key:string,values:array,urls:array}>
+ */
+function evented_resource_public_meta($post_id)
+{
+	$post_id = (int) $post_id;
+	$all     = get_post_meta($post_id);
+	$output  = array();
+	$blocked = '/(?:pass(?:word|wd)?|secret|token|nonce|api[_-]?key|license|credential|session|cookie|e-?mail|phone|mobile|auth)/i';
+
+	foreach (array_keys((array) $all) as $key) {
+		$key = (string) $key;
+		if ('' === $key || preg_match($blocked, $key) || 0 === strpos($key, '_oembed_')) {
+			continue;
+		}
+		$values = get_post_meta($post_id, $key, false);
+		$values = array_values(array_filter((array) $values, static function ($value) {
+			return !(null === $value || '' === $value || array() === $value);
+		}));
+		if (empty($values)) {
+			continue;
+		}
+		$urls = array();
+		foreach ($values as $value) {
+			$urls = array_merge($urls, evented_resource_meta_urls($value));
+		}
+		$output[] = array('key' => $key, 'values' => $values, 'urls' => array_values(array_unique($urls)));
+	}
+
+	return (array) apply_filters('evented_resource_public_meta', $output, $post_id);
+}
+
+/**
+ * تبدیل امن مقدار متا به HTML خوانا؛ هیچ HTML ذخیره‌شده‌ای اجرا نمی‌شود.
+ *
+ * @param mixed $value مقدار متا.
+ * @param int   $depth عمق آرایه.
+ * @return string
+ */
+function evented_resource_meta_value_html($value, $depth = 0)
+{
+	$value = maybe_unserialize($value);
+	if ((is_array($value) || is_object($value)) && $depth < 5) {
+		$items = '';
+		foreach ((array) $value as $key => $item) {
+			$label = is_int($key) ? '' : '<strong>' . esc_html((string) $key) . '</strong>';
+			$items .= '<li>' . $label . evented_resource_meta_value_html($item, $depth + 1) . '</li>';
+		}
+		return '<ul class="ee-resource-meta-list">' . $items . '</ul>';
+	}
+	if (is_bool($value)) {
+		return '<span>' . ($value ? esc_html__('بله', 'evented-edu') : esc_html__('خیر', 'evented-edu')) . '</span>';
+	}
+	if (!is_scalar($value)) {
+		return '<span>—</span>';
+	}
+	$text = (string) $value;
+	if (function_exists('mb_strlen') && mb_strlen($text) > 4000) {
+		$text = mb_substr($text, 0, 4000) . '…';
+	} elseif (strlen($text) > 4000) {
+		$text = substr($text, 0, 4000) . '…';
+	}
+	if (wp_http_validate_url($text)) {
+		return '<a href="' . esc_url($text) . '" target="_blank" rel="noopener nofollow">' . esc_html($text) . '</a>';
+	}
+	return '<span>' . nl2br(esc_html($text)) . '</span>';
+}
+
+/**
  * نوار ابزار بالای فهرست نتایج: «نمایش X دوره» + مرتب‌سازی جمع‌وجور.
  *
  * @param int    $total تعداد کل.

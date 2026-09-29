@@ -64,6 +64,12 @@ for path in "${resource_paths[@]}"; do
 done
 require_text "$tmp/resource-lib-lib-item-1-.html" 'ee-resource-single' 'library single template did not render'
 require_text "$tmp/resource-clip-clip-item-1-.html" 'ee-resource-single' 'video single template did not render'
+require_text "$tmp/resource-clip-clip-item-1-.html" 'class="ee-resource-data"' 'video metadata section did not render'
+require_text "$tmp/resource-clip-clip-item-1-.html" '<code dir="ltr">_video_url</code>' 'legacy video meta key is missing'
+require_text "$tmp/resource-clip-clip-item-1-.html" '/wp-content/uploads/video-1.mp4' 'video URL was not recovered from post meta'
+require_text "$tmp/resource-clip-clip-item-1-.html" 'class="ee-resource-video-player"' 'direct video URL did not render a player'
+require_text "$tmp/resource-clip-clip-item-1-.html" 'clip_playlist' 'nested playlist metadata is missing'
+reject_text "$tmp/resource-clip-clip-item-1-.html" 'must-not-be-public' 'sensitive video metadata leaked publicly'
 require_text "$tmp/resource-gallery-gallery-item-1-.html" 'ee-resource-single' 'gallery single template did not render'
 require_text "$tmp/resource-gallery-.html" 'ee-gallery-category-grid' 'gallery archive category cards are missing'
 if ! python3 - "$tmp/resource-gallery-.html" <<'PY'

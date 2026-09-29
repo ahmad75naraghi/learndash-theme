@@ -14,6 +14,7 @@ $ee_taxonomy   = isset($args['taxonomy']) ? sanitize_key($args['taxonomy']) : ''
 $ee_icon       = isset($args['icon']) ? sanitize_key($args['icon']) : 'article';
 $ee_comments   = !empty($args['comments']);
 $ee_image_download = !empty($args['image_download']);
+$ee_show_meta  = !empty($args['show_meta']);
 $ee_archive    = function_exists('evented_nav_url') ? evented_nav_url($ee_active) : get_post_type_archive_link($ee_type);
 $ee_archive    = $ee_archive ?: home_url('/');
 
@@ -31,6 +32,15 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 		$ee_thumb_id = $ee_image_download ? (int) get_post_thumbnail_id($ee_id) : 0;
 		$ee_original_image = $ee_thumb_id && function_exists('wp_get_original_image_url') ? wp_get_original_image_url($ee_thumb_id) : '';
 		if ($ee_thumb_id && !$ee_original_image) { $ee_original_image = wp_get_attachment_image_url($ee_thumb_id, 'full'); }
+		$ee_resource_meta = $ee_show_meta && function_exists('evented_resource_public_meta') ? evented_resource_public_meta($ee_id) : array();
+		$ee_resource_urls = array();
+		foreach ($ee_resource_meta as $ee_meta_row) { $ee_resource_urls = array_merge($ee_resource_urls, (array) $ee_meta_row['urls']); }
+		$ee_resource_urls = array_values(array_unique($ee_resource_urls));
+		$ee_primary_video = '';
+		foreach ($ee_resource_urls as $ee_resource_url) {
+			$ee_media_path = (string) wp_parse_url($ee_resource_url, PHP_URL_PATH);
+			if (preg_match('/\.(?:mp4|webm|ogv|ogg|m3u8)$/i', $ee_media_path)) { $ee_primary_video = $ee_resource_url; break; }
+		}
 		$ee_related_args = array(
 			'post_type' => $ee_type, 'post_status' => 'publish', 'posts_per_page' => 4, 'post__not_in' => array($ee_id),
 			'no_found_rows' => true, 'ignore_sticky_posts' => true,
@@ -79,6 +89,64 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 							<a class="ee-gallery-open-original" href="<?php echo esc_url($ee_original_image); ?>" target="_blank" rel="noopener"><?php esc_html_e('مشاهدهٔ تصویر بزرگ', 'evented-edu'); ?></a>
 						</div>
 					<?php endif; ?>
+				<?php endif; ?>
+
+				<?php if ($ee_show_meta) : ?>
+					<section class="ee-resource-data" aria-labelledby="eeResourceDataTitle">
+						<header class="ee-resource-data-head">
+							<span class="ee-resource-data-icon"><svg class="ee-ic" aria-hidden="true"><use href="#i-smart_display"></use></svg></span>
+							<div><h2 id="eeResourceDataTitle"><?php esc_html_e('اطلاعات و فایل‌های ویدئو', 'evented-edu'); ?></h2><p><?php esc_html_e('لینک‌های رسانه و تمام داده‌های ذخیره‌شدهٔ این ویدئو', 'evented-edu'); ?></p></div>
+						</header>
+
+						<?php if ($ee_primary_video) : ?>
+							<div class="ee-resource-video-player">
+								<video controls preload="metadata"<?php echo has_post_thumbnail() ? ' poster="' . esc_url(get_the_post_thumbnail_url($ee_id, 'large')) . '"' : ''; ?>>
+									<source src="<?php echo esc_url($ee_primary_video); ?>">
+									<?php esc_html_e('مرورگر شما پخش این ویدئو را پشتیبانی نمی‌کند.', 'evented-edu'); ?>
+								</video>
+							</div>
+						<?php endif; ?>
+
+						<?php if (!empty($ee_resource_urls)) : ?>
+							<div class="ee-resource-media-links">
+								<h3><?php esc_html_e('لینک‌های رسانه‌ای پیدا‌شده', 'evented-edu'); ?></h3>
+								<div class="ee-resource-media-grid">
+									<?php foreach ($ee_resource_urls as $ee_url_index => $ee_resource_url) :
+										$ee_url_host = (string) wp_parse_url($ee_resource_url, PHP_URL_HOST);
+										$ee_url_path = (string) wp_parse_url($ee_resource_url, PHP_URL_PATH);
+										$ee_url_name = urldecode((string) basename($ee_url_path));
+										if ('' === $ee_url_name || '/' === $ee_url_name) { $ee_url_name = sprintf(__('رسانهٔ شمارهٔ %s', 'evented-edu'), number_format_i18n($ee_url_index + 1)); }
+										?>
+										<a href="<?php echo esc_url($ee_resource_url); ?>" target="_blank" rel="noopener nofollow">
+											<svg class="ee-ic" aria-hidden="true"><use href="#i-play_arrow"></use></svg>
+											<span><strong><?php echo esc_html($ee_url_name); ?></strong><small dir="ltr"><?php echo esc_html($ee_url_host); ?></small></span>
+											<svg class="ee-ic ee-resource-media-open" aria-hidden="true"><use href="#i-open_in_new"></use></svg>
+										</a>
+									<?php endforeach; ?>
+								</div>
+							</div>
+						<?php endif; ?>
+
+						<details class="ee-resource-meta-details" open>
+							<summary><span><?php esc_html_e('همهٔ متاهای ذخیره‌شده', 'evented-edu'); ?></span><small><?php echo esc_html(number_format_i18n(count($ee_resource_meta))); ?></small><svg class="ee-ic" aria-hidden="true"><use href="#i-expand_more"></use></svg></summary>
+							<?php if (!empty($ee_resource_meta)) : ?>
+								<div class="ee-resource-meta-grid">
+									<?php foreach ($ee_resource_meta as $ee_meta_row) : ?>
+										<article class="ee-resource-meta-card">
+											<h3><code dir="ltr"><?php echo esc_html($ee_meta_row['key']); ?></code></h3>
+											<div class="ee-resource-meta-values">
+												<?php foreach ((array) $ee_meta_row['values'] as $ee_meta_value) : ?>
+													<div><?php echo function_exists('evented_resource_meta_value_html') ? evented_resource_meta_value_html($ee_meta_value) : esc_html((string) $ee_meta_value); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+												<?php endforeach; ?>
+											</div>
+										</article>
+									<?php endforeach; ?>
+								</div>
+							<?php else : ?>
+								<p class="ee-empty-inline"><?php esc_html_e('برای این ویدئو متای قابل‌نمایشی ذخیره نشده است.', 'evented-edu'); ?></p>
+							<?php endif; ?>
+						</details>
+					</section>
 				<?php endif; ?>
 
 				<div class="ee-post-content"><?php the_content(); ?></div>
