@@ -42,6 +42,9 @@ required_snippets = {
     "panel/payments.php": ["LIMIT %d OFFSET %d", "evented_panel_pagination"],
     "panel/my-courses.php": ["$courses_per_page", "'no_found_rows'"],
     "inc/performance.php": ["Vazirmatn-Variable.woff2", "print_emoji_detection_script"],
+    "template-parts/ee-header.php": ["ee_render_desktop_children", "ee-sub-flyout"],
+    "assets/css/newhome/ee-shell.css": [".ee-sub-item:hover > .ee-sub-flyout", "right: calc(100% + .4rem)"],
+    "assets/js/newhome/evented-home.js": ["ArrowLeft", "aria-expanded"],
 }
 for rel, snippets in required_snippets.items():
     text = (ROOT / rel).read_text(encoding="utf-8")

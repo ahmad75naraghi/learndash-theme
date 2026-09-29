@@ -57,6 +57,33 @@ $ee_flatten_children = static function ($children, $depth = 0) use (&$ee_flatten
 	}
 	return $flat;
 };
+
+/* دسکتاپ: درخت واقعی نگه داشته می‌شود تا فرزندان هر دسته در پنل کناری باز شوند. */
+$ee_render_desktop_children = static function ($children, $depth = 0) use (&$ee_render_desktop_children) {
+	if (empty($children)) {
+		return;
+	}
+	$nested = $depth > 0;
+	?>
+	<ul class="ee-sub-list<?php echo $nested ? ' ee-sub-flyout' : ' ee-sub-root'; ?>" role="menu">
+		<?php foreach ((array) $children as $child) :
+			if (empty($child['title']) || empty($child['url'])) { continue; }
+			$has_children = !empty($child['children']);
+			?>
+			<li class="ee-sub-item<?php echo $has_children ? ' has-children' : ''; ?>" role="none">
+				<a class="ee-sub-link<?php echo $has_children ? ' has-children' : ''; ?>" role="menuitem" href="<?php echo esc_url($child['url']); ?>"<?php echo $has_children ? ' aria-haspopup="true"' : ''; ?>>
+					<span class="ee-sub-label"><?php echo esc_html($child['title']); ?></span>
+					<span class="ee-sub-meta">
+						<?php if (!empty($child['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $child['count'])); ?></small><?php endif; ?>
+						<?php if ($has_children) : ?><svg class="ee-ic ee-sub-next" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg><?php endif; ?>
+					</span>
+				</a>
+				<?php if ($has_children) { $ee_render_desktop_children($child['children'], $depth + 1); } ?>
+			</li>
+		<?php endforeach; ?>
+	</ul>
+	<?php
+};
 ?>
     <!-- ======= نوار ابزار بالایی (فقط دسکتاپ) ======= -->
     <div class="ee-topbar">
@@ -180,14 +207,8 @@ $ee_flatten_children = static function ($children, $depth = 0) use (&$ee_flatten
                                 </div>
                             </div>
                         <?php elseif ($ee_has_sub) : ?>
-                            <div class="ee-sub" role="menu">
-                                <?php foreach ($ee_flatten_children($ee_it['children']) as $ee_sub) :
-                                    $ee_sub_depth = min(4, max(0, (int) $ee_sub['depth'])); ?>
-                                    <a class="ee-sub-depth-<?php echo (int) $ee_sub_depth; ?><?php echo !empty($ee_sub['has_children']) ? ' has-children' : ''; ?>" role="menuitem" href="<?php echo esc_url($ee_sub['url']); ?>">
-                                        <span><?php if ($ee_sub_depth > 0) : ?><svg class="ee-ic ee-sub-branch" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg><?php endif; ?><?php echo esc_html($ee_sub['title']); ?></span>
-                                        <?php if (!empty($ee_sub['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $ee_sub['count'])); ?></small><?php endif; ?>
-                                    </a>
-                                <?php endforeach; ?>
+                            <div class="ee-sub">
+                                <?php $ee_render_desktop_children($ee_it['children']); ?>
                                 <a class="ee-sub-all" href="<?php echo esc_url($ee_it['url']); ?>">همهٔ <?php echo esc_html($ee_it['title']); ?> <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                             </div>
                         <?php endif; ?>

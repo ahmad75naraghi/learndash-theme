@@ -87,6 +87,26 @@ try {
         await page.evaluate(() => document.fonts?.ready);
         await page.waitForTimeout(250);
 
+        if (viewportName === 'desktop1440' && slug === 'home') {
+          const nestedItem = page.locator('.ee-nav-item.has-sub:has(.ee-sub-item.has-children)').first();
+          if (await nestedItem.count()) {
+            await nestedItem.locator(':scope > a').hover();
+            const parentCategory = nestedItem.locator('.ee-sub-item.has-children').first();
+            await parentCategory.hover();
+            const parentBox = await parentCategory.boundingBox();
+            const flyout = parentCategory.locator(':scope > .ee-sub-flyout');
+            const flyoutBox = await flyout.boundingBox();
+            const childLink = flyout.locator('.ee-sub-link').first();
+            if (!parentBox || !flyoutBox || !await flyout.isVisible() || !await childLink.isVisible()) {
+              report('failure', viewportName, route, 'nested category flyout did not open on hover');
+            } else if (flyoutBox.x + flyoutBox.width > parentBox.x + 2) {
+              report('failure', viewportName, route, 'nested category flyout did not open to the left of its parent');
+            }
+          } else {
+            report('failure', viewportName, route, 'nested parent category fixture is missing');
+          }
+        }
+
         if (route.startsWith('/panel')) {
           const helpButton = page.locator('[data-ee-panel-help]');
           if (await helpButton.count()) {
