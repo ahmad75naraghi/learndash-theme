@@ -48,7 +48,7 @@ required_snippets = {
     "assets/js/newhome/evented-home.js": ["ArrowLeft", "aria-expanded"],
     "inc/content_types.php": ["register_post_type($post_type", "'lib' => array(", "'clip' => array(", "'gallery' => array(", "register_taxonomy('galery_cat'", "evented_detach_clip_taxonomies", "unregister_taxonomy_for_object_type($taxonomy, 'clip')"],
     "inc/navigation.php": ["'gallery' === $key", "'is_heading'", "'video' !== $key && 'clip' !== $post_type", "EVENTED_NAV_CACHE_VER', '10"],
-    "template-parts/ee-resource-single.php": ["ee-resource-single", "the_content()", "comments_template()", "wp_get_original_image_url", "ee-gallery-download", "ee-resource-data", "ee-resource-video-player", "ee-resource-playlist", "evented_clip_playlist"],
+    "template-parts/ee-resource-single.php": ["ee-resource-single", "the_content()", "comments_template()", "wp_get_original_image_url", "ee-gallery-download", "ee-resource-data", "ee-resource-video-player", "ee-resource-playlist", "evented_clip_playlist", "'clip' !== $ee_type"],
     "inc/template_helpers.php": ["evented_resource_public_meta", "evented_resource_meta_urls", "evented_resource_meta_value_html", "evented_clip_playlist", "_elementor_data", "EVENTED_VIDEO_PLAYLIST_META"],
     "assets/js/resource-video.js": ["data-ee-video-src", "aria-current", "video.load()"],
     "assets/js/admin/video-playlist.js": ["data-ee-video-add", "wp.media", "reindex"],

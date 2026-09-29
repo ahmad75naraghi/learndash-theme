@@ -127,6 +127,9 @@ else
 fi
 require_text "$tmp/resource-lib-lib-item-1-.html" 'ee-resource-single' 'library single template did not render'
 require_text "$tmp/resource-clip-clip-item-1-.html" 'ee-resource-single' 'video single template did not render'
+reject_text "$tmp/resource-clip-clip-item-1-.html" 'class="ee-post-content"' 'video single must not render Gutenberg/Elementor content below the custom player'
+reject_text "$tmp/resource-clip-clip-item-1-.html" 'class="ee-post-hero' 'video thumbnail must be used as the player poster, not rendered as a duplicate hero'
+require_text "$tmp/resource-lib-lib-item-1-.html" 'class="ee-post-content"' 'non-video resources unexpectedly lost their content'
 reject_text "$tmp/resource-clip-clip-item-1-.html" 'class="ee-meta-cat"' 'video single must not render a taxonomy category'
 reject_text "$tmp/resource-clip-.html" 'class="ee-arch-chips"' 'video archive inherited library taxonomy filters'
 require_text "$tmp/resource-lib-.html" 'منابع کتابخانه' 'library taxonomy fixture did not render'

@@ -89,7 +89,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 					</div>
 				</header>
 
-				<?php if (has_post_thumbnail()) : ?>
+				<?php if (has_post_thumbnail() && 'clip' !== $ee_type) : ?>
 					<figure class="ee-post-hero<?php echo $ee_original_image ? ' ee-gallery-hero' : ''; ?>">
 						<?php if ($ee_original_image) : ?><a href="<?php echo esc_url($ee_original_image); ?>" target="_blank" rel="noopener" aria-label="<?php esc_attr_e('باز کردن تصویر در اندازهٔ اصلی', 'evented-edu'); ?>"><?php endif; ?>
 						<?php the_post_thumbnail('large', array('loading' => 'eager', 'fetchpriority' => 'high')); ?>
@@ -192,8 +192,10 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 					</section>
 				<?php endif; ?>
 
-				<div class="ee-post-content"><?php the_content(); ?></div>
-				<?php wp_link_pages(array('before' => '<nav class="ee-page-links">', 'after' => '</nav>')); ?>
+				<?php if ('clip' !== $ee_type) : ?>
+					<div class="ee-post-content"><?php the_content(); ?></div>
+					<?php wp_link_pages(array('before' => '<nav class="ee-page-links">', 'after' => '</nav>')); ?>
+				<?php endif; ?>
 
 				<?php if (!empty($ee_shares)) : ?>
 					<div class="ee-share-block">
