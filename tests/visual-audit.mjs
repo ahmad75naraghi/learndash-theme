@@ -90,8 +90,9 @@ try {
         if (route.startsWith('/panel')) {
           const helpButton = page.locator('[data-ee-panel-help]');
           if (await helpButton.count()) {
+            await helpButton.evaluate(button => button.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' }));
+            await page.waitForTimeout(50);
             const clickability = await helpButton.evaluate(button => {
-              button.scrollIntoView({ block: 'center', inline: 'center' });
               const rect = button.getBoundingClientRect();
               const top = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
               return {
