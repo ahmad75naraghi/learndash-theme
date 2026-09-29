@@ -49,6 +49,10 @@ required_snippets = {
     "template-parts/ee-resource-single.php": ["ee-resource-single", "the_content()", "comments_template()"],
     "archive-lib.php": ["ee_taxonomy' => 'wpdmcategory'"],
     "archive-gallery.php": ["ee_taxonomy' => 'galery_cat'"],
+    "template-parts/ee-resource-page.php": ["resource_search", "resource_cat", "evented_pagination", "evented_empty_state"],
+    "page-library.php": ["'post_type' => 'lib'", "'taxonomy' => 'wpdmcategory'"],
+    "page-videos.php": ["'post_type' => 'clip'", "'taxonomy' => 'wpdmcategory'"],
+    "page-gallery.php": ["'post_type' => 'gallery'", "'taxonomy' => 'galery_cat'"],
 }
 for rel, snippets in required_snippets.items():
     text = (ROOT / rel).read_text(encoding="utf-8")

@@ -104,7 +104,9 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 | `/courses/<slug>/` | `single-sfwd-courses.php` | صفحهٔ دوره |
 | `/lessons/<slug>/` | `single-sfwd-lessons.php` | صفحهٔ درس (کلیپ/پادکست/متن + فهرست درس‌ها) |
 | آزمون (`sfwd-quiz`) | `single-sfwd-quiz.php` | صفحهٔ آزمون (فکت‌ها + بدنهٔ لرن‌دش) |
-| برگهٔ `/videos/` | `page-videos.php` | کوئری صفحه‌بندی‌شدهٔ `clip`؛ مستقل از `has_archive` و بدون نیاز اجباری به taxonomy |
+| برگهٔ کتابخانه | `page-library.php` | کوئری `lib` با فیلتر اختیاری `wpdmcategory` |
+| برگهٔ ویدئو | `page-videos.php` | کوئری `clip` با فیلتر اختیاری `wpdmcategory` |
+| برگهٔ گالری | `page-gallery.php` | کوئری `gallery` با فیلتر `galery_cat`؛ برای جلوگیری از تعارض archive از slug دیگری مانند `gallery-page` استفاده شود |
 | برگهٔ «دوره‌ها» | `page-courses.php` | گرید همهٔ دوره‌ها با صفحه‌بندی |
 | `/<post-slug>/` | `single.php` | تک‌نوشته (مقاله + سایدبار + دیدگاه) |
 | برگهٔ «نوشته‌ها» (is_home) | `home.php` | آرشیو همهٔ نوشته‌ها |

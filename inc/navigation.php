@@ -22,7 +22,7 @@ defined('ABSPATH') || exit;
 
 /* نسخهٔ ساختار کش — با تغییر ساختار آرایه‌ها این عدد را بالا ببرید تا کش قدیمی نادیده گرفته شود. */
 if (!defined('EVENTED_NAV_CACHE_VER')) {
-	define('EVENTED_NAV_CACHE_VER', '6');
+	define('EVENTED_NAV_CACHE_VER', '7');
 }
 
 /**
@@ -349,7 +349,7 @@ function evented_nav_build_items(): array {
 
     // CPT ها
     $items[] = evented_nav_build_cpt_item('library', 'کتابخانه', 'local_library', ['lib', 'library', 'کتابخانه', 'books', 'ketabkhaneh']);
-    $items[] = evented_nav_build_cpt_item('gallery', 'گالری', 'photo_library', ['gallery', 'گالری-مناسبتی', 'گالری-موضوعی', 'galleries']);
+    $items[] = evented_nav_build_cpt_item('gallery', 'گالری', 'photo_library', ['گالری-مناسبتی', 'گالری-موضوعی', 'galleries', 'gallery-page']);
     $items[] = evented_nav_build_cpt_item('video', 'ویدیو', 'smart_display', ['videos', 'video']);
     $items[] = evented_nav_build_cpt_item('downloads', 'دانلودها', 'download_for_offline', ['download', 'downloads']);
 

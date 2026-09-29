@@ -66,6 +66,23 @@ require_text "$tmp/resource-lib-lib-item-1-.html" 'ee-resource-single' 'library 
 require_text "$tmp/resource-clip-clip-item-1-.html" 'ee-resource-single' 'video single template did not render'
 require_text "$tmp/resource-gallery-gallery-item-1-.html" 'ee-resource-single' 'gallery single template did not render'
 
+# برگه‌های انتخاب‌پذیر منابع باید query مستقل، کنترل فیلتر و asset مشترک را رندر کنند.
+resource_pages=('library/' 'videos/' 'gallery-page/')
+for path in "${resource_pages[@]}"; do
+	name=${path//\//-}
+	fetch "/$path" "$tmp/resource-page-$name.html"
+	require_text "$tmp/resource-page-$name.html" 'class="ee-resource-page-main"' "resource page template did not render: /$path"
+	require_text "$tmp/resource-page-$name.html" 'name="resource_search"' "resource search is missing: /$path"
+	require_text "$tmp/resource-page-$name.html" 'archive-post.css' "resource page stylesheet is missing: /$path"
+done
+require_text "$tmp/resource-page-gallery-page-.html" 'name="resource_cat"' 'gallery taxonomy filter is missing'
+fetch '/library/page/2/' "$tmp/resource-page-paged.html"
+require_text "$tmp/resource-page-paged.html" 'کتاب آزمایشی' 'resource pagination did not return the second page'
+fetch '/videos/?resource_search=%D9%88%DB%8C%D8%AF%D8%A6%D9%88' "$tmp/resource-page-search.html"
+require_text "$tmp/resource-page-search.html" 'ee-resource-card' 'resource search did not return matching cards'
+fetch '/gallery-page/?resource_cat=999999' "$tmp/resource-page-empty.html"
+require_text "$tmp/resource-page-empty.html" 'ee-empty-state' 'resource empty state did not render for an unmatched taxonomy filter'
+
 panel_paths=(panel panel/profile panel/my-courses panel/payments panel/wishlist panel/certificates panel/settings)
 for path in "${panel_paths[@]}"; do
 	name=${path//\//-}
