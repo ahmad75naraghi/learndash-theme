@@ -95,12 +95,14 @@ try {
             const clickability = await helpButton.evaluate(button => {
               const rect = button.getBoundingClientRect();
               const top = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+              const blockerRect = top?.getBoundingClientRect();
               return {
                 clear: top === button || button.contains(top),
                 blocker: top ? `${top.tagName.toLowerCase()}${top.id ? `#${top.id}` : ''}${typeof top.className === 'string' && top.className ? `.${top.className.trim().split(/\\s+/).join('.')}` : ''}` : 'unknown',
+                geometry: `button(${Math.round(rect.left)},${Math.round(rect.top)},${Math.round(rect.width)}x${Math.round(rect.height)}) blocker(${Math.round(blockerRect?.left || 0)},${Math.round(blockerRect?.top || 0)},${Math.round(blockerRect?.width || 0)}x${Math.round(blockerRect?.height || 0)})`,
               };
             });
-            if (!clickability.clear) report('failure', viewportName, route, `section help is covered by ${clickability.blocker}`);
+            if (!clickability.clear) report('failure', viewportName, route, `section help is covered by ${clickability.blocker}; ${clickability.geometry}`);
             await helpButton.evaluate(button => button.click());
             const helpId = await helpButton.getAttribute('aria-controls');
             const helpState = await page.locator(`#${helpId}`).evaluate(el => ({ hidden: el.hidden, text: el.textContent.trim() }));
