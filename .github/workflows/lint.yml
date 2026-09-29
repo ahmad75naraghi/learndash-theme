@@ -49,8 +49,13 @@ jobs:
           cache: npm
           cache-dependency-path: bin/dev-playground.sh
 
+      - name: Install visual-test browser
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          npx playwright install chromium
+
       # Playground و درخواست‌ها در یک step می‌مانند تا runner پردازش orphan را بین stepها پاک نکند.
-      - name: Test WordPress routes, AJAX and a real theme replacement
+      - name: Test WordPress routes, responsive layout and a real theme replacement
         env:
           SMOKE_WRITE_PROFILE: '1'
           SMOKE_USERNAME: admin
@@ -61,6 +66,8 @@ jobs:
           set +e
           bash bin/smoke-test.sh http://127.0.0.1:9400 /tmp/wp/site/debug.log > /tmp/runtime-output.log 2>&1
           smoke_status=$?
+          node tests/visual-audit.mjs http://127.0.0.1:9400 /tmp/visual-audit >> /tmp/runtime-output.log 2>&1
+          visual_status=$?
           bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site >> /tmp/runtime-output.log 2>&1
           update_status=$?
           cat /tmp/runtime-output.log
@@ -70,5 +77,15 @@ jobs:
             cat /tmp/runtime-output.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          if (( visual_status != 0 )); then echo '::error title=Visual layout audit::Responsive browser audit failed'; fi
           if (( update_status != 0 )); then echo '::error title=WordPress updater integration::Theme_Upgrader integration failed'; fi
-          if (( smoke_status != 0 || update_status != 0 )); then exit 1; fi
+          if (( smoke_status != 0 || visual_status != 0 || update_status != 0 )); then exit 1; fi
+
+      - name: Upload responsive screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: responsive-screenshots
+          path: /tmp/visual-audit
+          if-no-files-found: warn
+          retention-days: 7
