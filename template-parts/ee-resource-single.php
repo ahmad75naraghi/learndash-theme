@@ -13,6 +13,7 @@ $ee_plural     = isset($args['plural']) ? (string) $args['plural'] : $ee_label;
 $ee_taxonomy   = isset($args['taxonomy']) ? sanitize_key($args['taxonomy']) : '';
 $ee_icon       = isset($args['icon']) ? sanitize_key($args['icon']) : 'article';
 $ee_comments   = !empty($args['comments']);
+$ee_image_download = !empty($args['image_download']);
 $ee_archive    = function_exists('evented_nav_url') ? evented_nav_url($ee_active) : get_post_type_archive_link($ee_type);
 $ee_archive    = $ee_archive ?: home_url('/');
 
@@ -27,6 +28,9 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 		$ee_term     = !empty($ee_terms) ? $ee_terms[0] : null;
 		$ee_date     = function_exists('evented_post_date') ? evented_post_date($ee_id) : get_the_date();
 		$ee_shares   = function_exists('evented_share_links') ? evented_share_links((string) get_permalink(), (string) get_the_title()) : array();
+		$ee_thumb_id = $ee_image_download ? (int) get_post_thumbnail_id($ee_id) : 0;
+		$ee_original_image = $ee_thumb_id && function_exists('wp_get_original_image_url') ? wp_get_original_image_url($ee_thumb_id) : '';
+		if ($ee_thumb_id && !$ee_original_image) { $ee_original_image = wp_get_attachment_image_url($ee_thumb_id, 'full'); }
 		$ee_related_args = array(
 			'post_type' => $ee_type, 'post_status' => 'publish', 'posts_per_page' => 4, 'post__not_in' => array($ee_id),
 			'no_found_rows' => true, 'ignore_sticky_posts' => true,
@@ -61,7 +65,20 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 				</header>
 
 				<?php if (has_post_thumbnail()) : ?>
-					<figure class="ee-post-hero"><?php the_post_thumbnail('large', array('loading' => 'eager', 'fetchpriority' => 'high')); ?></figure>
+					<figure class="ee-post-hero<?php echo $ee_original_image ? ' ee-gallery-hero' : ''; ?>">
+						<?php if ($ee_original_image) : ?><a href="<?php echo esc_url($ee_original_image); ?>" target="_blank" rel="noopener" aria-label="<?php esc_attr_e('باز کردن تصویر در اندازهٔ اصلی', 'evented-edu'); ?>"><?php endif; ?>
+						<?php the_post_thumbnail('large', array('loading' => 'eager', 'fetchpriority' => 'high')); ?>
+						<?php if ($ee_original_image) : ?></a><?php endif; ?>
+					</figure>
+					<?php if ($ee_original_image) : ?>
+						<div class="ee-gallery-image-actions">
+							<a class="ee-btn ee-btn-primary ee-gallery-download" href="<?php echo esc_url($ee_original_image); ?>" download>
+								<svg class="ee-ic" aria-hidden="true"><use href="#i-download"></use></svg>
+								<?php esc_html_e('دانلود تصویر با اندازهٔ اصلی', 'evented-edu'); ?>
+							</a>
+							<a class="ee-gallery-open-original" href="<?php echo esc_url($ee_original_image); ?>" target="_blank" rel="noopener"><?php esc_html_e('مشاهدهٔ تصویر بزرگ', 'evented-edu'); ?></a>
+						</div>
+					<?php endif; ?>
 				<?php endif; ?>
 
 				<div class="ee-post-content"><?php the_content(); ?></div>

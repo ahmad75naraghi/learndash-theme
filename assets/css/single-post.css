@@ -198,3 +198,15 @@ a.ee-meta-item:hover { color: var(--ee-tealP); }
 .ee-resource-single .ee-side > .ee-btn { justify-content: center; width: 100%; }
 .ee-resource-single .ee-mini-txt strong { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: .76rem; line-height: 1.7; }
 .ee-resource-single .ee-share-btn svg { width: 1rem; height: 1rem; }
+
+/* ---------- تصویر شاخص گالری: نمایش اصل و دانلود ---------- */
+.ee-gallery-hero a { position: relative; display: block; cursor: zoom-in; overflow: hidden; }
+.ee-gallery-hero a::after { content: "مشاهده در اندازهٔ اصلی"; position: absolute; inset: auto auto .8rem .8rem; padding: .38rem .7rem; border-radius: 999px; color: #fff; background: rgb(15 23 42 / .78); font-size: .68rem; font-weight: 800; opacity: 0; transform: translateY(.3rem); transition: opacity .2s, transform .2s; backdrop-filter: blur(5px); }
+.ee-gallery-hero a:hover::after, .ee-gallery-hero a:focus-visible::after { opacity: 1; transform: translateY(0); }
+.ee-gallery-hero a:focus-visible { outline: 3px solid var(--ee-teal); outline-offset: -3px; }
+.ee-gallery-image-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .7rem; margin: -.35rem 0 1.35rem; }
+.ee-gallery-image-actions .ee-btn { display: inline-flex; align-items: center; gap: .4rem; min-height: 2.75rem; }
+.ee-gallery-image-actions .ee-ic { width: 1.1rem; height: 1.1rem; }
+.ee-gallery-open-original { color: var(--ee-tealP); font-size: .74rem; font-weight: 800; text-decoration: underline; text-underline-offset: .22rem; }
+@media (max-width: 480px) { .ee-gallery-image-actions { align-items: stretch; flex-direction: column; }.ee-gallery-image-actions .ee-btn { justify-content: center; width: 100%; }.ee-gallery-open-original { padding: .45rem; text-align: center; } }
+@media (prefers-reduced-motion: reduce) { .ee-gallery-hero a::after { transition: none; } }

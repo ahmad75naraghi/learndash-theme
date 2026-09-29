@@ -151,3 +151,30 @@
 @media (max-width: 640px) { .ee-resource-hero-in { align-items: flex-start; min-height: 15rem; padding-block: 2.5rem 3.5rem; }.ee-resource-hero-stat { width: 6.5rem; border-radius: 1.4rem; }.ee-resource-hero-stat strong { font-size: 1.7rem; }.ee-resource-tools { grid-template-columns: 1fr; margin-top: -1.25rem; }.ee-resource-search { grid-column: auto; }.ee-resource-select select, .ee-resource-tools .ee-btn { width: 100%; }.ee-resource-grid { grid-template-columns: 1fr; }.ee-resource-card-body { min-height: 0; } }
 @media (max-width: 440px) { .ee-resource-hero-stat { display: none; }.ee-resource-hero-copy { max-width: 100%; }.ee-resource-page-wrap { padding-bottom: 2.5rem; } }
 @media (prefers-reduced-motion: reduce) { .ee-resource-card, .ee-resource-card-media img, .ee-resource-play, .ee-resource-card-more .ee-ic { transition: none; } }
+
+/* ---------- آرشیو گالری: دسته‌های تصویری بدون سایدبار ---------- */
+@media (min-width: 1024px) { .ee-arch-grid.ee-arch-grid-full { grid-template-columns: minmax(0, 1fr); } }
+.ee-arch-grid-full .ee-arch-main { min-width: 0; }
+.ee-arch-grid-full .ee-arch-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ee-gallery-categories { margin: 1.2rem 0 1.7rem; padding: 1.15rem; border: 1px solid var(--ee-line); border-radius: 1.35rem; background: linear-gradient(145deg, #fff, #f4fbfa); box-shadow: var(--ee-sh-sm); }
+.ee-gallery-categories-head { display: flex; align-items: end; justify-content: space-between; gap: 1.25rem; margin-bottom: 1rem; }
+.ee-gallery-categories-head .ee-resource-eyebrow { margin-bottom: .45rem; color: var(--ee-tealP); border-color: rgb(0 137 123 / .2); background: var(--ee-tealL); }
+.ee-gallery-categories-head h2 { margin: 0; color: var(--ee-ink); font-size: clamp(1rem, 2.3vw, 1.35rem); }
+.ee-gallery-categories-head > p { max-width: 24rem; margin: 0; color: var(--ee-soft); font-size: .72rem; line-height: 1.8; }
+.ee-gallery-category-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+.ee-gallery-category-card { position: relative; display: block; min-width: 0; overflow: hidden; border-radius: 1rem; background: #0f766e; box-shadow: 0 7px 20px rgb(15 23 42 / .1); isolation: isolate; transition: transform .2s, box-shadow .2s; }
+.ee-gallery-category-card:hover { transform: translateY(-4px); box-shadow: 0 15px 32px rgb(15 23 42 / .18); }
+.ee-gallery-category-media { display: block; aspect-ratio: 16 / 10; overflow: hidden; }
+.ee-gallery-category-media img { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .4s; }
+.ee-gallery-category-card:hover .ee-gallery-category-media img { transform: scale(1.06); }
+.ee-gallery-category-placeholder { display: grid; place-items: center; width: 100%; height: 100%; color: rgb(255 255 255 / .62); background: linear-gradient(135deg, #0f766e, #115e59); }
+.ee-gallery-category-placeholder .ee-ic { width: 3rem; height: 3rem; }
+.ee-gallery-category-shade { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 28%, rgb(2 44 42 / .88)); pointer-events: none; }
+.ee-gallery-category-info { position: absolute; z-index: 2; inset: auto .85rem .75rem; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .12rem .5rem; color: #fff; }
+.ee-gallery-category-info strong { min-width: 0; overflow: hidden; font-size: .9rem; text-overflow: ellipsis; white-space: nowrap; }
+.ee-gallery-category-info span { grid-column: 1; color: rgb(255 255 255 / .76); font-size: .64rem; }
+.ee-gallery-category-info > .ee-ic { grid-column: 2; grid-row: 1 / 3; width: 1.15rem; height: 1.15rem; transition: transform .2s; }
+.ee-gallery-category-card:hover .ee-gallery-category-info > .ee-ic { transform: translateX(-4px); }
+@media (max-width: 800px) { .ee-gallery-category-grid, .ee-arch-grid-full .ee-arch-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .ee-gallery-categories { padding: .8rem; border-radius: 1rem; }.ee-gallery-categories-head { display: block; }.ee-gallery-categories-head > p { margin-top: .35rem; }.ee-gallery-category-grid, .ee-arch-grid-full .ee-arch-cards { grid-template-columns: 1fr; }.ee-gallery-category-media { aspect-ratio: 16 / 9; } }
+@media (prefers-reduced-motion: reduce) { .ee-gallery-category-card, .ee-gallery-category-media img, .ee-gallery-category-info > .ee-ic { transition: none; } }

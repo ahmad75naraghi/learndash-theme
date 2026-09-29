@@ -65,6 +65,20 @@ done
 require_text "$tmp/resource-lib-lib-item-1-.html" 'ee-resource-single' 'library single template did not render'
 require_text "$tmp/resource-clip-clip-item-1-.html" 'ee-resource-single' 'video single template did not render'
 require_text "$tmp/resource-gallery-gallery-item-1-.html" 'ee-resource-single' 'gallery single template did not render'
+require_text "$tmp/resource-gallery-.html" 'ee-gallery-category-grid' 'gallery archive category cards are missing'
+if ! python3 - "$tmp/resource-gallery-.html" <<'PY'
+from pathlib import Path
+import sys
+html = Path(sys.argv[1]).read_text(encoding='utf-8').split('ee-gallery-category-grid', 1)[-1]
+pos = [html.find(label) for label in ('گزارش تصویری', 'مراسم و رویدادها', 'فعالیت‌های آموزشی')]
+raise SystemExit(0 if min(pos) >= 0 and pos == sorted(pos) else 1)
+PY
+then
+	fail 'gallery categories are not ordered from highest to lowest count'
+fi
+reject_text "$tmp/resource-gallery-.html" 'class="ee-side"' 'gallery archive must not render a sidebar'
+require_text "$tmp/resource-gallery-gallery-item-1-.html" 'class="ee-btn ee-btn-primary ee-gallery-download"' 'original gallery image download is missing'
+require_text "$tmp/resource-gallery-gallery-item-1-.html" 'target="_blank" rel="noopener"' 'gallery thumbnail does not open the original image in a new page'
 
 # برگه‌های انتخاب‌پذیر منابع باید query مستقل، کنترل فیلتر و asset مشترک را رندر کنند.
 resource_pages=('library/' 'videos/' 'gallery-page/')
@@ -76,6 +90,9 @@ for path in "${resource_pages[@]}"; do
 	require_text "$tmp/resource-page-$name.html" 'archive-post.css' "resource page stylesheet is missing: /$path"
 done
 require_text "$tmp/resource-page-gallery-page-.html" 'name="resource_cat"' 'gallery taxonomy filter is missing'
+video_grid_count=$(grep -Foc 'class="ee-resource-grid"' "$tmp/resource-page-videos-.html" || true)
+[[ "$video_grid_count" -eq 1 ]] || fail "videos page rendered its archive $video_grid_count times instead of once"
+reject_text "$tmp/resource-page-videos-.html" 'wp-audio-shortcode' 'videos page executed legacy page shortcodes and duplicated structural content'
 fetch '/library/page/2/' "$tmp/resource-page-paged.html"
 require_text "$tmp/resource-page-paged.html" 'کتاب آزمایشی' 'resource pagination did not return the second page'
 fetch '/videos/?resource_search=%D9%88%DB%8C%D8%AF%D8%A6%D9%88' "$tmp/resource-page-search.html"

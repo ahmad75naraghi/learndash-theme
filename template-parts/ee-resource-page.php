@@ -16,14 +16,16 @@ $ee_icon       = isset($args['icon']) ? sanitize_key($args['icon']) : 'article';
 $ee_modifier   = isset($args['modifier']) ? sanitize_html_class($args['modifier']) : 'resources';
 $ee_page       = get_queried_object();
 $ee_page_id    = $ee_page instanceof WP_Post ? (int) $ee_page->ID : 0;
-$ee_intro      = $ee_page_id ? (string) $ee_page->post_content : '';
+$ee_intro_raw  = $ee_page_id && '' !== trim((string) $ee_page->post_excerpt) ? (string) $ee_page->post_excerpt : ($ee_page_id ? (string) $ee_page->post_content : '');
+$ee_intro_raw  = function_exists('excerpt_remove_blocks') ? excerpt_remove_blocks($ee_intro_raw) : $ee_intro_raw;
+$ee_intro      = trim(wp_strip_all_tags(strip_shortcodes($ee_intro_raw))); // متن ساده؛ از اجرای دوبارهٔ shortcode/Query Loop برگه جلوگیری می‌کند.
 $ee_base_url   = $ee_page_id ? (string) get_permalink($ee_page_id) : (string) get_post_type_archive_link($ee_type);
 $ee_base_url   = $ee_base_url ?: home_url('/');
 $ee_paged      = max(1, (int) get_query_var('paged'), (int) get_query_var('page'));
 $ee_search     = isset($_GET['resource_search']) ? sanitize_text_field(wp_unslash($_GET['resource_search'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $ee_term_id    = isset($_GET['resource_cat']) ? absint($_GET['resource_cat']) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $ee_order      = isset($_GET['resource_order']) ? sanitize_key(wp_unslash($_GET['resource_order'])) : 'newest'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$ee_orders     = array('newest' => __('جدیدترین', 'evented-edu'), 'oldest' => __('قدیمی‌ترین', 'evented-edu'), 'title' => __('عنوان', 'evented-edu'), 'popular' => __('پربازدیدترین', 'evented-edu'));
+$ee_orders     = array('newest' => __('جدیدترین', 'evented-edu'), 'oldest' => __('قدیمی‌ترین', 'evented-edu'), 'title' => __('عنوان', 'evented-edu'));
 if (!isset($ee_orders[$ee_order])) { $ee_order = 'newest'; }
 
 $ee_query_args = array(
@@ -50,7 +52,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 				<span class="ee-resource-eyebrow"><svg class="ee-ic" aria-hidden="true"><use href="#i-<?php echo esc_attr($ee_icon); ?>"></use></svg><?php echo esc_html($ee_label); ?></span>
 				<h1><?php echo esc_html($ee_title); ?></h1>
 				<p><?php echo esc_html($ee_subtitle); ?></p>
-				<?php if ('' !== trim(wp_strip_all_tags($ee_intro))) : ?><div class="ee-resource-intro"><?php echo apply_filters('the_content', $ee_intro); // phpcs:ignore ?></div><?php endif; ?>
+				<?php if ('' !== $ee_intro) : ?><div class="ee-resource-intro"><?php echo wpautop(esc_html($ee_intro)); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- متن پیش‌تر escape شده است. ?></div><?php endif; ?>
 			</div>
 			<div class="ee-resource-hero-stat" aria-label="<?php echo esc_attr(sprintf(__('%s مورد منتشرشده', 'evented-edu'), $ee_items instanceof WP_Query ? number_format_i18n($ee_items->found_posts) : 0)); ?>">
 				<strong><?php echo esc_html($ee_items instanceof WP_Query ? number_format_i18n($ee_items->found_posts) : 0); ?></strong>

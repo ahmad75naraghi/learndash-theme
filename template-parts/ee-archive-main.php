@@ -21,6 +21,9 @@ $ee_arch_taxonomy = isset($args['ee_taxonomy']) ? sanitize_key($args['ee_taxonom
 $ee_arch_icon     = isset($args['ee_icon']) ? sanitize_key($args['ee_icon']) : 'newspaper';
 $ee_item_label    = isset($args['ee_item_label']) ? (string) $args['ee_item_label'] : __('نوشته', 'evented-edu');
 $ee_all_url       = isset($args['ee_all_url']) ? (string) $args['ee_all_url'] : '';
+$ee_hide_sidebar  = !empty($args['ee_hide_sidebar']);
+$ee_category_cards = !empty($args['ee_category_cards']);
+$ee_terms_limit   = isset($args['ee_terms_limit']) ? max(0, (int) $args['ee_terms_limit']) : 12;
 $ee_meta_on       = static function ($key) {
 	return !function_exists('evented_post_meta_visible') || evented_post_meta_visible($key);
 };
@@ -59,7 +62,7 @@ $ee_arch_count = isset($GLOBALS['wp_query']->found_posts) ? (int) $GLOBALS['wp_q
 $ee_arch_cats = taxonomy_exists($ee_arch_taxonomy) ? get_terms(array(
 	'taxonomy'   => $ee_arch_taxonomy,
 	'hide_empty' => true,
-	'number'     => 12,
+	'number'     => $ee_terms_limit,
 	'orderby'    => 'count',
 	'order'      => 'DESC',
 )) : array();
@@ -83,7 +86,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 	$ee_arch_title = sprintf(__('نتایج جستجوی «%1$s» در %2$s', 'evented-edu'), get_search_query(), $ee_search_scopes[$ee_search_scope]);
 }
 ?>
-<div class="ee-wrap ee-arch-grid">
+<div class="ee-wrap ee-arch-grid<?php echo $ee_hide_sidebar ? ' ee-arch-grid-full' : ''; ?>">
 
 	<div class="ee-arch-main">
 
@@ -140,6 +143,53 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 					<a class="ee-chip-btn<?php echo $ee_sc_val === $ee_search_scope ? ' ee-on' : ''; ?>" href="<?php echo esc_url($ee_sc_url); ?>"><?php echo esc_html($ee_sc_label); ?><?php if ($ee_sc_n >= 0) : ?><span class="ee-chip-count"><?php echo esc_html(number_format_i18n($ee_sc_n)); ?></span><?php endif; ?></a>
 				<?php endforeach; ?>
 			</nav>
+		<?php elseif ($ee_category_cards && !empty($ee_arch_cats)) :
+			$ee_gallery_cover_map = array();
+			$ee_gallery_cover_ids = get_posts(array(
+				'post_type' => 'gallery', 'post_status' => 'publish', 'posts_per_page' => 100,
+				'fields' => 'ids', 'no_found_rows' => true, 'ignore_sticky_posts' => true,
+				'meta_query' => array(array('key' => '_thumbnail_id', 'compare' => 'EXISTS')),
+			));
+			foreach ($ee_gallery_cover_ids as $ee_gallery_cover_id) {
+				$ee_cover_terms = get_the_terms($ee_gallery_cover_id, $ee_arch_taxonomy);
+				if (is_wp_error($ee_cover_terms)) { continue; }
+				foreach ((array) $ee_cover_terms as $ee_cover_term) {
+					if (!isset($ee_gallery_cover_map[$ee_cover_term->term_id])) { $ee_gallery_cover_map[$ee_cover_term->term_id] = (int) $ee_gallery_cover_id; }
+				}
+			}
+			?>
+			<section class="ee-gallery-categories" aria-labelledby="eeGalleryCategoriesTitle">
+				<div class="ee-gallery-categories-head">
+					<div>
+						<span class="ee-resource-eyebrow"><svg class="ee-ic" aria-hidden="true"><use href="#i-category"></use></svg><?php esc_html_e('دسته‌بندی تصاویر', 'evented-edu'); ?></span>
+						<h2 id="eeGalleryCategoriesTitle"><?php esc_html_e('گالری‌ها را بر اساس موضوع ببینید', 'evented-edu'); ?></h2>
+					</div>
+					<p><?php esc_html_e('دسته‌ها از بیشترین تعداد تصویر به کمترین مرتب شده‌اند.', 'evented-edu'); ?></p>
+				</div>
+				<div class="ee-gallery-category-grid">
+					<?php foreach ($ee_arch_cats as $ee_cat) :
+						$ee_term_link = get_term_link($ee_cat);
+						if (is_wp_error($ee_term_link)) { continue; }
+						$ee_cover_id = isset($ee_gallery_cover_map[$ee_cat->term_id]) ? (int) $ee_gallery_cover_map[$ee_cat->term_id] : 0;
+						?>
+						<a class="ee-gallery-category-card" href="<?php echo esc_url($ee_term_link); ?>">
+							<span class="ee-gallery-category-media">
+								<?php if ($ee_cover_id && has_post_thumbnail($ee_cover_id)) : ?>
+									<?php echo get_the_post_thumbnail($ee_cover_id, 'medium_large', array('loading' => 'lazy', 'decoding' => 'async', 'alt' => '')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+								<?php else : ?>
+									<span class="ee-gallery-category-placeholder"><svg class="ee-ic" aria-hidden="true"><use href="#i-photo_library"></use></svg></span>
+								<?php endif; ?>
+								<span class="ee-gallery-category-shade"></span>
+							</span>
+							<span class="ee-gallery-category-info">
+								<strong><?php echo esc_html($ee_cat->name); ?></strong>
+								<span><?php echo esc_html(sprintf(__('%s تصویر', 'evented-edu'), number_format_i18n((int) $ee_cat->count))); ?></span>
+								<svg class="ee-ic" aria-hidden="true"><use href="#i-arrow_back"></use></svg>
+							</span>
+						</a>
+					<?php endforeach; ?>
+				</div>
+			</section>
 		<?php elseif (!empty($ee_arch_cats)) : ?>
 			<!-- چیپ‌های دسته‌بندی -->
 			<nav class="ee-arch-chips" aria-label="<?php esc_attr_e('فیلتر دسته‌بندی', 'evented-edu'); ?>">
@@ -259,6 +309,6 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 
 	</div>
 
-	<?php get_template_part('template-parts/ee', 'sidebar'); ?>
+	<?php if (!$ee_hide_sidebar) { get_template_part('template-parts/ee', 'sidebar'); } ?>
 
 </div>
