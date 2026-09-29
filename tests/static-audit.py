@@ -38,6 +38,7 @@ for path in (ROOT / "panel").glob("*.php"):
 
 required_snippets = {
     "assets/assets_functions.php": ["'profile' === $panel_section", "jalalidatepicker-js"],
+    "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page'))", "archive-post.css', array('ee-shell'), '1.6.0'"],
     "assets/css/panel.css": ["@media (max-width: 359.98px)", ".ee-panel-pager"],
     "panel/payments.php": ["LIMIT %d OFFSET %d", "evented_panel_pagination"],
     "panel/my-courses.php": ["$courses_per_page", "'no_found_rows'"],
@@ -55,7 +56,7 @@ required_snippets = {
     "archive-gallery.php": ["ee_taxonomy' => 'galery_cat'", "'ee_category_cards' => true", "'ee_hide_sidebar' => true"],
     "taxonomy-galery_cat.php": ["'ee_hide_sidebar' => true"],
     "single-gallery.php": ["'hide_sidebar' => true"],
-    "template-parts/ee-resource-page.php": ["resource_search", "resource_cat", "evented_pagination", "evented_empty_state"],
+    "template-parts/ee-resource-page.php": ["resource_search", "resource_cat", "evented_pagination", "evented_empty_state", "wp_style_is('archive-post'", "'1.6.0'"],
     "page-library.php": ["'post_type' => 'lib'", "'taxonomy' => 'wpdmcategory'"],
     "page-videos.php": ["'post_type' => 'clip'", "'taxonomy' => ''"],
     "page-gallery.php": ["'post_type' => 'gallery'", "'taxonomy' => 'galery_cat'"],

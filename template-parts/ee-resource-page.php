@@ -42,6 +42,15 @@ $ee_items = post_type_exists($ee_type) ? new WP_Query($ee_query_args) : null;
 $ee_terms = ($ee_taxonomy && taxonomy_exists($ee_taxonomy)) ? get_terms(array('taxonomy' => $ee_taxonomy, 'hide_empty' => true, 'number' => 20, 'orderby' => 'count', 'order' => 'DESC')) : array();
 $ee_terms = is_wp_error($ee_terms) ? array() : (array) $ee_terms;
 
+/*
+ * fallback ضروری: page-videos.php ممکن است از سلسله‌مراتب page-{slug}.php انتخاب شود
+ * و در آن حالت is_page_template() روی بعضی نسخه‌ها/تنظیمات false است.
+ */
+if (!wp_style_is('archive-post', 'enqueued')) {
+	$ee_theme_url = defined('PATH_DIR_URL') ? PATH_DIR_URL : get_template_directory_uri();
+	wp_enqueue_style('archive-post', $ee_theme_url . '/assets/css/archive-post.css', array('ee-shell'), '1.6.0');
+}
+
 get_template_part('template-parts/ee', 'head', array('ee_body_class' => 'ee-archive ee-resource-page ee-resource-page-' . $ee_modifier));
 get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active));
 ?>
