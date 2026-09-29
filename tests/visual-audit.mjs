@@ -98,8 +98,10 @@ try {
           const nestedItem = page.locator('.ee-nav-item.has-sub:has(.ee-sub-item.has-children)').first();
           if (await nestedItem.count()) {
             await nestedItem.locator(':scope > a').hover();
+            await page.waitForTimeout(200);
             const parentCategory = nestedItem.locator('.ee-sub-item.has-children').first();
             await parentCategory.hover();
+            await page.waitForTimeout(200);
             const parentBox = await parentCategory.boundingBox();
             const flyout = parentCategory.locator(':scope > .ee-sub-flyout');
             const flyoutBox = await flyout.boundingBox();
