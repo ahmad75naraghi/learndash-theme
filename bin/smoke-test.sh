@@ -54,6 +54,17 @@ fetch '/' "$tmp/home.html"
 require_text "$tmp/home.html" 'id="ee-main"' 'home did not render the evented shell'
 require_text "$tmp/home.html" ' defer src=' 'theme scripts are not deferred'
 require_text "$tmp/home.html" 'Vazirmatn-Variable.woff2' 'main font preload is missing'
+if ! python3 - "$tmp/home.html" <<'PY'
+from pathlib import Path
+import re
+import sys
+html = Path(sys.argv[1]).read_text(encoding='utf-8')
+item = re.search(r'<div class="([^"]*\bee-nav-item\b[^"]*)"[^>]*>\s*<a href="[^"]*/videos/"', html)
+raise SystemExit(0 if item and 'has-sub' not in item.group(1).split() else 1)
+PY
+then
+	fail 'video navigation item must not have a taxonomy submenu'
+fi
 
 # CPTهای مهاجرت‌کرده بدون CPT UI باید آرشیو و نمای تکی سالم داشته باشند.
 resource_paths=('lib/' 'clip/' 'gallery/' 'galery_cat/%DA%AF%D8%B2%D8%A7%D8%B1%D8%B4-%D8%AA%D8%B5%D9%88%DB%8C%D8%B1%DB%8C/' 'lib/lib-item-1/' 'clip/clip-item-1/' 'gallery/gallery-item-1/')
@@ -62,8 +73,15 @@ for path in "${resource_paths[@]}"; do
 	fetch "/$path" "$tmp/resource-$name.html"
 	require_text "$tmp/resource-$name.html" 'id="ee-main"' "custom content route did not render: /$path"
 done
+fetch '/wp-json/wp/v2/types/clip' "$tmp/clip-rest-type.json"
+require_text "$tmp/clip-rest-type.json" '"slug":"clip"' 'clip REST type is missing'
+reject_text "$tmp/clip-rest-type.json" 'wpdmcategory' 'clip remains associated with the library category taxonomy'
+reject_text "$tmp/clip-rest-type.json" 'wpdmtag' 'clip remains associated with the library tag taxonomy'
 require_text "$tmp/resource-lib-lib-item-1-.html" 'ee-resource-single' 'library single template did not render'
 require_text "$tmp/resource-clip-clip-item-1-.html" 'ee-resource-single' 'video single template did not render'
+reject_text "$tmp/resource-clip-clip-item-1-.html" 'class="ee-meta-cat"' 'video single must not render a taxonomy category'
+reject_text "$tmp/resource-clip-.html" 'class="ee-arch-chips"' 'video archive inherited library taxonomy filters'
+require_text "$tmp/resource-lib-.html" 'منابع کتابخانه' 'library taxonomy fixture did not render'
 require_text "$tmp/resource-clip-clip-item-1-.html" 'class="ee-resource-data"' 'video metadata section did not render'
 require_text "$tmp/resource-clip-clip-item-1-.html" '<code dir="ltr">_video_url</code>' 'legacy video meta key is missing'
 require_text "$tmp/resource-clip-clip-item-1-.html" '/wp-content/uploads/video-1.mp4' 'video URL was not recovered from post meta'
@@ -103,6 +121,8 @@ for path in "${resource_pages[@]}"; do
 	require_text "$tmp/resource-page-$name.html" 'name="resource_search"' "resource search is missing: /$path"
 	require_text "$tmp/resource-page-$name.html" 'archive-post.css' "resource page stylesheet is missing: /$path"
 done
+require_text "$tmp/resource-page-library-.html" 'name="resource_cat"' 'library taxonomy filter is missing'
+reject_text "$tmp/resource-page-videos-.html" 'name="resource_cat"' 'videos page must not render a taxonomy filter'
 require_text "$tmp/resource-page-gallery-page-.html" 'name="resource_cat"' 'gallery taxonomy filter is missing'
 reject_text "$tmp/resource-page-gallery-page-.html" 'class="ee-side"' 'gallery page template must not render a sidebar'
 video_grid_count=$(grep -Foc 'class="ee-resource-grid"' "$tmp/resource-page-videos-.html" || true)

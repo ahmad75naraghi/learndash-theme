@@ -93,7 +93,7 @@ function evented_register_migrated_content_types()
 			'singular'     => 'ویدئو',
 			'menu_icon'    => 'dashicons-video-alt3',
 			'supports'     => array('title', 'editor', 'thumbnail', 'comments'),
-			'taxonomies'   => array('wpdmcategory', 'wpdmtag'),
+			'taxonomies'   => array(),
 			'has_archive'  => 'clip',
 		),
 		'gallery' => array(
@@ -143,6 +143,21 @@ function evented_register_migrated_content_types()
 	}
 }
 add_action('init', 'evented_register_migrated_content_types', 20);
+
+/**
+ * ویدئوها taxonomy ندارند؛ association اشتباه نسخه‌های قبلی بدون حذف داده جدا می‌شود.
+ *
+ * unregister فقط اتصال runtime را برمی‌دارد و هیچ term یا رابطه‌ای را از دیتابیس حذف نمی‌کند.
+ */
+function evented_detach_clip_taxonomies()
+{
+	foreach ((array) get_object_taxonomies('clip') as $taxonomy) {
+		if (taxonomy_exists($taxonomy) && is_object_in_taxonomy('clip', $taxonomy)) {
+			unregister_taxonomy_for_object_type($taxonomy, 'clip');
+		}
+	}
+}
+add_action('init', 'evented_detach_clip_taxonomies', 100);
 
 /** بعد از مهاجرت یا تغییر قالب فقط یک بار rewriteها را بازسازی می‌کند. */
 function evented_content_types_maybe_flush_rewrite_rules()

@@ -8,5 +8,5 @@ defined('ABSPATH') || exit;
 get_template_part('template-parts/ee-resource', 'page', array(
 	'post_type' => 'clip', 'active' => 'video', 'title' => 'ویدئوها', 'label' => 'ویدئو',
 	'subtitle' => 'مجموعه ویدئوهای آموزشی، فرهنگی و رسانه‌ای را تماشا کنید',
-	'taxonomy' => 'wpdmcategory', 'icon' => 'smart_display', 'modifier' => 'video',
+	'taxonomy' => '', 'icon' => 'smart_display', 'modifier' => 'video',
 ));

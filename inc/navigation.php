@@ -22,7 +22,7 @@ defined('ABSPATH') || exit;
 
 /* نسخهٔ ساختار کش — با تغییر ساختار آرایه‌ها این عدد را بالا ببرید تا کش قدیمی نادیده گرفته شود. */
 if (!defined('EVENTED_NAV_CACHE_VER')) {
-	define('EVENTED_NAV_CACHE_VER', '9');
+	define('EVENTED_NAV_CACHE_VER', '10');
 }
 
 /**
@@ -280,7 +280,7 @@ function evented_nav_build_cpt_item($key, $title, $icon, $page_slugs)
 	$url       = evented_nav_manual_url($key);
 	$page_id   = 0;
 
-	if ('' !== $post_type) {
+	if ('' !== $post_type && 'video' !== $key && 'clip' !== $post_type) {
 		$children = evented_nav_post_type_children($post_type);
 	}
 
