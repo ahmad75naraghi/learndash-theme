@@ -92,7 +92,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 					$item_term = !empty($item_terms) ? $item_terms[0] : null;
 					?>
 					<article id="post-<?php echo (int) $ee_id; ?>" <?php post_class('ee-resource-card'); ?>>
-						<a class="ee-resource-card-media" href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true">
+						<a class="ee-resource-card-media" href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr(sprintf(__('مشاهدهٔ %s', 'evented-edu'), get_the_title())); ?>">
 							<?php if (has_post_thumbnail()) { the_post_thumbnail('medium_large', array('loading' => 'lazy', 'decoding' => 'async')); } else { ?><span class="ee-resource-placeholder"><svg class="ee-ic" aria-hidden="true"><use href="#i-<?php echo esc_attr($ee_icon); ?>"></use></svg></span><?php } ?>
 							<?php if ('video' === $ee_modifier) : ?><span class="ee-resource-play"><svg class="ee-ic" aria-hidden="true"><use href="#i-play_arrow"></use></svg></span><?php endif; ?>
 							<?php if ($item_term instanceof WP_Term) : ?><span class="ee-resource-card-cat"><?php echo esc_html($item_term->name); ?></span><?php endif; ?>
