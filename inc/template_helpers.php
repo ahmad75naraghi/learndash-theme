@@ -401,6 +401,18 @@ function evented_share_links($url, $title)
 		),
 	);
 
+	/* آی‌گپ share URL عمومی ندارد؛ در بلوک اشتراک به کانال تنظیم‌شدهٔ سایت می‌رود. */
+	$igap_url = 'https://profile.igap.net/';
+	foreach (evented_channel_links() as $channel) {
+		if ('igap' === ($channel['key'] ?? '')) { $igap_url = (string) $channel['url']; break; }
+	}
+	$links[] = array('key' => 'igap', 'label' => 'آی‌گپ', 'url' => $igap_url, 'color' => '#84cc16', 'svg' => '');
+	/* همهٔ محل‌های اشتراک از asset واقعی و محلی برند استفاده می‌کنند. */
+	foreach ($links as &$link) {
+		$link['svg'] = evented_channel_icon_html($link, 'ee-channel-icon-share');
+	}
+	unset($link);
+
 	/**
 	 * Filters the share links array.
 	 *

@@ -32,6 +32,9 @@ $ee_query_args = array(
 	'post_type' => $ee_type, 'post_status' => 'publish', 'posts_per_page' => 12, 'paged' => $ee_paged,
 	'ignore_sticky_posts' => true, 'no_found_rows' => false,
 );
+if ('gallery' === $ee_type) {
+	$ee_query_args['meta_query'] = array(array('key' => '_thumbnail_id', 'compare' => 'EXISTS'));
+}
 if ('' !== $ee_search) { $ee_query_args['s'] = $ee_search; }
 if ($ee_term_id && $ee_taxonomy && taxonomy_exists($ee_taxonomy)) {
 	$ee_query_args['tax_query'] = array(array('taxonomy' => $ee_taxonomy, 'field' => 'term_id', 'terms' => $ee_term_id));
@@ -48,7 +51,7 @@ $ee_terms = is_wp_error($ee_terms) ? array() : (array) $ee_terms;
  */
 if (!wp_style_is('archive-post', 'enqueued')) {
 	$ee_theme_url = defined('PATH_DIR_URL') ? PATH_DIR_URL : get_template_directory_uri();
-	wp_enqueue_style('archive-post', $ee_theme_url . '/assets/css/archive-post.css', array('ee-shell'), '1.6.0');
+	wp_enqueue_style('archive-post', $ee_theme_url . '/assets/css/archive-post.css', array('ee-shell'), '1.7.0');
 }
 
 get_template_part('template-parts/ee', 'head', array('ee_body_class' => 'ee-archive ee-resource-page ee-resource-page-' . $ee_modifier));

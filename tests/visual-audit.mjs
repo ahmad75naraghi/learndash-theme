@@ -30,6 +30,8 @@ const routes = [
   ['library-single', '/lib/lib-item-1/'],
   ['video-archive', '/clip/'],
   ['video-single', '/clip/clip-item-1/'],
+  ['downloads-page', '/download/'],
+  ['download-single', '/download/download-item-1/'],
   ['gallery-archive', '/gallery/'],
   ['gallery-category', '/galery_cat/%DA%AF%D8%B2%D8%A7%D8%B1%D8%B4-%D8%AA%D8%B5%D9%88%DB%8C%D8%B1%DB%8C/'],
   ['gallery-single', '/gallery/gallery-item-1/'],

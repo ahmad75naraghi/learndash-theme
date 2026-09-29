@@ -190,3 +190,6 @@
 .ee-gallery-category-depth-2, .ee-gallery-category-depth-3, .ee-gallery-category-depth-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 800px) { .ee-gallery-category-depth-1, .ee-gallery-category-depth-2, .ee-gallery-category-depth-3, .ee-gallery-category-depth-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .ee-gallery-category-group { padding: .65rem; }.ee-gallery-category-depth-1, .ee-gallery-category-depth-2, .ee-gallery-category-depth-3, .ee-gallery-category-depth-4 { grid-template-columns: 1fr; } }
+
+/* ---------- مرکز دانلود مستقل WPDM ---------- */
+.ee-download-card-stats { display: flex; flex-wrap: wrap; gap: .4rem .75rem; margin-top: auto; padding-top: .65rem; color: var(--ee-soft); font-size: .62rem; }.ee-download-card-stats span { display: inline-flex; align-items: center; gap: .25rem; }.ee-download-card-stats .ee-ic { width: .85rem; height: .85rem; color: var(--ee-tealP); }.ee-download-card-actions { display: flex; align-items: center; justify-content: space-between; gap: .6rem; margin-top: .65rem; }.ee-download-card-actions .ee-resource-card-more { margin-top: 0; }.ee-download-direct { min-height: 2.2rem; padding: .35rem .8rem; font-size: .65rem; }

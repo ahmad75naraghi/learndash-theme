@@ -54,6 +54,7 @@ fetch '/' "$tmp/home.html"
 require_text "$tmp/home.html" 'id="ee-main"' 'home did not render the evented shell'
 require_text "$tmp/home.html" ' defer src=' 'theme scripts are not deferred'
 require_text "$tmp/home.html" 'Vazirmatn-Variable.woff2' 'main font preload is missing'
+require_text "$tmp/home.html" "href=\"$base/gallery/\"" 'gallery menu must link to /gallery/'
 if ! python3 - "$tmp/home.html" <<'PY'
 from pathlib import Path
 import re
@@ -67,7 +68,7 @@ then
 fi
 
 # CPTهای مهاجرت‌کرده بدون CPT UI باید آرشیو و نمای تکی سالم داشته باشند.
-resource_paths=('lib/' 'clip/' 'gallery/' 'galery_cat/%DA%AF%D8%B2%D8%A7%D8%B1%D8%B4-%D8%AA%D8%B5%D9%88%DB%8C%D8%B1%DB%8C/' 'lib/lib-item-1/' 'clip/clip-item-1/' 'gallery/gallery-item-1/')
+resource_paths=('lib/' 'clip/' 'gallery/' 'galery_cat/%DA%AF%D8%B2%D8%A7%D8%B1%D8%B4-%D8%AA%D8%B5%D9%88%DB%8C%D8%B1%DB%8C/' 'lib/lib-item-1/' 'clip/clip-item-1/' 'gallery/gallery-item-1/' 'download/download-item-1/')
 for path in "${resource_paths[@]}"; do
 	name=${path//\//-}
 	fetch "/$path" "$tmp/resource-$name.html"
@@ -167,6 +168,39 @@ reject_text "$gallery_tax_file" 'class="ee-side"' 'gallery taxonomy must not ren
 reject_text "$tmp/resource-gallery-gallery-item-1-.html" 'class="ee-side"' 'gallery single must not render a sidebar'
 require_text "$tmp/resource-gallery-gallery-item-1-.html" 'class="ee-btn ee-btn-primary ee-gallery-download"' 'original gallery image download is missing'
 require_text "$tmp/resource-gallery-gallery-item-1-.html" 'target="_blank" rel="noopener"' 'gallery thumbnail does not open the original image in a new page'
+reject_text "$tmp/resource-gallery-.html" 'gallery-item-13' 'gallery without a featured image leaked into the archive'
+reject_text "$tmp/resource-gallery-.html" 'ee-gallery-category-placeholder' 'gallery category did not inherit a contained gallery image'
+gallery_empty_code=$(curl -sS --max-time 30 --max-redirs 10 -c "$cookie" -b "$cookie" -L -o "$tmp/gallery-empty.html" -w '%{http_code}' "$base/gallery/gallery-item-13/") || gallery_empty_code=000
+requests=$((requests + 1))
+[[ "$gallery_empty_code" == 404 ]] || fail "imageless gallery single returned HTTP $gallery_empty_code instead of 404"
+
+# داده‌های wpdmpro باید بدون افزونه در همان /download/ و صفحهٔ تکی باقی بمانند.
+fetch '/download/' "$tmp/download-archive.html"
+require_text "$tmp/download-archive.html" 'class="ee-resource-grid ee-download-grid"' 'independent download archive is missing'
+require_text "$tmp/download-archive.html" 'دانلود آزمایشی 1' 'WPDM package data is missing from /download/'
+require_text "$tmp/resource-download-download-item-1-.html" 'class="ee-download-files"' 'WPDM single download files are missing'
+require_text "$tmp/resource-download-download-item-1-.html" 'راهنمای آزمایشی 1' 'WPDM file metadata was not recovered'
+download_url=$(python3 - "$tmp/resource-download-download-item-1-.html" <<'PY2'
+from html.parser import HTMLParser
+import sys
+class P(HTMLParser):
+    url = ''
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if tag == 'a' and 'evented_public_download' in a.get('href', '') and not self.url: self.url = a['href']
+p=P(); p.feed(open(sys.argv[1], encoding='utf-8').read()); print(p.url.replace('&amp;', '&'))
+PY2
+)
+if [[ -n "$download_url" ]]; then
+	code=$(curl -sS --max-time 30 -c "$cookie" -b "$cookie" -L -o "$tmp/downloaded-file.bin" -w '%{http_code}' "$download_url") || code=000
+	requests=$((requests + 1)); [[ "$code" == 200 ]] || fail "public download endpoint returned HTTP $code"
+	require_text "$tmp/downloaded-file.bin" 'fixture download file' 'public download endpoint returned the wrong file'
+else
+	fail 'public download URL is missing'
+fi
+for social_asset in eitaa.svg bale.svg rubika.svg igap.png soroush.svg; do
+	require_text "$tmp/resource-download-download-item-1-.html" "assets/images/social/$social_asset" "share block is missing real social icon: $social_asset"
+done
 
 # برگه‌های انتخاب‌پذیر منابع باید query مستقل، کنترل فیلتر و asset مشترک را رندر کنند.
 resource_pages=('library/' 'videos/' 'gallery-page/')
@@ -181,7 +215,7 @@ require_text "$tmp/resource-page-library-.html" 'name="resource_cat"' 'library t
 reject_text "$tmp/resource-page-videos-.html" 'name="resource_cat"' 'videos page must not render a taxonomy filter'
 require_text "$tmp/resource-page-gallery-page-.html" 'name="resource_cat"' 'gallery taxonomy filter is missing'
 reject_text "$tmp/resource-page-gallery-page-.html" 'class="ee-side"' 'gallery page template must not render a sidebar'
-require_text "$tmp/resource-page-videos-.html" 'archive-post.css?ver=1.6.0' 'videos page did not enqueue its dedicated layout stylesheet'
+require_text "$tmp/resource-page-videos-.html" 'archive-post.css?ver=1.7.0' 'videos page did not enqueue its dedicated layout stylesheet'
 require_text "$tmp/resource-page-videos-.html" 'page-template-default' 'videos fixture unexpectedly relies on a manually assigned page template'
 video_grid_count=$(grep -Foc 'class="ee-resource-grid"' "$tmp/resource-page-videos-.html" || true)
 [[ "$video_grid_count" -eq 1 ]] || fail "videos page rendered its archive $video_grid_count times instead of once"

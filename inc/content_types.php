@@ -164,6 +164,44 @@ function evented_detach_clip_taxonomies()
 }
 add_action('init', 'evented_detach_clip_taxonomies', 100);
 
+/** فهرست‌ها و taxonomyهای گالری فقط موارد دارای تصویر را query می‌کنند. */
+function evented_filter_gallery_queries($query)
+{
+	if (is_admin() || !$query instanceof WP_Query || !$query->is_main_query()) { return; }
+	if ($query->is_post_type_archive('gallery') || $query->is_tax('galery_cat')) {
+		$meta_query   = (array) $query->get('meta_query');
+		$meta_query[] = array('key' => '_thumbnail_id', 'compare' => 'EXISTS');
+		$query->set('meta_query', $meta_query);
+	}
+}
+add_action('pre_get_posts', 'evented_filter_gallery_queries');
+
+/** گالری بدون تصویر شاخص در هیچ فهرست عمومی نمایش داده نمی‌شود. */
+function evented_hide_imageless_galleries($posts, $query)
+{
+	if (is_admin() || !$query instanceof WP_Query || $query->is_singular()) {
+		return $posts;
+	}
+	return array_values(array_filter((array) $posts, static function ($post) {
+		return !$post instanceof WP_Post || 'gallery' !== $post->post_type || has_post_thumbnail($post->ID);
+	}));
+}
+add_filter('the_posts', 'evented_hide_imageless_galleries', 20, 2);
+
+/** آدرس مستقیم گالری بدون عکس نیز خروجی عمومی تولید نمی‌کند. */
+function evented_reject_imageless_gallery_single()
+{
+	if (!is_singular('gallery')) { return; }
+	$post_id = (int) get_queried_object_id();
+	if ($post_id && !has_post_thumbnail($post_id)) {
+		global $wp_query;
+		$wp_query->set_404();
+		status_header(404);
+		nocache_headers();
+	}
+}
+add_action('template_redirect', 'evented_reject_imageless_gallery_single', 1);
+
 /** بعد از مهاجرت یا تغییر قالب فقط یک بار rewriteها را بازسازی می‌کند. */
 function evented_content_types_maybe_flush_rewrite_rules()
 {

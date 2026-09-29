@@ -22,7 +22,7 @@ defined('ABSPATH') || exit;
 
 /* نسخهٔ ساختار کش — با تغییر ساختار آرایه‌ها این عدد را بالا ببرید تا کش قدیمی نادیده گرفته شود. */
 if (!defined('EVENTED_NAV_CACHE_VER')) {
-	define('EVENTED_NAV_CACHE_VER', '10');
+	define('EVENTED_NAV_CACHE_VER', '11');
 }
 
 /**
@@ -46,7 +46,7 @@ function evented_nav_post_type_candidates()
 		'library'   => array('lib', 'library', 'book', 'books', 'ebook', 'ebooks', 'ketab', 'ketabkhaneh', 'wp_library'),
 		'gallery'   => array('gallery', 'galleries', 'photo', 'photos', 'album', 'albums', 'envira', 'foogallery'),
 		'video'     => array('video', 'videos', 'clip', 'clips', 'film', 'movie'),
-		'downloads' => array('download', 'downloads', 'dlm_download', 'edd_download', 'file', 'files', 'attachment_file'),
+		'downloads' => array('wpdmpro', 'download', 'downloads', 'dlm_download', 'edd_download', 'file', 'files', 'attachment_file'),
 		'podcast'   => array('podcast', 'podcasts', 'episode', 'episodes', 'audio', 'seriously-simple-podcasting'),
 		'courses'   => array('sfwd-courses'),
 	);
@@ -116,6 +116,7 @@ function evented_nav_term_children($taxonomy, $limit = 12)
 				continue;
 			}
 			$out[] = array(
+				'term_id'  => (int) $term->term_id,
 				'title'    => (string) $term->name,
 				'url'      => (string) $link,
 				'count'    => (int) $term->count,
@@ -175,6 +176,7 @@ function evented_nav_term_children($taxonomy, $limit = 12)
 			$next_trail           = $trail;
 			$next_trail[$term_id] = true;
 			$items[] = array(
+				'term_id'  => (int) $term_id,
 				'title'    => (string) $term->name,
 				'url'      => (string) $link,
 				'count'    => (int) $totals[$term_id],
@@ -285,6 +287,20 @@ function evented_nav_build_cpt_item($key, $title, $icon, $page_slugs)
 	}
 
 	/* در گالری، والدها فقط عنوان گروه هستند و فقط زیر‌دسته‌های نهایی لینک دارند. */
+	if ('downloads' === $key && !empty($children)) {
+		$download_links = static function ($items) use (&$download_links) {
+			foreach ($items as &$item) {
+				if (!empty($item['term_id'])) {
+					$item['url'] = (string) add_query_arg('download_cat', (int) $item['term_id'], home_url('/download/'));
+				}
+				if (!empty($item['children'])) { $item['children'] = $download_links($item['children']); }
+			}
+			unset($item);
+			return $items;
+		};
+		$children = $download_links($children);
+	}
+
 	if ('gallery' === $key && !empty($children)) {
 		$gallery_headings = static function ($items) use (&$gallery_headings) {
 			$output = array();
@@ -366,7 +382,9 @@ function evented_nav_build_items(): array {
 
     // CPT ها
     $items[] = evented_nav_build_cpt_item('library', 'کتابخانه', 'local_library', ['lib', 'library', 'کتابخانه', 'books', 'ketabkhaneh']);
-    $items[] = evented_nav_build_cpt_item('gallery', 'گالری', 'photo_library', ['گالری-مناسبتی', 'گالری-موضوعی', 'galleries', 'gallery-page']);
+    $gallery_item = evented_nav_build_cpt_item('gallery', 'گالری', 'photo_library', ['gallery']);
+    $gallery_item['url'] = (string) home_url('/gallery/');
+    $items[] = $gallery_item;
     $items[] = evented_nav_build_cpt_item('video', 'ویدیو', 'smart_display', ['videos', 'video']);
     $items[] = evented_nav_build_cpt_item('downloads', 'دانلودها', 'download_for_offline', ['download', 'downloads']);
 

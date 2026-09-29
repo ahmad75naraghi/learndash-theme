@@ -147,7 +147,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 		<?php elseif ($ee_category_cards && !empty($ee_arch_cats)) :
 			$ee_gallery_cover_map = array();
 			$ee_gallery_cover_ids = get_posts(array(
-				'post_type' => 'gallery', 'post_status' => 'publish', 'posts_per_page' => 100,
+				'post_type' => 'gallery', 'post_status' => 'publish', 'posts_per_page' => -1,
 				'fields' => 'ids', 'no_found_rows' => true, 'ignore_sticky_posts' => true,
 				'meta_query' => array(array('key' => '_thumbnail_id', 'compare' => 'EXISTS')),
 			));
@@ -162,9 +162,29 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 			$ee_gallery_children    = array();
 			foreach ($ee_arch_cats as $ee_gallery_term) {
 				if (!$ee_gallery_term instanceof WP_Term || (int) $ee_gallery_term->count < 1) { continue; }
-				$ee_gallery_terms_by_id[(int) $ee_gallery_term->term_id] = $ee_gallery_term;
-				$ee_gallery_children[(int) $ee_gallery_term->parent][] = (int) $ee_gallery_term->term_id;
+				$term_id = (int) $ee_gallery_term->term_id;
+				$ee_gallery_terms_by_id[$term_id] = $ee_gallery_term;
+				$ee_gallery_children[(int) $ee_gallery_term->parent][] = $term_id;
+				/* تصویر اختصاصی taxonomy مقدم است؛ در نبود آن تصویر یک گالری داخل دسته استفاده می‌شود. */
+				foreach (array('thumbnail_id', 'image_id', 'galery_cat_image_id', 'category_image_id') as $image_meta_key) {
+					$term_image_id = absint(get_term_meta($term_id, $image_meta_key, true));
+					if ($term_image_id && wp_attachment_is_image($term_image_id)) {
+						$ee_gallery_cover_map[$term_id] = $term_image_id;
+						break;
+					}
+				}
 			}
+			$ee_find_gallery_cover = static function ($term_id, $trail = array()) use (&$ee_find_gallery_cover, &$ee_gallery_cover_map, $ee_gallery_children) {
+				if (!empty($ee_gallery_cover_map[$term_id])) { return (int) $ee_gallery_cover_map[$term_id]; }
+				if (isset($trail[$term_id])) { return 0; }
+				$trail[$term_id] = true;
+				foreach ((array) ($ee_gallery_children[$term_id] ?? array()) as $child_id) {
+					$cover_id = $ee_find_gallery_cover($child_id, $trail);
+					if ($cover_id) { $ee_gallery_cover_map[$term_id] = $cover_id; return $cover_id; }
+				}
+				return 0;
+			};
+			foreach (array_keys($ee_gallery_terms_by_id) as $gallery_term_id) { $ee_find_gallery_cover($gallery_term_id); }
 			$ee_render_gallery_terms = static function ($parent_id, $depth = 0) use (&$ee_render_gallery_terms, $ee_gallery_children, $ee_gallery_terms_by_id, $ee_gallery_cover_map) {
 				if (empty($ee_gallery_children[$parent_id])) { return; }
 				echo '<div class="ee-gallery-category-grid ee-gallery-category-level ee-gallery-category-depth-' . (int) min(4, $depth) . '">';
@@ -181,6 +201,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 					$ee_term_link = get_term_link($ee_cat);
 					if (is_wp_error($ee_term_link)) { continue; }
 					$ee_cover_id = isset($ee_gallery_cover_map[$ee_cat->term_id]) ? (int) $ee_gallery_cover_map[$ee_cat->term_id] : 0;
+					if (!$ee_cover_id) { continue; }
 					?>
 					<a class="ee-gallery-category-card" href="<?php echo esc_url($ee_term_link); ?>">
 						<span class="ee-gallery-category-media">
