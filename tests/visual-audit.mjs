@@ -86,6 +86,20 @@ try {
         }
         await page.evaluate(() => document.fonts?.ready);
 
+        if (route.startsWith('/panel')) {
+          const helpButton = page.locator('[data-ee-panel-help]');
+          if (await helpButton.count()) {
+            await helpButton.click();
+            const helpId = await helpButton.getAttribute('aria-controls');
+            const helpState = await page.locator(`#${helpId}`).evaluate(el => ({ hidden: el.hidden, text: el.textContent.trim() }));
+            if (helpState.hidden || !helpState.text || await helpButton.getAttribute('aria-expanded') !== 'true') {
+              report('failure', viewportName, route, 'section help did not open correctly');
+            }
+          } else {
+            report('failure', viewportName, route, 'section help button is missing');
+          }
+        }
+
         const metrics = await page.evaluate(() => {
           const root = document.documentElement;
           const brokenImages = [...document.images]

@@ -60,7 +60,21 @@
 /* سربرگ صفحه */
 .ee-panel-main { min-width: 0; display: flex; flex-direction: column; gap: 1.25rem; }
 .ee-panel-head { display: flex; flex-direction: column; gap: .3rem; }
+.ee-panel-title-row { display: flex; align-items: center; gap: .55rem; min-width: 0; }
 .ee-panel-title { font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0; }
+.ee-panel-help-button {
+    width: 2.5rem; height: 2.5rem; flex: 0 0 2.5rem; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid #99f6e4; border-radius: 50%; background: #ecfdf5; color: var(--ee-tealP);
+    font: 900 1rem/1 "Vazirmatn", Tahoma, sans-serif; cursor: pointer; transition: background .15s, color .15s, transform .15s;
+}
+.ee-panel-help-button:hover, .ee-panel-help-button[aria-expanded="true"] { background: var(--ee-tealP); color: #fff; }
+.ee-panel-help-button:active { transform: scale(.94); }
+.ee-panel-help-button:focus-visible { outline: 3px solid rgb(0 137 123 / .2); outline-offset: 2px; }
+.ee-panel-help-text {
+    margin: .35rem 0 .2rem; padding: .75rem .9rem; border: 1px solid #a7f3d0; border-radius: .85rem;
+    background: #f0fdf4; color: #166534; font-size: .78rem; line-height: 1.9;
+}
+.ee-panel-help-text[hidden] { display: none; }
 .ee-panel-head .ee-crumb { margin: 0; }
 
 /* مودال عمومی */

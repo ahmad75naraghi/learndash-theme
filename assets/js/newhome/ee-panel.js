@@ -16,6 +16,17 @@
         });
     });
 
+    /* راهنمای کوتاه هر بخش پنل */
+    $$('[data-ee-panel-help]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var help = document.getElementById(button.getAttribute('aria-controls'));
+            if (!help) { return; }
+            var open = button.getAttribute('aria-expanded') === 'true';
+            button.setAttribute('aria-expanded', open ? 'false' : 'true');
+            help.hidden = open;
+        });
+    });
+
     /* --- مودال خروج --- */
     var logoutModal = $('#eeLogoutModal');
     var logoutConfirm = $('#eeLogoutConfirm');

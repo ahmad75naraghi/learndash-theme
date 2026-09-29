@@ -61,6 +61,8 @@ for path in "${panel_paths[@]}"; do
 	fetch "/$path/" "$tmp/$name.html"
 	require_text "$tmp/$name.html" 'class="ee-panel' "panel shell missing on /$path/ (authenticated session required)"
 	require_text "$tmp/$name.html" 'data-ee-panel-nav' "mobile panel navigation missing on /$path/"
+	require_text "$tmp/$name.html" 'data-ee-panel-help' "section help button missing on /$path/"
+	require_text "$tmp/$name.html" 'class="ee-panel-help-text"' "section help text missing on /$path/"
 done
 
 # دارایی 23KB تقویم فقط باید روی پروفایل باشد.

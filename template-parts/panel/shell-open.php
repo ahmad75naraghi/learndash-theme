@@ -30,6 +30,18 @@ $ee_panel_menu = array(
 	'settings'     => array('حساب کاربری', 'settings', home_url('/panel/settings')),
 );
 $ee_panel_menu = apply_filters('evented_panel_menu', $ee_panel_menu);
+$ee_panel_help = array(
+	'dashboard'    => 'در پیشخوان، خلاصهٔ وضعیت آموزشی، دوره‌های در حال یادگیری و مسیر ادامهٔ مطالعه را می‌بینید.',
+	'my-courses'   => 'در این بخش همهٔ دوره‌هایی که در آن‌ها ثبت‌نام کرده‌اید، میزان پیشرفت و دکمهٔ ادامهٔ آموزش نمایش داده می‌شود.',
+	'certificates' => 'گواهینامه‌های دریافت‌شده از دوره‌ها و آزمون‌ها در این بخش قرار می‌گیرند و می‌توانید آن‌ها را مشاهده یا دریافت کنید.',
+	'wishlist'     => 'دوره‌هایی که برای بررسی یا ثبت‌نام در آینده ذخیره کرده‌اید اینجا هستند؛ هر مورد را می‌توانید باز یا حذف کنید.',
+	'payments'     => 'سوابق پرداخت، وضعیت تراکنش و اطلاعات پیگیری خریدهای شما در این بخش نمایش داده می‌شود.',
+	'profile'      => 'نام فارسی و انگلیسی، جنسیت و تاریخ تولد را اینجا تکمیل کنید؛ این اطلاعات برای پروفایل و صدور گواهینامه استفاده می‌شوند.',
+	'settings'     => 'شمارهٔ همراه، ایمیل و رمز عبور حساب از این بخش مدیریت می‌شوند. شمارهٔ همراه، شناسهٔ ورود شماست.',
+);
+$ee_panel_help = apply_filters('evented_panel_help_texts', $ee_panel_help);
+$ee_help_text  = isset($ee_panel_help[$ee_panel_current]) ? (string) $ee_panel_help[$ee_panel_current] : '';
+$ee_help_id    = 'ee-panel-help-' . sanitize_html_class($ee_panel_current ?: 'page');
 ?>
 <main id="ee-main" class="ee-panel">
 	<div class="ee-wrap ee-panel-grid">
@@ -70,7 +82,15 @@ $ee_panel_menu = apply_filters('evented_panel_menu', $ee_panel_menu);
 		<section class="ee-panel-main">
 			<?php if ('' !== $ee_panel_title) : ?>
 				<header class="ee-panel-head">
-					<h1 class="ee-panel-title"><?php echo esc_html($ee_panel_title); ?></h1>
+					<div class="ee-panel-title-row">
+						<h1 class="ee-panel-title"><?php echo esc_html($ee_panel_title); ?></h1>
+						<?php if ('' !== $ee_help_text) : ?>
+							<button type="button" class="ee-panel-help-button" data-ee-panel-help aria-expanded="false" aria-controls="<?php echo esc_attr($ee_help_id); ?>" aria-label="راهنمای بخش <?php echo esc_attr($ee_panel_title); ?>">؟</button>
+						<?php endif; ?>
+					</div>
+					<?php if ('' !== $ee_help_text) : ?>
+						<p class="ee-panel-help-text" id="<?php echo esc_attr($ee_help_id); ?>" hidden><?php echo esc_html($ee_help_text); ?></p>
+					<?php endif; ?>
 					<nav class="ee-crumb" aria-label="مسیر صفحه">
 						<a href="<?php echo esc_url(home_url('/')); ?>">خانه</a>
 						<?php echo ee_icon('chevron_left'); // phpcs:ignore ?>
