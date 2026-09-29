@@ -3,7 +3,8 @@
 قالب داده‌های اصلی افزونه را جابه‌جا نمی‌کند. بعد از حذف افزونه، همان ساختارهای موجود ثبت و خوانده می‌شوند:
 
 - post type: `wpdmpro`
-- taxonomyها: `wpdmcategory` و `wpdmtag`
+- دانلود عمداً هیچ taxonomy ندارد. associationهای قدیمی `wpdmcategory`/`wpdmtag` فقط در runtime جدا می‌شوند و رابطه‌های احتمالی موجود از دیتابیس حذف نمی‌شوند.
+- `wpdmcategory` صرفاً برای post type کتابخانه (`lib`) باقی می‌ماند.
 - فایل‌ها: `__wpdm_files` و کلیدهای قدیمی `_wpdm_files`
 - اطلاعات فایل: `__wpdm_fileinfo`
 - حجم بسته: `__wpdm_package_size`

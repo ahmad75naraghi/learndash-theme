@@ -60,11 +60,13 @@ from pathlib import Path
 import re
 import sys
 html = Path(sys.argv[1]).read_text(encoding='utf-8')
-item = re.search(r'<div class="([^"]*\bee-nav-item\b[^"]*)"[^>]*>\s*<a href="[^"]*/videos/"', html)
-raise SystemExit(0 if item and 'has-sub' not in item.group(1).split() else 1)
+def plain_item(path):
+    item = re.search(r'<div class="([^"]*\bee-nav-item\b[^"]*)"[^>]*>\s*<a href="[^"]*/' + path + r'/"', html)
+    return item and 'has-sub' not in item.group(1).split()
+raise SystemExit(0 if plain_item('videos') and plain_item('download') else 1)
 PY
 then
-	fail 'video navigation item must not have a taxonomy submenu'
+	fail 'video/download navigation items must not have taxonomy submenus'
 fi
 
 # CPTهای مهاجرت‌کرده بدون CPT UI باید آرشیو و نمای تکی سالم داشته باشند.
@@ -78,6 +80,13 @@ fetch '/wp-json/wp/v2/types/clip' "$tmp/clip-rest-type.json"
 require_text "$tmp/clip-rest-type.json" '"slug":"clip"' 'clip REST type is missing'
 reject_text "$tmp/clip-rest-type.json" 'wpdmcategory' 'clip remains associated with the library category taxonomy'
 reject_text "$tmp/clip-rest-type.json" 'wpdmtag' 'clip remains associated with the library tag taxonomy'
+fetch '/wp-json/wp/v2/types/wpdmpro' "$tmp/download-rest-type.json"
+require_text "$tmp/download-rest-type.json" '"slug":"wpdmpro"' 'download REST type is missing'
+reject_text "$tmp/download-rest-type.json" 'wpdmcategory' 'downloads remain associated with the library category taxonomy'
+reject_text "$tmp/download-rest-type.json" 'wpdmtag' 'downloads remain associated with a tag taxonomy'
+fetch '/wp-admin/edit.php?post_type=wpdmpro' "$tmp/download-admin.html"
+reject_text "$tmp/download-admin.html" 'taxonomy=wpdmcategory&amp;post_type=wpdmpro' 'download admin menu still exposes library categories'
+reject_text "$tmp/download-admin.html" 'taxonomy=wpdmtag&amp;post_type=wpdmpro' 'download admin menu still exposes tags'
 fetch '/wp-json/wp/v2/clip?slug=clip-item-1' "$tmp/clip-rest-item.json"
 require_text "$tmp/clip-rest-item.json" '"_evented_video_playlist"' 'canonical video playlist meta is missing from Gutenberg REST data'
 clip_id=$(python3 - "$tmp/clip-rest-item.json" <<'PY'
@@ -178,7 +187,10 @@ requests=$((requests + 1))
 fetch '/download/' "$tmp/download-archive.html"
 require_text "$tmp/download-archive.html" 'class="ee-resource-grid ee-download-grid"' 'independent download archive is missing'
 require_text "$tmp/download-archive.html" 'دانلود آزمایشی 1' 'WPDM package data is missing from /download/'
+reject_text "$tmp/download-archive.html" 'name="download_cat"' 'download archive must not expose a taxonomy filter'
+reject_text "$tmp/download-archive.html" 'class="ee-resource-chips"' 'download archive must not expose taxonomy chips'
 require_text "$tmp/resource-download-download-item-1-.html" 'class="ee-download-files"' 'WPDM single download files are missing'
+reject_text "$tmp/resource-download-download-item-1-.html" 'class="ee-download-terms"' 'download single must not render taxonomy terms'
 require_text "$tmp/resource-download-download-item-1-.html" 'راهنمای آزمایشی 1' 'WPDM file metadata was not recovered'
 download_url=$(python3 - "$tmp/resource-download-download-item-1-.html" <<'PY2'
 from html.parser import HTMLParser

@@ -5,7 +5,7 @@ get_template_part('template-parts/ee', 'head', array('ee_body_class' => 'ee-sing
 get_template_part('template-parts/ee', 'header', array('ee_active' => 'downloads'));
 ?>
 <main id="ee-main" class="ee-single-main">
-<?php while (have_posts()) : the_post(); $id = get_the_ID(); $data = evented_download_data($id); $shares = evented_share_links(get_permalink(), get_the_title()); $terms = get_the_terms($id, 'wpdmcategory'); $terms = is_wp_error($terms) ? array() : (array) $terms; ?>
+<?php while (have_posts()) : the_post(); $id = get_the_ID(); $data = evented_download_data($id); $shares = evented_share_links(get_permalink(), get_the_title()); ?>
 	<div class="ee-wrap ee-download-single-wrap">
 		<article <?php post_class('ee-post ee-download-post'); ?>>
 			<nav class="ee-crumb" aria-label="مسیر صفحه"><a href="<?php echo esc_url(home_url('/')); ?>">خانه</a><svg class="ee-ic" aria-hidden="true"><use href="#i-chevron_left"></use></svg><a href="<?php echo esc_url(home_url('/download/')); ?>">دانلودها</a><svg class="ee-ic" aria-hidden="true"><use href="#i-chevron_left"></use></svg><span><?php the_title(); ?></span></nav>
@@ -16,7 +16,6 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'downloads
 					<?php if ($data['files']) : ?><div class="ee-download-files"><?php foreach ($data['files'] as $index => $file) : ?><div class="ee-download-file"><span class="ee-download-file-type"><?php echo esc_html($file['extension'] ?: 'FILE'); ?></span><span class="ee-download-file-copy"><strong><?php echo esc_html($file['label']); ?></strong><small><?php echo esc_html($file['size'] ? evented_download_size_label($file['size']) : ($data['size'] ?: 'فایل دانلودی')); ?></small></span><a class="ee-btn ee-btn-primary" href="<?php echo esc_url($file['url']); ?>"><svg class="ee-ic" aria-hidden="true"><use href="#i-download"></use></svg>دانلود</a></div><?php endforeach; ?></div><?php else : ?><p class="ee-empty-inline">فایلی برای این مورد پیدا نشد. متای اصلی نوشته حفظ شده و می‌توانید مسیر فایل را در مدیریت بررسی کنید.</p><?php endif; ?>
 				</section>
 			</div>
-			<?php if ($terms) : ?><div class="ee-download-terms"><?php foreach ($terms as $term) : ?><a href="<?php echo esc_url(add_query_arg('download_cat', $term->term_id, home_url('/download/'))); ?>"><?php echo esc_html($term->name); ?></a><?php endforeach; ?></div><?php endif; ?>
 			<?php if (trim((string) get_the_content())) : ?><div class="ee-post-content"><?php the_content(); ?></div><?php endif; ?>
 			<?php if ($shares) : ?><div class="ee-share-block"><span class="ee-share-label">اشتراک‌گذاری این دانلود</span><div class="ee-share-row"><?php foreach ($shares as $share) : ?><a class="ee-share-btn" style="background:<?php echo esc_attr($share['color']); ?>" href="<?php echo esc_url($share['url']); ?>" target="_blank" rel="noopener nofollow" aria-label="<?php echo esc_attr($share['label']); ?>"><?php echo $share['svg']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a><?php endforeach; ?></div></div><?php endif; ?>
 		</article>

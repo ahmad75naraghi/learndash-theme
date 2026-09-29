@@ -47,16 +47,16 @@ required_snippets = {
     "assets/css/newhome/ee-shell.css": [".ee-sub-item:hover > .ee-sub-flyout", "right: calc(100% + .4rem)"],
     "assets/js/newhome/evented-home.js": ["ArrowLeft", "aria-expanded"],
     "inc/content_types.php": ["register_post_type($post_type", "'lib' => array(", "'clip' => array(", "'gallery' => array(", "register_taxonomy('galery_cat'", "evented_detach_clip_taxonomies", "unregister_taxonomy_for_object_type($taxonomy, 'clip')"],
-    "inc/navigation.php": ["'gallery' === $key", "'is_heading'", "'video' !== $key && 'clip' !== $post_type", "EVENTED_NAV_CACHE_VER', '11"],
+    "inc/navigation.php": ["'gallery' === $key", "'is_heading'", "array('video', 'downloads')", "array('clip', 'wpdmpro')", "EVENTED_NAV_CACHE_VER', '11"],
     "template-parts/ee-resource-single.php": ["ee-resource-single", "the_content()", "comments_template()", "wp_get_original_image_url", "ee-gallery-download", "ee-resource-data", "ee-resource-video-player", "ee-resource-playlist", "evented_clip_playlist", "'clip' !== $ee_type"],
     "inc/template_helpers.php": ["evented_resource_public_meta", "evented_resource_meta_urls", "evented_resource_meta_value_html", "evented_clip_playlist", "_elementor_data", "EVENTED_VIDEO_PLAYLIST_META"],
     "assets/js/resource-video.js": ["data-ee-video-src", "aria-current", "video.load()"],
     "assets/js/admin/video-playlist.js": ["data-ee-video-add", "wp.media", "reindex"],
     "assets/css/admin/video-playlist.css": [".ee-video-admin-row", ".ee-video-admin-fields"],
-    "inc/downloads.php": ["register_post_type('wpdmpro'", "register_taxonomy('wpdmcategory'", "register_taxonomy('wpdmtag'", "__wpdm_files", "evented_download_files", "evented_serve_public_download"],
+    "inc/downloads.php": ["register_post_type('wpdmpro'", "register_taxonomy('wpdmcategory'", "'taxonomies' => array()", "evented_detach_download_taxonomies", "unregister_taxonomy_for_object_type($taxonomy, 'wpdmpro')", "evented_remove_download_taxonomy_menus", "__wpdm_files", "evented_download_files", "evented_serve_public_download"],
     "page-download.php": ["ee-download", "Template Name: دانلودها"],
     "single-wpdmpro.php": ["evented_download_data", "ee-download-files", "evented_share_links"],
-    "template-parts/ee-download-archive.php": ["download_search", "download_cat", "ee-download-grid", "evented_download_data"],
+    "template-parts/ee-download-archive.php": ["download_search", "download_order", "ee-download-grid", "evented_download_data"],
     "inc/video_playlist.php": ["EVENTED_VIDEO_PLAYLIST_META", "register_post_meta('clip'", "evented_save_video_playlist", "evented_migrate_video_playlists", "__block_editor_compatible_meta_box"],
     "single-clip.php": ["'show_meta' => true", "'taxonomy' => ''"],
     "archive-clip.php": ["'ee_taxonomy' => ''"],
@@ -75,6 +75,17 @@ for rel, snippets in required_snippets.items():
         checked += 1
         if snippet not in text:
             errors.append(f"required QA contract missing in {rel}: {snippet}")
+
+forbidden_snippets = {
+    "template-parts/ee-download-archive.php": ["download_cat", "wpdmcategory", "ee-resource-chips"],
+    "single-wpdmpro.php": ["wpdmcategory", "ee-download-terms"],
+}
+for rel, snippets in forbidden_snippets.items():
+    text = (ROOT / rel).read_text(encoding="utf-8")
+    for snippet in snippets:
+        checked += 1
+        if snippet in text:
+            errors.append(f"forbidden QA contract found in {rel}: {snippet}")
 
 if errors:
     for error in errors:

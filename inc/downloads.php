@@ -2,8 +2,8 @@
 /**
  * پشتیبانی مستقل از داده‌های WordPress Download Manager پس از حذف افزونه.
  *
- * هیچ رکوردی مهاجرت یا حذف نمی‌شود: post type `wpdmpro`، taxonomy
- * `wpdmcategory` و متاهای `__wpdm_*` با همان کلیدهای اصلی خوانده می‌شوند.
+ * هیچ رکوردی مهاجرت یا حذف نمی‌شود: post type `wpdmpro` و متاهای
+ * `__wpdm_*` با همان کلیدهای اصلی خوانده می‌شوند. دانلود عمداً هیچ taxonomy ندارد.
  *
  * @package evented-edu
  */
@@ -12,25 +12,18 @@ defined('ABSPATH') || exit;
 /** ثبت همان کلیدهای WPDM فقط وقتی افزونه آن‌ها را ثبت نکرده باشد. */
 function evented_register_wpdm_content()
 {
+	/* wpdmcategory فقط taxonomy کتابخانه است و هرگز به دانلود متصل نمی‌شود. */
 	if (!taxonomy_exists('wpdmcategory')) {
-		register_taxonomy('wpdmcategory', array('wpdmpro', 'lib'), array(
+		register_taxonomy('wpdmcategory', array('lib'), array(
 			'labels' => array(
-				'name' => 'دسته‌های دانلود', 'singular_name' => 'دستهٔ دانلود',
+				'name' => 'دسته‌های کتابخانه', 'singular_name' => 'دستهٔ کتابخانه',
 				'all_items' => 'همهٔ دسته‌ها', 'edit_item' => 'ویرایش دسته',
 				'add_new_item' => 'افزودن دسته', 'search_items' => 'جستجوی دسته‌ها',
 			),
 			'public' => true, 'publicly_queryable' => true, 'hierarchical' => true,
 			'show_ui' => true, 'show_admin_column' => true, 'show_in_rest' => true,
 			'show_in_nav_menus' => true, 'query_var' => true,
-			'rewrite' => array('slug' => 'download-category', 'with_front' => false, 'hierarchical' => true),
-		));
-	}
-	if (!taxonomy_exists('wpdmtag')) {
-		register_taxonomy('wpdmtag', array('wpdmpro'), array(
-			'labels' => array('name' => 'برچسب‌های دانلود', 'singular_name' => 'برچسب دانلود'),
-			'public' => true, 'publicly_queryable' => true, 'hierarchical' => false,
-			'show_ui' => true, 'show_admin_column' => true, 'show_in_rest' => true,
-			'rewrite' => array('slug' => 'download-tag', 'with_front' => false),
+			'rewrite' => array('slug' => 'wpdmcategory', 'with_front' => true, 'hierarchical' => true),
 		));
 	}
 	if (!post_type_exists('wpdmpro')) {
@@ -42,18 +35,37 @@ function evented_register_wpdm_content()
 			'has_archive' => false, 'query_var' => true, 'menu_icon' => 'dashicons-download',
 			'rewrite' => array('slug' => 'download', 'with_front' => false),
 			'supports' => array('title', 'editor', 'excerpt', 'thumbnail', 'author', 'custom-fields'),
-			'taxonomies' => array('wpdmcategory'),
+			'taxonomies' => array(),
 		));
 	}
 	if (taxonomy_exists('wpdmcategory')) {
-		register_taxonomy_for_object_type('wpdmcategory', 'wpdmpro');
 		register_taxonomy_for_object_type('wpdmcategory', 'lib');
-	}
-	if (taxonomy_exists('wpdmtag')) {
-		register_taxonomy_for_object_type('wpdmtag', 'wpdmpro');
 	}
 }
 add_action('init', 'evented_register_wpdm_content', 21);
+
+/**
+ * دانلود هیچ دسته/برچسبی ندارد؛ association افزونه فقط از runtime جدا می‌شود.
+ * termها و relationshipهای قدیمی در دیتابیس حذف نمی‌شوند.
+ */
+function evented_detach_download_taxonomies()
+{
+	foreach ((array) get_object_taxonomies('wpdmpro') as $taxonomy) {
+		if (taxonomy_exists($taxonomy) && is_object_in_taxonomy('wpdmpro', $taxonomy)) {
+			unregister_taxonomy_for_object_type($taxonomy, 'wpdmpro');
+		}
+	}
+}
+add_action('init', 'evented_detach_download_taxonomies', 100);
+
+/** هر زیرمنوی taxonomy باقی‌مانده از WPDM نیز از منوی دانلود حذف می‌شود. */
+function evented_remove_download_taxonomy_menus()
+{
+	$parent = 'edit.php?post_type=wpdmpro';
+	remove_submenu_page($parent, 'edit-tags.php?taxonomy=wpdmcategory&post_type=wpdmpro');
+	remove_submenu_page($parent, 'edit-tags.php?taxonomy=wpdmtag&post_type=wpdmpro');
+}
+add_action('admin_menu', 'evented_remove_download_taxonomy_menus', 999);
 
 /** رشتهٔ متا با سازگاری کلیدهای قدیمی/جدید WPDM. */
 function evented_wpdm_meta($post_id, $names, $default = '')

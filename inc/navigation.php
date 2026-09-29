@@ -116,7 +116,6 @@ function evented_nav_term_children($taxonomy, $limit = 12)
 				continue;
 			}
 			$out[] = array(
-				'term_id'  => (int) $term->term_id,
 				'title'    => (string) $term->name,
 				'url'      => (string) $link,
 				'count'    => (int) $term->count,
@@ -176,7 +175,6 @@ function evented_nav_term_children($taxonomy, $limit = 12)
 			$next_trail           = $trail;
 			$next_trail[$term_id] = true;
 			$items[] = array(
-				'term_id'  => (int) $term_id,
 				'title'    => (string) $term->name,
 				'url'      => (string) $link,
 				'count'    => (int) $totals[$term_id],
@@ -282,25 +280,15 @@ function evented_nav_build_cpt_item($key, $title, $icon, $page_slugs)
 	$url       = evented_nav_manual_url($key);
 	$page_id   = 0;
 
-	if ('' !== $post_type && 'video' !== $key && 'clip' !== $post_type) {
+	if (
+		'' !== $post_type
+		&& !in_array($key, array('video', 'downloads'), true)
+		&& !in_array($post_type, array('clip', 'wpdmpro'), true)
+	) {
 		$children = evented_nav_post_type_children($post_type);
 	}
 
 	/* در گالری، والدها فقط عنوان گروه هستند و فقط زیر‌دسته‌های نهایی لینک دارند. */
-	if ('downloads' === $key && !empty($children)) {
-		$download_links = static function ($items) use (&$download_links) {
-			foreach ($items as &$item) {
-				if (!empty($item['term_id'])) {
-					$item['url'] = (string) add_query_arg('download_cat', (int) $item['term_id'], home_url('/download/'));
-				}
-				if (!empty($item['children'])) { $item['children'] = $download_links($item['children']); }
-			}
-			unset($item);
-			return $items;
-		};
-		$children = $download_links($children);
-	}
-
 	if ('gallery' === $key && !empty($children)) {
 		$gallery_headings = static function ($items) use (&$gallery_headings) {
 			$output = array();
