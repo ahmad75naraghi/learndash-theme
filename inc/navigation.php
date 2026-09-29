@@ -22,7 +22,7 @@ defined('ABSPATH') || exit;
 
 /* نسخهٔ ساختار کش — با تغییر ساختار آرایه‌ها این عدد را بالا ببرید تا کش قدیمی نادیده گرفته شود. */
 if (!defined('EVENTED_NAV_CACHE_VER')) {
-	define('EVENTED_NAV_CACHE_VER', '7');
+	define('EVENTED_NAV_CACHE_VER', '9');
 }
 
 /**
@@ -282,6 +282,23 @@ function evented_nav_build_cpt_item($key, $title, $icon, $page_slugs)
 
 	if ('' !== $post_type) {
 		$children = evented_nav_post_type_children($post_type);
+	}
+
+	/* در گالری، والدها فقط عنوان گروه هستند و فقط زیر‌دسته‌های نهایی لینک دارند. */
+	if ('gallery' === $key && !empty($children)) {
+		$gallery_headings = static function ($items) use (&$gallery_headings) {
+			$output = array();
+			foreach ((array) $items as $item) {
+				if (!empty($item['children'])) {
+					$item['is_heading'] = true;
+					$item['url']        = '';
+					$item['children']   = $gallery_headings($item['children']);
+				}
+				$output[] = $item;
+			}
+			return $output;
+		};
+		$children = $gallery_headings($children);
 	}
 
 	/* اولویت: آدرس دستی → برگهٔ هم‌نام (shamiim.ir بخش‌ها را با برگه می‌سازد) → بایگانی پست‌تایپ → مسیر پیش‌فرض */

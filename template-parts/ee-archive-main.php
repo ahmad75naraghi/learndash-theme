@@ -61,7 +61,8 @@ $ee_arch_count = isset($GLOBALS['wp_query']->found_posts) ? (int) $GLOBALS['wp_q
 /* ---------- چیپ‌های taxonomy مرتبط با نمای جاری ---------- */
 $ee_arch_cats = taxonomy_exists($ee_arch_taxonomy) ? get_terms(array(
 	'taxonomy'   => $ee_arch_taxonomy,
-	'hide_empty' => true,
+	'hide_empty' => !$ee_category_cards,
+	'pad_counts' => $ee_category_cards,
 	'number'     => $ee_terms_limit,
 	'orderby'    => 'count',
 	'order'      => 'DESC',
@@ -157,6 +158,41 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 					if (!isset($ee_gallery_cover_map[$ee_cover_term->term_id])) { $ee_gallery_cover_map[$ee_cover_term->term_id] = (int) $ee_gallery_cover_id; }
 				}
 			}
+			$ee_gallery_terms_by_id = array();
+			$ee_gallery_children    = array();
+			foreach ($ee_arch_cats as $ee_gallery_term) {
+				if (!$ee_gallery_term instanceof WP_Term || (int) $ee_gallery_term->count < 1) { continue; }
+				$ee_gallery_terms_by_id[(int) $ee_gallery_term->term_id] = $ee_gallery_term;
+				$ee_gallery_children[(int) $ee_gallery_term->parent][] = (int) $ee_gallery_term->term_id;
+			}
+			$ee_render_gallery_terms = static function ($parent_id, $depth = 0) use (&$ee_render_gallery_terms, $ee_gallery_children, $ee_gallery_terms_by_id, $ee_gallery_cover_map) {
+				if (empty($ee_gallery_children[$parent_id])) { return; }
+				echo '<div class="ee-gallery-category-grid ee-gallery-category-level ee-gallery-category-depth-' . (int) min(4, $depth) . '">';
+				foreach ($ee_gallery_children[$parent_id] as $ee_gallery_term_id) {
+					if (empty($ee_gallery_terms_by_id[$ee_gallery_term_id])) { continue; }
+					$ee_cat          = $ee_gallery_terms_by_id[$ee_gallery_term_id];
+					$ee_has_children = !empty($ee_gallery_children[$ee_gallery_term_id]);
+					if ($ee_has_children) {
+						echo '<section class="ee-gallery-category-group"><header class="ee-gallery-category-group-head"><span class="ee-gallery-category-group-icon"><svg class="ee-ic" aria-hidden="true"><use href="#i-folder"></use></svg></span><div><h3>' . esc_html($ee_cat->name) . '</h3><p>' . esc_html(sprintf(__('%s تصویر در زیر‌دسته‌ها', 'evented-edu'), number_format_i18n((int) $ee_cat->count))) . '</p></div></header>';
+						$ee_render_gallery_terms($ee_gallery_term_id, $depth + 1);
+						echo '</section>';
+						continue;
+					}
+					$ee_term_link = get_term_link($ee_cat);
+					if (is_wp_error($ee_term_link)) { continue; }
+					$ee_cover_id = isset($ee_gallery_cover_map[$ee_cat->term_id]) ? (int) $ee_gallery_cover_map[$ee_cat->term_id] : 0;
+					?>
+					<a class="ee-gallery-category-card" href="<?php echo esc_url($ee_term_link); ?>">
+						<span class="ee-gallery-category-media">
+							<?php if ($ee_cover_id && has_post_thumbnail($ee_cover_id)) : ?><?php echo get_the_post_thumbnail($ee_cover_id, 'medium_large', array('loading' => 'lazy', 'decoding' => 'async', 'alt' => '')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php else : ?><span class="ee-gallery-category-placeholder"><svg class="ee-ic" aria-hidden="true"><use href="#i-photo_library"></use></svg></span><?php endif; ?>
+							<span class="ee-gallery-category-shade"></span>
+						</span>
+						<span class="ee-gallery-category-info"><strong><?php echo esc_html($ee_cat->name); ?></strong><span><?php echo esc_html(sprintf(__('%s تصویر', 'evented-edu'), number_format_i18n((int) $ee_cat->count))); ?></span><svg class="ee-ic" aria-hidden="true"><use href="#i-arrow_back"></use></svg></span>
+					</a>
+					<?php
+				}
+				echo '</div>';
+			};
 			?>
 			<section class="ee-gallery-categories" aria-labelledby="eeGalleryCategoriesTitle">
 				<div class="ee-gallery-categories-head">
@@ -166,29 +202,7 @@ if (is_search() && '' !== $ee_search_scope && isset($ee_search_scopes[$ee_search
 					</div>
 					<p><?php esc_html_e('دسته‌ها از بیشترین تعداد تصویر به کمترین مرتب شده‌اند.', 'evented-edu'); ?></p>
 				</div>
-				<div class="ee-gallery-category-grid">
-					<?php foreach ($ee_arch_cats as $ee_cat) :
-						$ee_term_link = get_term_link($ee_cat);
-						if (is_wp_error($ee_term_link)) { continue; }
-						$ee_cover_id = isset($ee_gallery_cover_map[$ee_cat->term_id]) ? (int) $ee_gallery_cover_map[$ee_cat->term_id] : 0;
-						?>
-						<a class="ee-gallery-category-card" href="<?php echo esc_url($ee_term_link); ?>">
-							<span class="ee-gallery-category-media">
-								<?php if ($ee_cover_id && has_post_thumbnail($ee_cover_id)) : ?>
-									<?php echo get_the_post_thumbnail($ee_cover_id, 'medium_large', array('loading' => 'lazy', 'decoding' => 'async', 'alt' => '')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-								<?php else : ?>
-									<span class="ee-gallery-category-placeholder"><svg class="ee-ic" aria-hidden="true"><use href="#i-photo_library"></use></svg></span>
-								<?php endif; ?>
-								<span class="ee-gallery-category-shade"></span>
-							</span>
-							<span class="ee-gallery-category-info">
-								<strong><?php echo esc_html($ee_cat->name); ?></strong>
-								<span><?php echo esc_html(sprintf(__('%s تصویر', 'evented-edu'), number_format_i18n((int) $ee_cat->count))); ?></span>
-								<svg class="ee-ic" aria-hidden="true"><use href="#i-arrow_back"></use></svg>
-							</span>
-						</a>
-					<?php endforeach; ?>
-				</div>
+				<?php $ee_render_gallery_terms(0); ?>
 			</section>
 		<?php elseif (!empty($ee_arch_cats)) : ?>
 			<!-- چیپ‌های دسته‌بندی -->

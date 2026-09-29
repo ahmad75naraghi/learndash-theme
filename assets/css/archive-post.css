@@ -178,3 +178,15 @@
 @media (max-width: 800px) { .ee-gallery-category-grid, .ee-arch-grid-full .ee-arch-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .ee-gallery-categories { padding: .8rem; border-radius: 1rem; }.ee-gallery-categories-head { display: block; }.ee-gallery-categories-head > p { margin-top: .35rem; }.ee-gallery-category-grid, .ee-arch-grid-full .ee-arch-cards { grid-template-columns: 1fr; }.ee-gallery-category-media { aspect-ratio: 16 / 9; } }
 @media (prefers-reduced-motion: reduce) { .ee-gallery-category-card, .ee-gallery-category-media img, .ee-gallery-category-info > .ee-ic { transition: none; } }
+
+/* ---------- سلسله‌مراتب گالری: والد عنوان، زیر‌دسته لینک ---------- */
+.ee-gallery-category-group { grid-column: 1 / -1; min-width: 0; padding: .85rem; border: 1px solid var(--ee-line); border-radius: 1rem; background: rgb(255 255 255 / .72); }
+.ee-gallery-category-group-head { display: flex; align-items: center; gap: .65rem; margin-bottom: .8rem; padding-bottom: .65rem; border-bottom: 1px dashed var(--ee-line); }
+.ee-gallery-category-group-icon { flex: 0 0 auto; display: grid; place-items: center; width: 2.3rem; height: 2.3rem; border-radius: .75rem; color: var(--ee-tealP); background: var(--ee-tealL); }
+.ee-gallery-category-group-icon .ee-ic { width: 1.2rem; height: 1.2rem; }
+.ee-gallery-category-group-head h3 { margin: 0; color: var(--ee-ink); font-size: .9rem; }.ee-gallery-category-group-head p { margin: .1rem 0 0; color: var(--ee-soft); font-size: .62rem; }
+.ee-gallery-category-group .ee-gallery-category-level { margin: 0; }
+.ee-gallery-category-depth-1 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ee-gallery-category-depth-2, .ee-gallery-category-depth-3, .ee-gallery-category-depth-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 800px) { .ee-gallery-category-depth-1, .ee-gallery-category-depth-2, .ee-gallery-category-depth-3, .ee-gallery-category-depth-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .ee-gallery-category-group { padding: .65rem; }.ee-gallery-category-depth-1, .ee-gallery-category-depth-2, .ee-gallery-category-depth-3, .ee-gallery-category-depth-4 { grid-template-columns: 1fr; } }

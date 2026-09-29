@@ -581,3 +581,12 @@ html.no-js .ee-rv, .ee-rv.is-in { opacity: 1; transform: none; }
 @media (hover: none) and (pointer: coarse) {
     .ee-home button, .ee-home select, .ee-home input[type="submit"], .ee-home input[type="button"] { min-height: 44px; }
 }
+
+/* ---------- عنوان‌های غیرلینکی والد در زیرمنوی گالری ---------- */
+.ee-sub-heading { cursor: default; color: var(--ee-ink); background: linear-gradient(90deg, var(--ee-tealL), transparent); }
+.ee-sub-heading .ee-sub-label { font-weight: 900; }
+.ee-sub-heading:focus-visible { outline: 2px solid var(--ee-tealP); outline-offset: -2px; }
+.ee-dn-sub .ee-dn-sub-heading { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .3rem; padding: .55rem .6rem; border-bottom: 1px solid var(--ee-line); color: var(--ee-ink); font-size: .75rem; font-weight: 900; }
+.ee-dn-sub .ee-dn-sub-heading > span { display: inline-flex; align-items: center; min-width: 0; }
+.ee-dn-sub .ee-dn-sub-heading small { flex: 0 0 auto; color: var(--ee-tealP); font-size: .63rem; }
+.ee-dn-sub .ee-dn-sub-heading + a { margin-top: .15rem; }

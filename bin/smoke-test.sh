@@ -72,17 +72,25 @@ require_text "$tmp/resource-clip-clip-item-1-.html" 'clip_playlist' 'nested play
 reject_text "$tmp/resource-clip-clip-item-1-.html" 'must-not-be-public' 'sensitive video metadata leaked publicly'
 require_text "$tmp/resource-gallery-gallery-item-1-.html" 'ee-resource-single' 'gallery single template did not render'
 require_text "$tmp/resource-gallery-.html" 'ee-gallery-category-grid' 'gallery archive category cards are missing'
-if ! python3 - "$tmp/resource-gallery-.html" <<'PY'
+require_text "$tmp/resource-gallery-.html" 'class="ee-gallery-category-group-head"' 'gallery parent category heading is missing'
+if ! python3 - "$tmp/resource-gallery-.html" "$tmp/home.html" <<'PY'
 from pathlib import Path
+import re
 import sys
-html = Path(sys.argv[1]).read_text(encoding='utf-8').split('ee-gallery-category-grid', 1)[-1]
-pos = [html.find(label) for label in ('گزارش تصویری', 'مراسم و رویدادها', 'فعالیت‌های آموزشی')]
-raise SystemExit(0 if min(pos) >= 0 and pos == sorted(pos) else 1)
+archive = Path(sys.argv[1]).read_text(encoding='utf-8').split('ee-gallery-categories', 1)[-1]
+menu = Path(sys.argv[2]).read_text(encoding='utf-8')
+pos = [archive.find(label) for label in ('گزارش تصویری', 'مراسم و رویدادها', 'فعالیت‌های آموزشی')]
+archive_parent_is_plain = not re.search(r'<a class="ee-gallery-category-card"[^>]*>.*?گزارش تصویری.*?</a>', archive, re.S)
+menu_parent_is_plain = 'ee-sub-heading' in menu and not re.search(r'<a class="ee-sub-link[^"]*"[^>]*>(?:(?!</a>).)*گزارش تصویری', menu, re.S)
+raise SystemExit(0 if min(pos) >= 0 and pos == sorted(pos) and archive_parent_is_plain and menu_parent_is_plain else 1)
 PY
 then
-	fail 'gallery categories are not ordered from highest to lowest count'
+	fail 'gallery parent must be a non-link heading followed by count-sorted child categories'
 fi
+gallery_tax_file=$(find "$tmp" -maxdepth 1 -name 'resource-galery_cat-*.html' | head -n 1)
 reject_text "$tmp/resource-gallery-.html" 'class="ee-side"' 'gallery archive must not render a sidebar'
+reject_text "$gallery_tax_file" 'class="ee-side"' 'gallery taxonomy must not render a sidebar'
+reject_text "$tmp/resource-gallery-gallery-item-1-.html" 'class="ee-side"' 'gallery single must not render a sidebar'
 require_text "$tmp/resource-gallery-gallery-item-1-.html" 'class="ee-btn ee-btn-primary ee-gallery-download"' 'original gallery image download is missing'
 require_text "$tmp/resource-gallery-gallery-item-1-.html" 'target="_blank" rel="noopener"' 'gallery thumbnail does not open the original image in a new page'
 
@@ -96,6 +104,7 @@ for path in "${resource_pages[@]}"; do
 	require_text "$tmp/resource-page-$name.html" 'archive-post.css' "resource page stylesheet is missing: /$path"
 done
 require_text "$tmp/resource-page-gallery-page-.html" 'name="resource_cat"' 'gallery taxonomy filter is missing'
+reject_text "$tmp/resource-page-gallery-page-.html" 'class="ee-side"' 'gallery page template must not render a sidebar'
 video_grid_count=$(grep -Foc 'class="ee-resource-grid"' "$tmp/resource-page-videos-.html" || true)
 [[ "$video_grid_count" -eq 1 ]] || fail "videos page rendered its archive $video_grid_count times instead of once"
 reject_text "$tmp/resource-page-videos-.html" 'wp-audio-shortcode' 'videos page executed legacy page shortcodes and duplicated structural content'

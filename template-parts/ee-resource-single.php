@@ -15,6 +15,7 @@ $ee_icon       = isset($args['icon']) ? sanitize_key($args['icon']) : 'article';
 $ee_comments   = !empty($args['comments']);
 $ee_image_download = !empty($args['image_download']);
 $ee_show_meta  = !empty($args['show_meta']);
+$ee_hide_sidebar = !empty($args['hide_sidebar']);
 $ee_archive    = function_exists('evented_nav_url') ? evented_nav_url($ee_active) : get_post_type_archive_link($ee_type);
 $ee_archive    = $ee_archive ?: home_url('/');
 
@@ -48,9 +49,9 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 		if ($ee_term instanceof WP_Term) {
 			$ee_related_args['tax_query'] = array(array('taxonomy' => $ee_taxonomy, 'field' => 'term_id', 'terms' => $ee_term->term_id));
 		}
-		$ee_related = new WP_Query($ee_related_args);
+		$ee_related = $ee_hide_sidebar ? null : new WP_Query($ee_related_args);
 		?>
-		<div class="ee-wrap ee-single-grid">
+		<div class="ee-wrap ee-single-grid<?php echo $ee_hide_sidebar ? ' ee-single-grid-full' : ''; ?>">
 			<article id="post-<?php echo esc_attr($ee_id); ?>" <?php post_class('ee-post ee-resource-post'); ?>>
 				<nav class="ee-crumb" aria-label="<?php esc_attr_e('مسیر صفحه', 'evented-edu'); ?>">
 					<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('خانه', 'evented-edu'); ?></a>
@@ -169,6 +170,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 				<?php if ($ee_comments && (comments_open() || get_comments_number())) { comments_template(); } ?>
 			</article>
 
+			<?php if (!$ee_hide_sidebar) : ?>
 			<aside class="ee-side" aria-label="<?php echo esc_attr('مطالب مرتبط ' . $ee_plural); ?>">
 				<section class="ee-widget">
 					<h2 class="ee-w-title"><svg class="ee-ic" aria-hidden="true"><use href="#i-<?php echo esc_attr($ee_icon); ?>"></use></svg><?php echo esc_html($ee_plural . ' مرتبط'); ?></h2>
@@ -183,6 +185,7 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 				</section>
 				<a class="ee-btn ee-btn-primary" href="<?php echo esc_url($ee_archive); ?>"><?php echo esc_html('مشاهده همهٔ ' . $ee_plural); ?></a>
 			</aside>
+			<?php endif; ?>
 		</div>
 	<?php endwhile; ?>
 </main>

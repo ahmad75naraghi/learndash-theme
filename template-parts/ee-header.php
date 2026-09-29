@@ -45,7 +45,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
 $ee_flatten_children = static function ($children, $depth = 0) use (&$ee_flatten_children) {
 	$flat = array();
 	foreach ((array) $children as $child) {
-		if (empty($child['title']) || empty($child['url'])) {
+		if (empty($child['title']) || (empty($child['url']) && empty($child['is_heading']))) {
 			continue;
 		}
 		$child['depth']        = (int) $depth;
@@ -67,17 +67,18 @@ $ee_render_desktop_children = static function ($children, $depth = 0) use (&$ee_
 	?>
 	<ul class="ee-sub-list<?php echo $nested ? ' ee-sub-flyout' : ' ee-sub-root'; ?>" role="menu">
 		<?php foreach ((array) $children as $child) :
-			if (empty($child['title']) || empty($child['url'])) { continue; }
+			$is_heading  = !empty($child['is_heading']);
+			if (empty($child['title']) || (empty($child['url']) && !$is_heading)) { continue; }
 			$has_children = !empty($child['children']);
 			?>
-			<li class="ee-sub-item<?php echo $has_children ? ' has-children' : ''; ?>" role="none">
-				<a class="ee-sub-link<?php echo $has_children ? ' has-children' : ''; ?>" role="menuitem" href="<?php echo esc_url($child['url']); ?>"<?php echo $has_children ? ' aria-haspopup="true"' : ''; ?>>
+			<li class="ee-sub-item<?php echo $has_children ? ' has-children' : ''; ?><?php echo $is_heading ? ' is-heading' : ''; ?>" role="none">
+				<?php if ($is_heading) : ?><span class="ee-sub-link ee-sub-heading<?php echo $has_children ? ' has-children' : ''; ?>" role="heading" aria-level="3" tabindex="0"><?php else : ?><a class="ee-sub-link<?php echo $has_children ? ' has-children' : ''; ?>" role="menuitem" href="<?php echo esc_url($child['url']); ?>"<?php echo $has_children ? ' aria-haspopup="true"' : ''; ?>><?php endif; ?>
 					<span class="ee-sub-label"><?php echo esc_html($child['title']); ?></span>
 					<span class="ee-sub-meta">
 						<?php if (!empty($child['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $child['count'])); ?></small><?php endif; ?>
 						<?php if ($has_children) : ?><svg class="ee-ic ee-sub-next" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg><?php endif; ?>
 					</span>
-				</a>
+				<?php if ($is_heading) : ?></span><?php else : ?></a><?php endif; ?>
 				<?php if ($has_children) { $ee_render_desktop_children($child['children'], $depth + 1); } ?>
 			</li>
 		<?php endforeach; ?>
@@ -265,11 +266,12 @@ $ee_render_desktop_children = static function ($children, $depth = 0) use (&$ee_
                     <?php if ($ee_has_sub) : ?>
                         <div class="ee-dn-sub" id="<?php echo esc_attr($ee_sub_id); ?>" hidden>
                             <?php foreach ($ee_flatten_children($ee_it['children']) as $ee_sub) :
-                                $ee_sub_depth = min(4, max(0, (int) $ee_sub['depth'])); ?>
-                                <a class="ee-sub-depth-<?php echo (int) $ee_sub_depth; ?><?php echo !empty($ee_sub['has_children']) ? ' has-children' : ''; ?>" href="<?php echo esc_url($ee_sub['url']); ?>">
+                                $ee_sub_depth   = min(4, max(0, (int) $ee_sub['depth']));
+                                $ee_sub_heading = !empty($ee_sub['is_heading']); ?>
+                                <?php if ($ee_sub_heading) : ?><div class="ee-dn-sub-heading ee-sub-depth-<?php echo (int) $ee_sub_depth; ?>" role="heading" aria-level="3"><?php else : ?><a class="ee-sub-depth-<?php echo (int) $ee_sub_depth; ?><?php echo !empty($ee_sub['has_children']) ? ' has-children' : ''; ?>" href="<?php echo esc_url($ee_sub['url']); ?>"><?php endif; ?>
                                     <span><?php if ($ee_sub_depth > 0) : ?><svg class="ee-ic ee-sub-branch" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg><?php endif; ?><?php echo esc_html($ee_sub['title']); ?></span>
                                     <?php if (!empty($ee_sub['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $ee_sub['count'])); ?></small><?php endif; ?>
-                                </a>
+                                <?php if ($ee_sub_heading) : ?></div><?php else : ?></a><?php endif; ?>
                             <?php endforeach; ?>
                             <a class="ee-dn-all" href="<?php echo esc_url($ee_it['url']); ?>">همهٔ <?php echo esc_html($ee_it['title']); ?></a>
                         </div>
