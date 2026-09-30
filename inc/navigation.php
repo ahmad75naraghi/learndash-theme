@@ -22,7 +22,7 @@ defined('ABSPATH') || exit;
 
 /* نسخهٔ ساختار کش — با تغییر ساختار آرایه‌ها این عدد را بالا ببرید تا کش قدیمی نادیده گرفته شود. */
 if (!defined('EVENTED_NAV_CACHE_VER')) {
-	define('EVENTED_NAV_CACHE_VER', '12');
+	define('EVENTED_NAV_CACHE_VER', '13');
 }
 
 /**
@@ -47,7 +47,7 @@ function evented_nav_post_type_candidates()
 		'gallery'   => array('gallery', 'galleries', 'photo', 'photos', 'album', 'albums', 'envira', 'foogallery'),
 		'video'     => array('video', 'videos', 'clip', 'clips', 'film', 'movie'),
 		'downloads' => array('wpdmpro', 'download', 'downloads', 'dlm_download', 'edd_download', 'file', 'files', 'attachment_file'),
-		'podcast'   => array('podcast', 'podcasts', 'episode', 'episodes', 'audio', 'seriously-simple-podcasting'),
+		'podcast'   => array('sr_playlist', 'podcast', 'podcasts', 'episode', 'episodes', 'audio', 'seriously-simple-podcasting'),
 		'courses'   => array('sfwd-courses'),
 	);
 

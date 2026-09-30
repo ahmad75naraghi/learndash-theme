@@ -111,13 +111,13 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 					<article id="post-<?php echo (int) $ee_id; ?>" <?php post_class('ee-resource-card'); ?>>
 						<a class="ee-resource-card-media" href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr(sprintf(__('مشاهدهٔ %s', 'evented-edu'), get_the_title())); ?>">
 							<?php if (has_post_thumbnail()) { the_post_thumbnail('medium_large', array('loading' => 'lazy', 'decoding' => 'async')); } else { ?><span class="ee-resource-placeholder"><svg class="ee-ic" aria-hidden="true"><use href="#i-<?php echo esc_attr($ee_icon); ?>"></use></svg></span><?php } ?>
-							<?php if ('video' === $ee_modifier) : ?><span class="ee-resource-play"><svg class="ee-ic" aria-hidden="true"><use href="#i-play_arrow"></use></svg></span><?php endif; ?>
+							<?php if (in_array($ee_modifier, array('video', 'podcast'), true)) : ?><span class="ee-resource-play"><svg class="ee-ic" aria-hidden="true"><use href="#i-<?php echo esc_attr('podcast' === $ee_modifier ? 'podcasts' : 'play_arrow'); ?>"></use></svg></span><?php endif; ?>
 							<?php if ($item_term instanceof WP_Term) : ?><span class="ee-resource-card-cat"><?php echo esc_html($item_term->name); ?></span><?php endif; ?>
 						</a>
 						<div class="ee-resource-card-body">
 							<h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
 							<p><?php echo esc_html(wp_trim_words(get_the_excerpt(), 20)); ?></p>
-							<div class="ee-resource-card-meta"><span><svg class="ee-ic" aria-hidden="true"><use href="#i-calendar_month"></use></svg><?php echo esc_html(get_the_date()); ?></span><?php if ('clip' === $ee_type) : ?><span><svg class="ee-ic" aria-hidden="true"><use href="#i-forum"></use></svg><?php echo esc_html(number_format_i18n(get_comments_number())); ?></span><?php endif; ?></div>
+							<div class="ee-resource-card-meta"><span><svg class="ee-ic" aria-hidden="true"><use href="#i-calendar_month"></use></svg><?php echo esc_html(get_the_date()); ?></span><?php if ('clip' === $ee_type) : ?><span><svg class="ee-ic" aria-hidden="true"><use href="#i-forum"></use></svg><?php echo esc_html(number_format_i18n(get_comments_number())); ?></span><?php elseif ('sr_playlist' === $ee_type && function_exists('evented_podcast_track_count')) : ?><span><svg class="ee-ic" aria-hidden="true"><use href="#i-podcasts"></use></svg><?php echo esc_html(sprintf('%s قسمت', number_format_i18n(evented_podcast_track_count($ee_id)))); ?></span><?php endif; ?></div>
 							<a class="ee-resource-card-more" href="<?php the_permalink(); ?>"><?php echo esc_html('مشاهده ' . $ee_label); ?><svg class="ee-ic" aria-hidden="true"><use href="#i-arrow_back"></use></svg></a>
 						</div>
 					</article>

@@ -12,7 +12,7 @@
 defined('ABSPATH') || exit;
 
 $ee_podcast_type = '';
-$ee_candidates   = array('podcast', 'podcasts', 'episode', 'episodes', 'audio', 'seriously-simple-podcasting');
+$ee_candidates   = array('sr_playlist', 'podcast', 'podcasts', 'episode', 'episodes', 'audio', 'seriously-simple-podcasting');
 $ee_candidates   = (array) apply_filters('evented_podcast_post_type_candidates', $ee_candidates);
 
 foreach ($ee_candidates as $ee_candidate) {
@@ -35,7 +35,7 @@ get_template_part('template-parts/ee-resource', 'page', array(
 	'label'      => 'پادکست',
 	'subtitle'   => 'مجموعه برنامه‌های صوتی و پادکست‌های آموزشی شمیم را بشنوید',
 	'intro'      => '',
-	'taxonomy'   => '',
+	'taxonomy'   => 'sr_playlist' === $ee_podcast_type && taxonomy_exists('playlist-category') ? 'playlist-category' : '',
 	'icon'       => 'podcasts',
 	'modifier'   => 'podcast',
 	'empty_title' => 'هنوز پادکستی منتشر نشده است',

@@ -12,6 +12,7 @@ require_once get_stylesheet_directory() . '/inc/template_helpers.php';
 require_once get_stylesheet_directory() . '/inc/certificates.php';
 require_once get_stylesheet_directory() . '/inc/content_types.php';
 require_once get_stylesheet_directory() . '/inc/downloads.php';
+require_once get_stylesheet_directory() . '/inc/podcasts.php';
 require_once get_stylesheet_directory() . '/inc/video_playlist.php';
 require_once get_stylesheet_directory() . '/inc/navigation.php';
 require_once get_stylesheet_directory() . '/inc/theme_updater.php';
