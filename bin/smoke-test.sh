@@ -394,6 +394,39 @@ fi
 fetch '/wp-admin/admin.php?page=evented-theme-settings' "$tmp/settings.html"
 require_text "$tmp/settings.html" 'evented-update-card' 'theme settings/update card did not render (admin session required)'
 
+# مرکز گزارش‌گیری داخلی: داده، فیلتر، asset و خروجی server-side.
+fetch '/wp-admin/admin.php?page=evented-reports' "$tmp/reports-overview.html"
+require_text "$tmp/reports-overview.html" 'مرکز یکپارچهٔ گزارش دوره‌ها و آزمون‌های LearnDash' 'reports overview did not render'
+require_text "$tmp/reports-overview.html" 'گزارش تکمیل دوره‌ها' 'course report card is missing'
+fetch '/wp-admin/admin.php?page=evented-reports-courses' "$tmp/reports-courses.html"
+require_text "$tmp/reports-courses.html" 'دورهٔ گزارش آزمایشی' 'completed course fixture is missing from reports'
+require_text "$tmp/reports-courses.html" 'reports.css?ver=1.0.0' 'reports stylesheet was not enqueued'
+require_text "$tmp/reports-courses.html" 'خروجی CSV برای Excel' 'server-side CSV action is missing'
+fetch '/wp-admin/admin.php?page=evented-reports-quizzes&quiz_id=999999' "$tmp/reports-quiz-empty.html"
+require_text "$tmp/reports-quiz-empty.html" 'نتیجه‌ای مطابق فیلترها پیدا نشد' 'quiz ID filter did not produce an empty result'
+fetch '/wp-admin/admin.php?page=evented-reports-quizzes' "$tmp/reports-quizzes.html"
+require_text "$tmp/reports-quizzes.html" 'آزمون گزارش آزمایشی' 'quiz fixture is missing from reports'
+require_text "$tmp/reports-quizzes.html" '203.0.113.10' 'quiz IP is missing from reports'
+require_text "$tmp/reports-quizzes.html" '80' 'quiz score is missing from reports'
+report_csv_url=$(python3 - "$tmp/reports-courses.html" <<'PY'
+from html.parser import HTMLParser
+import html,sys
+class P(HTMLParser):
+    url=''
+    def handle_starttag(self,tag,attrs):
+        href=dict(attrs).get('href','')
+        if tag=='a' and 'action=evented_export_report' in href and 'format=csv' in href and not self.url: self.url=html.unescape(href)
+p=P();p.feed(open(sys.argv[1],encoding='utf-8').read());print(p.url)
+PY
+)
+if [[ -n "$report_csv_url" ]]; then
+	code=$(curl -sS --max-time 60 -c "$cookie" -b "$cookie" -o "$tmp/report.csv" -w '%{http_code}' "$report_csv_url") || code=000
+	requests=$((requests + 1)); [[ "$code" == 200 ]] || fail "report CSV export returned HTTP $code"
+	require_text "$tmp/report.csv" 'دورهٔ گزارش آزمایشی' 'CSV export does not contain the filtered course data'
+else
+	fail 'signed report CSV URL is missing'
+fi
+
 # همهٔ assetهای محلی قالب که در HTML صفحهٔ خانه کشف شده‌اند باید 200 باشند.
 python3 - "$tmp/home.html" <<'PY' > "$tmp/assets.txt"
 import html, re, sys
