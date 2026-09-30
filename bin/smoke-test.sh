@@ -81,7 +81,7 @@ reject_text "$tmp/resource-podcast-.html" 'هنوز پادکستی منتشر ن
 require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" 'data-ee-podcast-player' 'legacy podcast player did not render'
 require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" 'توصیهٔ تربیتی اول' 'first serialized Sonaar track was not recovered'
 require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" 'توصیهٔ تربیتی دوم' 'second serialized Sonaar track was not recovered'
-require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" '/wp-content/uploads/podcast-1.mp3' 'legacy Sonaar stream URL was not recovered'
+require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" 'https://cdn.example.com/podcast-1.mp3' 'legacy Sonaar stream URL was not recovered'
 require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" 'podcast-player.js?ver=1.0.0' 'podcast player behavior was not enqueued'
 fetch '/wp-json/wp/v2/types/sr_playlist' "$tmp/podcast-rest-type.json"
 require_text "$tmp/podcast-rest-type.json" '"slug":"sr_playlist"' 'legacy Sonaar post type is missing from REST'
