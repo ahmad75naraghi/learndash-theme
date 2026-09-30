@@ -426,6 +426,38 @@ if [[ -n "$report_csv_url" ]]; then
 else
 	fail 'signed report CSV URL is missing'
 fi
+report_json_url=$(python3 - "$tmp/reports-quizzes.html" <<'PY'
+from html.parser import HTMLParser
+import html,sys
+class P(HTMLParser):
+    url=''
+    def handle_starttag(self,tag,attrs):
+        href=dict(attrs).get('href','')
+        if tag=='a' and 'action=evented_export_report' in href and 'format=json' in href and not self.url: self.url=html.unescape(href)
+p=P();p.feed(open(sys.argv[1],encoding='utf-8').read());print(p.url)
+PY
+)
+if [[ -n "$report_json_url" ]]; then
+	code=$(curl -sS --max-time 60 -c "$cookie" -b "$cookie" -o "$tmp/report.json" -w '%{http_code}' "$report_json_url") || code=000
+	requests=$((requests + 1)); [[ "$code" == 200 ]] || fail "report JSON export returned HTTP $code"
+	if ! python3 - "$tmp/report.json" <<'PY'
+import json,sys
+report=json.load(open(sys.argv[1],encoding='utf-8'))
+raise SystemExit(0 if report.get('rows') and any('آزمون گزارش آزمایشی' in row for row in report['rows']) else 1)
+PY
+	then fail 'JSON export is invalid or missing quiz data'; fi
+else
+	fail 'signed report JSON URL is missing'
+fi
+fetch '/wp-admin/admin.php?page=evented-reports-quizzes&passed=no' "$tmp/reports-quiz-failed.html"
+require_text "$tmp/reports-quiz-failed.html" 'نتیجه‌ای مطابق فیلترها پیدا نشد' 'quiz pass/fail filter is incorrect'
+fetch '/card-number-test/' "$tmp/card-number.html"
+require_text "$tmp/card-number.html" '6037 **** **** 5678' 'legacy card-number shortcode did not render saved value'
+if [[ -n "$report_csv_url" ]]; then
+	code=$(curl -sS --max-time 60 -o "$tmp/report-unauthorized.txt" -w '%{http_code}' "$report_csv_url") || code=000
+	requests=$((requests + 1))
+	if grep -Fq 'آزمون گزارش آزمایشی' "$tmp/report-unauthorized.txt"; then fail 'report export exposed data without authentication'; fi
+fi
 
 # همهٔ assetهای محلی قالب که در HTML صفحهٔ خانه کشف شده‌اند باید 200 باشند.
 python3 - "$tmp/home.html" <<'PY' > "$tmp/assets.txt"

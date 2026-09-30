@@ -81,12 +81,25 @@ function evented_reports_filters($type)
 		'search'    => sanitize_text_field($get('s')),
 		'course_id' => absint($get('course_id')),
 		'quiz_id'   => 'quiz' === $type ? absint($get('quiz_id')) : 0,
-		'date_from' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_from) ? $date_from : '',
-		'date_to'   => preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_to) ? $date_to : '',
+		'date_from' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_from) && evented_reports_filter_timestamp($date_from) ? $date_from : '',
+		'date_to'   => preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_to) && evented_reports_filter_timestamp($date_to, true) ? $date_to : '',
 		'passed'    => 'quiz' === $type && in_array($passed, array('yes', 'no'), true) ? $passed : '',
 		'per_page'  => $per_page,
 		'paged'     => max(1, absint($get('paged'))),
 	);
+}
+
+/** تبدیل تاریخ میلادی فیلتر در timezone وردپرس به timestamp. */
+function evented_reports_filter_timestamp($date, $end_of_day = false)
+{
+	try {
+		$time = DateTimeImmutable::createFromFormat('!Y-m-d H:i:s', $date . ($end_of_day ? ' 23:59:59' : ' 00:00:00'), wp_timezone());
+		$errors = DateTimeImmutable::getLastErrors();
+		if (false === $time || (is_array($errors) && ($errors['warning_count'] || $errors['error_count']))) { return 0; }
+		return $time->getTimestamp();
+	} catch (Exception $exception) {
+		return 0;
+	}
 }
 
 /** شرط‌های SQL مشترک؛ همهٔ مقادیر از prepare عبور می‌کنند. */
@@ -99,8 +112,8 @@ function evented_reports_where($type, $filters, &$params)
 	if (!empty($filters['course_id'])) { $where[] = ('course' === $type ? 'a.post_id' : 'a.course_id') . ' = %d'; $params[] = $filters['course_id']; }
 	if ('quiz' === $type && !empty($filters['quiz_id'])) { $where[] = 'a.post_id = %d'; $params[] = $filters['quiz_id']; }
 	$date_column = 'quiz' === $type ? 'COALESCE(NULLIF(a.activity_completed,0),a.activity_updated)' : 'a.activity_completed';
-	if (!empty($filters['date_from'])) { $where[] = $date_column . ' >= %d'; $params[] = strtotime($filters['date_from'] . ' 00:00:00'); }
-	if (!empty($filters['date_to'])) { $where[] = $date_column . ' <= %d'; $params[] = strtotime($filters['date_to'] . ' 23:59:59'); }
+	if (!empty($filters['date_from'])) { $where[] = $date_column . ' >= %d'; $params[] = evented_reports_filter_timestamp($filters['date_from']); }
+	if (!empty($filters['date_to'])) { $where[] = $date_column . ' <= %d'; $params[] = evented_reports_filter_timestamp($filters['date_to'], true); }
 	if (!empty($filters['search'])) {
 		$like = '%' . $wpdb->esc_like($filters['search']) . '%';
 		$where[] = '(u.user_login LIKE %s OR u.display_name LIKE %s OR p.post_title LIKE %s)';
@@ -150,14 +163,22 @@ function evented_reports_quiz_rows($filters, $limit = null, $offset = 0)
 		MAX(CASE WHEN am.activity_meta_key='graded' THEN am.activity_meta_value END) AS graded,
 		COALESCE(MAX(CASE WHEN am.activity_meta_key='user_ip' THEN am.activity_meta_value END),MAX(oldip.activity_meta_value)) AS user_ip
 		FROM {$a} a INNER JOIN {$wpdb->users} u ON u.ID=a.user_id INNER JOIN {$wpdb->posts} p ON p.ID=a.post_id
-		LEFT JOIN {$wpdb->posts} c ON c.ID=a.course_id LEFT JOIN {$m} am ON am.activity_id=a.activity_id
+		LEFT JOIN {$wpdb->posts} c ON c.ID=a.course_id
+		LEFT JOIN {$m} am ON am.activity_id=a.activity_id AND am.activity_meta_key IN ('points','total_points','percentage','pass','graded','user_ip')
 		LEFT JOIN {$m} oldip ON oldip.activity_id=CAST(CONCAT(a.user_id,a.activity_updated) AS UNSIGNED) AND oldip.activity_meta_key='user_ip'
 		WHERE {$where} GROUP BY a.activity_id";
 	if (!empty($filters['passed'])) { $sql .= ' HAVING ' . ('yes' === $filters['passed'] ? "passed IN ('1','true','yes')" : "COALESCE(passed,'0') NOT IN ('1','true','yes')"); }
 	$sql .= ' ORDER BY COALESCE(NULLIF(a.activity_completed,0),a.activity_updated) DESC,a.activity_id DESC';
 	if (null !== $limit) { $sql .= ' LIMIT %d OFFSET %d'; $params[] = (int) $limit; $params[] = (int) $offset; }
 	$rows = $wpdb->get_results($wpdb->prepare($sql, $params));
-	if ($rows) { update_meta_cache('user', array_values(array_unique(wp_list_pluck($rows, 'user_id')))); }
+	if ($rows) {
+		update_meta_cache('user', array_values(array_unique(wp_list_pluck($rows, 'user_id'))));
+		$graded_post_ids = array();
+		foreach ($rows as $row) {
+			foreach (evented_reports_graded_post_ids($row->graded) as $post_id) { $graded_post_ids[$post_id] = $post_id; }
+		}
+		if ($graded_post_ids) { update_meta_cache('post', array_values($graded_post_ids)); }
+	}
 	return (array) $rows;
 }
 
@@ -172,7 +193,7 @@ function evented_reports_quiz_count($filters)
 		return (int) $wpdb->get_var($wpdb->prepare($sql, $params));
 	}
 	$sql = "SELECT COUNT(*) FROM (SELECT a.activity_id,MAX(CASE WHEN am.activity_meta_key='pass' THEN am.activity_meta_value END) passed
-		FROM {$a} a INNER JOIN {$wpdb->users} u ON u.ID=a.user_id INNER JOIN {$wpdb->posts} p ON p.ID=a.post_id LEFT JOIN {$m} am ON am.activity_id=a.activity_id
+		FROM {$a} a INNER JOIN {$wpdb->users} u ON u.ID=a.user_id INNER JOIN {$wpdb->posts} p ON p.ID=a.post_id LEFT JOIN {$m} am ON am.activity_id=a.activity_id AND am.activity_meta_key='pass'
 		WHERE {$where} GROUP BY a.activity_id";
 	$sql .= ' HAVING ' . ('yes' === $filters['passed'] ? "passed IN ('1','true','yes')" : "COALESCE(passed,'0') NOT IN ('1','true','yes')");
 	$sql .= ') report_rows';
@@ -193,14 +214,23 @@ function evented_reports_user_data($user_id)
 	);
 }
 
+/** شناسه‌های نوشتهٔ پاسخ تشریحی در meta قدیمی graded. */
+function evented_reports_graded_post_ids($serialized)
+{
+	$graded = maybe_unserialize($serialized);
+	if (!is_array($graded)) { return array(); }
+	$ids = array();
+	foreach ($graded as $item) {
+		if (is_array($item) && !empty($item['post_id'])) { $ids[] = absint($item['post_id']); }
+	}
+	return array_values(array_unique(array_filter($ids)));
+}
+
 /** URL پاسخ تشریحی/آپلودشده از graded. */
 function evented_reports_quiz_upload($serialized)
 {
-	$graded = maybe_unserialize($serialized);
-	if (!is_array($graded)) { return ''; }
-	foreach ($graded as $item) {
-		if (!is_array($item) || empty($item['post_id'])) { continue; }
-		$value = get_post_meta(absint($item['post_id']), 'upload', true);
+	foreach (evented_reports_graded_post_ids($serialized) as $post_id) {
+		$value = get_post_meta($post_id, 'upload', true);
 		if (is_numeric($value)) { $value = wp_get_attachment_url(absint($value)); }
 		if (is_array($value)) { $value = $value['url'] ?? ''; }
 		if ($value && wp_http_validate_url((string) $value)) { return esc_url_raw((string) $value); }
@@ -215,10 +245,11 @@ function evented_reports_quiz_score($row)
 	return (float) $row->total_points > 0 ? round(((float) $row->points / (float) $row->total_points) * 100, 2) : 0;
 }
 
-/** گزینه‌های دوره، بدون بارگذاری meta/content. */
+/** گزینه‌های دوره فقط با ID/عنوان؛ بدون content و meta. */
 function evented_reports_course_options()
 {
-	return get_posts(array('post_type' => 'sfwd-courses', 'post_status' => array('publish', 'private'), 'posts_per_page' => -1, 'orderby' => 'title', 'order' => 'ASC', 'fields' => 'ids', 'no_found_rows' => true));
+	global $wpdb;
+	return (array) $wpdb->get_results("SELECT ID,post_title FROM {$wpdb->posts} WHERE post_type='sfwd-courses' AND post_status IN ('publish','private') ORDER BY post_title ASC"); // phpcs:ignore WordPress.DB.PreparedSQL
 }
 
 /** URL خروجی امضاشده همراه فیلترهای جاری. */
@@ -247,7 +278,7 @@ function evented_reports_filter_form($type, $filters)
 	?>
 	<form class="ee-report-filters" method="get"><input type="hidden" name="page" value="<?php echo esc_attr($page); ?>">
 		<label><span>جستجو</span><input type="search" name="s" value="<?php echo esc_attr($filters['search']); ?>" placeholder="کاربر یا عنوان"></label>
-		<label><span>دوره</span><select name="course_id"><option value="0">همهٔ دوره‌ها</option><?php foreach ($courses as $id) : ?><option value="<?php echo (int) $id; ?>"<?php selected($filters['course_id'], $id); ?>><?php echo esc_html(get_the_title($id)); ?></option><?php endforeach; ?></select></label>
+		<label><span>دوره</span><select name="course_id"><option value="0">همهٔ دوره‌ها</option><?php foreach ($courses as $course) : ?><option value="<?php echo (int) $course->ID; ?>"<?php selected($filters['course_id'], (int) $course->ID); ?>><?php echo esc_html($course->post_title); ?></option><?php endforeach; ?></select></label>
 		<?php if ('quiz' === $type) : ?><label><span>شناسه آزمون</span><input type="number" min="1" name="quiz_id" value="<?php echo $filters['quiz_id'] ?: ''; ?>" placeholder="مثلاً 123"></label><label><span>نتیجه</span><select name="passed"><option value="">همه</option><option value="yes"<?php selected($filters['passed'], 'yes'); ?>>قبول</option><option value="no"<?php selected($filters['passed'], 'no'); ?>>مردود</option></select></label><?php endif; ?>
 		<label><span>از تاریخ</span><input type="date" name="date_from" value="<?php echo esc_attr($filters['date_from']); ?>"></label><label><span>تا تاریخ</span><input type="date" name="date_to" value="<?php echo esc_attr($filters['date_to']); ?>"></label>
 		<label><span>در هر صفحه</span><select name="per_page"><?php foreach (array(25,50,100,200) as $size) : ?><option value="<?php echo $size; ?>"<?php selected($filters['per_page'], $size); ?>><?php echo $size; ?></option><?php endforeach; ?></select></label>
@@ -263,10 +294,13 @@ function evented_reports_overview_page()
 	global $wpdb; $a = $wpdb->prefix . 'learndash_user_activity';
 	$stats = array('completed' => 0, 'learners' => 0, 'quizzes' => 0, 'recent' => 0);
 	if (evented_reports_tables_exist()) {
-		$stats['completed'] = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$a} WHERE activity_type='course' AND activity_completed>0"); // phpcs:ignore WordPress.DB.PreparedSQL
-		$stats['learners'] = (int) $wpdb->get_var("SELECT COUNT(DISTINCT user_id) FROM {$a} WHERE activity_type='course' AND activity_completed>0"); // phpcs:ignore WordPress.DB.PreparedSQL
-		$stats['quizzes'] = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$a} WHERE activity_type='quiz'"); // phpcs:ignore WordPress.DB.PreparedSQL
-		$stats['recent'] = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$a} WHERE activity_type='course' AND activity_completed>=%d", time() - MONTH_IN_SECONDS));
+		$row = $wpdb->get_row($wpdb->prepare("SELECT
+			COUNT(CASE WHEN activity_type='course' AND activity_completed>0 THEN 1 END) completed,
+			COUNT(DISTINCT CASE WHEN activity_type='course' AND activity_completed>0 THEN user_id END) learners,
+			COUNT(CASE WHEN activity_type='quiz' THEN 1 END) quizzes,
+			COUNT(CASE WHEN activity_type='course' AND activity_completed>=%d THEN 1 END) recent
+			FROM {$a}", time() - MONTH_IN_SECONDS));
+		if ($row) { foreach (array_keys($stats) as $key) { $stats[$key] = (int) $row->{$key}; } }
 	}
 	?>
 	<div class="wrap ee-reports"><?php evented_reports_page_header('گزارش‌گیری', 'مرکز یکپارچهٔ گزارش دوره‌ها و آزمون‌های LearnDash'); ?>
@@ -349,7 +383,8 @@ add_action('admin_post_evented_export_report','evented_reports_export');
 function evented_reports_remote_ip()
 {
 	$ip=isset($_SERVER['REMOTE_ADDR'])?sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])):'';
-	return filter_var($ip,FILTER_VALIDATE_IP)?$ip:'';
+	$ip=filter_var($ip,FILTER_VALIDATE_IP)?$ip:'';
+	return (string) apply_filters('evented_reports_remote_ip',$ip);
 }
 
 /** ثبت IP روی activity_id واقعی آزمون. */
