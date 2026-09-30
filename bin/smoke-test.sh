@@ -87,6 +87,55 @@ reject_text "$tmp/download-rest-type.json" 'wpdmtag' 'downloads remain associate
 fetch '/wp-admin/edit.php?post_type=wpdmpro' "$tmp/download-admin.html"
 reject_text "$tmp/download-admin.html" 'taxonomy=wpdmcategory&amp;post_type=wpdmpro' 'download admin menu still exposes library categories'
 reject_text "$tmp/download-admin.html" 'taxonomy=wpdmtag&amp;post_type=wpdmpro' 'download admin menu still exposes tags'
+fetch '/wp-json/wp/v2/wpdmpro?slug=download-item-1' "$tmp/download-rest-item.json"
+require_text "$tmp/download-rest-item.json" '"_evented_download_files"' 'canonical download files meta is missing from Gutenberg REST data'
+download_id=$(python3 - "$tmp/download-rest-item.json" <<'PY'
+import json, sys
+rows = json.load(open(sys.argv[1], encoding='utf-8'))
+print(rows[0]['id'] if rows else '')
+PY
+)
+if [[ -n "$download_id" ]]; then
+	fetch "/wp-admin/post.php?post=$download_id&action=edit" "$tmp/download-editor.html"
+	require_text "$tmp/download-editor.html" 'data-ee-download-editor' 'Gutenberg download files editor is missing'
+	require_text "$tmp/download-editor.html" 'data-ee-download-add' 'download file add button is missing'
+	require_text "$tmp/download-editor.html" 'download-files.js?ver=1.0.0' 'download editor behavior was not enqueued'
+	require_text "$tmp/download-editor.html" 'راهنمای آزمایشی 1' 'legacy WPDM file was not prefilled in the editor'
+	reject_text "$tmp/download-editor.html" 'wpdmcategorydiv' 'download editor still renders the library category box'
+	reject_text "$tmp/download-editor.html" 'tagsdiv-wpdmtag' 'download editor still renders a tag box'
+else
+	fail 'download fixture ID was not returned by REST'
+fi
+fetch '/wp-admin/edit.php?post_type=wpdmpro&page=evented-download-sync' "$tmp/download-sync.html"
+require_text "$tmp/download-sync.html" 'شروع همگام‌سازی امن' 'download data synchronization tool is missing'
+download_sync_nonce=$(python3 - "$tmp/download-sync.html" <<'PY'
+from html.parser import HTMLParser
+import sys
+class P(HTMLParser):
+    value = ''
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == 'input' and attrs.get('name') == '_wpnonce': self.value = attrs.get('value', '')
+p=P(); p.feed(open(sys.argv[1], encoding='utf-8').read()); print(p.value)
+PY
+)
+if [[ -n "$download_sync_nonce" ]]; then
+	code=$(curl -sS --max-time 60 --max-redirs 10 -c "$cookie" -b "$cookie" -L \
+		--data-urlencode "_wpnonce=$download_sync_nonce" --data-urlencode 'evented_sync_downloads=1' \
+		-o "$tmp/download-sync-result.html" -w '%{http_code}' "$base/wp-admin/edit.php?post_type=wpdmpro&page=evented-download-sync") || code=000
+	requests=$((requests + 1)); [[ "$code" == 200 ]] || fail "download synchronization returned HTTP $code"
+	if ! grep -Eq 'همگام‌شده: 13|قبلاً استاندارد: 13' "$tmp/download-sync-result.html"; then fail 'legacy WPDM files were not synchronized'; fi
+	fetch '/wp-json/wp/v2/wpdmpro?slug=download-item-1' "$tmp/download-rest-synced.json"
+	if ! python3 - "$tmp/download-rest-synced.json" <<'PY'
+import json, sys
+rows=json.load(open(sys.argv[1], encoding='utf-8'))
+files=rows[0].get('meta', {}).get('_evented_download_files', []) if rows else []
+raise SystemExit(0 if files and files[0].get('title') == 'راهنمای آزمایشی 1' and files[0].get('legacy_path') == 'fixture-guide.pdf' else 1)
+PY
+	then fail 'synchronized canonical download data is invalid'; fi
+else
+	fail 'download synchronization nonce is missing'
+fi
 fetch '/wp-json/wp/v2/clip?slug=clip-item-1' "$tmp/clip-rest-item.json"
 require_text "$tmp/clip-rest-item.json" '"_evented_video_playlist"' 'canonical video playlist meta is missing from Gutenberg REST data'
 clip_id=$(python3 - "$tmp/clip-rest-item.json" <<'PY'
