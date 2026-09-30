@@ -34,8 +34,9 @@ add_action('wp_enqueue_scripts', function () {
     if (is_front_page()) {
         wp_enqueue_style('ee-home', PATH_DIR_URL . '/assets/css/newhome/evented-home.css', array('ee-shell'), '1.3.0');
     } elseif (
-        is_page_template(array('page-library.php', 'page-videos.php', 'page-gallery.php', 'page-download.php'))
+        is_page_template(array('page-library.php', 'page-videos.php', 'page-gallery.php', 'page-download.php', 'page-podcast.php'))
         || is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))
+        || is_page('podcast')
     ) {
         // هم Page Template انتخابی و هم page-{slug}.php باید asset کامل منابع را بگیرند.
         wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.7.0');

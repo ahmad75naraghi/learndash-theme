@@ -38,7 +38,7 @@ for path in (ROOT / "panel").glob("*.php"):
 
 required_snippets = {
     "assets/assets_functions.php": ["'profile' === $panel_section", "jalalidatepicker-js"],
-    "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "archive-post.css', array('ee-shell'), '1.7.0'"],
+    "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.7.0'"],
     "assets/css/panel.css": ["@media (max-width: 359.98px)", ".ee-panel-pager"],
     "panel/payments.php": ["LIMIT %d OFFSET %d", "evented_panel_pagination"],
     "panel/my-courses.php": ["$courses_per_page", "'no_found_rows'"],
@@ -70,6 +70,7 @@ required_snippets = {
     "page-library.php": ["'post_type' => 'lib'", "'taxonomy' => 'wpdmcategory'"],
     "page-videos.php": ["'post_type' => 'clip'", "'taxonomy' => ''"],
     "page-gallery.php": ["'post_type' => 'gallery'", "'taxonomy' => 'galery_cat'"],
+    "page-podcast.php": ["Template Name: پادکست‌ها", "evented_podcast_post_type_candidates", "'intro'      => ''", "'modifier'   => 'podcast'"],
 }
 for rel, snippets in required_snippets.items():
     text = (ROOT / rel).read_text(encoding="utf-8")

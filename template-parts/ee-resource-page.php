@@ -16,9 +16,14 @@ $ee_icon       = isset($args['icon']) ? sanitize_key($args['icon']) : 'article';
 $ee_modifier   = isset($args['modifier']) ? sanitize_html_class($args['modifier']) : 'resources';
 $ee_page       = get_queried_object();
 $ee_page_id    = $ee_page instanceof WP_Post ? (int) $ee_page->ID : 0;
-$ee_intro_raw  = $ee_page_id && '' !== trim((string) $ee_page->post_excerpt) ? (string) $ee_page->post_excerpt : ($ee_page_id ? (string) $ee_page->post_content : '');
+/* آرگومان intro اجازه می‌دهد برگه‌های اختصاصی محتوای قدیمی page builder را نادیده بگیرند. */
+$ee_intro_raw  = array_key_exists('intro', $args)
+	? (string) $args['intro']
+	: ($ee_page_id && '' !== trim((string) $ee_page->post_excerpt) ? (string) $ee_page->post_excerpt : ($ee_page_id ? (string) $ee_page->post_content : ''));
 $ee_intro_raw  = function_exists('excerpt_remove_blocks') ? excerpt_remove_blocks($ee_intro_raw) : $ee_intro_raw;
 $ee_intro      = trim(wp_strip_all_tags(strip_shortcodes($ee_intro_raw))); // متن ساده؛ از اجرای دوبارهٔ shortcode/Query Loop برگه جلوگیری می‌کند.
+$ee_empty_title = isset($args['empty_title']) ? (string) $args['empty_title'] : __('موردی پیدا نشد', 'evented-edu');
+$ee_empty_text  = isset($args['empty_text']) ? (string) $args['empty_text'] : __('عبارت یا فیلتر دیگری را امتحان کنید.', 'evented-edu');
 $ee_base_url   = $ee_page_id ? (string) get_permalink($ee_page_id) : (string) get_post_type_archive_link($ee_type);
 $ee_base_url   = $ee_base_url ?: home_url('/');
 $ee_paged      = max(1, (int) get_query_var('paged'), (int) get_query_var('page'));
@@ -121,7 +126,13 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => $ee_active
 			<?php echo function_exists('evented_pagination') ? evented_pagination($ee_items) : ''; // phpcs:ignore ?>
 			<?php wp_reset_postdata(); ?>
 		<?php else : ?>
-			<?php echo function_exists('evented_empty_state') ? evented_empty_state(array('title' => __('موردی پیدا نشد', 'evented-edu'), 'text' => __('عبارت یا فیلتر دیگری را امتحان کنید.', 'evented-edu'), 'icon' => $ee_icon, 'actions' => array(array('label' => __('پاک کردن فیلترها', 'evented-edu'), 'url' => $ee_base_url, 'primary' => true)))) : '<p>' . esc_html__('موردی پیدا نشد.', 'evented-edu') . '</p>'; // phpcs:ignore ?>
+			<?php
+			$ee_empty_args = array('title' => $ee_empty_title, 'text' => $ee_empty_text, 'icon' => $ee_icon);
+			if ('' !== $ee_search || $ee_term_id || 'newest' !== $ee_order) {
+				$ee_empty_args['actions'] = array(array('label' => __('پاک کردن فیلترها', 'evented-edu'), 'url' => $ee_base_url, 'primary' => true));
+			}
+			echo function_exists('evented_empty_state') ? evented_empty_state($ee_empty_args) : '<p>' . esc_html($ee_empty_title) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper خروجی امن تولید می‌کند.
+			?>
 		<?php endif; ?>
 	</div>
 </main>
