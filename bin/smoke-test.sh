@@ -70,12 +70,21 @@ then
 fi
 
 # CPTهای مهاجرت‌کرده بدون CPT UI باید آرشیو و نمای تکی سالم داشته باشند.
-resource_paths=('lib/' 'clip/' 'gallery/' 'galery_cat/%DA%AF%D8%B2%D8%A7%D8%B1%D8%B4-%D8%AA%D8%B5%D9%88%DB%8C%D8%B1%DB%8C/' 'lib/lib-item-1/' 'clip/clip-item-1/' 'gallery/gallery-item-1/' 'download/download-item-1/')
+resource_paths=('lib/' 'clip/' 'gallery/' 'podcast/' 'galery_cat/%DA%AF%D8%B2%D8%A7%D8%B1%D8%B4-%D8%AA%D8%B5%D9%88%DB%8C%D8%B1%DB%8C/' 'lib/lib-item-1/' 'clip/clip-item-1/' 'gallery/gallery-item-1/' 'download/download-item-1/' 'podcast-episode/legacy-podcast-fixture/')
 for path in "${resource_paths[@]}"; do
 	name=${path//\//-}
 	fetch "/$path" "$tmp/resource-$name.html"
 	require_text "$tmp/resource-$name.html" 'id="ee-main"' "custom content route did not render: /$path"
 done
+require_text "$tmp/resource-podcast-.html" 'پادکست بازیابی‌شدهٔ آزمایشی' 'legacy Sonaar playlist is missing from /podcast/'
+reject_text "$tmp/resource-podcast-.html" 'هنوز پادکستی منتشر نشده است' 'podcast page still renders the empty state despite legacy data'
+require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" 'data-ee-podcast-player' 'legacy podcast player did not render'
+require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" 'توصیهٔ تربیتی اول' 'first serialized Sonaar track was not recovered'
+require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" 'توصیهٔ تربیتی دوم' 'second serialized Sonaar track was not recovered'
+require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" '/wp-content/uploads/podcast-1.mp3' 'legacy Sonaar stream URL was not recovered'
+require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" 'podcast-player.js?ver=1.0.0' 'podcast player behavior was not enqueued'
+fetch '/wp-json/wp/v2/types/sr_playlist' "$tmp/podcast-rest-type.json"
+require_text "$tmp/podcast-rest-type.json" '"slug":"sr_playlist"' 'legacy Sonaar post type is missing from REST'
 fetch '/wp-json/wp/v2/types/clip' "$tmp/clip-rest-type.json"
 require_text "$tmp/clip-rest-type.json" '"slug":"clip"' 'clip REST type is missing'
 reject_text "$tmp/clip-rest-type.json" 'wpdmcategory' 'clip remains associated with the library category taxonomy'
