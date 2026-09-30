@@ -85,6 +85,54 @@ require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" 'https
 require_text "$tmp/resource-podcast-episode-legacy-podcast-fixture-.html" 'podcast-player.js?ver=1.0.0' 'podcast player behavior was not enqueued'
 fetch '/wp-json/wp/v2/types/sr_playlist' "$tmp/podcast-rest-type.json"
 require_text "$tmp/podcast-rest-type.json" '"slug":"sr_playlist"' 'legacy Sonaar post type is missing from REST'
+fetch '/wp-json/wp/v2/sr_playlist?slug=legacy-podcast-fixture' "$tmp/podcast-rest-item.json"
+require_text "$tmp/podcast-rest-item.json" '"_evented_podcast_tracks"' 'canonical podcast tracks meta is missing from REST'
+podcast_id=$(python3 - "$tmp/podcast-rest-item.json" <<'PY'
+import json, sys
+rows=json.load(open(sys.argv[1], encoding='utf-8'))
+print(rows[0]['id'] if rows else '')
+PY
+)
+if [[ -n "$podcast_id" ]]; then
+	fetch "/wp-admin/post.php?post=$podcast_id&action=edit" "$tmp/podcast-editor.html"
+	require_text "$tmp/podcast-editor.html" 'data-ee-podcast-editor' 'podcast tracks editor is missing'
+	require_text "$tmp/podcast-editor.html" 'data-ee-podcast-add' 'podcast audio add button is missing'
+	require_text "$tmp/podcast-editor.html" 'podcast-tracks.js?ver=1.0.0' 'podcast editor behavior was not enqueued'
+	require_text "$tmp/podcast-editor.html" 'توصیهٔ تربیتی دوم' 'legacy Sonaar tracks were not prefilled in the editor'
+else
+	fail 'podcast fixture ID was not returned by REST'
+fi
+fetch '/wp-admin/edit.php?post_type=sr_playlist&page=evented-podcast-sync' "$tmp/podcast-sync.html"
+require_text "$tmp/podcast-sync.html" 'شروع همگام‌سازی امن' 'podcast synchronization tool is missing'
+podcast_sync_nonce=$(python3 - "$tmp/podcast-sync.html" <<'PY'
+from html.parser import HTMLParser
+import sys
+class P(HTMLParser):
+    value=''
+    def handle_starttag(self, tag, attrs):
+        attrs=dict(attrs)
+        if tag=='input' and attrs.get('name')=='_wpnonce': self.value=attrs.get('value','')
+p=P(); p.feed(open(sys.argv[1], encoding='utf-8').read()); print(p.value)
+PY
+)
+if [[ -n "$podcast_sync_nonce" ]]; then
+	code=$(curl -sS --max-time 60 --max-redirs 10 -c "$cookie" -b "$cookie" -L --data-urlencode "_wpnonce=$podcast_sync_nonce" --data-urlencode 'evented_sync_podcasts=1' -o "$tmp/podcast-sync-result.html" -w '%{http_code}' "$base/wp-admin/edit.php?post_type=sr_playlist&page=evented-podcast-sync") || code=000
+	requests=$((requests + 1)); [[ "$code" == 200 ]] || fail "podcast synchronization returned HTTP $code"
+	if ! grep -Eq 'همگام‌شده: 1|قبلاً استاندارد: 1' "$tmp/podcast-sync-result.html"; then fail 'legacy Sonaar tracks were not synchronized'; fi
+	fetch '/wp-json/wp/v2/sr_playlist?slug=legacy-podcast-fixture' "$tmp/podcast-rest-synced.json"
+	if ! python3 - "$tmp/podcast-rest-synced.json" <<'PY'
+import json, sys
+rows=json.load(open(sys.argv[1], encoding='utf-8'))
+tracks=rows[0].get('meta',{}).get('_evented_podcast_tracks',[]) if rows else []
+raise SystemExit(0 if len(tracks)==2 and tracks[0].get('title')=='توصیهٔ تربیتی اول' and tracks[1].get('audio_url','').endswith('podcast-2.mp3') else 1)
+PY
+	then fail 'synchronized canonical podcast data is invalid'; fi
+	code=$(curl -sS --max-time 60 --max-redirs 10 -c "$cookie" -b "$cookie" -L --data-urlencode "_wpnonce=$podcast_sync_nonce" --data-urlencode 'evented_sync_podcasts=1' -o "$tmp/podcast-sync-second.html" -w '%{http_code}' "$base/wp-admin/edit.php?post_type=sr_playlist&page=evented-podcast-sync") || code=000
+	requests=$((requests + 1)); [[ "$code" == 200 ]] || fail "second podcast synchronization returned HTTP $code"
+	require_text "$tmp/podcast-sync-second.html" 'قبلاً استاندارد: 1' 'podcast synchronization is not idempotent'
+else
+	fail 'podcast synchronization nonce is missing'
+fi
 fetch '/wp-json/wp/v2/types/clip' "$tmp/clip-rest-type.json"
 require_text "$tmp/clip-rest-type.json" '"slug":"clip"' 'clip REST type is missing'
 reject_text "$tmp/clip-rest-type.json" 'wpdmcategory' 'clip remains associated with the library category taxonomy'

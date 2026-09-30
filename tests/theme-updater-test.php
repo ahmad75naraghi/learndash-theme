@@ -32,24 +32,24 @@ $assert = static function ($condition, $message) use (&$failures) {
 };
 
 $base = array(
-	'tag_name'     => 'v2.2.0',
+	'tag_name'     => 'v2.3.0',
 	'draft'        => false,
 	'prerelease'   => false,
-	'html_url'     => 'https://github.com/ahmad75naraghi/learndash-theme/releases/tag/v2.2.0',
-	'zipball_url'  => 'https://api.github.com/repos/ahmad75naraghi/learndash-theme/zipball/v2.2.0',
+	'html_url'     => 'https://github.com/ahmad75naraghi/learndash-theme/releases/tag/v2.3.0',
+	'zipball_url'  => 'https://api.github.com/repos/ahmad75naraghi/learndash-theme/zipball/v2.3.0',
 	'body'         => "Changes\n- tested",
 	'published_at' => '2026-09-28T00:00:00Z',
 	'assets'       => array(
 		array(
 			'name'                 => 'evented-edu.zip',
-			'browser_download_url' => 'https://github.com/ahmad75naraghi/learndash-theme/releases/download/v2.2.0/evented-edu.zip',
+			'browser_download_url' => 'https://github.com/ahmad75naraghi/learndash-theme/releases/download/v2.3.0/evented-edu.zip',
 		),
 	),
 );
 
 $release = evented_theme_updater_normalize_release($base);
 $assert(is_array($release), 'A valid stable release must normalize.');
-$assert('2.2.0' === $release['version'], 'The leading v must be removed from the version.');
+$assert('2.3.0' === $release['version'], 'The leading v must be removed from the version.');
 $assert(false !== strpos($release['package'], '/evented-edu.zip'), 'The canonical release asset must have priority.');
 
 $fallback = $base;
@@ -69,9 +69,9 @@ $evil['zipball_url'] = 'https://evil.example/fallback.zip';
 $assert(null === evented_theme_updater_normalize_release($evil), 'Packages outside official GitHub hosts must be rejected.');
 
 $update = evented_theme_updater_build_update($release, '2.1.0', 'evented-edu');
-$assert(is_array($update) && '2.2.0' === $update['new_version'], 'A newer release must create a WordPress update response.');
-$assert(null === evented_theme_updater_build_update($release, '2.2.0', 'evented-edu'), 'The installed version must not update to itself.');
-$assert(null === evented_theme_updater_build_update($release, '2.3.0', 'evented-edu'), 'Downgrades must never be offered.');
+$assert(is_array($update) && '2.3.0' === $update['new_version'], 'A newer release must create a WordPress update response.');
+$assert(null === evented_theme_updater_build_update($release, '2.3.0', 'evented-edu'), 'The installed version must not update to itself.');
+$assert(null === evented_theme_updater_build_update($release, '2.4.0', 'evented-edu'), 'Downgrades must never be offered.');
 
 /* Simulate the random root directory produced by a GitHub zipball. */
 $callbacks = isset($GLOBALS['ee_test_filters']['upgrader_source_selection']) ? $GLOBALS['ee_test_filters']['upgrader_source_selection'] : array();
@@ -82,7 +82,7 @@ $tmp = sys_get_temp_dir() . '/evented-update-test-' . uniqid('', true);
 $remote = $tmp . '/unpacked/';
 $source = $remote . 'ahmad75naraghi-learndash-theme-abcdef/';
 mkdir($source, 0777, true);
-file_put_contents($source . 'style.css', "/*\nTheme Name: evented-edu\nVersion: 2.2.0\n*/\n");
+file_put_contents($source . 'style.css', "/*\nTheme Name: evented-edu\nVersion: 2.3.0\n*/\n");
 
 $wp_filesystem = new class {
 	public function exists($path) { return file_exists($path); }
@@ -104,7 +104,7 @@ if (is_callable($source_callback)) {
 $wp_filesystem->delete($tmp, true);
 
 $style = file_get_contents(dirname(__DIR__) . '/style.css');
-$assert(1 === preg_match('/^Version:\s*2\.2\.0\s*$/m', $style), 'style.css must advertise version 2.2.0.');
+$assert(1 === preg_match('/^Version:\s*2\.3\.0\s*$/m', $style), 'style.css must advertise version 2.3.0.');
 $assert(1 === preg_match('#^Update URI:\s*https://github\.com/ahmad75naraghi/learndash-theme\s*$#m', $style), 'style.css must have the GitHub Update URI.');
 
 if ($failures) {
