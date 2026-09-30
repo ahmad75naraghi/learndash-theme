@@ -337,10 +337,10 @@ function evented_reports_export()
 	$headers='course'===$type?array('نام کاربری','دوره','شروع','تکمیل','نام','نام خانوادگی','استان','شهر','موبایل','کد ملی','جنسیت','تولد'):array('نام کاربری','آزمون','دوره','تکمیل','نمره','نتیجه','IP','نام','نام خانوادگی','موبایل','کد ملی','شماره کارت','استان','شهر','جنسیت','تولد','فایل');
 	$filename='shamiim-'.$type.'-report-'.gmdate('Y-m-d-His').'.'.$format;
 	nocache_headers(); header('X-Content-Type-Options: nosniff'); header('Content-Disposition: attachment; filename="'.$filename.'"');
-	if('csv'===$format){header('Content-Type: text/csv; charset=UTF-8');$out=fopen('php://output','w');fwrite($out,"\xEF\xBB\xBF");fputcsv($out,$headers);}
+	if('csv'===$format){header('Content-Type: text/csv; charset=UTF-8');$out=fopen('php://output','w');fwrite($out,"\xEF\xBB\xBF");fputcsv($out,$headers,',','"','');}
 	else{header('Content-Type: application/json; charset=UTF-8');echo '{"columns":'.wp_json_encode($headers,JSON_UNESCAPED_UNICODE).',"rows":[';$first=true;}
 	$offset=0;$chunk=500;
-	do{$rows='course'===$type?evented_reports_course_rows($filters,$chunk,$offset):evented_reports_quiz_rows($filters,$chunk,$offset);foreach($rows as $row){$data=array_map('evented_reports_export_cell',evented_reports_export_row($type,$row));if('csv'===$format)fputcsv($out,$data);else{if(!$first)echo ',';echo wp_json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);$first=false;}}$offset+=$chunk;}while(count($rows)===$chunk);
+	do{$rows='course'===$type?evented_reports_course_rows($filters,$chunk,$offset):evented_reports_quiz_rows($filters,$chunk,$offset);foreach($rows as $row){$data=array_map('evented_reports_export_cell',evented_reports_export_row($type,$row));if('csv'===$format)fputcsv($out,$data,',','"','');else{if(!$first)echo ',';echo wp_json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);$first=false;}}$offset+=$chunk;}while(count($rows)===$chunk);
 	if('csv'===$format)fclose($out);else echo ']}';exit;
 }
 add_action('admin_post_evented_export_report','evented_reports_export');
