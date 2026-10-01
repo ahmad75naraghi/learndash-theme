@@ -22,7 +22,7 @@ if grep -Ev '^evented-edu/' <<<"$entries" | grep -q .; then
 	echo 'Package contains files outside the evented-edu root.' >&2
 	exit 1
 fi
-for required in style.css functions.php inc/includes.php inc/theme_updater.php; do
+for required in style.css functions.php inc/includes.php inc/theme_updater.php assets/fonts/Vazirmatn-Regular.ttf assets/fonts/Vazirmatn-Bold.ttf; do
 	if ! grep -Fxq "evented-edu/$required" <<<"$entries"; then
 		echo "Required package file is missing: $required" >&2
 		exit 1

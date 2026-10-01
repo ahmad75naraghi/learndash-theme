@@ -29,9 +29,11 @@ jobs:
       - name: Run lint script
         run: bash bin/lint.sh
 
-      - name: Test updater, panel helpers and static QA
+      - name: Test updater, certificate font, panel helpers and static QA
         run: |
+          composer install --no-interaction --prefer-dist --no-progress
           php tests/theme-updater-test.php
+          php tests/certificate-font-test.php
           php tests/panel-helpers-test.php
           python3 tests/static-audit.py
           bash bin/build-theme-release.sh /tmp/evented-edu.zip

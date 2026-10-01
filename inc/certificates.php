@@ -96,13 +96,65 @@ function shamiim_cert_background_path($cert_post_id)
 }
 
 /**
+ * پیکربندی mPDF همراه فونت TTF فارسی واقعی.
+ *
+ * @return array{0: array<string,mixed>, 1: string}
+ */
+function shamiim_cert_mpdf_config($temp_dir)
+{
+    /*
+     * فونت PDF باید TTF باشد؛ mPDF فایل WOFF2 رابط سایت را نمی‌خواند.
+     * بررسی اندازه مانع ثبت فایل ناقص/صفر بایتی به‌عنوان فونت می‌شود.
+     */
+    $fonts_dir   = get_template_directory() . '/assets/fonts';
+    $regular_ttf = $fonts_dir . '/Vazirmatn-Regular.ttf';
+    $bold_ttf    = $fonts_dir . '/Vazirmatn-Bold.ttf';
+    $has_vazir   = is_readable($regular_ttf) && filesize($regular_ttf) > 10000;
+    $has_bold    = is_readable($bold_ttf) && filesize($bold_ttf) > 10000;
+    $cert_font   = $has_vazir ? 'eventedcert' : 'dejavusans';
+    $config      = array(
+        'mode'             => 'utf-8',
+        'format'           => 'A4-L',
+        'tempDir'          => $temp_dir,
+        'margin_left'      => 0,
+        'margin_right'     => 0,
+        'margin_top'       => 0,
+        'margin_bottom'    => 0,
+        'margin_header'    => 0,
+        'margin_footer'    => 0,
+        'default_font'     => $cert_font,
+        'autoScriptToLang' => false,
+        'autoLangToFont'   => false,
+    );
+
+    if ($has_vazir) {
+        $config['fontDir'] = array_merge(
+            (new \Mpdf\Config\ConfigVariables())->getDefaults()['fontDir'],
+            array($fonts_dir)
+        );
+        $config['fontdata'] = (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'] + array(
+            'eventedcert' => array(
+                'R'          => 'Vazirmatn-Regular.ttf',
+                'B'          => $has_bold ? 'Vazirmatn-Bold.ttf' : 'Vazirmatn-Regular.ttf',
+                'useOTL'     => 0xFF,
+                'useKashida' => 75,
+            ),
+        );
+    }
+
+    return array($config, $cert_font);
+}
+
+/**
  * قرار دادن یک متن در کادر دقیق (میلی‌متر)
  */
 function shamiim_cert_place($mpdf, $text, array $f, $debug = false)
 {
-    $font  = !empty($f['font']) && 'vazir' === $f['font'] ? 'vazir' : 'dejavusans';
+    // نام خانواده عمداً اختصاصی است تا cache قدیمی mPDF برای فونت‌های حذف‌شده
+    // (Vazir/Shabnam) دوباره استفاده نشود.
+    $font  = ! empty($f['font']) && 'eventedcert' === $f['font'] ? 'eventedcert' : 'dejavusans';
     $style = sprintf(
-        'direction:rtl; font-family:%s; text-align:%s; font-size:%spt; color:%s; font-weight:%s;%s',
+        'direction:rtl; unicode-bidi:embed; font-family:%s; text-align:%s; font-size:%spt; color:%s; font-weight:%s;%s',
         $font,
         $f['align'],
         $f['size'],
@@ -111,7 +163,8 @@ function shamiim_cert_place($mpdf, $text, array $f, $debug = false)
         $debug ? ' border:0.2mm dashed #00aa00;' : ''
     );
 
-    $html = '<div style="' . $style . '">' . esc_html($text) . '</div>';
+    $text = wp_check_invalid_utf8((string) $text, true);
+    $html = '<div dir="rtl" lang="fa" style="' . $style . '">' . esc_html($text) . '</div>';
 
     $mpdf->WriteFixedPosHTML(
         $html,
@@ -194,42 +247,7 @@ function shamiim_cert_stream_pdf($user_id, $quiz_id, $time, $cert_post_id = 0, $
         file_put_contents($temp_dir . '/index.html', '');
     }
 
-    /* --- فونت‌ها: TTF سفارشی اختیاری است؛ بدون آن DejaVuSans داخلی mPDF استفاده می‌شود. --- */
-    $fonts_dir   = get_template_directory() . '/assets/fonts';
-    $regular_ttf = $fonts_dir . '/Vazir-Regular.ttf';
-    $has_vazir   = file_exists($regular_ttf);
-    $cert_font   = $has_vazir ? 'vazir' : 'dejavusans';
-    $mpdf_config = array(
-        'mode'             => 'utf-8',
-        'format'           => 'A4-L',
-        'tempDir'          => $temp_dir,
-        'margin_left'      => 0,
-        'margin_right'     => 0,
-        'margin_top'       => 0,
-        'margin_bottom'    => 0,
-        'margin_header'    => 0,
-        'margin_footer'    => 0,
-        'default_font'     => $cert_font,
-        'autoScriptToLang' => false,
-        'autoLangToFont'   => false,
-    );
-
-    if ($has_vazir) {
-        $bold_file = file_exists($fonts_dir . '/Vazir-Bold.ttf') ? 'Vazir-Bold.ttf' : 'Vazir-Regular.ttf';
-        $mpdf_config['fontDir'] = array_merge(
-            (new \Mpdf\Config\ConfigVariables())->getDefaults()['fontDir'],
-            array($fonts_dir)
-        );
-        $mpdf_config['fontdata'] = (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'] + array(
-            'vazir' => array(
-                'R'          => 'Vazir-Regular.ttf',
-                'B'          => $bold_file,
-                'useOTL'     => 0xFF,
-                'useKashida' => 75,
-            ),
-        );
-    }
-
+    list($mpdf_config, $cert_font) = shamiim_cert_mpdf_config($temp_dir);
     $mpdf = new \Mpdf\Mpdf($mpdf_config);
 
     $mpdf->SetTitle('گواهینامه - ' . $student_name);

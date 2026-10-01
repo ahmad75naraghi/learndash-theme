@@ -8,6 +8,15 @@ ROOT = Path(__file__).resolve().parents[1]
 errors = []
 checked = 0
 
+# Certificate PDFs require actual TTF files; mPDF cannot use the site's WOFF2 font.
+for rel in ("assets/fonts/Vazirmatn-Regular.ttf", "assets/fonts/Vazirmatn-Bold.ttf"):
+    path = ROOT / rel
+    checked += 1
+    if not path.is_file() or path.stat().st_size < 10000:
+        errors.append(f"missing or truncated certificate font: {rel}")
+    elif path.read_bytes()[:4] not in (b"\x00\x01\x00\x00", b"OTTO"):
+        errors.append(f"invalid TTF/OTF signature: {rel}")
+
 # Local assets referenced through PATH_DIR_URL/get_template_directory_uri must exist.
 asset_re = re.compile(r"(?:PATH_DIR_URL|get_template_directory_uri\(\))\s*\.\s*['\"](/assets/[^'\"?#]+)")
 for path in list(ROOT.rglob("*.php")) + list(ROOT.rglob("*.js")):
@@ -57,6 +66,7 @@ required_snippets = {
     "assets/css/admin/download-files.css": [".ee-download-admin-row", ".ee-download-admin-fields"],
     "inc/downloads.php": ["EVENTED_DOWNLOAD_FILES_META", "register_post_meta('wpdmpro'", "register_post_type('wpdmpro'", "register_taxonomy('wpdmcategory'", "'taxonomies' => array()", "evented_detach_download_taxonomies", "unregister_taxonomy_for_object_type($taxonomy, 'wpdmpro')", "evented_remove_download_taxonomy_menus", "evented_sync_download_files", "__wpdm_files", "evented_download_files", "evented_serve_public_download"],
     "inc/reports.php": ["evented_reports_admin_menu", "گزارش‌گیری", "evented_reports_course_rows", "evented_reports_quiz_rows", "evented_reports_export", "evented_reports_capture_quiz_ip", "evented_reports_card_number_shortcode", "update_meta_cache('user'", "admin_post_evented_export_report", "check_admin_referer('evented_export_report')"],
+    "inc/certificates.php": ["Vazirmatn-Regular.ttf", "Vazirmatn-Bold.ttf", "'eventedcert'", "'useOTL'", "lang=\"fa\""],
     "assets/css/admin/reports.css": [".ee-report-filters", ".ee-report-table-wrap", "@media print"],
     "assets/js/admin/reports.js": ["data-ee-report-print", "window.print()"],
     "assets/css/card-number.css": [".ee-card-form", ".ee-card-saved"],
