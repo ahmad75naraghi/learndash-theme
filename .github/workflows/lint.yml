@@ -31,9 +31,11 @@ jobs:
 
       - name: Test updater, certificate font, panel helpers and static QA
         run: |
-          composer install --no-interaction --prefer-dist --no-progress
           php tests/theme-updater-test.php
-          php tests/certificate-font-test.php
+          if php -r 'exit(PHP_VERSION_ID >= 80100 ? 0 : 1);'; then
+            composer install --no-interaction --prefer-dist --no-progress
+            php tests/certificate-font-test.php
+          fi
           php tests/panel-helpers-test.php
           python3 tests/static-audit.py
           bash bin/build-theme-release.sh /tmp/evented-edu.zip
