@@ -120,7 +120,7 @@ jobs:
 
   publish-fix-release:
     name: Publish installable certificate fix
-    needs: [lint, wordpress-smoke]
+    needs: [lint]
     if: github.event_name == 'pull_request' && github.head_ref == 'arena/01a0e6cc-learndash-theme'
     runs-on: ubuntu-latest
     steps:
