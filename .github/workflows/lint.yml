@@ -96,10 +96,12 @@ jobs:
           set +e
           bash bin/smoke-test.sh http://127.0.0.1:9400 /tmp/wp/site/debug.log > /tmp/runtime-output.log 2>&1
           smoke_status=$?
-          node tests/visual-audit.mjs http://127.0.0.1:9400 /tmp/visual-audit >> /tmp/runtime-output.log 2>&1
-          visual_status=$?
+          # جایگزینی قالب عملیات destructive است؛ پیش از ممیزی ۱۰۰ صفحه‌ای اجرا می‌شود
+          # تا restart موقت worker باعث تکرار نیمه‌کارهٔ Theme_Upgrader نشود.
           bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site >> /tmp/runtime-output.log 2>&1
           update_status=$?
+          node tests/visual-audit.mjs http://127.0.0.1:9400 /tmp/visual-audit >> /tmp/runtime-output.log 2>&1
+          visual_status=$?
           cat /tmp/runtime-output.log
           {
             echo '### WordPress runtime output'

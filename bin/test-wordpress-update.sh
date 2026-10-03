@@ -42,7 +42,9 @@ PY
 [[ -n "$nonce" ]] || { echo 'Could not extract authenticated updater nonce.' >&2; exit 1; }
 
 set +e
-curl -sS "${curl_retry[@]}" --fail-with-body --max-time 120 -c "$cookie" -b "$cookie" \
+# خود Theme_Upgrader عملیات destructive است؛ endpoint نباید بعد از پاسخ 5xx به‌طور
+# خودکار تکرار شود، چون تلاش نخست ممکن است جایگزینی را کامل کرده باشد.
+curl -sS --fail-with-body --max-time 120 -c "$cookie" -b "$cookie" \
 	-o "$response" "$base/evented-update-integration.php?_wpnonce=$nonce"
 curl_status=$?
 set -e
