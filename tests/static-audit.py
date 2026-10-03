@@ -47,7 +47,7 @@ for path in (ROOT / "panel").glob("*.php"):
 
 required_snippets = {
     "assets/assets_functions.php": ["'profile' === $panel_section", "jalalidatepicker-js"],
-    "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.9.0'"],
+    "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.9.0'", "evented-home.css', array('ee-shell'), '1.5.0'"],
     "assets/css/panel.css": ["@media (max-width: 359.98px)", ".ee-panel-pager", "Final containment layer", ".transactions-table", "overflow-x: auto"],
     "assets/css/login.css": ["width: min(960px, 100%)", "min-height: 100dvh", "@media (max-width: 420px)", ".otp-field"],
     "page-login.php": ["login.css?ver=1.1.0"],
@@ -65,7 +65,10 @@ required_snippets = {
     "assets/js/newhome/ee-sw.js": ["res.headers.get('cache-control')", "res.headers.get('vary')", "x-evented-private", "privateResponse"],
     "template-parts/ee-header.php": ["ee_render_desktop_children", "ee-sub-flyout", "ee-sub-heading", "ee-dn-sub-heading"],
     "assets/css/newhome/ee-shell.css": [".ee-sub-item:hover > .ee-sub-flyout", "right: calc(100% + .4rem)", "overflow-wrap: break-word", "@media (max-width: 639.98px)"],
-    "assets/css/newhome/evented-home.css": ["تایپوگرافی و چیدمان موبایل صفحهٔ اصلی", ".ee-sec-title", "white-space: nowrap", "@media (max-width: 359.98px)"],
+    "assets/css/newhome/evented-home.css": ["تایپوگرافی و چیدمان موبایل صفحهٔ اصلی", ".ee-sec-title", "white-space: nowrap", "@media (max-width: 359.98px)", ".ee-home button.ee-slide-dot", "min-height: .38rem", "--ee-slider-height-mobile"],
+    "assets/css/admin/theme-settings.css": [".evented-slider-size", ".evented-number-unit"],
+    "inc/theme_settings.php": ["EVENTED_OPT_SLIDER_HEIGHT", "EVENTED_OPT_SLIDER_HEIGHT_MOBILE", "evented_get_home_slider_height", "name=\"slider_height\"", "name=\"slider_height_mobile\"", "max(220, min(720", "max(180, min(520"],
+    "front-page.php": ["--ee-slider-height:", "--ee-slider-height-mobile:"],
     "assets/css/newhome/ee-catalog.css": ["سربرگ و کارت‌های کاتالوگ روی موبایل باریک", ".ee-ct-title", "text-overflow: ellipsis"],
     "assets/js/newhome/evented-home.js": ["ArrowLeft", "aria-expanded"],
     "tests/visual-audit.mjs": ["guestLogin", "playground_auto_login_already_happened", "course-single", "lesson-single", "quiz-single", "podcast-single", "escapedContent", "formLayout.overlapping", "quiz form control(s) escape the form"],

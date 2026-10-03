@@ -241,6 +241,30 @@ try {
           }
         }, new URL(base).origin);
 
+        if (slug === 'home') {
+          const sliderUi = await page.evaluate(() => {
+            const dots = [...document.querySelectorAll('.ee-slide-dot')].filter(el => el.offsetParent !== null);
+            const dotsWrap = document.querySelector('.ee-slider-dots');
+            const feature = document.querySelector('.ee-hero-feat .ee-feature');
+            return {
+              count: dots.length,
+              maxDotHeight: dots.reduce((max, dot) => Math.max(max, dot.getBoundingClientRect().height), 0),
+              maxDotWidth: dots.reduce((max, dot) => Math.max(max, dot.getBoundingClientRect().width), 0),
+              wrapHeight: dotsWrap?.getBoundingClientRect().height || 0,
+              featureHeight: feature?.getBoundingClientRect().height || 0,
+            };
+          });
+          if (sliderUi.count > 1) {
+            if (sliderUi.maxDotHeight > 10 || sliderUi.maxDotWidth > 24 || sliderUi.wrapHeight > 28) {
+              report('failure', viewportName, route, `slider dots are oversized (${Math.round(sliderUi.maxDotWidth)}x${Math.round(sliderUi.maxDotHeight)}, wrapper ${Math.round(sliderUi.wrapHeight)}px)`);
+            }
+            const expectedHeight = viewport.width <= 639 ? 260 : 360;
+            if (Math.abs(sliderUi.featureHeight - expectedHeight) > 3) {
+              report('failure', viewportName, route, `configured slider height was not applied (${Math.round(sliderUi.featureHeight)}px, expected ${expectedHeight}px)`);
+            }
+          }
+        }
+
         if (viewportName === 'desktop1440' && slug === 'home') {
           const nestedItem = page.locator('.ee-nav-item.has-sub:has(.ee-sub-item.has-children)').first();
           if (await nestedItem.count()) {

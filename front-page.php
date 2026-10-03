@@ -139,6 +139,8 @@ foreach ($ee_saved_slides as $s) {
 
 $ee_slide_count  = count($ee_feature_slides);
 $ee_slider_mode  = $ee_slide_count > 1;
+$ee_slider_height = function_exists('evented_get_home_slider_height') ? evented_get_home_slider_height(false) : 360;
+$ee_slider_height_mobile = function_exists('evented_get_home_slider_height') ? evented_get_home_slider_height(true) : 260;
 
 /* تصویر LCP اسلاید نخست پیش از CSS کشف و دریافت شود. */
 if (!empty($ee_feature_slides[0]['img'])) {
@@ -160,7 +162,7 @@ if (!empty($ee_feature_slides[0]['img'])) {
     <section class="ee-hero<?php echo empty($ee_feature_slides) ? ' is-no-slider' : ''; ?>">
         <div class="ee-wrap ee-hero-grid">
 
-            <div class="ee-hero-feat ee-fade">
+            <div class="ee-hero-feat ee-fade" style="--ee-slider-height:<?php echo esc_attr($ee_slider_height); ?>px;--ee-slider-height-mobile:<?php echo esc_attr($ee_slider_height_mobile); ?>px">
 
                 <?php if ($ee_slider_mode) : ?>
                     <div class="ee-slider" id="eeSlider" data-count="<?php echo esc_attr($ee_slide_count); ?>">

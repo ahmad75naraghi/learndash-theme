@@ -393,6 +393,9 @@ fi
 
 fetch '/wp-admin/admin.php?page=evented-theme-settings' "$tmp/settings.html"
 require_text "$tmp/settings.html" 'evented-update-card' 'theme settings/update card did not render (admin session required)'
+require_text "$tmp/settings.html" 'name="slider_height"' 'desktop slider height setting is missing'
+require_text "$tmp/settings.html" 'name="slider_height_mobile"' 'mobile slider height setting is missing'
+require_text "$tmp/settings.html" 'theme-settings.css?ver=1.3.0' 'slider settings stylesheet cache version is stale'
 
 # مرکز گزارش‌گیری داخلی: داده، فیلتر، asset و خروجی server-side.
 fetch '/wp-admin/admin.php?page=evented-reports' "$tmp/reports-overview.html"
