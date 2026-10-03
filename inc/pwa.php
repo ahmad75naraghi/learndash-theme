@@ -19,7 +19,7 @@
 
 defined('ABSPATH') || exit;
 
-const EVENTED_PWA_VER = '1.0.0';
+const EVENTED_PWA_VER = '1.0.1';
 
 /* ------------------------------------------------------------------ */
 /* تنظیمات                                                              */
@@ -88,6 +88,17 @@ function evented_pwa_cache_ver()
 	$theme = wp_get_theme();
 	return 'ee-' . preg_replace('/[^a-z0-9.]/i', '', (string) $theme->get('Version')) . '-' . (int) evented_pwa_opt('pwa_cache_ver', 1) . '-' . EVENTED_PWA_VER;
 }
+
+/**
+ * Service workers cannot reliably inspect the Cookie request header. Mark every
+ * authenticated response explicitly so personalized HTML is never persisted,
+ * even if another plugin accidentally weakens WordPress's Cache-Control policy.
+ */
+add_action('send_headers', static function () {
+	if (evented_pwa_enabled() && is_user_logged_in()) {
+		header('X-Evented-Private: 1');
+	}
+});
 
 /* ------------------------------------------------------------------ */
 /* مسیرها                                                               */

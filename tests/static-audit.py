@@ -52,6 +52,11 @@ required_snippets = {
     "panel/payments.php": ["LIMIT %d OFFSET %d", "evented_panel_pagination"],
     "panel/my-courses.php": ["$courses_per_page", "'no_found_rows'"],
     "inc/performance.php": ["Vazirmatn-Variable.woff2", "print_emoji_detection_script"],
+    "inc/live_search.php": ["'clip'         => 'smart_display'", "'sr_playlist'  => 'podcasts'", "'lib'          => 'local_library'", "'wpdmpro'      => 'download'", "add_query_arg($more_args"],
+    "inc/theme_options.php": ["current_user_can('unfiltered_html')", "current_user_can('manage_options')", "array('response' => 403)", "!get_userdata($target_user_id)"],
+    "inc/theme_updater.php": ["'evented-edu.zip' === $name", "source zipball omits generated production dependencies"],
+    "inc/pwa.php": ["X-Evented-Private: 1", "EVENTED_PWA_VER = '1.0.1'"],
+    "assets/js/newhome/ee-sw.js": ["res.headers.get('cache-control')", "res.headers.get('vary')", "x-evented-private", "privateResponse"],
     "template-parts/ee-header.php": ["ee_render_desktop_children", "ee-sub-flyout", "ee-sub-heading", "ee-dn-sub-heading"],
     "assets/css/newhome/ee-shell.css": [".ee-sub-item:hover > .ee-sub-flyout", "right: calc(100% + .4rem)"],
     "assets/js/newhome/evented-home.js": ["ArrowLeft", "aria-expanded"],
@@ -101,6 +106,9 @@ for rel, snippets in required_snippets.items():
 forbidden_snippets = {
     "template-parts/ee-download-archive.php": ["download_cat", "wpdmcategory", "ee-resource-chips"],
     "single-wpdmpro.php": ["wpdmcategory", "ee-download-terms"],
+    "inc/live_search.php": ["rawurlencode($q)", "'video'        => 'smart_display'", "'downloads'    => 'download'"],
+    "inc/theme_updater.php": ["$payload['zipball_url']"],
+    "assets/js/newhome/ee-sw.js": ["res.headers.get('set-cookie')"],
 }
 for rel, snippets in forbidden_snippets.items():
     text = (ROOT / rel).read_text(encoding="utf-8")

@@ -52,10 +52,9 @@ $assert(is_array($release), 'A valid stable release must normalize.');
 $assert('2.4.4' === $release['version'], 'The leading v must be removed from the version.');
 $assert(false !== strpos($release['package'], '/evented-edu.zip'), 'The canonical release asset must have priority.');
 
-$fallback = $base;
-$fallback['assets'] = array();
-$fallback_release = evented_theme_updater_normalize_release($fallback);
-$assert($fallback_release && $fallback_release['package'] === $base['zipball_url'], 'zipball_url must be used when the canonical asset is absent.');
+$missing_asset = $base;
+$missing_asset['assets'] = array();
+$assert(null === evented_theme_updater_normalize_release($missing_asset), 'A source zipball without packaged production dependencies must never be offered.');
 
 $draft = $base;
 $draft['draft'] = true;
@@ -104,7 +103,7 @@ if (is_callable($source_callback)) {
 $wp_filesystem->delete($tmp, true);
 
 $style = file_get_contents(dirname(__DIR__) . '/style.css');
-$assert(1 === preg_match('/^Version:\s*2\.4\.4\s*$/m', $style), 'style.css must advertise version 2.4.4.');
+$assert(1 === preg_match('/^Version:\s*2\.4\.5\s*$/m', $style), 'style.css must advertise version 2.4.5.');
 $assert(1 === preg_match('#^Update URI:\s*https://github\.com/ahmad75naraghi/learndash-theme\s*$#m', $style), 'style.css must have the GitHub Update URI.');
 
 if ($failures) {

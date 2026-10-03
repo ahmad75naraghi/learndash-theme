@@ -81,7 +81,7 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 │   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها) + هلپرهای LMS
 │   ├── certificates.php          گواهینامهٔ فارسی: mPDF بسته‌شده در inc/lib + fallback چاپی مستقل
 │   ├── navigation.php            منوی استاتیک هدر/فوتر/کشوی موبایل (کش هفتگی) + فیلتر بخش جستجو + تب‌های مقالات خانه
-│   ├── theme_updater.php         به‌روزرسان امن قالب از GitHub Releases + نرمال‌سازی zipball
+│   ├── theme_updater.php         به‌روزرسان امن قالب از artifact کامل GitHub Release
 │   ├── login.php                 کلاس EventedAuthHandler + نشست امن OTP/ورود
 │   ├── sms.php                   send_pattern_sms (SOAP)
 │   ├── meta_functions.php        متاباکس دوره/دسته/کاربر + فیلتر آواتار
@@ -235,16 +235,16 @@ define('EVENTED_SMS_BODY_ID', 12345);
 
 1. مقدار `Version` در `style.css` افزایش یابد.
 2. بعد از merge، بسته با `bash bin/build-theme-release.sh /tmp/evented-edu.zip` ساخته شود.
-3. GitHub Release با tag هم‌نسخه (مثلاً `v2.4.4`) ساخته و فایل `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به آن پیوست شود.
+3. GitHub Release با tag هم‌نسخه (مثلاً `v2.4.5`) ساخته و فایل `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به آن پیوست شود.
 4. وجود `evented-edu/inc/lib/autoload.php`، کلاس `Mpdf\\Mpdf` و دو TTF گواهینامه در خود ZIP تأیید شود.
 5. در پیشخوان «تنظیمات قالب → بررسی دوباره» زده شود و نصب از صفحهٔ به‌روزرسانی‌های وردپرس انجام گیرد.
 
-zipball رسمی سورس برای بازیابی کد پشتیبانی می‌شود، اما artifact استاندارد `evented-edu.zip` تنها بستهٔ قابل استقرار کامل است. تنظیمات، نوشته‌ها و محتوای سایت در دیتابیس‌اند و با جایگزینی فایل‌های قالب حذف نمی‌شوند.
+zipball رسمی سورس بستهٔ قابل استقرار نیست و updater آن را پیشنهاد نمی‌دهد؛ artifact استاندارد `evented-edu.zip` تنها بستهٔ کامل است. تنظیمات، نوشته‌ها و محتوای سایت در دیتابیس‌اند و با جایگزینی فایل‌های قالب حذف نمی‌شوند.
 
 ## ۷. تست‌ها
 
 - GitHub Actions روی PHP 7.4/8.1/8.3، JavaScript و CSS اجرا می‌شود.
-- `tests/theme-updater-test.php` parsing امن Release، جلوگیری از downgrade/prerelease/host ناشناس و نرمال‌سازی پوشهٔ zipball را آزمایش می‌کند.
+- `tests/theme-updater-test.php` parsing امن Release، جلوگیری از downgrade/prerelease/host ناشناس و نرمال‌سازی پوشهٔ بسته را آزمایش می‌کند.
 - `tests/panel-helpers-test.php` نرمال‌سازی ارقام فارسی/عربی پنل و `tests/static-audit.py` قراردادهای asset، دسترس‌پذیری تصاویر، صفحه‌بندی و کارایی را بررسی می‌کنند.
 - `tests/certificate-font-test.php` بارگذاری mPDF، انتخاب TTF فارسی و تولید PDF واقعی را روی PHPهای پشتیبانی‌شده می‌آزماید.
 - `bin/build-theme-release.sh` ساختار ZIP، نسخه، `Update URI`، `inc/lib`، فونت‌ها و تولید PDF از staging نهایی را اعتبارسنجی می‌کند.

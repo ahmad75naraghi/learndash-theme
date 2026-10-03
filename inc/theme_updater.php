@@ -3,9 +3,8 @@
  * به‌روزرسان خودکار قالب از GitHub Releases.
  *
  * انتشار باید در مخزن عمومی GitHub با tag نسخه (برای نمونه v2.2.0) ساخته شود.
- * اگر asset با نام evented-edu.zip وجود داشته باشد در اولویت است؛ در غیر این صورت
- * zipball رسمی همان Release مصرف و پوشهٔ تصادفی GitHub پیش از نصب به slug قالب
- * نرمال می‌شود.
+ * فقط asset ساخته‌شدهٔ CI با نام evented-edu.zip پذیرفته می‌شود؛ zipball سورس
+ * وابستگی‌های production همراه قالب را ندارد و نباید به‌عنوان بستهٔ قابل نصب عرضه شود.
  *
  * @package evented-edu
  */
@@ -80,18 +79,14 @@ function evented_theme_updater_normalize_release($payload)
 	foreach (isset($payload['assets']) && is_array($payload['assets']) ? $payload['assets'] : array() as $asset) {
 		$name = isset($asset['name']) ? strtolower((string) $asset['name']) : '';
 		$url  = isset($asset['browser_download_url']) ? (string) $asset['browser_download_url'] : '';
-		if (in_array($name, array('evented-edu.zip', 'learndash-theme.zip'), true) && evented_theme_updater_package_url_is_safe($url)) {
+		if ('evented-edu.zip' === $name && evented_theme_updater_package_url_is_safe($url)) {
 			$package = $url;
 			break;
 		}
 	}
 
-	if ('' === $package) {
-		$fallback = isset($payload['zipball_url']) ? (string) $payload['zipball_url'] : '';
-		if (evented_theme_updater_package_url_is_safe($fallback)) {
-			$package = $fallback;
-		}
-	}
+	// GitHub's source zipball omits generated production dependencies (notably
+	// inc/lib/mPDF). Offering it would install a theme whose certificates fail.
 	if ('' === $package) {
 		return null;
 	}
@@ -229,8 +224,8 @@ add_filter('themes_api', function ($result, $action, $args) {
 }, 20, 3);
 
 /**
- * zipball گیت‌هاب پوشه‌ای با نام owner-repo-hash دارد. فقط هنگام آپدیت همین قالب،
- * آن را به slug ثابت تغییر می‌دهیم تا قالب پس از نصب غیرفعال یا گم نشود.
+ * اگر ریشهٔ بستهٔ Release نامی غیر از slug نصب‌شده داشته باشد، فقط هنگام آپدیت
+ * همین قالب آن را به slug ثابت تغییر می‌دهیم تا قالب غیرفعال یا گم نشود.
  */
 add_filter('upgrader_source_selection', function ($source, $remote_source, $upgrader, $hook_extra = array()) {
 	$slug   = evented_theme_updater_slug();

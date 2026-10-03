@@ -74,13 +74,20 @@ try {
 
     for (const [slug, route] of routes) {
       const page = await context.newPage();
-      const responseErrors = [];
+      // Keep only the latest status per resource. A successful retry should clear a
+      // transient Playground/PHP-worker failure instead of failing the whole audit.
+      const responseErrors = new Map();
       const consoleErrors = [];
       page.on('response', response => {
         const url = response.url();
-        const expected404 = slug === 'not-found' && new URL(url).pathname === route;
+        const parsed = new URL(url);
+        parsed.searchParams.delete('__ee_retry');
+        const key = parsed.href;
+        const expected404 = slug === 'not-found' && parsed.pathname === route;
         if (url.startsWith(base) && response.status() >= 400 && !url.includes('favicon') && !expected404) {
-          responseErrors.push(`${response.status()} ${new URL(url).pathname}`);
+          responseErrors.set(key, `${response.status()} ${parsed.pathname}`);
+        } else if (response.ok()) {
+          responseErrors.delete(key);
         }
       });
       page.on('console', message => {
@@ -97,7 +104,7 @@ try {
         for (let attempt = 0; attempt < 5; attempt++) {
           response = await page.goto(`${base}${route}`, { waitUntil: 'load', timeout: 30_000 });
           if (!response || ![500, 502, 503, 504].includes(response.status()) || attempt === 4) break;
-          responseErrors.length = 0;
+          responseErrors.clear();
           consoleErrors.length = 0;
           await page.waitForTimeout(1_000 * (attempt + 1));
         }
@@ -106,6 +113,29 @@ try {
         }
         await page.evaluate(() => document.fonts?.ready);
         await page.waitForTimeout(250);
+
+        // Under a heavy 100-page audit Playground can briefly return 502/503 for a
+        // media request even after the document succeeded. Retry visible same-origin
+        // images before declaring the layout broken; permanent 4xx/5xx still fail.
+        await page.evaluate(async origin => {
+          const broken = [...document.images].filter(img => img.offsetParent !== null && (!img.complete || img.naturalWidth === 0));
+          for (const img of broken) {
+            let source;
+            try { source = new URL(img.currentSrc || img.src, document.baseURI); } catch { continue; }
+            if (source.origin !== origin) continue;
+            for (let attempt = 1; attempt <= 3 && (!img.complete || img.naturalWidth === 0); attempt++) {
+              source.searchParams.set('__ee_retry', `${Date.now()}-${attempt}`);
+              img.removeAttribute('srcset');
+              await new Promise(resolve => {
+                const done = () => resolve();
+                img.addEventListener('load', done, { once: true });
+                img.addEventListener('error', done, { once: true });
+                img.src = source.href;
+                setTimeout(done, 750 * attempt);
+              });
+            }
+          }
+        }, new URL(base).origin);
 
         if (viewportName === 'desktop1440' && slug === 'home') {
           const nestedItem = page.locator('.ee-nav-item.has-sub:has(.ee-sub-item.has-children)').first();
@@ -199,7 +229,7 @@ try {
         if (!metrics.title) report('failure', viewportName, route, 'document title is empty');
         if (!metrics.main) report('warning', viewportName, route, 'semantic main landmark is missing');
         if (metrics.unnamed.length) report('warning', viewportName, route, `interactive elements without accessible names: ${metrics.unnamed.slice(0, 8).join(', ')}`);
-        if (responseErrors.length) report('failure', viewportName, route, `local resource errors: ${[...new Set(responseErrors)].join(', ')}`);
+        if (responseErrors.size) report('failure', viewportName, route, `local resource errors: ${[...new Set(responseErrors.values())].join(', ')}`);
         if (consoleErrors.length) report('failure', viewportName, route, `browser errors: ${[...new Set(consoleErrors)].slice(0, 3).join(' | ')}`);
 
         const dir = path.join(outputDir, viewportName);

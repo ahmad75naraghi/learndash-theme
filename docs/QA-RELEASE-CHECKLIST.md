@@ -23,7 +23,7 @@ bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site
 - [ ] ZIP فقط یک ریشهٔ `evented-edu/` دارد و Version/Update URI صحیح است.
 - [ ] ZIP رسمی شامل `inc/lib/autoload.php`، کلاس mPDF و دو فایل TTF گواهینامه است؛ به پوشهٔ `vendor/` روی سرور وابسته نیست.
 - [ ] `certificate-font-test.php` با متن فارسی شامل «پ ژ چ گ ی ک» PDF معتبر تولید می‌کند.
-- [ ] updater، جلوگیری از downgrade/prerelease و نرمال‌سازی zipball پاس است.
+- [ ] updater، ردکردن source zip ناقص، جلوگیری از downgrade/prerelease و نرمال‌سازی بسته پاس است.
 - [ ] smoke test واقعی WordPress مسیر خانه، هفت مسیر پنل، تنظیمات مدیریت و assetها را بدون خطای قالب باز می‌کند.
 - [ ] AJAX پروفایل ارقام فارسی را ذخیره و تاریخ نامعتبر را رد می‌کند.
 - [ ] `Theme_Upgrader` نسخهٔ قدیمی شبیه‌سازی‌شده را جایگزین می‌کند؛ قالب فعال، optionها و slug حفظ و فایل منسوخ حذف می‌شود.
