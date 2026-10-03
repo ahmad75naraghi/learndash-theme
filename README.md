@@ -79,7 +79,7 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 │   ├── pwa.php                   PWA: manifest، سرویس‌ورکر (/ee-sw.js)، صفحهٔ آفلاین، دکمهٔ نصب
 │   ├── notifications.php         اعلان‌ها: جدول {wp}_evented_notifications، REST، رویدادها، پیامک اختیاری
 │   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها) + هلپرهای LMS
-│   ├── certificates.php          تولید PDF گواهینامه با mPDF (autoload اختیاری Composer)
+│   ├── certificates.php          گواهینامهٔ فارسی: mPDF بسته‌شده در inc/lib + fallback چاپی مستقل
 │   ├── navigation.php            منوی استاتیک هدر/فوتر/کشوی موبایل (کش هفتگی) + فیلتر بخش جستجو + تب‌های مقالات خانه
 │   ├── theme_updater.php         به‌روزرسان امن قالب از GitHub Releases + نرمال‌سازی zipball
 │   ├── login.php                 کلاس EventedAuthHandler + نشست امن OTP/ورود
@@ -129,7 +129,7 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 | PHP | 7.4+ (ترجیحاً 8.x) با افزونهٔ `soap`، `gd`، `dom`/`libxml` و `mbstring` |
 | وردپرس | 6.x |
 | LearnDash | نسخهٔ فعال (با Course Builder) |
-| Composer/mPDF | اجرای `composer install --no-dev --optimize-autoloader`؛ `vendor/` در Git نگهداری نمی‌شود |
+| Composer/mPDF | در توسعه با Composer؛ در ZIP رسمی، وابستگی‌های production آماده زیر `inc/lib/` هستند و روی سرور Composer لازم نیست |
 | جدول `{wp}_evented_transactions` | باید ساخته شود (DDL در `ARCHITECTURE.md` §3) |
 | تابع بله | اختیاری: `evented_send_otp_with_bale()` یا legacy `falnic_send_otp_with_bale()` در mu-plugin (بدون آن، فقط پیامک ارسال می‌شود) |
 
@@ -217,7 +217,17 @@ define('EVENTED_SMS_BODY_ID', 12345);
 
 **سیاست «بدون درخواست خارجی»:** فونت‌ها، آیکن‌ها و همهٔ اسکریپت‌ها محلی‌اند و `inc/no_external.php` هر استایل/اسکریپت ثبت‌شده از دامنهٔ دیگر را روی فرانت‌اند حذف می‌کند (استثنا با فیلتر `evented_allowed_external_hosts`).
 
-### ۶.۱ به‌روزرسانی خودکار از GitHub
+### ۶.۱ گواهینامهٔ فارسی و mPDF
+
+- تولید اصلی گواهی آزمون در `inc/certificates.php` با mPDF، صفحهٔ A4 افقی، پس‌زمینهٔ گواهی و مختصات میلی‌متری انجام می‌شود.
+- نام دانشجو، کد ملی، عنوان دوره و تاریخ از داده‌های مجاز LearnDash/User Meta خوانده می‌شوند؛ درخواست باید متعلق به کاربر جاری باشد، مگر مدیر دارای `manage_options`.
+- فونت‌های واقعی `Vazirmatn-Regular.ttf` و `Vazirmatn-Bold.ttf` با خانوادهٔ اختصاصی `eventedcert`، OTL و RTL داخل PDF استفاده می‌شوند. WOFF2 رابط سایت جایگزین TTF در mPDF نیست.
+- بستهٔ رسمی انتشار mPDF و وابستگی‌های production را زیر `inc/lib/` دارد. این نام عمداً به‌جای `vendor/` انتخاب شده تا فیلترهای امنیتی بعضی هاست‌ها پوشه را هنگام نصب پوسته حذف نکنند.
+- فونت‌های عمومی و بلااستفادهٔ حجیم mPDF از artifact حذف می‌شوند؛ `bin/build-theme-release.sh` از staging نهایی یک PDF فارسی واقعی می‌سازد و سپس ZIP را منتشر می‌کند.
+- اگر کتابخانه روی یک هاست غیرعادی حذف یا مسدود شود، همان گواهی به‌صورت HTML دقیق A4 با دکمهٔ «چاپ / ذخیره PDF» نمایش داده می‌شود و کاربر با خطای توقف مواجه نمی‌شود.
+- برای نصب production فقط asset نام‌گذاری‌شدهٔ `evented-edu.zip` از GitHub Release معتبر است؛ فایل‌های خودکار **Source code.zip** بستهٔ runtime گواهینامه را تضمین نمی‌کنند.
+
+### ۶.۲ به‌روزرسانی خودکار از GitHub
 
 `inc/theme_updater.php` هر شش ساعت آخرین **GitHub Release** عمومی مخزن `ahmad75naraghi/learndash-theme` را بررسی می‌کند. بررسی دستی از کارت «به‌روزرسانی قالب» در بالای صفحهٔ تنظیمات در دسترس است. فقط نسخهٔ پایدار با شمارهٔ SemVer بالاتر و بسته‌ای از میزبان‌های رسمی GitHub پذیرفته می‌شود؛ Draft و prerelease نادیده گرفته می‌شوند.
 
@@ -225,17 +235,19 @@ define('EVENTED_SMS_BODY_ID', 12345);
 
 1. مقدار `Version` در `style.css` افزایش یابد.
 2. بعد از merge، بسته با `bash bin/build-theme-release.sh /tmp/evented-edu.zip` ساخته شود.
-3. GitHub Release با tag هم‌نسخه (مثلاً `v2.4.0`) ساخته و فایل `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به آن پیوست شود.
-4. در پیشخوان «تنظیمات قالب → بررسی دوباره» زده شود و نصب از صفحهٔ به‌روزرسانی‌های وردپرس انجام گیرد.
+3. GitHub Release با tag هم‌نسخه (مثلاً `v2.4.4`) ساخته و فایل `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به آن پیوست شود.
+4. وجود `evented-edu/inc/lib/autoload.php`، کلاس `Mpdf\\Mpdf` و دو TTF گواهینامه در خود ZIP تأیید شود.
+5. در پیشخوان «تنظیمات قالب → بررسی دوباره» زده شود و نصب از صفحهٔ به‌روزرسانی‌های وردپرس انجام گیرد.
 
-در نبود asset استاندارد، zipball رسمی Release نیز پشتیبانی می‌شود و ریشهٔ تصادفی بسته پیش از نصب به `evented-edu` تغییر نام می‌دهد. تنظیمات، نوشته‌ها و محتوای سایت در دیتابیس‌اند و با جایگزینی فایل‌های قالب حذف نمی‌شوند.
+zipball رسمی سورس برای بازیابی کد پشتیبانی می‌شود، اما artifact استاندارد `evented-edu.zip` تنها بستهٔ قابل استقرار کامل است. تنظیمات، نوشته‌ها و محتوای سایت در دیتابیس‌اند و با جایگزینی فایل‌های قالب حذف نمی‌شوند.
 
 ## ۷. تست‌ها
 
 - GitHub Actions روی PHP 7.4/8.1/8.3، JavaScript و CSS اجرا می‌شود.
 - `tests/theme-updater-test.php` parsing امن Release، جلوگیری از downgrade/prerelease/host ناشناس و نرمال‌سازی پوشهٔ zipball را آزمایش می‌کند.
 - `tests/panel-helpers-test.php` نرمال‌سازی ارقام فارسی/عربی پنل و `tests/static-audit.py` قراردادهای asset، دسترس‌پذیری تصاویر، صفحه‌بندی و کارایی را بررسی می‌کنند.
-- `bin/build-theme-release.sh` ساختار ZIP، فایل‌های الزامی، نسخه و `Update URI` را اعتبارسنجی می‌کند.
+- `tests/certificate-font-test.php` بارگذاری mPDF، انتخاب TTF فارسی و تولید PDF واقعی را روی PHPهای پشتیبانی‌شده می‌آزماید.
+- `bin/build-theme-release.sh` ساختار ZIP، نسخه، `Update URI`، `inc/lib`، فونت‌ها و تولید PDF از staging نهایی را اعتبارسنجی می‌کند.
 - ماتریس کامل موبایل، بودجهٔ Lighthouse، سناریوهای پنل و rollback در `docs/QA-RELEASE-CHECKLIST.md` است.
 - دستورهای پیشنهادی برای بررسی سلامت کد:
 
@@ -278,6 +290,7 @@ bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site
 | `TODO.md` | تسک‌های معلق، باگ‌های شناخته‌شده (چک‌لیست) |
 | `TECH_DEBT.md` | بدهی فنی، کدهای نیازمند ریفکتور، تنگناهای عملکرد |
 | `docs/QA-RELEASE-CHECKLIST.md` | ماتریس واکنش‌گرایی، بودجهٔ سرعت، تست پنل، staging و rollback |
+| `docs/CERTIFICATES.md` | معماری mPDF، فونت فارسی، fallback چاپی، بسته‌بندی و عیب‌یابی گواهینامه |
 
 ---
 

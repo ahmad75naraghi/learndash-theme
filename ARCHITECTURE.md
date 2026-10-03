@@ -138,7 +138,17 @@ CREATE TABLE IF NOT EXISTS {wp}_evented_transactions (
 | `instructor_user_role` | نقش نمایشی مدرس |
 | `instructor_rating_average` | میانگین امتیاز (فقط خوانده می‌شود) |
 
-### ۳.۷ Session و Transient (جریان OTP)
+### ۳.۷ معماری گواهینامه
+
+1. لینک استاندارد LearnDash به post type گواهینامه می‌رسد و hook موجود در `inc/certificates.php` پارامترهای `quiz`، `time` و کاربر جاری را اعتبارسنجی می‌کند.
+2. تلاش قبول‌شده فقط از user-meta استاندارد `_sfwd-quizzes` انتخاب می‌شود؛ کاربر عادی نمی‌تواند گواهی کاربر دیگر را دریافت کند.
+3. داده‌های چاپی شامل `first_last_name` با fallback به `display_name`، کد ملی، عنوان دوره و تاریخ صدور شمسی است.
+4. مسیر اصلی خروجی، mPDF آمادهٔ انتشار در `inc/lib/` و فونت TTF اختصاصی `eventedcert` است. مختصات در `shamiim_cert_fields()` و برحسب میلی‌متر تعریف می‌شوند.
+5. `vendor/` فقط workspace توسعهٔ Composer است و داخل Git نگهداری نمی‌شود؛ سازندهٔ release آن را پس از حذف منابع بلااستفاده به `inc/lib/` artifact منتقل می‌کند.
+6. نبود یا مسدودشدن mPDF باعث Fatal/Error نمی‌شود: خروجی HTML مستقل، A4 افقی، دارای فونت محلی و دکمهٔ چاپ/ذخیره PDF ارائه می‌شود.
+7. asset رسمی Release باید `evented-edu.zip` باشد؛ source zip گیت‌هاب artifact استقرار محسوب نمی‌شود.
+
+### ۳.۸ Session و Transient (جریان OTP)
 
 | کلید | معنا |
 |---|---|

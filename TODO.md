@@ -24,8 +24,10 @@
 - [x] رفع toast موفقیت بی‌قیدوشرط و کد نمونهٔ غیرقابل‌دسترسی در ورود.
 - [x] ورود مدیران از `wp-login.php` بدون گرفتار شدن در ریدایرکت `/login`.
 - [x] متاباکس رسمی صوت و پیوست درس (`_lesson_audio_url` و `_lesson_attachments`).
-- [x] fallback امن فونت گواهینامه به DejaVuSans داخلی mPDF در نبود TTF سفارشی.
-- [x] Composer به‌عنوان وابستگی زمان استقرار تعریف شد؛ vendor ناقص از Git حذف و `/vendor/` ignore شد.
+- [x] افزودن TTF واقعی Vazirmatn Regular/Bold، OTL/RTL و خانوادهٔ cache-safe به mPDF گواهینامه.
+- [x] انتقال خودکار وابستگی production از `vendor/` توسعه به `inc/lib/` در ZIP رسمی؛ Composer روی سرور لازم نیست.
+- [x] fallback مستقل HTML/A4 برای چاپ یا ذخیره PDF در صورت حذف/مسدودشدن mPDF توسط هاست.
+- [x] تست تولید PDF فارسی از staging نهایی و الزام وجود autoloader/mPDF/TTF در بستهٔ Release.
 
 ## ۳. صفحهٔ اصلی و محتوای داینامیک — انجام‌شده
 

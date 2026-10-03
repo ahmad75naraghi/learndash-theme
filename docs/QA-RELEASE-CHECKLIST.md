@@ -6,7 +6,9 @@
 
 ```bash
 bash bin/lint.sh
+composer install --no-dev --classmap-authoritative
 php tests/theme-updater-test.php
+php tests/certificate-font-test.php
 php tests/panel-helpers-test.php
 python3 tests/static-audit.py
 bash bin/build-theme-release.sh /tmp/evented-edu.zip
@@ -19,6 +21,8 @@ bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site
 - [ ] همهٔ JavaScriptها با `node --check` و CSSها از نظر توازن آکولاد پاس می‌شوند.
 - [ ] ارجاع asset محلی شکسته وجود ندارد.
 - [ ] ZIP فقط یک ریشهٔ `evented-edu/` دارد و Version/Update URI صحیح است.
+- [ ] ZIP رسمی شامل `inc/lib/autoload.php`، کلاس mPDF و دو فایل TTF گواهینامه است؛ به پوشهٔ `vendor/` روی سرور وابسته نیست.
+- [ ] `certificate-font-test.php` با متن فارسی شامل «پ ژ چ گ ی ک» PDF معتبر تولید می‌کند.
 - [ ] updater، جلوگیری از downgrade/prerelease و نرمال‌سازی zipball پاس است.
 - [ ] smoke test واقعی WordPress مسیر خانه، هفت مسیر پنل، تنظیمات مدیریت و assetها را بدون خطای قالب باز می‌کند.
 - [ ] AJAX پروفایل ارقام فارسی را ذخیره و تاریخ نامعتبر را رد می‌کند.
@@ -99,14 +103,18 @@ Lighthouse موبایل در پنجرهٔ ناشناس، بدون افزونهٔ
 - [ ] ثبت/تأیید دیدگاه و امتیاز دوره.
 - [ ] اعلان داخل سایت، SMS اختیاری و پاک‌سازی retention.
 - [ ] PWA: manifest، service worker، offline fallback و نصب موبایل.
-- [ ] PDF گواهی با `composer install --no-dev --optimize-autoloader`.
+- [ ] گواهی آزمون قبول‌شده نام فارسی، کد ملی، دوره، تاریخ و پس‌زمینه را در جای صحیح نشان می‌دهد.
+- [ ] مسیر اصلی mPDF از `inc/lib/` PDF را مستقیم باز می‌کند و فونت فارسی به `؟` تبدیل نمی‌شود.
+- [ ] با تغییر موقت نام `inc/lib/`، fallback HTML در A4 افقی باز می‌شود و «چاپ / ذخیره PDF» کار می‌کند؛ هیچ پیام «کتابخانه mPDF بارگذاری نشده است» نباید وجود داشته باشد.
+- [ ] کاربر عادی با تغییر `user` در URL نمی‌تواند گواهی کاربر دیگر را دریافت کند.
 
 ## ۷) انتشار و rollback
 
 - [ ] backup دیتابیس و پوشهٔ قالب گرفته شده است.
 - [ ] PR merge و tag با Version در `style.css` یکسان است.
-- [ ] `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به GitHub Release پیوست شده است.
-- [ ] آپدیت از پیشخوان روی staging انجام و فعال‌بودن قالب، optionها و مسیرهای پنل تأیید شده‌اند.
+- [ ] `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به GitHub Release پیوست شده است؛ Source code.zip برای production استفاده نمی‌شود.
+- [ ] اندازه و لیست ZIP بازبینی شده و `evented-edu/inc/lib/autoload.php` و `evented-edu/inc/lib/mpdf/mpdf/src/Mpdf.php` واقعاً داخل آن هستند.
+- [ ] آپدیت از پیشخوان روی staging انجام و فعال‌بودن قالب، optionها، مسیرهای پنل و یک گواهی واقعی تأیید شده‌اند.
 - [ ] cacheهای صفحه/CDN/object پس از انتشار purge شده‌اند.
 - [ ] لاگ PHP، شبکه و کنسول ۳۰ دقیقه پس از انتشار بازبینی شده‌اند.
 - [ ] rollback با ZIP نسخهٔ قبل و restore دیتابیس تمرین یا مستند شده است.

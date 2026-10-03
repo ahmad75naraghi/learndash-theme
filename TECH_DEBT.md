@@ -25,7 +25,7 @@
 ## ۴. وابستگی‌های بیرونی
 
 1. **LearnDash** و APIهای عمومی آن برای دوره، پیشرفت و گواهینامه.
-2. **mPDF** از Composer؛ پوشهٔ `vendor/` عمداً در Git نیست و هنگام استقرار ساخته می‌شود.
+2. **mPDF** از Composer؛ `vendor/` فقط در توسعه است و در Git نیست. سازندهٔ release وابستگی production را به `inc/lib/` داخل `evented-edu.zip` منتقل می‌کند. نصب production نباید Composer اجرا کند و Source code ZIP بستهٔ قابل استقرار نیست. خروجی HTML چاپی نیز fallback مستقل از کتابخانه است.
 3. **سرویس پیامک SOAP**؛ credential فقط از تنظیمات یا ثابت‌های wp-config خوانده می‌شود.
 4. **provider بله** در mu-plugin/افزونه؛ نبود آن جریان SMS را متوقف نمی‌کند.
 5. جدول `{wp}_evented_transactions` توسط درگاه/لایهٔ بیرونی ساخته می‌شود و قالب فقط می‌خواند.
