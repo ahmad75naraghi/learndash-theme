@@ -181,6 +181,19 @@ try {
         await page.evaluate(() => document.fonts?.ready);
         await page.waitForTimeout(250);
 
+        // A successful document can still receive a transient 502/503 for its service
+        // worker, script or stylesheet while Playground restarts. Reload the route so
+        // both the resource status and its browser-console error are verified again.
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const transientAsset = [...responseErrors.values()].some(value => /^(500|502|503|504)\b/.test(value));
+          if (!transientAsset) break;
+          responseErrors.clear();
+          consoleErrors.length = 0;
+          response = await page.goto(`${base}${route}`, { waitUntil: 'load', timeout: 30_000 });
+          await page.evaluate(() => document.fonts?.ready);
+          await page.waitForTimeout(500 * (attempt + 1));
+        }
+
         if (slug === 'quiz-single') {
           const formLayout = await page.evaluate(() => {
             const forms = [...document.querySelectorAll('.wpProQuiz_forms')].filter(el => el.offsetParent !== null);
