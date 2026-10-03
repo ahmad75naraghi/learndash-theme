@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   lint:
     name: PHP / JS / CSS syntax
@@ -113,3 +117,38 @@ jobs:
           path: /tmp/visual-audit
           if-no-files-found: warn
           retention-days: 7
+
+  publish-fix-release:
+    name: Publish installable certificate fix
+    needs: [lint, wordpress-smoke]
+    if: github.event_name == 'pull_request' && github.head_ref == 'arena/01a0e6cc-learndash-theme'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          coverage: none
+          tools: composer
+
+      - name: Build PHP 7.4-compatible deployable package
+        run: |
+          composer update --no-dev --classmap-authoritative --no-interaction --prefer-dist --no-progress
+          php tests/certificate-font-test.php
+          bash bin/build-theme-release.sh /tmp/evented-edu.zip
+
+      - name: Publish versioned release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          version=$(sed -nE 's/^Version:[[:space:]]*([^[:space:]]+).*/\1/p' style.css | head -1)
+          if gh release view "v$version" >/dev/null 2>&1; then
+            echo "Release v$version already exists."
+            exit 0
+          fi
+          gh release create "v$version" /tmp/evented-edu.zip \
+            --target "$TARGET_SHA" \
+            --title "evented-edu $version" \
+            --notes "نسخهٔ نصب‌شدنی کامل قالب شامل mPDF، وابستگی‌های Composer و فونت‌های TTF فارسی گواهینامه."
