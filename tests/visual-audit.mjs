@@ -181,6 +181,43 @@ try {
         await page.evaluate(() => document.fonts?.ready);
         await page.waitForTimeout(250);
 
+        if (slug === 'quiz-single') {
+          const formLayout = await page.evaluate(() => {
+            const forms = [...document.querySelectorAll('.wpProQuiz_forms')].filter(el => el.offsetParent !== null);
+            if (!forms.length) return { missing: true };
+            let fieldsCount = 0;
+            let overlapping = false;
+            let escapedControls = 0;
+            let formEscapes = false;
+            for (const form of forms) {
+              const formRect = form.getBoundingClientRect();
+              const fields = [...form.querySelectorAll('fieldset, table > tbody > tr')].filter(el => el.offsetParent !== null);
+              const controls = [...form.querySelectorAll('input, select, textarea')].filter(el => el.offsetParent !== null);
+              fieldsCount += fields.length;
+              overlapping ||= fields.some((field, index) => {
+                const a = field.getBoundingClientRect();
+                return fields.slice(index + 1).some(other => {
+                  const b = other.getBoundingClientRect();
+                  return Math.min(a.right, b.right) - Math.max(a.left, b.left) > 3
+                    && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 3;
+                });
+              });
+              escapedControls += controls.filter(control => {
+                const rect = control.getBoundingClientRect();
+                return rect.left < formRect.left - 2 || rect.right > formRect.right + 2 || rect.width < 16;
+              }).length;
+              formEscapes ||= formRect.left < -2 || formRect.right > document.documentElement.clientWidth + 2;
+            }
+            return { missing: false, forms: forms.length, fields: fieldsCount, overlapping, escapedControls, formEscapes };
+          });
+          if (formLayout.missing || formLayout.forms < 2 || formLayout.fields < 8) report('failure', viewportName, route, 'quiz participant form fixture is missing');
+          else {
+            if (formLayout.overlapping) report('failure', viewportName, route, 'quiz participant form fields overlap');
+            if (formLayout.escapedControls) report('failure', viewportName, route, `${formLayout.escapedControls} quiz form control(s) escape the form`);
+            if (formLayout.formEscapes) report('failure', viewportName, route, 'quiz participant form escapes viewport');
+          }
+        }
+
         // Under a heavy multi-page audit Playground can briefly return 502/503 for a
         // media request even after the document succeeded. Retry visible same-origin
         // images before declaring the layout broken; permanent 4xx/5xx still fail.
