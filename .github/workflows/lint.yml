@@ -5,8 +5,10 @@ on:
     branches: [main]
   pull_request:
 
+# Test jobs are read-only. Release publishing receives write access only in its
+# own job after a tested commit lands on main.
 permissions:
-  contents: write
+  contents: read
   pull-requests: read
 
 jobs:
@@ -118,10 +120,12 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
-  publish-fix-release:
-    name: Publish installable certificate fix
-    needs: [lint]
-    if: github.event_name == 'pull_request' && github.head_ref == 'arena/01a0e6cc-learndash-theme'
+  publish-release:
+    name: Publish installable theme release
+    needs: [lint, wordpress-smoke]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -141,7 +145,7 @@ jobs:
       - name: Publish versioned release asset
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_SHA: ${{ github.event.pull_request.head.sha }}
+          TARGET_SHA: ${{ github.sha }}
         run: |
           version=$(sed -nE 's/^Version:[[:space:]]*([^[:space:]]+).*/\1/p' style.css | head -1)
           if gh release view "v$version" >/dev/null 2>&1; then
