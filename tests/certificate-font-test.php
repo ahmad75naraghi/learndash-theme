@@ -10,7 +10,9 @@ function get_stylesheet_directory(): string { return $GLOBALS['theme_root']; }
 function add_action(): void {}
 $GLOBALS['theme_root'] = $theme_root;
 
-$autoload = $theme_root . '/vendor/autoload.php';
+$autoload = is_file($theme_root . '/inc/lib/autoload.php')
+    ? $theme_root . '/inc/lib/autoload.php'
+    : $theme_root . '/vendor/autoload.php';
 if (! is_file($autoload)) {
     fwrite(STDERR, "Composer dependencies are missing.\n");
     exit(1);

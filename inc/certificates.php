@@ -16,9 +16,11 @@ defined('ABSPATH') || exit;
  */
 
 
-// بستهٔ رسمی قالب vendor/mPDF را همراه خود دارد؛ روی سرور Composer لازم نیست.
-// هر دو مسیر parent/stylesheet بررسی می‌شوند تا نصب‌های قدیمی یا child-theme هم کار کنند.
+// بستهٔ رسمی قالب mPDF را در inc/lib همراه خود دارد؛ روی سرور Composer لازم نیست.
+// مسیر vendor قدیمی هم برای نصب‌های قبلی و child-theme پشتیبانی می‌شود.
 $evented_autoload_paths = array_unique(array(
+    get_stylesheet_directory() . '/inc/lib/autoload.php',
+    get_template_directory() . '/inc/lib/autoload.php',
     get_stylesheet_directory() . '/vendor/autoload.php',
     get_template_directory() . '/vendor/autoload.php',
 ));
@@ -203,15 +205,33 @@ function shamiim_cert_draw_grid($mpdf)
     }
 }
 
+/* خروجی HTML قابل چاپ، مستقل از mPDF برای هاست‌هایی که Composer را حذف می‌کنند. */
+function shamiim_cert_stream_printable_html(array $texts, $cert_post_id = 0)
+{
+    $background = '';
+    $bg_path = shamiim_cert_background_path($cert_post_id);
+    if ($bg_path && is_readable($bg_path)) {
+        $type = wp_check_filetype($bg_path);
+        $data = file_get_contents($bg_path);
+        if (false !== $data) { $background = 'data:' . (! empty($type['type']) ? $type['type'] : 'image/jpeg') . ';base64,' . base64_encode($data); }
+    }
+    $font_data = '';
+    $font_path = get_template_directory() . '/assets/fonts/Vazirmatn-Variable.woff2';
+    if (is_readable($font_path)) {
+        $data = file_get_contents($font_path);
+        if (false !== $data) { $font_data = 'data:font/woff2;base64,' . base64_encode($data); }
+    }
+    $fields = shamiim_cert_fields();
+    nocache_headers(); header('Content-Type: text/html; charset=UTF-8');
+    ?><!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?php echo esc_html('گواهینامه - ' . $texts['name']); ?></title><style><?php if ($font_data) : ?>@font-face{font-family:EventedCert;src:url('<?php echo esc_attr($font_data); ?>') format('woff2');font-weight:100 900}<?php endif; ?>@page{size:A4 landscape;margin:0}*{box-sizing:border-box}html,body{margin:0;background:#e5e7eb;font-family:EventedCert,Tahoma,sans-serif}.cert{position:relative;width:297mm;height:210mm;margin:0 auto;background:#fff;overflow:hidden}.cert-bg{position:absolute;inset:0;width:100%;height:100%}.cert-field{position:absolute;direction:rtl;line-height:1.5;white-space:nowrap}.print{position:fixed;z-index:10;left:18px;bottom:18px;border:0;border-radius:10px;background:#087b31;color:#fff;padding:10px 18px;font:700 14px EventedCert,Tahoma;cursor:pointer}@media print{html,body{background:#fff}.print{display:none}.cert{margin:0}}</style></head><body><button class="print" type="button" onclick="window.print()">چاپ / ذخیره PDF</button><main class="cert"><?php if ($background) : ?><img class="cert-bg" src="<?php echo esc_attr($background); ?>" alt=""><?php endif; ?><?php foreach ($fields as $key => $field) : if (! isset($texts[$key])) { continue; } ?><div class="cert-field" style="left:<?php echo (float) $field['x']; ?>mm;top:<?php echo (float) $field['y']; ?>mm;width:<?php echo (float) $field['w']; ?>mm;height:<?php echo (float) $field['h']; ?>mm;text-align:<?php echo esc_attr($field['align']); ?>;font-size:<?php echo (float) $field['size']; ?>pt;color:<?php echo esc_attr($field['color']); ?>;font-weight:<?php echo ! empty($field['bold']) ? '800' : '400'; ?>"><?php echo esc_html(wp_check_invalid_utf8((string) $texts[$key], true)); ?></div><?php endforeach; ?></main></body></html><?php
+    exit;
+}
+
 /* -------------------------------------------------------------------------
  * تولید و ارسال PDF
  * ---------------------------------------------------------------------- */
 function shamiim_cert_stream_pdf($user_id, $quiz_id, $time, $cert_post_id = 0, $debug = false)
 {
-    if (! class_exists('\Mpdf\Mpdf')) {
-        wp_die('کتابخانه mPDF بارگذاری نشده است.', 'خطا', ['response' => 500]);
-    }
-
     $attempt = shamiim_cert_find_attempt($user_id, $quiz_id, $time);
     if (! $attempt) {
         wp_die('گواهینامه‌ای یافت نشد.', 'خطا', ['response' => 404]);
@@ -245,6 +265,11 @@ function shamiim_cert_stream_pdf($user_id, $quiz_id, $time, $cert_post_id = 0, $
         'nid'    => shamiim_to_persian_digits($national_code),
         'course' => $course_title,
     ];
+
+    // گواهینامه هیچ‌وقت با خطای «mPDF بارگذاری نشده» متوقف نمی‌شود.
+    if (! class_exists('\Mpdf\Mpdf')) {
+        shamiim_cert_stream_printable_html($texts, $cert_post_id);
+    }
 
     /* --- پوشه موقت محافظت‌شده --- */
     $temp_dir = WP_CONTENT_DIR . '/uploads/mpdf-tmp';
