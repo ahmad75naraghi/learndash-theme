@@ -72,7 +72,13 @@ try {
     // establishing the session used by panel routes.
     const guestLogin = await context.newPage();
     try {
-      const response = await guestLogin.goto(`${base}/login/`, { waitUntil: 'load', timeout: 30_000 });
+      let response;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        response = await guestLogin.goto(`${base}/login/`, { waitUntil: 'load', timeout: 30_000 });
+        const hasDocument = response?.ok() && await guestLogin.evaluate(() => (document.body?.innerHTML.length || 0) > 100);
+        if (hasDocument || attempt === 4 || response && response.status() >= 400 && ![500, 502, 503, 504].includes(response.status())) break;
+        await guestLogin.waitForTimeout(1_000 * (attempt + 1));
+      }
       if (!response || response.status() >= 400) {
         report('failure', viewportName, '/login/', `HTTP ${response?.status() ?? 'no response'}`);
       } else {
@@ -110,7 +116,14 @@ try {
     }
 
     const login = await context.newPage();
-    await login.goto(`${base}/wp-login.php`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    let loginResponse;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      loginResponse = await login.goto(`${base}/wp-login.php`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      const hasLoginForm = await login.locator('#user_login').count();
+      const hasSession = (await context.cookies()).some(cookie => cookie.name.startsWith('wordpress_logged_in_'));
+      if (hasLoginForm || hasSession || attempt === 4 || loginResponse && loginResponse.status() >= 400 && ![500, 502, 503, 504].includes(loginResponse.status())) break;
+      await login.waitForTimeout(1_000 * (attempt + 1));
+    }
     const userInput = login.locator('#user_login');
     if (await userInput.count()) {
       await userInput.fill(username);
@@ -120,6 +133,8 @@ try {
         login.locator('#wp-submit').click(),
       ]);
     }
+    const authenticated = (await context.cookies()).some(cookie => cookie.name.startsWith('wordpress_logged_in_'));
+    if (!authenticated) report('failure', viewportName, '/wp-login.php', `authentication setup failed (HTTP ${loginResponse?.status() ?? 'no response'})`);
     await login.close();
 
     for (const [slug, route] of routes) {
@@ -153,7 +168,9 @@ try {
         // Retry transient gateway failures, while keeping real route/application failures visible.
         for (let attempt = 0; attempt < 5; attempt++) {
           response = await page.goto(`${base}${route}`, { waitUntil: 'load', timeout: 30_000 });
-          if (!response || ![500, 502, 503, 504].includes(response.status()) || attempt === 4) break;
+          const transientStatus = response && [500, 502, 503, 504].includes(response.status());
+          const hasDocument = response?.ok() && await page.evaluate(() => (document.body?.innerHTML.length || 0) > 100);
+          if (hasDocument || attempt === 4 || response && response.status() >= 400 && !transientStatus) break;
           responseErrors.clear();
           consoleErrors.length = 0;
           await page.waitForTimeout(1_000 * (attempt + 1));
