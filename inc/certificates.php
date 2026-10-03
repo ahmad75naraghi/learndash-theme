@@ -17,9 +17,16 @@ defined('ABSPATH') || exit;
 
 
 // بستهٔ رسمی قالب vendor/mPDF را همراه خود دارد؛ روی سرور Composer لازم نیست.
-$evented_autoload = get_template_directory() . '/vendor/autoload.php';
-if (file_exists($evented_autoload)) {
-    require_once $evented_autoload;
+// هر دو مسیر parent/stylesheet بررسی می‌شوند تا نصب‌های قدیمی یا child-theme هم کار کنند.
+$evented_autoload_paths = array_unique(array(
+    get_stylesheet_directory() . '/vendor/autoload.php',
+    get_template_directory() . '/vendor/autoload.php',
+));
+foreach ($evented_autoload_paths as $evented_autoload) {
+    if (is_readable($evented_autoload)) {
+        require_once $evented_autoload;
+        if (class_exists('\\Mpdf\\Mpdf')) { break; }
+    }
 }
 
 /* -------------------------------------------------------------------------

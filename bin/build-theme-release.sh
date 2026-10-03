@@ -32,6 +32,19 @@ trap cleanup EXIT
 mkdir -p "$stage/evented-edu"
 git archive --format=tar HEAD | tar -xf - -C "$stage/evented-edu"
 cp -a vendor "$stage/evented-edu/vendor"
+
+# mPDF حدود ۴۰ مگابایت فونت عمومی همراه دارد. گواهینامه فقط از دو TTF
+# فارسی خود قالب استفاده می‌کند؛ حذف این مجموعه احتمال timeout/نصب ناقص روی
+# هاست‌های اشتراکی را به‌شدت کم می‌کند.
+if [[ -d "$stage/evented-edu/vendor/mpdf/mpdf/ttfonts" ]]; then
+	find "$stage/evented-edu/vendor/mpdf/mpdf/ttfonts" -type f -delete
+fi
+find "$stage/evented-edu/vendor" -type d \( -name .github -o -name tests \) -prune -exec rm -rf {} +
+
+# فقط وجود کلاس کافی نیست؛ از خود staging نهایی یک PDF فارسی واقعی می‌سازیم.
+if command -v php >/dev/null 2>&1; then
+	EVENTED_THEME_ROOT="$stage/evented-edu" php "$root/tests/certificate-font-test.php"
+fi
 (
 	cd "$stage"
 	zip -q -r "$output" evented-edu

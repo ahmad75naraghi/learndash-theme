@@ -4,16 +4,19 @@
 declare(strict_types=1);
 
 define('ABSPATH', __DIR__ . '/');
-function get_template_directory(): string { return dirname(__DIR__); }
+$theme_root = getenv('EVENTED_THEME_ROOT') ?: dirname(__DIR__);
+function get_template_directory(): string { return $GLOBALS['theme_root']; }
+function get_stylesheet_directory(): string { return $GLOBALS['theme_root']; }
 function add_action(): void {}
+$GLOBALS['theme_root'] = $theme_root;
 
-$autoload = dirname(__DIR__) . '/vendor/autoload.php';
+$autoload = $theme_root . '/vendor/autoload.php';
 if (! is_file($autoload)) {
     fwrite(STDERR, "Composer dependencies are missing.\n");
     exit(1);
 }
 require_once $autoload;
-require_once dirname(__DIR__) . '/inc/certificates.php';
+require_once $theme_root . '/inc/certificates.php';
 
 $temp = sys_get_temp_dir() . '/evented-cert-font-' . getmypid();
 mkdir($temp, 0700, true);

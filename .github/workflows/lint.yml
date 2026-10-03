@@ -48,7 +48,7 @@ jobs:
         if: matrix.php == '8.3'
         uses: actions/upload-artifact@v5
         with:
-          name: evented-edu-2.4.2
+          name: evented-edu-2.4.3
           path: |
             /tmp/evented-edu.zip
             composer.lock
