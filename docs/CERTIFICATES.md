@@ -68,7 +68,7 @@ unzip -l /tmp/evented-edu.zip | grep -E \
 
 ## عیب‌یابی استقرار
 
-1. نسخهٔ فعال در «نمایش ← پوسته‌ها» باید 2.4.5 یا بالاتر باشد.
+1. نسخهٔ فعال در «نمایش ← پوسته‌ها» باید 2.4.6 یا بالاتر باشد.
 2. وجود `wp-content/themes/evented-edu/inc/lib/autoload.php` بررسی شود.
 3. از نصب `Source code.zip` خودداری شود.
 4. پس از جایگزینی فایل‌های قالب، page cache، object cache، CDN و PHP OPcache پاک شوند.

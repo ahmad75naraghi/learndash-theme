@@ -26,20 +26,20 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('ee-fonts', PATH_DIR_URL . '/assets/css/newhome/ee-fonts.css', array(), '1.0.0');
 
     // پوستهٔ مشترک: توکن‌ها، هدر، فوتر، نوار موبایل و ویجت‌های سایدبار
-    wp_enqueue_style('ee-shell', PATH_DIR_URL . '/assets/css/newhome/ee-shell.css', array('ee-fonts'), '1.9.0');
+    wp_enqueue_style('ee-shell', PATH_DIR_URL . '/assets/css/newhome/ee-shell.css', array('ee-fonts'), '1.10.0');
 
     // رفتارها: منوی موبایل، اسلایدر هیرو، کپی لینک اشتراک‌گذاری
     wp_enqueue_script('ee-home-js', PATH_DIR_URL . '/assets/js/newhome/evented-home.js', array(), '1.4.0', true);
 
     if (is_front_page()) {
-        wp_enqueue_style('ee-home', PATH_DIR_URL . '/assets/css/newhome/evented-home.css', array('ee-shell'), '1.3.0');
+        wp_enqueue_style('ee-home', PATH_DIR_URL . '/assets/css/newhome/evented-home.css', array('ee-shell'), '1.4.0');
     } elseif (
         is_page_template(array('page-library.php', 'page-videos.php', 'page-gallery.php', 'page-download.php', 'page-podcast.php'))
         || is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))
         || is_page('podcast')
     ) {
         // هم Page Template انتخابی و هم page-{slug}.php باید asset کامل منابع را بگیرند.
-        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.7.0');
+        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.8.0');
     } elseif (is_singular(array('post', 'lib', 'clip', 'gallery', 'wpdmpro', 'sr_playlist'))) {
         wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.8.0');
         if (is_singular('clip')) {
@@ -70,6 +70,6 @@ add_action('wp_enqueue_scripts', function () {
         // سایدبار فیلتر دوره‌ها و نوار مرتب‌سازی (باز/بسته در موبایل، ارسال خودکار)
         wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.2.0', true);
     } elseif (is_home() || is_archive() || is_search()) {
-        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.7.0');
+        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.8.0');
     }
 }, 20);

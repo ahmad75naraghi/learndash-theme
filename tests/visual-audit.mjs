@@ -208,6 +208,24 @@ try {
               const rect = el.getBoundingClientRect();
               return rect.right > root.clientWidth + 2 || rect.left < -2;
             }).length;
+          const escapedHeadings = [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')]
+            .filter(el => el.offsetParent !== null && el.textContent.trim())
+            .filter(el => {
+              const rect = el.getBoundingClientRect();
+              const parent = el.parentElement?.getBoundingClientRect();
+              return rect.right > root.clientWidth + 2 || rect.left < -2 || (parent && (rect.right > parent.right + 2 || rect.left < parent.left - 2));
+            })
+            .map(el => `${el.tagName.toLowerCase()}.${typeof el.className === 'string' ? el.className.trim().split(/\\s+/).join('.') : ''}`);
+          const wrappedSectionHeadings = innerWidth <= 640
+            ? [...document.querySelectorAll('.ee-sec-title, .ee-ct-title, .ee-steps-top h3, .ee-latest-card .lc-title, .ee-radio-title, .ee-feature .feat-title')]
+              .filter(el => el.offsetParent !== null && el.textContent.trim())
+              .filter(el => {
+                const style = getComputedStyle(el);
+                const lineHeight = Number.parseFloat(style.lineHeight) || Number.parseFloat(style.fontSize) * 1.7;
+                return el.getBoundingClientRect().height > lineHeight * 1.55;
+              })
+              .map(el => `${el.tagName.toLowerCase()}.${typeof el.className === 'string' ? el.className.trim().split(/\\s+/).join('.') : ''}`)
+            : [];
           return {
             title: document.title,
             clientWidth: root.clientWidth,
@@ -215,6 +233,8 @@ try {
             brokenImages,
             unnamed,
             escaped,
+            escapedHeadings,
+            wrappedSectionHeadings,
             main: Boolean(document.querySelector('main, #main, #ee-main, [role="main"]')),
           };
         });
@@ -226,6 +246,8 @@ try {
           report('failure', viewportName, route, `broken images: ${metrics.brokenImages.slice(0, 3).join(', ')}`);
         }
         if (metrics.escaped) report('failure', viewportName, route, `${metrics.escaped} form/table element(s) escape viewport`);
+        if (metrics.escapedHeadings.length) report('failure', viewportName, route, `headings escape their box/viewport: ${metrics.escapedHeadings.slice(0, 6).join(', ')}`);
+        if (metrics.wrappedSectionHeadings.length) report('failure', viewportName, route, `mobile section headings wrap to multiple lines: ${metrics.wrappedSectionHeadings.slice(0, 6).join(', ')}`);
         if (!metrics.title) report('failure', viewportName, route, 'document title is empty');
         if (!metrics.main) report('warning', viewportName, route, 'semantic main landmark is missing');
         if (metrics.unnamed.length) report('warning', viewportName, route, `interactive elements without accessible names: ${metrics.unnamed.slice(0, 8).join(', ')}`);

@@ -426,3 +426,88 @@
 .ee-radio-play .ee-ic { font-size: 1.3rem; margin-inline-start: -.1rem; }
 .ee-radio-card:hover .ee-radio-play { transform: scale(1.08); }
 @media (prefers-reduced-motion: reduce) { .ee-radio-glow, .ee-radio-rings i, .ee-radio-live i, .ee-radio-eq i { animation: none; } }
+
+/* ---------- تایپوگرافی و چیدمان موبایل صفحهٔ اصلی ----------
+ * عنوان بخش‌ها عمداً تک‌خط و دارای ellipsis هستند؛ عنوان محتوای کارت‌ها می‌تواند
+ * حداکثر دو خط بماند، اما هیچ متن یا flex item نباید از کارت بیرون بزند. */
+.ee-home-main :where(.ee-sec-head, .ee-sec-head > div, .ee-sec-title, .ee-steps-top > div,
+    .ee-latest-card .lc-head, .ee-latest-card .lc-title, .ee-radio-body,
+    .ee-course-card .cc-body, .ee-art-card > div, .bf-hero-body, .bf-row-txt) { min-width: 0; }
+.ee-home-main :where(.ee-sec-title, .ee-ct-title, .ee-steps-top h3, .ee-latest-card .lc-title, .ee-radio-title) {
+    max-width: 100%;
+}
+
+@media (max-width: 639.98px) {
+    .ee-hero { padding-top: .75rem; }
+    .ee-feature { min-height: 15rem; border-radius: 1.1rem; }
+    .ee-feature .feat-body { padding: .85rem .85rem 2.15rem; }
+    .ee-feature .feat-title {
+        max-width: 100%; margin-block: .15rem; font-size: clamp(.88rem, 4.2vw, 1.02rem); line-height: 1.6;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ee-feature .feat-desc {
+        max-width: 100%; font-size: .7rem; line-height: 1.75;
+        display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+    }
+    .ee-feature .feat-tags { top: .65rem; right: .7rem; max-width: calc(100% - 1.4rem); }
+    .ee-feature .feat-tags .ee-chip { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .ee-sec-head { align-items: flex-start; gap: .35rem .65rem; margin-bottom: .7rem; }
+    .ee-sec-head > div { flex: 1 1 auto; max-width: 100%; }
+    .ee-sec-title {
+        width: 100%; font-size: clamp(.82rem, 4vw, .94rem); line-height: 1.55;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ee-sec-title .bar { flex: 0 0 auto; }
+    .ee-sec-sub, .ee-sec-head .sec-sub { font-size: .67rem; line-height: 1.7; }
+    .ee-sec-head .lc-more { flex: 0 0 auto; max-width: 42%; font-size: .68rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .ee-latest-card { padding: .75rem; border-radius: 1.1rem; }
+    .ee-latest-card .lc-head { gap: .5rem; }
+    .ee-latest-card .lc-title { flex: 1 1 auto; font-size: .78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ee-latest-card .lc-more { flex: 0 0 auto; font-size: .66rem; white-space: nowrap; }
+
+    .ee-qgrid { gap: .5rem; }
+    .ee-qitem { min-width: 0; padding: .65rem .15rem; border-radius: .9rem; }
+    .ee-qitem .qi-ic { width: 2.25rem; height: 2.25rem; margin-bottom: .35rem; font-size: 1.25rem; }
+    .ee-qitem span { display: block; width: 100%; padding-inline: .1rem; font-size: .62rem; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .ee-steps { padding: .9rem .75rem; border-radius: 1.1rem; }
+    .ee-steps > .ee-wrap { padding-inline: 0; }
+    .ee-steps-top { display: block; padding-bottom: .65rem; margin-bottom: .7rem; }
+    .ee-steps-top .st-badge { max-width: 100%; font-size: .65rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ee-steps-top h3 { font-size: .9rem; line-height: 1.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ee-steps-top p { font-size: .69rem; line-height: 1.8; }
+    .ee-step { min-width: 0; padding: .8rem; }
+    .ee-step h5 { font-size: .82rem; line-height: 1.6; }
+
+    .ee-bf-row { min-width: 0; gap: .55rem; padding: .45rem; }
+    .bf-row-media { width: 5.2rem; height: 4.25rem; }
+    .ee-bf-row strong { font-size: .76rem; line-height: 1.7; }
+    .ee-bf-hero h4, .ee-art-card h4, .ee-course-card .cc-title {
+        max-width: 100%; font-size: .8rem; line-height: 1.75; overflow-wrap: break-word; word-break: normal;
+    }
+    .bf-hero-foot { gap: .4rem .6rem; }
+    .bf-hero-foot .bf-read { margin-inline-start: 0; }
+
+    .ee-radio-card { gap: .55rem; padding: .75rem; border-radius: 1.1rem; }
+    .ee-radio-ic { width: 2.45rem; height: 2.45rem; border-radius: .8rem; }
+    .ee-radio-title { display: block; font-size: .82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ee-radio-live { margin-inline-start: .25rem; vertical-align: middle; }
+    .ee-home .ee-radio-card .ee-radio-sub { font-size: .64rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ee-radio-eq, .ee-radio-rings { display: none; }
+    .ee-radio-play { width: 2rem; height: 2rem; }
+
+    .ee-instructors { padding: 1rem .6rem; border-radius: 1.1rem; }
+    .ee-instructors .ee-sec-title { margin-inline: auto; }
+    .ee-instr-row { gap: .9rem .5rem; }
+    .ee-instr { width: calc(33.333% - .5rem); min-width: 0; }
+    .ee-instr strong, .ee-instr .ee-role { width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+
+@media (max-width: 359.98px) {
+    .ee-sec-head .lc-more { max-width: 36%; }
+    .ee-feature .feat-cta-row .ee-btn { padding-inline: .7rem; font-size: .7rem; }
+    .ee-radio-live, .ee-radio-play { display: none; }
+    .ee-instr { width: calc(50% - .4rem); }
+}

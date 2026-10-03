@@ -47,7 +47,7 @@ for path in (ROOT / "panel").glob("*.php"):
 
 required_snippets = {
     "assets/assets_functions.php": ["'profile' === $panel_section", "jalalidatepicker-js"],
-    "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.7.0'"],
+    "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.8.0'"],
     "assets/css/panel.css": ["@media (max-width: 359.98px)", ".ee-panel-pager"],
     "panel/payments.php": ["LIMIT %d OFFSET %d", "evented_panel_pagination"],
     "panel/my-courses.php": ["$courses_per_page", "'no_found_rows'"],
@@ -58,7 +58,9 @@ required_snippets = {
     "inc/pwa.php": ["X-Evented-Private: 1", "EVENTED_PWA_VER = '1.0.1'"],
     "assets/js/newhome/ee-sw.js": ["res.headers.get('cache-control')", "res.headers.get('vary')", "x-evented-private", "privateResponse"],
     "template-parts/ee-header.php": ["ee_render_desktop_children", "ee-sub-flyout", "ee-sub-heading", "ee-dn-sub-heading"],
-    "assets/css/newhome/ee-shell.css": [".ee-sub-item:hover > .ee-sub-flyout", "right: calc(100% + .4rem)"],
+    "assets/css/newhome/ee-shell.css": [".ee-sub-item:hover > .ee-sub-flyout", "right: calc(100% + .4rem)", "overflow-wrap: break-word", "@media (max-width: 639.98px)"],
+    "assets/css/newhome/evented-home.css": ["تایپوگرافی و چیدمان موبایل صفحهٔ اصلی", ".ee-sec-title", "white-space: nowrap", "@media (max-width: 359.98px)"],
+    "assets/css/newhome/ee-catalog.css": ["سربرگ و کارت‌های کاتالوگ روی موبایل باریک", ".ee-ct-title", "text-overflow: ellipsis"],
     "assets/js/newhome/evented-home.js": ["ArrowLeft", "aria-expanded"],
     "inc/content_types.php": ["register_post_type($post_type", "'lib' => array(", "'clip' => array(", "'gallery' => array(", "register_taxonomy('galery_cat'", "evented_detach_clip_taxonomies", "unregister_taxonomy_for_object_type($taxonomy, 'clip')"],
     "inc/navigation.php": ["'gallery' === $key", "'is_heading'", "array('video', 'downloads')", "array('clip', 'wpdmpro')", "'sr_playlist'", "EVENTED_NAV_CACHE_VER', '13"],

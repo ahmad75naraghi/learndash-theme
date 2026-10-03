@@ -568,8 +568,16 @@ html.no-js .ee-rv, .ee-rv.is-in { opacity: 1; transform: none; }
 [hidden] { display: none !important; }
 
 /* تکمیل نمایشگرهای باریک و ورودی لمسی */
-.ee-home :where(h1, h2, h3, h4, p, a, td, th) { overflow-wrap: anywhere; }
+.ee-home :where(h1, h2, h3, h4, h5, h6, p, td, th) { overflow-wrap: break-word; word-break: normal; }
+.ee-home :where(a, code) { overflow-wrap: anywhere; }
 .ee-home :where(input, select, textarea, button) { max-width: 100%; }
+@media (max-width: 639.98px) {
+    .ee-home :where(.ee-arch-title, .ee-post-title, .ee-lh-title, .ee-course-title, .ee-lesson-title, .ee-panel-title) {
+        max-width: 100%; font-size: clamp(1rem, 5vw, 1.25rem); line-height: 1.65;
+        overflow-wrap: break-word; word-break: normal;
+    }
+    .ee-home :where(.ee-arch-head, .ee-post-head, .ee-lh-copy, .ee-course-hero-copy, .ee-panel-title-row) { min-width: 0; }
+}
 @media (max-width: 479.98px) {
     .ee-wrap { padding-inline: .75rem; }
     .ee-header-in { padding-block: .55rem; }
