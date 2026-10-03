@@ -42,9 +42,9 @@ function theme_enqueue()
         return;
     }
 
-    wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.0.0');
+    wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.3.0');
     wp_enqueue_style('ee-panel', PATH_DIR_URL . '/assets/css/newhome/ee-panel.css', array('ee-shell'), '1.2.0');
-    wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', array('ee-panel'), '2.3.0');
+    wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', array('ee-panel'), '2.4.0');
 
     /* تقویم ۲۳ کیلوبایتی فقط در پروفایل لازم است، نه تمام صفحه‌های پنل. */
     $panel_section = function_exists('evented_panel_current_section') ? evented_panel_current_section() : '';

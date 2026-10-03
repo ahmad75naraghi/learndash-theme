@@ -39,9 +39,9 @@ add_action('wp_enqueue_scripts', function () {
         || is_page('podcast')
     ) {
         // هم Page Template انتخابی و هم page-{slug}.php باید asset کامل منابع را بگیرند.
-        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.8.0');
+        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.9.0');
     } elseif (is_singular(array('post', 'lib', 'clip', 'gallery', 'wpdmpro', 'sr_playlist'))) {
-        wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.8.0');
+        wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.9.0');
         if (is_singular('clip')) {
             wp_enqueue_script('ee-resource-video', PATH_DIR_URL . '/assets/js/resource-video.js', array(), '1.1.0', true);
         } elseif (is_singular('sr_playlist')) {
@@ -49,13 +49,13 @@ add_action('wp_enqueue_scripts', function () {
         }
     } elseif (is_singular(array('sfwd-courses', 'sfwd-lessons', 'sfwd-topic', 'sfwd-quiz'))) {
         // دوره، درس و آزمون: استایل + رفتارها (آکاردئون، دیدگاه، تکمیل درس، علاقه‌مندی)
-        wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.3.0');
+        wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.4.0');
         wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.2.0', true);
         wp_localize_script('ee-lms', 'eeLms', array('ajax_url' => admin_url('admin-ajax.php')));
 
         if (is_singular('sfwd-quiz')) {
             // سایدبار آزمون کارت دوره و گرید دوره‌ها را نشان می‌دهد.
-            wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.2.0');
+            wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.3.0');
         }
     } elseif (
         is_post_type_archive('sfwd-courses')
@@ -66,10 +66,10 @@ add_action('wp_enqueue_scripts', function () {
     ) {
         // فهرست‌ها: بایگانی/دستهٔ دوره، برگهٔ دوره‌ها، اساتید، پروفایل مدرس،
         // برگهٔ عمومی و صفحهٔ ۴۰۴.
-        wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.2.0');
+        wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.3.0');
         // سایدبار فیلتر دوره‌ها و نوار مرتب‌سازی (باز/بسته در موبایل، ارسال خودکار)
         wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.2.0', true);
     } elseif (is_home() || is_archive() || is_search()) {
-        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.8.0');
+        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.9.0');
     }
 }, 20);

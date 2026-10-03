@@ -23,8 +23,13 @@ const routes = [
   ['archive', '/?post_type=post'],
   ['search', '/?s=آزمایشی'],
   ['courses', '/courses/'],
+  ['course-single', '/sfwd-courses/report-course/'],
+  ['lesson-single', '/sfwd-lessons/report-lesson/'],
+  ['quiz-single', '/sfwd-quiz/report-quiz/'],
   ['library-page', '/library/'],
   ['videos-page', '/videos/'],
+  ['podcast-page', '/podcast/'],
+  ['podcast-single', '/sr_playlist/legacy-podcast-fixture/'],
   ['gallery-page', '/gallery-page/'],
   ['library-archive', '/lib/'],
   ['library-single', '/lib/lib-item-1/'],
@@ -59,6 +64,51 @@ function report(kind, viewport, route, message) {
 try {
   for (const [viewportName, viewport] of Object.entries(viewports)) {
     const context = await browser.newContext({ viewport, locale: 'fa-IR', colorScheme: 'light' });
+    // WP Playground auto-authenticates the first request unless this marker exists.
+    // Set it explicitly so the guest login template can be measured as a real visitor.
+    await context.addCookies([{ name: 'playground_auto_login_already_happened', value: '1', url: base }]);
+
+    // The custom login template redirects authenticated users, so audit it before
+    // establishing the session used by panel routes.
+    const guestLogin = await context.newPage();
+    try {
+      const response = await guestLogin.goto(`${base}/login/`, { waitUntil: 'load', timeout: 30_000 });
+      if (!response || response.status() >= 400) {
+        report('failure', viewportName, '/login/', `HTTP ${response?.status() ?? 'no response'}`);
+      } else {
+        const loginMetrics = await guestLogin.evaluate(() => {
+          const root = document.documentElement;
+          const container = document.querySelector('.auth-container');
+          const containerRect = container?.getBoundingClientRect();
+          const escapedControls = [...document.querySelectorAll('input, button, select, textarea')]
+            .filter(el => el.offsetParent !== null)
+            .filter(el => {
+              const rect = el.getBoundingClientRect();
+              return rect.left < -2 || rect.right > root.clientWidth + 2;
+            }).length;
+          return {
+            clientWidth: root.clientWidth,
+            scrollWidth: Math.max(root.scrollWidth, document.body?.scrollWidth || 0),
+            hasContainer: Boolean(container),
+            containerEscapes: Boolean(containerRect && (containerRect.left < -2 || containerRect.right > root.clientWidth + 2)),
+            escapedControls,
+          };
+        });
+        if (!loginMetrics.hasContainer) report('failure', viewportName, '/login/', 'custom login container is missing');
+        if (loginMetrics.scrollWidth > loginMetrics.clientWidth + 2) report('failure', viewportName, '/login/', `horizontal overflow ${loginMetrics.scrollWidth}px > ${loginMetrics.clientWidth}px`);
+        if (loginMetrics.containerEscapes) report('failure', viewportName, '/login/', 'login container escapes viewport');
+        if (loginMetrics.escapedControls) report('failure', viewportName, '/login/', `${loginMetrics.escapedControls} login control(s) escape viewport`);
+        const dir = path.join(outputDir, viewportName);
+        await fs.mkdir(dir, { recursive: true });
+        await guestLogin.screenshot({ path: path.join(dir, 'login-guest.png'), fullPage: true, animations: 'disabled' });
+        screenshots++;
+      }
+    } catch (error) {
+      report('failure', viewportName, '/login/', error.message);
+    } finally {
+      await guestLogin.close();
+    }
+
     const login = await context.newPage();
     await login.goto(`${base}/wp-login.php`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
     const userInput = login.locator('#user_login');
@@ -99,7 +149,7 @@ try {
 
       try {
         let response;
-        // Playground occasionally restarts its lone PHP worker under the full 92-page audit.
+        // Playground occasionally restarts its lone PHP worker during the full multi-page audit.
         // Retry transient gateway failures, while keeping real route/application failures visible.
         for (let attempt = 0; attempt < 5; attempt++) {
           response = await page.goto(`${base}${route}`, { waitUntil: 'load', timeout: 30_000 });
@@ -114,7 +164,7 @@ try {
         await page.evaluate(() => document.fonts?.ready);
         await page.waitForTimeout(250);
 
-        // Under a heavy 100-page audit Playground can briefly return 502/503 for a
+        // Under a heavy multi-page audit Playground can briefly return 502/503 for a
         // media request even after the document succeeded. Retry visible same-origin
         // images before declaring the layout broken; permanent 4xx/5xx still fail.
         await page.evaluate(async origin => {
@@ -208,6 +258,13 @@ try {
               const rect = el.getBoundingClientRect();
               return rect.right > root.clientWidth + 2 || rect.left < -2;
             }).length;
+          const escapedContent = [...document.querySelectorAll('main img, main video, main audio, main iframe, main pre, main .ee-post, main .ee-ccard, main .ee-arch-card, main .ee-resource-card, main .horizontal-card, main .panel-card')]
+            .filter(el => el.offsetParent !== null)
+            .filter(el => {
+              const rect = el.getBoundingClientRect();
+              return rect.right > root.clientWidth + 2 || rect.left < -2;
+            })
+            .map(el => `${el.tagName.toLowerCase()}.${typeof el.className === 'string' ? el.className.trim().split(/\\s+/).join('.') : ''}`);
           const escapedHeadings = [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')]
             .filter(el => el.offsetParent !== null && el.textContent.trim())
             .filter(el => {
@@ -233,6 +290,7 @@ try {
             brokenImages,
             unnamed,
             escaped,
+            escapedContent,
             escapedHeadings,
             wrappedSectionHeadings,
             main: Boolean(document.querySelector('main, #main, #ee-main, [role="main"]')),
@@ -246,6 +304,7 @@ try {
           report('failure', viewportName, route, `broken images: ${metrics.brokenImages.slice(0, 3).join(', ')}`);
         }
         if (metrics.escaped) report('failure', viewportName, route, `${metrics.escaped} form/table element(s) escape viewport`);
+        if (metrics.escapedContent.length) report('failure', viewportName, route, `media/card elements escape viewport: ${metrics.escapedContent.slice(0, 6).join(', ')}`);
         if (metrics.escapedHeadings.length) report('failure', viewportName, route, `headings escape their box/viewport: ${metrics.escapedHeadings.slice(0, 6).join(', ')}`);
         if (metrics.wrappedSectionHeadings.length) report('failure', viewportName, route, `mobile section headings wrap to multiple lines: ${metrics.wrappedSectionHeadings.slice(0, 6).join(', ')}`);
         if (!metrics.title) report('failure', viewportName, route, 'document title is empty');

@@ -23,17 +23,22 @@
     font-feature-settings: "ss02";
 }
 
+html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
 body {
     background-color: #f5f6f8;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-height: 100dvh;
+    padding: 1rem;
 }
 
 .auth-container {
     background: #ffffff;
-    width: 960px;
+    width: min(960px, 100%);
+    max-width: 100%;
+    min-width: 0;
     border-radius: 8px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     display: flex;
@@ -151,6 +156,7 @@ body {
 /* بخش سمت راست - فرم‌ها */
 .auth-content {
     flex: 1.2;
+    min-width: 0;
     padding: 50px 60px;
     display: flex;
     flex-direction: column;
@@ -567,9 +573,26 @@ input:focus {
     transform: rotate(42deg);
 }
 @media (max-width: 768px) {
-    .auth-sidebar{
-        display: none;
-    }
+    body { align-items: flex-start; padding: clamp(.6rem, 3vw, 1rem); }
+    .auth-container { width: min(30rem, 100%); min-height: calc(100dvh - 2rem); }
+    .auth-sidebar { display: none; }
+    .auth-content { width: 100%; padding: 2rem clamp(1rem, 6vw, 2.2rem); }
+    .brand-logo { margin-bottom: 2rem; }
+    .toast-wrapper { padding: 1rem 0 0; }
+}
+@media (max-width: 420px) {
+    .auth-content { padding: 1.35rem .85rem; }
+    .brand-logo { margin-bottom: 1.4rem; }
+    h2 { font-size: 1.05rem; line-height: 1.7; }
+    .step-desc { margin-bottom: 1.15rem; font-size: .82rem; line-height: 1.8; }
+    .input-group { margin-bottom: 1rem; }
+    .otp-inputs-container { gap: .35rem; direction: ltr; }
+    .otp-field { width: clamp(2.25rem, 12vw, 2.75rem) !important; height: clamp(2.5rem, 13vw, 2.875rem) !important; padding: .25rem !important; }
+    .btn-submit { font-size: .88rem; }
+    .alt-actions { gap: .8rem; margin-top: 1.2rem; }
+    .alt-actions a { font-size: .76rem; text-align: center; }
+    .toast-content { min-width: 0; padding: .75rem .6rem; }
+    .toast-text, .error-message, .terms-text { overflow-wrap: anywhere; }
 }
 .admin-login-link { margin-top: 10px; }
 .admin-login-link a { color: #94a3b8; font-size: 12px; }

@@ -1453,3 +1453,21 @@ h2 {
 @media (hover: none) and (pointer: coarse) {
     .ee-panel-main button, .ee-panel-main a.btn-primary, .ee-panel-main .btn-receipt { min-height: 44px; }
 }
+
+/* Final containment layer for legacy panel forms and long transaction data. */
+@media (max-width: 520px) {
+    .panel-main,
+    .panel-section,
+    .panel-card,
+    .panel-form { min-width: 0; }
+    .panel-form input,
+    .panel-form select,
+    .panel-form textarea,
+    .panel-form button { max-width: 100%; min-width: 0; }
+    .panel-section table,
+    .transactions-table { display: block; width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .panel-section pre,
+    .panel-section code,
+    .transaction-id { max-width: 100%; overflow-wrap: anywhere; }
+    .panel-modal { width: calc(100vw - 1.25rem); max-width: calc(100vw - 1.25rem); max-height: calc(100dvh - 1.25rem); overflow-y: auto; }
+}

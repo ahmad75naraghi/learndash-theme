@@ -18,7 +18,7 @@ if ('oldest' === $order) { $args['order'] = 'ASC'; }
 if ('title' === $order) { $args['orderby'] = 'title'; $args['order'] = 'ASC'; }
 $downloads = post_type_exists('wpdmpro') ? new WP_Query($args) : null;
 if (!wp_style_is('archive-post', 'enqueued')) {
-	wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.7.0');
+	wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.9.0');
 }
 get_template_part('template-parts/ee', 'head', array('ee_body_class' => 'ee-archive ee-download-archive'));
 get_template_part('template-parts/ee', 'header', array('ee_active' => 'downloads'));

@@ -1175,3 +1175,25 @@ a.ee-cur-item:hover .ee-cur-title { color: var(--ee-tealP); }
 .ee-quiz-body .ld-quiz-actions { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; margin-top: 1rem; }
 .ee-quiz-body .wpProQuiz_header + .wpProQuiz_text { margin-top: -.4rem; }
 .ee-quiz-body .learndash-wrapper .ld-alert { border-radius: 1rem; }
+
+/* Keep LearnDash, quiz and media controls usable on narrow phones. */
+@media (max-width: 520px) {
+    .ee-lms-grid, .ee-lms-main, .ee-course-body, .ee-lesson-main, .ee-lesson-body, .ee-quiz-main, .ee-quiz-body { min-width: 0; }
+    .ee-course-card, .ee-lesson-card, .ee-quiz-card { padding: .85rem; }
+    .ee-course-title, .ee-lesson-title, .ee-quiz-title { overflow-wrap: break-word; word-break: normal; }
+    .ee-course-meta, .ee-lesson-meta, .ee-quiz-meta { gap: .4rem .6rem; }
+    .ee-course-body img, .ee-course-body video, .ee-course-body iframe,
+    .ee-lesson-content img, .ee-lesson-content video, .ee-lesson-content iframe,
+    .ee-quiz-body img, .ee-quiz-body video, .ee-quiz-body iframe { max-width: 100%; height: auto; }
+    .ee-course-body table, .ee-lesson-content table, .ee-quiz-body table,
+    .ee-quiz-body .wpProQuiz_results table, .ee-quiz-body .ld-quiz-results table { display: block; width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .ee-audio-row { align-items: stretch; flex-direction: column; }
+    .ee-audio-row .ee-audio, .ee-audio-row audio, .ee-player audio { width: 100%; max-width: 100%; min-width: 0; }
+    .ee-player-actions, .ee-lesson-actions, .ee-quiz-actions { align-items: stretch; flex-direction: column; }
+    .ee-player-actions > *, .ee-lesson-actions > *, .ee-quiz-actions > * { width: 100%; min-width: 0; justify-content: center; }
+    .ee-quiz-body .wpProQuiz_button, .ee-quiz-body input[type="button"], .ee-quiz-body input[type="submit"] { max-width: 100%; white-space: normal; overflow-wrap: break-word; }
+    .ee-quiz-body .wpProQuiz_questionListItem label { min-width: 0; overflow-wrap: break-word; }
+}
+@media (max-width: 350px) {
+    .ee-course-card, .ee-lesson-card, .ee-quiz-card { padding-inline: .65rem; }
+}

@@ -258,3 +258,29 @@ a.ee-meta-item:hover { color: var(--ee-tealP); }
 @media (max-width: 760px) { .ee-podcast-head { grid-template-columns: 8rem minmax(0, 1fr); gap: 1rem; padding: 1rem; }.ee-podcast-cover { border-radius: 1rem; }.ee-podcast-summary h1 { font-size: 1.15rem; }.ee-podcast-player { grid-column: 1 / -1; }.ee-podcast-track-section { padding: 1rem; } }
 @media (max-width: 520px) { .ee-podcast-head { grid-template-columns: 1fr; }.ee-podcast-cover { width: min(13rem, 70vw); margin-inline: auto; }.ee-podcast-summary { text-align: center; }.ee-podcast-meta, .ee-podcast-terms { justify-content: center; }.ee-podcast-now { justify-content: center; }.ee-podcast-tracks li { grid-template-columns: minmax(0, 1fr) 2.5rem; }.ee-podcast-tracks button { grid-template-columns: 2rem minmax(0, 1fr) 1.2rem; gap: .45rem; padding: .55rem; }.ee-podcast-track-number { width: 1.9rem; height: 1.9rem; } }
 @media (prefers-reduced-motion: reduce) { .ee-podcast-tracks button, .ee-podcast-download { transition: none; } }
+
+/* Long editorial content, comments, downloads and podcast controls on phones. */
+@media (max-width: 520px) {
+    .ee-single-grid, .ee-single-main, .ee-post, .ee-post-content, .ee-post-body,
+    .ee-resource-single, .ee-resource-post, .ee-download-post, .ee-podcast-main { min-width: 0; }
+    .ee-post { padding-inline: .8rem; }
+    .ee-post-body img, .ee-post-body video, .ee-post-body iframe,
+    .ee-resource-post img, .ee-resource-post video, .ee-resource-post iframe,
+    .ee-download-post img, .ee-podcast-main img { max-width: 100%; height: auto; }
+    .ee-post-body table, .ee-resource-post table, .ee-download-post table, .ee-podcast-main table { display: block; width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .ee-post-body pre, .ee-post-body code { max-width: 100%; overflow-x: auto; overflow-wrap: anywhere; }
+    .ee-post-authorline { align-items: flex-start; flex-wrap: wrap; }
+    .ee-comment-list .children { margin-inline-start: 0; padding-inline-start: .6rem; }
+    .ee-comment-list .comment-body { min-width: 0; padding: .75rem; }
+    .ee-comment-list .comment-content, .ee-comment-list .comment-content p { overflow-wrap: break-word; }
+    .ee-comment-form input, .ee-comment-form textarea, .ee-comment-form select { width: 100%; max-width: 100%; min-width: 0; }
+    .ee-download-file { min-width: 0; }
+    .ee-podcast-player audio { width: 100%; max-width: 100%; min-width: 0; }
+    .ee-podcast-track-section, .ee-podcast-content { padding-inline: .8rem; }
+}
+@media (max-width: 350px) {
+    .ee-author-box { align-items: center; flex-direction: column; text-align: center; }
+    .ee-comment-list .children { padding-inline-start: .3rem; }
+    .ee-download-file { grid-template-columns: minmax(0, 1fr); }
+    .ee-download-file-type { justify-self: start; }
+}

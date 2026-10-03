@@ -193,3 +193,23 @@
 
 /* ---------- مرکز دانلود مستقل WPDM ---------- */
 .ee-download-card-stats { display: flex; flex-wrap: wrap; gap: .4rem .75rem; margin-top: auto; padding-top: .65rem; color: var(--ee-soft); font-size: .62rem; }.ee-download-card-stats span { display: inline-flex; align-items: center; gap: .25rem; }.ee-download-card-stats .ee-ic { width: .85rem; height: .85rem; color: var(--ee-tealP); }.ee-download-card-actions { display: flex; align-items: center; justify-content: space-between; gap: .6rem; margin-top: .65rem; }.ee-download-card-actions .ee-resource-card-more { margin-top: 0; }.ee-download-direct { min-height: 2.2rem; padding: .35rem .8rem; font-size: .65rem; }
+
+/* Archive and resource cards must not force the document wider than a phone. */
+@media (max-width: 520px) {
+    .ee-archive-main, .ee-arch-grid, .ee-arch-main, .ee-arch-cards,
+    .ee-resource-page-main, .ee-resource-page-wrap, .ee-resource-grid { min-width: 0; }
+    .ee-arch-head { padding-inline: .8rem; }
+    .ee-arch-title { font-size: clamp(1.15rem, 7vw, 1.55rem); overflow-wrap: break-word; }
+    .ee-arch-search { width: 100%; min-width: 0; padding-inline: .65rem .25rem; }
+    .ee-arch-search input { min-width: 0; }
+    .ee-arch-search .ee-btn { flex: 0 0 auto; padding-inline: .75rem; }
+    .ee-arch-card, .ee-resource-card, .ee-gallery-category-card { min-width: 0; }
+    .ee-ac-body, .ee-resource-card-body { min-width: 0; padding-inline: .75rem; }
+    .ee-ac-title, .ee-resource-card h2, .ee-gallery-category-info strong { overflow-wrap: break-word; word-break: normal; }
+    .ee-ac-foot, .ee-resource-card-meta { flex-wrap: wrap; }
+    .ee-resource-select, .ee-resource-select select { width: 100%; min-width: 0; }
+}
+@media (max-width: 350px) {
+    .ee-arch-search { align-items: stretch; flex-direction: column; border-radius: .8rem; padding: .45rem; }
+    .ee-arch-search .ee-btn { width: 100%; justify-content: center; }
+}
