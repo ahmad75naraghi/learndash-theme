@@ -264,7 +264,27 @@ try {
         }
 
         if (route.startsWith('/panel')) {
-          const helpButton = page.locator('[data-ee-panel-help]');
+          let helpButton = page.locator('[data-ee-panel-help]');
+          // A restarted Playground worker can invalidate the in-memory login session
+          // midway through the long audit. Re-authenticate and reload before treating
+          // a missing panel control as a layout regression.
+          for (let attempt = 0; !(await helpButton.count()) && attempt < 3; attempt++) {
+            await page.goto(`${base}/wp-login.php`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+            const retryUser = page.locator('#user_login');
+            if (await retryUser.count()) {
+              await retryUser.fill(username);
+              await page.locator('#user_pass').fill(password);
+              await Promise.all([
+                page.waitForLoadState('domcontentloaded'),
+                page.locator('#wp-submit').click(),
+              ]);
+            }
+            responseErrors.clear();
+            consoleErrors.length = 0;
+            await page.goto(`${base}${route}`, { waitUntil: 'load', timeout: 30_000 });
+            await page.waitForTimeout(300 * (attempt + 1));
+            helpButton = page.locator('[data-ee-panel-help]');
+          }
           if (await helpButton.count()) {
             await helpButton.evaluate(button => button.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' }));
             await page.waitForTimeout(50);
@@ -286,7 +306,7 @@ try {
               report('failure', viewportName, route, 'section help did not open correctly');
             }
           } else {
-            report('failure', viewportName, route, 'section help button is missing');
+            report('failure', viewportName, route, `section help button is missing after session retry (final URL: ${page.url()})`);
           }
         }
 
