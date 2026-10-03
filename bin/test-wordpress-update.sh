@@ -41,7 +41,7 @@ PY
 )
 [[ -n "$nonce" ]] || { echo 'Could not extract authenticated updater nonce.' >&2; exit 1; }
 
-code=$(curl -sS --max-time 120 -c "$cookie" -b "$cookie" -o "$response" -w '%{http_code}' "$base/evented-update-integration.php?_wpnonce=$nonce")
+code=$(curl -sS "${curl_retry[@]}" --max-time 120 -c "$cookie" -b "$cookie" -o "$response" -w '%{http_code}' "$base/evented-update-integration.php?_wpnonce=$nonce")
 cat "$response"
 printf '\n'
 [[ "$code" == 200 ]] || { echo "Theme_Upgrader integration returned HTTP $code" >&2; exit 1; }
