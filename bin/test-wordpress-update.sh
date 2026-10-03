@@ -41,10 +41,14 @@ PY
 )
 [[ -n "$nonce" ]] || { echo 'Could not extract authenticated updater nonce.' >&2; exit 1; }
 
-code=$(curl -sS "${curl_retry[@]}" --max-time 120 -c "$cookie" -b "$cookie" -o "$response" -w '%{http_code}' "$base/evented-update-integration.php?_wpnonce=$nonce")
+set +e
+curl -sS "${curl_retry[@]}" --fail-with-body --max-time 120 -c "$cookie" -b "$cookie" \
+	-o "$response" "$base/evented-update-integration.php?_wpnonce=$nonce"
+curl_status=$?
+set -e
 cat "$response"
 printf '\n'
-[[ "$code" == 200 ]] || { echo "Theme_Upgrader integration returned HTTP $code" >&2; exit 1; }
+[[ "$curl_status" == 0 ]] || { echo "Theme_Upgrader integration request failed (curl $curl_status)." >&2; exit 1; }
 python3 - "$response" <<'PY'
 import json, sys
 payload = json.load(open(sys.argv[1], encoding='utf-8'))
