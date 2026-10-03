@@ -40,6 +40,51 @@ $ee_today = function_exists('evented_today_label') ? evented_today_label() : dat
 
 /* پیام‌رسان‌ها (فیلتر evented_channel_links در template_helpers) */
 $ee_channels = function_exists('evented_channel_links') ? (array) evented_channel_links() : array();
+
+/* زیرمنوی درختی برای نمایش خوانا در دسکتاپ و موبایل به فهرست عمق‌دار تبدیل می‌شود. */
+$ee_flatten_children = static function ($children, $depth = 0) use (&$ee_flatten_children) {
+	$flat = array();
+	foreach ((array) $children as $child) {
+		if (empty($child['title']) || (empty($child['url']) && empty($child['is_heading']))) {
+			continue;
+		}
+		$child['depth']        = (int) $depth;
+		$child['has_children'] = !empty($child['children']);
+		$flat[]                = $child;
+		if (!empty($child['children'])) {
+			$flat = array_merge($flat, $ee_flatten_children($child['children'], $depth + 1));
+		}
+	}
+	return $flat;
+};
+
+/* دسکتاپ: درخت واقعی نگه داشته می‌شود تا فرزندان هر دسته در پنل کناری باز شوند. */
+$ee_render_desktop_children = static function ($children, $depth = 0) use (&$ee_render_desktop_children) {
+	if (empty($children)) {
+		return;
+	}
+	$nested = $depth > 0;
+	?>
+	<ul class="ee-sub-list<?php echo $nested ? ' ee-sub-flyout' : ' ee-sub-root'; ?>" role="menu">
+		<?php foreach ((array) $children as $child) :
+			$is_heading  = !empty($child['is_heading']);
+			if (empty($child['title']) || (empty($child['url']) && !$is_heading)) { continue; }
+			$has_children = !empty($child['children']);
+			?>
+			<li class="ee-sub-item<?php echo $has_children ? ' has-children' : ''; ?><?php echo $is_heading ? ' is-heading' : ''; ?>" role="none">
+				<?php if ($is_heading) : ?><span class="ee-sub-link ee-sub-heading<?php echo $has_children ? ' has-children' : ''; ?>" role="heading" aria-level="3" tabindex="0"><?php else : ?><a class="ee-sub-link<?php echo $has_children ? ' has-children' : ''; ?>" role="menuitem" href="<?php echo esc_url($child['url']); ?>"<?php echo $has_children ? ' aria-haspopup="true"' : ''; ?>><?php endif; ?>
+					<span class="ee-sub-label"><?php echo esc_html($child['title']); ?></span>
+					<span class="ee-sub-meta">
+						<?php if (!empty($child['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $child['count'])); ?></small><?php endif; ?>
+						<?php if ($has_children) : ?><svg class="ee-ic ee-sub-next" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg><?php endif; ?>
+					</span>
+				<?php if ($is_heading) : ?></span><?php else : ?></a><?php endif; ?>
+				<?php if ($has_children) { $ee_render_desktop_children($child['children'], $depth + 1); } ?>
+			</li>
+		<?php endforeach; ?>
+	</ul>
+	<?php
+};
 ?>
     <!-- ======= نوار ابزار بالایی (فقط دسکتاپ) ======= -->
     <div class="ee-topbar">
@@ -52,7 +97,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                 <span class="ee-tb-sep">|</span>
                 <span class="ee-tb-item"><span class="ee-tb-label">کانال‌های رسمی:</span></span>
                 <?php if (!empty($ee_channels)) : foreach ($ee_channels as $ee_ch) : ?>
-                    <a class="ee-tb-item" href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="color:<?php echo esc_attr($ee_ch['color']); ?>;font-weight:600;"><span class="dot" style="background:<?php echo esc_attr($ee_ch['color']); ?>;"></span><?php echo esc_html($ee_ch['label']); ?></a>
+                    <a class="ee-tb-item" href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="color:<?php echo esc_attr($ee_ch['color']); ?>;font-weight:600;"><?php echo function_exists('evented_channel_icon_html') ? evented_channel_icon_html($ee_ch, 'ee-channel-icon-topbar') : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php echo esc_html($ee_ch['label']); ?></a>
                 <?php endforeach; else : ?>
                     <a class="ee-tb-item ee-u-teal ee-u-b" href="<?php echo esc_url($ee_url_bale); ?>"><span class="dot ee-u-bg-green"></span>بله</a>
                     <a class="ee-tb-item ee-u-amber ee-u-b" href="<?php echo esc_url($ee_url_eitaa); ?>"><span class="dot ee-u-bg-amber"></span>ایتا</a>
@@ -163,13 +208,8 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                                 </div>
                             </div>
                         <?php elseif ($ee_has_sub) : ?>
-                            <div class="ee-sub" role="menu">
-                                <?php foreach ($ee_it['children'] as $ee_sub) : ?>
-                                    <a role="menuitem" href="<?php echo esc_url($ee_sub['url']); ?>">
-                                        <span><?php echo esc_html($ee_sub['title']); ?></span>
-                                        <?php if (!empty($ee_sub['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $ee_sub['count'])); ?></small><?php endif; ?>
-                                    </a>
-                                <?php endforeach; ?>
+                            <div class="ee-sub">
+                                <?php $ee_render_desktop_children($ee_it['children']); ?>
                                 <a class="ee-sub-all" href="<?php echo esc_url($ee_it['url']); ?>">همهٔ <?php echo esc_html($ee_it['title']); ?> <svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-arrow_back"></use></svg></a>
                             </div>
                         <?php endif; ?>
@@ -225,11 +265,13 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                     </div>
                     <?php if ($ee_has_sub) : ?>
                         <div class="ee-dn-sub" id="<?php echo esc_attr($ee_sub_id); ?>" hidden>
-                            <?php foreach ($ee_it['children'] as $ee_sub) : ?>
-                                <a href="<?php echo esc_url($ee_sub['url']); ?>">
-                                    <span><?php echo esc_html($ee_sub['title']); ?></span>
+                            <?php foreach ($ee_flatten_children($ee_it['children']) as $ee_sub) :
+                                $ee_sub_depth   = min(4, max(0, (int) $ee_sub['depth']));
+                                $ee_sub_heading = !empty($ee_sub['is_heading']); ?>
+                                <?php if ($ee_sub_heading) : ?><div class="ee-dn-sub-heading ee-sub-depth-<?php echo (int) $ee_sub_depth; ?>" role="heading" aria-level="3"><?php else : ?><a class="ee-sub-depth-<?php echo (int) $ee_sub_depth; ?><?php echo !empty($ee_sub['has_children']) ? ' has-children' : ''; ?>" href="<?php echo esc_url($ee_sub['url']); ?>"><?php endif; ?>
+                                    <span><?php if ($ee_sub_depth > 0) : ?><svg class="ee-ic ee-sub-branch" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg><?php endif; ?><?php echo esc_html($ee_sub['title']); ?></span>
                                     <?php if (!empty($ee_sub['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $ee_sub['count'])); ?></small><?php endif; ?>
-                                </a>
+                                <?php if ($ee_sub_heading) : ?></div><?php else : ?></a><?php endif; ?>
                             <?php endforeach; ?>
                             <a class="ee-dn-all" href="<?php echo esc_url($ee_it['url']); ?>">همهٔ <?php echo esc_html($ee_it['title']); ?></a>
                         </div>
@@ -243,7 +285,7 @@ $ee_channels = function_exists('evented_channel_links') ? (array) evented_channe
                 <span class="ee-drawer-foot-label">کانال‌های رسمی</span>
                 <div class="ee-drawer-chans">
                     <?php foreach ($ee_channels as $ee_ch) : ?>
-                        <a href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="--c:<?php echo esc_attr($ee_ch['color']); ?>;"><span class="dot"></span><?php echo esc_html($ee_ch['label']); ?></a>
+                        <a href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" style="--c:<?php echo esc_attr($ee_ch['color']); ?>;"><?php echo function_exists('evented_channel_icon_html') ? evented_channel_icon_html($ee_ch, 'ee-channel-icon-drawer') : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php echo esc_html($ee_ch['label']); ?></a>
                     <?php endforeach; ?>
                 </div>
             </div>

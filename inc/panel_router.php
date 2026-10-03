@@ -36,6 +36,39 @@ function evented_panel_sections()
 }
 
 /**
+ * کلید canonical بخش جاری پنل؛ برای دارایی شرطی و ناوبری موبایل.
+ *
+ * @return string
+ */
+function evented_panel_current_section()
+{
+	$requested = sanitize_key((string) get_query_var('ee_panel'));
+	if ('' !== $requested) {
+		$file = isset(evented_panel_sections()[$requested]) ? evented_panel_sections()[$requested] : '';
+	} else {
+		$page = get_queried_object();
+		if (!$page instanceof WP_Post) {
+			return '';
+		}
+		if ('panel' === (string) $page->post_name && !$page->post_parent) {
+			return 'dashboard';
+		}
+		$file = evented_panel_template_for_page($page);
+	}
+
+	$canonical = array(
+		'panel/dashboard.php'    => 'dashboard',
+		'panel/my-courses.php'   => 'my-courses',
+		'panel/certificates.php' => 'certificates',
+		'panel/wishlist.php'     => 'wishlist',
+		'panel/payments.php'     => 'payments',
+		'panel/profile.php'      => 'profile',
+		'panel/settings.php'     => 'settings',
+	);
+	return isset($canonical[$file]) ? $canonical[$file] : '';
+}
+
+/**
  * قالب مناسب برای برگهٔ جاری پنل (یا خالی).
  *
  * @param WP_Post $page

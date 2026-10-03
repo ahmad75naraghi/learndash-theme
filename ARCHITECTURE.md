@@ -32,8 +32,10 @@ flowchart TD
 
 نکات:
 - `EventedAuthHandler` با `add_action('init', fn => new EventedAuthHandler())` نمونه‌سازی می‌شود.
-- کپچا: `inc/captcha.php` و `captcha_verify()` حذف شده‌اند (ورود از طریق افزونهٔ جداگانه انجام می‌شود؛ کد ورود قالب دست‌نخورده باقی مانده).
+- کپچا حذف شده است؛ ورود قالب با OTP/رمز و کنترل‌های نشست امن انجام می‌شود.
 - هوک‌های ریدایرکت: `login_url` → `/login/` و `logout_redirect` → خانه (هر دو در `inc/login.php`)؛ `login_redirect` برای نقش subscriber → `/panel` (در `inc/theme_options.php`).
+- «تنظیمات قالب» با `add_menu_page()` در موقعیت ۲٫۱، بلافاصله زیر پیشخوان، ثبت می‌شود؛ URL پایدار آن `admin.php?page=evented-theme-settings` است.
+- `inc/theme_updater.php` آخرین GitHub Release پایدار را با site-transient شش‌ساعته می‌خواند، فقط برای artifact کامل `evented-edu.zip` پاسخ `update_themes` می‌سازد و ریشهٔ بسته را در `upgrader_source_selection` به slug ثابت قالب تبدیل می‌کند. Draft/prerelease، downgrade و URL خارج از میزبان‌های رسمی GitHub رد می‌شوند.
 
 ## ۳. ساختار پایگاه‌داده (Data Structures)
 
@@ -136,13 +138,23 @@ CREATE TABLE IF NOT EXISTS {wp}_evented_transactions (
 | `instructor_user_role` | نقش نمایشی مدرس |
 | `instructor_rating_average` | میانگین امتیاز (فقط خوانده می‌شود) |
 
-### ۳.۷ Session و Transient (جریان OTP)
+### ۳.۷ معماری گواهینامه
+
+1. لینک استاندارد LearnDash به post type گواهینامه می‌رسد و hook موجود در `inc/certificates.php` پارامترهای `quiz`، `time` و کاربر جاری را اعتبارسنجی می‌کند.
+2. تلاش قبول‌شده فقط از user-meta استاندارد `_sfwd-quizzes` انتخاب می‌شود؛ کاربر عادی نمی‌تواند گواهی کاربر دیگر را دریافت کند.
+3. داده‌های چاپی شامل `first_last_name` با fallback به `display_name`، کد ملی، عنوان دوره و تاریخ صدور شمسی است.
+4. مسیر اصلی خروجی، mPDF آمادهٔ انتشار در `inc/lib/` و فونت TTF اختصاصی `eventedcert` است. مختصات در `shamiim_cert_fields()` و برحسب میلی‌متر تعریف می‌شوند.
+5. `vendor/` فقط workspace توسعهٔ Composer است و داخل Git نگهداری نمی‌شود؛ سازندهٔ release آن را پس از حذف منابع بلااستفاده به `inc/lib/` artifact منتقل می‌کند.
+6. نبود یا مسدودشدن mPDF باعث Fatal/Error نمی‌شود: خروجی HTML مستقل، A4 افقی، دارای فونت محلی و دکمهٔ چاپ/ذخیره PDF ارائه می‌شود.
+7. asset رسمی Release باید `evented-edu.zip` باشد؛ source zip گیت‌هاب artifact استقرار محسوب نمی‌شود.
+
+### ۳.۸ Session و Transient (جریان OTP)
 
 | کلید | معنا |
 |---|---|
-| سشن: `fl_otp` / `fl_mobile` / `fl_otp_time` / `fl_otp_purpose` / `fl_otp_verified` / `fl_otp_verified_for` | وضعیت OTP |
-| سشن: `captcha_code` | (برای captcha — غیرفعال) |
-| ترنزینت: `otp_limit_{mobile}` (۶۰ ثانیه) | محدودیت نرخ ارسال کد |
+| سشن: `evented_otp` / `evented_mobile` / `evented_otp_time` / `evented_otp_purpose` / `evented_otp_verified` / `evented_otp_verified_for` / `evented_otp_attempts` | وضعیت OTP، هدف تأیید و شمارندهٔ حدس کد |
+| ترنزینت: `otp_limit_{mobile}` (قابل تنظیم؛ پیش‌فرض ۶۰ ثانیه) | محدودیت نرخ ارسال کد |
+| ترنزینت: `evented_login_fail_{hash}` (۱۵ دقیقه) | محدودیت ورود با رمز برای ترکیب شماره و IP |
 
 ---
 
@@ -172,7 +184,7 @@ sequenceDiagram
 
     U->>P: enters OTP
     P->>A: POST evented_verify_otp
-    A->>S: handle_verify_otp (compare session fl_otp)
+    A->>S: handle_verify_otp (compare session evented_otp)
     alt purpose = reset_password
         S-->>P: {result:reset_password} -> new-password step
     else new user (not found)
@@ -184,32 +196,30 @@ sequenceDiagram
 
 مسیرهای تکمیلی (خلاصه): ثبت‌نام نهایی = `save_user_register_name` (ساخت کاربر: login=موبایل، ایمیل `{mobile}@evented-edu.user`) سپس `evented_register_user` (ست رمز + لاگین). ورود با رمز = `evented_login_user`. بازیابی رمز = `evented_send_otp(purpose=reset_password)` → `evented_verify_otp` → `evented_reset_password`.
 
-> ✅ این دو «خط طلایی» رفع شده‌اند: `save_user_register_name` فقط با OTP تأییدشدهٔ همان شماره کاربر می‌سازد و `handle_register_user` با `$user->ID` (نه خروجی void تابع `wp_set_password`) لاگین خودکار را انجام می‌دهد.
+> نشست OTP با نام اختصاصی، strict mode، کوکی `HttpOnly`/`SameSite=Lax` و `Secure` روی HTTPS آغاز می‌شود. پس از تأیید، شناسهٔ نشست regenerate می‌شود؛ مراحل ساخت حساب و بازیابی علاوه بر شماره و هدف، تازه‌بودن OTP را دوباره کنترل می‌کنند و دادهٔ یک‌بارمصرف پس از مصرف پاک می‌شود. ورود با رمز نیز برای ترکیب شماره و IP rate-limit دارد و پاسخ کاربر موجود/ناموجود یکسان است.
 
-### ۴.۲ تکمیل درس (دور زدن قفل ویدیو/تایمر)
+### ۴.۲ تکمیل درس
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant U as "User (enrolled)"
-    participant M as "lesson modal (single-courses.js)"
+    participant P as "ee-lms.js"
     participant A as "admin-ajax.php"
     participant S as "inc/ajax_functions.php"
     participant LD as "LearnDash"
 
-    U->>M: click "next video" / "finish lesson"
-    M->>A: POST custom_mark_lesson_complete (security=mark_complete_nonce_lessonId)
+    U->>P: click "تکمیل درس"
+    P->>A: POST custom_mark_lesson_complete (security=mark_complete_nonce_lessonId)
     A->>S: handle_custom_mark_lesson_complete
-    S->>LD: learndash_video_complete_for_step(..) / fallback meta
-    S->>LD: update_user_meta(learndash_timer_complete_lessonId)
-    S->>LD: learndash_process_mark_complete(..)
-    alt still not saved
-        S->>S: force write _sfwd-course_progress[courseId][lessons][id]=1
-        S->>LD: learndash_update_user_activity(..)
-    end
+    S->>S: validate nonce, post types and lesson-course relation
+    S->>LD: sfwd_lms_has_access(course,user)
+    S->>LD: learndash_process_mark_complete(user,lesson,false,course)
     S->>LD: learndash_course_progress(array=true)
-    S-->>M: progress data -> updateProgressUI(bar %)
+    S-->>P: progress data -> updateProgressUI(bar %)
 ```
+
+قالب قفل ویدیو/تایمر یا `_sfwd-course-progress` را مستقیماً تغییر نمی‌دهد. اگر LearnDash تکمیل را طبق تنظیمات دوره نپذیرد، قالب نیز آن محدودیت را دور نمی‌زند.
 
 ### ۴.۳ نظر / علاقه‌مندی (کوتاه)
 
@@ -230,7 +240,7 @@ flowchart TD
     SLESS["is_singular sfwd-lessons"] --> SL["single-sfwd-lessons.php"]
     ARCH["is_post_type_archive sfwd-courses"] --> AX["archive-sfwd-courses.php"]
     TAXT["is_tax ld_course_category"] --> TAX["taxonomy-ld_course_category.php"]
-    QUIZ["is_singular sfwd-quizzes"] --> SQ["single-sfwd-quizzes.php"]
+    QUIZ["is_singular sfwd-quiz"] --> SQ["single-sfwd-quiz.php"]
     PGC["page slug = courses"] --> PGCourses["page-courses.php"]
     PGCC["page slug = courses-cat"] --> PGCats["page-courses-cat.php"]
     TINSTR["Template Name: اساتید"] --> TI["template-instructors.php"]
@@ -262,9 +272,9 @@ flowchart TD
 
 قالب‌های صفحهٔ اصلی، تک‌نوشته، آرشیو/برگهٔ نوشته‌ها، جستجو، تک‌دوره، تک‌درس، تک‌آزمون،
 بایگانی/دستهٔ دوره، برگهٔ دوره‌ها/دسته‌ها، پروفایل مدرس، فهرست اساتید، برگهٔ عمومی، fallback
-و ۴۰۴ سند HTML کامل را خودشان چاپ می‌کنند (`get_header()`/`get_footer()` قدیمی را صدا نمی‌زنند)
+برگهٔ ویدئوها (`page-videos.php`) و ۴۰۴ سند HTML کامل را خودشان چاپ می‌کنند (`get_header()`/`get_footer()` قدیمی را صدا نمی‌زنند)
 و از قطعه‌های مشترک زیر استفاده می‌کنند. تنها استثناء `page-login.php`، `page-panel.php` و
-قالب‌های `panel/*` هستند که طراحی مستقل خودشان را دارند (`evented_is_standalone_page()`).
+قالب‌های `panel/*` هستند که طراحی مستقل خودشان را دارند (`evented_is_standalone_page()`). صفحهٔ ورود CSS/JS خود را از `assets/css/login.css` و `assets/js/login.js` بارگذاری می‌کند و پیکربندی امن آن با `wp_json_encode` در صفحه قرار می‌گیرد.
 
 | قطعه | نقش |
 | --- | --- |
@@ -286,7 +296,9 @@ flowchart TD
 فقط وقتی افزونهٔ شمسی‌ساز فعال نباشد)، `evented_post_date()`/`evented_post_time()`،
 `evented_reading_time()`، `evented_get_post_views()`/`evented_track_post_view()`
 (متای `evented_post_views`)، `evented_share_links()`/`evented_channel_links()` (فیلترپذیر) و
-`evented_related_posts()`. دیدگاه‌ها از `comments.php` قالب با لیبل‌های فارسی و
+`evented_related_posts()` و `evented_channel_icon_html()` (نشان‌های برند از `assets/images/social/`).
+نمایش متادیتای مقاله با `evented_post_meta_visible()` و شش گزینهٔ `post_meta_*` کنترل می‌شود؛ این قرارداد در نوشتهٔ تکی، آرشیو/جستجو و هر دو نوع کارت مقالهٔ صفحهٔ اصلی مشترک است. خاموش‌کردن بازدید یا دیدگاه فقط خروجی شمارنده را پنهان می‌کند و رفتار ثبت بازدید/دیدگاه را تغییر نمی‌دهد.
+منوی دسته‌ها در `inc/navigation.php` از تمام ترم‌های taxonomy درخت می‌سازد؛ count والد مجموع محتوای مستقیم و همهٔ descendants است و همان درخت به‌صورت عمق‌دار در منوی hover دسکتاپ و آکاردئون موبایل نمایش داده می‌شود. دیدگاه‌ها از `comments.php` قالب با لیبل‌های فارسی و
 `comment_form()` استایل‌خورده نمایش داده می‌شوند.
 
 ### ۵.۲ صفحهٔ دوره و درس (LMS)
@@ -337,9 +349,11 @@ flowchart TD
     EE -- yes --> SHELL["ee-shell.css + ee-home-js + وزیرمتن + Material Symbols"]
     SHELL --> B1{"is_front_page?"}
     B1 -- yes --> EEH["evented-home.css"]
-    B1 -- no --> B2{"is_singular post?"}
+    B1 -- no --> BV{"is_page_template page-videos.php?"}
+    BV -- yes --> VP["archive-post.css (گرید clip)"]
+    BV -- no --> B2{"is_singular post?"}
     B2 -- yes --> SPC["single-post.css"]
-    B2 -- no --> B4{"is_singular sfwd-courses، sfwd-lessons یا sfwd-quizzes?"}
+    B2 -- no --> B4{"is_singular sfwd-courses، sfwd-lessons، sfwd-topic یا sfwd-quiz?"}
     B4 -- yes --> LMSC["ee-lms.css + ee-lms.js + localize eeLms.ajax_url (+ ee-courses.css برای آزمون)"]
     B4 -- no --> B5{"بایگانی/دستهٔ دوره، is_author، is_404 یا is_page?"}
     B5 -- yes --> CCSS["ee-courses.css"]
@@ -348,7 +362,7 @@ flowchart TD
 ```
 
 - **پوستهٔ ee-***: `functions.php` با اولویت ۲۰ و شرط `evented_is_ee_view()` بارگذاری می‌کند:
-  فونت وزیرمتن + Material Symbols + `assets/css/newhome/ee-shell.css` (توکن‌ها، هدر/فوتر،
+  فونت وزیرمتن + sprite آیکن SVG محلی + `assets/css/newhome/ee-shell.css` (توکن‌ها، هدر/فوتر،
   نوار موبایل، ویجت‌های سایدبار) + `assets/js/newhome/evented-home.js` (منوی موبایل،
   اسلایدر هیرو، کپی لینک اشتراک). سپس بسته به صفحه یکی از `evented-home.css`،
   `single-post.css` یا `archive-post.css` (هر سه با وابستگی به `ee-shell`).
@@ -373,10 +387,12 @@ flowchart TD
 - `ee-lms.js` بدون jQuery است و سه قرارداد AJAX موجود را مصرف می‌کند: `submit_course_review`،
   `custom_mark_lesson_complete` (پاسخ = خروجی `learndash_course_progress`؛ نوارهای پیشرفت و
   شمارندهٔ درس‌ها بدون رفرش به‌روز می‌شوند) و `toggle_course_wishlist`.
-- `main.js` لوکال‌سازی: `ajax_object = {ajax_url, nonce}` — nonce مربوط به `notification_nonce` است و استفاده نمی‌شود؛ اسکریپت‌های واقعی nonce را از `data-nonce` می‌خوانند.
-- پنل: `ee-courses.css` + `ee-panel.css` + `panel.css` (هرس‌شده، v2.1.0) + `jalalidatepicker` + `assets/js/newhome/ee-panel.js` (v1.1.0، با `eePanel` localize) وقتی برگه، خودِ `panel` یا زیرمجموعهٔ آن باشد. سایدبار/شل پنل در `template-parts/panel/shell-open.php` و `shell-close.php` است.
+- `inc/performance.php` ایموجی وردپرس را حذف، فونت محلی اصلی را preload و اسکریپت‌های مستقل قالب را defer می‌کند؛ تصویر نخست هیرو نیز preload و `fetchpriority=high` دارد.
+- `bin/dev-playground.sh` یک WordPress disposable می‌سازد؛ `bin/smoke-test.sh` مسیرها/AJAX/asset/debug log و `bin/test-wordpress-update.sh` جایگزینی واقعی فایل‌های قالب با `Theme_Upgrader` را کنترل می‌کنند.
+- پنل: `ee-courses.css` + `ee-panel.css` + `panel.css` + `assets/js/newhome/ee-panel.js` (با `eePanel` localize) فقط روی مسیرهای پنل بارگذاری می‌شوند. Jalali Date Picker به‌طور شرطی فقط در بخش پروفایل بارگذاری می‌شود. سایدبار دسکتاپ در موبایل به select بومی قابل‌دسترسی تبدیل می‌شود.
+- دادهٔ پنل با `inc/panel_helpers.php` prime/page‌بندی می‌شود: دوره‌های من ۱۰تایی و تراکنش‌ها ۲۰تایی‌اند؛ dashboard فقط چهار کارت را رندر می‌کند.
 - کلاس‌های ابزاری `ee-u-*` (در انتهای `ee-shell.css`) جایگزین استایل‌های inline ایستا در قالب‌ها هستند؛ `[hidden]{display:none!important}` هم آنجا تعریف شده.
-- کتابخانه‌ها: Owl Carousel (سراسری)، Plyr (دیگر enqueue نمی‌شود)، Jalali Date Picker (پنل)، PhotoSwipe (enqueue نشده — بدون استفاده)، Font Awesome (یک آیکن در `author.php` بدون لودر!).
+- کتابخانه‌های مردهٔ Owl، Plyr، PhotoSwipe، Font Awesome و jQuery فرانت بارگذاری نمی‌شوند؛ Jalali Date Picker تنها کتابخانهٔ رابط پنل و محدود به پروفایل است.
 
 ## ۷. قراردادهای AJAX (Inventory)
 
@@ -402,5 +418,5 @@ flowchart TD
 - **Hook-driven**: همهٔ منطق از طریق `add_action/add_filter` به وردپرس وصل می‌شود؛ هیچ routing دستی‌ای نیست.
 - **Template Name**: صفحات پنل با هدر `Template Name: Panel - …` (وردپرس 4.7+ تمپلیت‌های زیرپوشهٔ سطح اول را خودکار پیدا می‌کند).
 - **توابع کمکی متمرکز** در برخی صفحات (مثل helpers قیمت/تصویر در `panel/my-courses.php`) — ⚠️ تکرار شده در چند فایل (رجوع: `TECH_DEBT.md`).
-- **خروجی RTL فارسی**: همهٔ قالب‌ها `dir="rtl"`؛ اسکریپت‌های Owl با `rtl: true`.
+- **خروجی RTL فارسی**: همهٔ قالب‌ها `dir="rtl"` و چیدمان‌ها با logical properties و breakpointهای 320 تا 1440 پیکسل سازگارند.
 - **امنیت پایه**: `check_ajax_referer`، `sanitize_text_field`، `esc_html/esc_url` در اکثر نقاط؛ استثناها در `TECH_DEBT.md`/`TODO.md`.

@@ -2,7 +2,7 @@
 /**
  * تنظیمات قالب (evented-edu)
  *
- * صفحهٔ «تنظیمات قالب» در پیشخوان (ظاهر ← تنظیمات قالب):
+ * صفحهٔ «تنظیمات قالب» در منوی اصلی پیشخوان:
  * مدیریت اسلایدرهای صفحهٔ اصلی — هر اسلاید شامل:
  *   تصویر (از کتابخانهٔ رسانه وردپرس) + عنوان + توضیحات + لینک
  *
@@ -15,29 +15,52 @@ defined('ABSPATH') || exit;
 if (!defined('EVENTED_OPT_SLIDES')) {
     define('EVENTED_OPT_SLIDES', 'evented_home_slides');
 }
+if (!defined('EVENTED_OPT_SLIDER_HEIGHT')) {
+    define('EVENTED_OPT_SLIDER_HEIGHT', 'evented_home_slider_height');
+}
+if (!defined('EVENTED_OPT_SLIDER_HEIGHT_MOBILE')) {
+    define('EVENTED_OPT_SLIDER_HEIGHT_MOBILE', 'evented_home_slider_height_mobile');
+}
+
+/**
+ * ارتفاع امن اسلایدر هیرو برای دسکتاپ یا موبایل.
+ * مقادیر محدود می‌شوند تا تنظیم اشتباه، صفحهٔ اصلی را غیرقابل استفاده نکند.
+ */
+function evented_get_home_slider_height($mobile = false)
+{
+    $option  = $mobile ? EVENTED_OPT_SLIDER_HEIGHT_MOBILE : EVENTED_OPT_SLIDER_HEIGHT;
+    $default = $mobile ? 260 : 360;
+    $min     = $mobile ? 180 : 220;
+    $max     = $mobile ? 520 : 720;
+    $value   = absint(get_option($option, $default));
+
+    return max($min, min($max, $value ?: $default));
+}
 
 /* ---------- منوی پیشخوان ---------- */
 add_action('admin_menu', function () {
-    add_theme_page(
+    add_menu_page(
         'تنظیمات قالب',
         'تنظیمات قالب',
         'manage_options',
         'evented-theme-settings',
-        'evented_render_theme_settings_page'
+        'evented_render_theme_settings_page',
+        'dashicons-admin-customizer',
+        2.1
     );
 });
 
 /**
  * آیا در صفحهٔ «تنظیمات قالب» هستیم؟
  *
- * علاوه بر هوک استاندارد (`appearance_page_evented-theme-settings`)، slug صفحه هم
- * بررسی می‌شود: اگر افزونه‌ای منو را جابه‌جا کند یا هوک پیشخوان تغییر کند،
+ * علاوه بر هوک منوی اصلی (`toplevel_page_evented-theme-settings`) و هوک قدیمی
+ * زیرمنوی نمایش، slug صفحه هم بررسی می‌شود تا با جابه‌جایی منو،
  * کتابخانهٔ رسانه و اسکریپت اسلایدرها همچنان بارگذاری می‌شوند و دکمهٔ
  * «انتخاب تصویر» بی‌صدا از کار نمی‌افتد.
  */
 function evented_is_theme_settings_screen($hook = '')
 {
-    if ($hook === 'appearance_page_evented-theme-settings') {
+    if (in_array($hook, array('toplevel_page_evented-theme-settings', 'appearance_page_evented-theme-settings'), true)) {
         return true;
     }
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- فقط تشخیص صفحه است، نه پردازش داده
@@ -50,7 +73,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
         return;
     }
     wp_enqueue_media();
-    wp_enqueue_style('evented-theme-settings', PATH_DIR_URL . '/assets/css/admin/theme-settings.css', array(), '1.1.0');
+    wp_enqueue_style('evented-theme-settings', PATH_DIR_URL . '/assets/css/admin/theme-settings.css', array(), '1.3.0');
     wp_enqueue_script('evented-theme-settings-js', PATH_DIR_URL . '/assets/js/admin/theme-settings.js', array('jquery'), '1.1.0', true);
     wp_localize_script('evented-theme-settings-js', 'eeSettings', array(
         'mediaTitle'    => 'انتخاب تصویر اسلایدر',
@@ -116,6 +139,13 @@ function evented_render_theme_settings_page()
     if (isset($_POST['evented_theme_options_nonce'])) {
         check_admin_referer('save_evented_theme_options', 'evented_theme_options_nonce');
 
+        $slider_height = isset($_POST['slider_height']) ? absint($_POST['slider_height']) : 360;
+        $slider_height_mobile = isset($_POST['slider_height_mobile']) ? absint($_POST['slider_height_mobile']) : 260;
+        $slider_height = max(220, min(720, $slider_height));
+        $slider_height_mobile = max(180, min(520, $slider_height_mobile));
+        update_option(EVENTED_OPT_SLIDER_HEIGHT, $slider_height, false);
+        update_option(EVENTED_OPT_SLIDER_HEIGHT_MOBILE, $slider_height_mobile, false);
+
         $raw  = (isset($_POST['slides']) && is_array($_POST['slides'])) ? $_POST['slides'] : array();
         $saved = array();
 
@@ -174,12 +204,44 @@ function evented_render_theme_settings_page()
     }
 
     $slides = evented_get_home_slides();
+    $slider_height = evented_get_home_slider_height(false);
+    $slider_height_mobile = evented_get_home_slider_height(true);
     $schema = evented_options_schema();
-    $values = array_merge(evented_options_defaults(), (array) get_option(EVENTED_OPT_KEY, array()));
-    $base   = admin_url('themes.php?page=evented-theme-settings');
+    $values        = array_merge(evented_options_defaults(), (array) get_option(EVENTED_OPT_KEY, array()));
+    $base          = admin_url('admin.php?page=evented-theme-settings');
+    $theme         = wp_get_theme();
+    $theme_version = (string) $theme->get('Version');
+    $release       = function_exists('evented_theme_updater_get_release') ? evented_theme_updater_get_release() : null;
+    $has_update    = is_array($release) && !empty($release['version']) && version_compare((string) $release['version'], $theme_version, '>');
+    $check_url     = wp_nonce_url(admin_url('admin-post.php?action=evented_check_theme_update'), 'evented_check_theme_update');
     ?>
     <div class="wrap evented-settings-wrap">
         <h1>تنظیمات قالب <?php echo esc_html(get_bloginfo('name')); ?></h1>
+
+        <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- فقط پیام نتیجهٔ redirect است. ?>
+        <?php if (isset($_GET['evented_update_checked'])) : ?>
+            <div class="notice notice-success is-dismissible"><p>بررسی به‌روزرسانی GitHub انجام شد.</p></div>
+        <?php endif; ?>
+
+        <div class="evented-update-card">
+            <span class="dashicons dashicons-update-alt" aria-hidden="true"></span>
+            <div>
+                <strong>به‌روزرسانی قالب</strong>
+                <p>نسخهٔ نصب‌شده: <b dir="ltr"><?php echo esc_html($theme_version); ?></b>
+                    <?php if ($has_update) : ?>
+                        — نسخهٔ <b dir="ltr"><?php echo esc_html($release['version']); ?></b> آمادهٔ نصب است.
+                    <?php elseif ($release) : ?>
+                        — قالب به‌روز است.
+                    <?php else : ?>
+                        — هنوز Release عمومی معتبری در GitHub منتشر نشده یا ارتباط موقتاً در دسترس نیست.
+                    <?php endif; ?>
+                </p>
+            </div>
+            <div class="evented-update-actions">
+                <?php if ($has_update) : ?><a class="button button-primary" href="<?php echo esc_url(self_admin_url('update-core.php')); ?>">مشاهده و نصب</a><?php endif; ?>
+                <a class="button" href="<?php echo esc_url($check_url); ?>">بررسی دوباره</a>
+            </div>
+        </div>
 
         <?php if ($updated) : ?>
             <div class="notice notice-success is-dismissible"><p>✅ تغییرات با موفقیت ذخیره شد.</p></div>
@@ -199,6 +261,18 @@ function evented_render_theme_settings_page()
         </p>
         <form method="post" action="<?php echo esc_url(add_query_arg('tab', 'slides', $base)); ?>" class="evented-slides-form">
             <?php wp_nonce_field('save_evented_theme_options', 'evented_theme_options_nonce'); ?>
+            <fieldset class="evented-slider-size" aria-describedby="evented-slider-size-help">
+                <legend>ارتفاع بنر اسلایدر</legend>
+                <label for="evented-slider-height">
+                    <span>دسکتاپ و تبلت</span>
+                    <span class="evented-number-unit"><input id="evented-slider-height" type="number" name="slider_height" value="<?php echo esc_attr($slider_height); ?>" min="220" max="720" step="10"> پیکسل</span>
+                </label>
+                <label for="evented-slider-height-mobile">
+                    <span>موبایل</span>
+                    <span class="evented-number-unit"><input id="evented-slider-height-mobile" type="number" name="slider_height_mobile" value="<?php echo esc_attr($slider_height_mobile); ?>" min="180" max="520" step="10"> پیکسل</span>
+                </label>
+                <p class="description" id="evented-slider-size-help">این ارتفاع برای همهٔ تصاویر اسلایدر یکسان است تا هنگام جابه‌جایی اسلایدها صفحه نپرد. تصویر با برش مرکزی و بدون کشیدگی نمایش داده می‌شود.</p>
+            </fieldset>
             <div id="evented-slides-list">
                 <?php
                 if (empty($slides)) {

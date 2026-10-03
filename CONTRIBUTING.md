@@ -15,7 +15,7 @@
 
 | حوزه | قانون | نمونه |
 |---|---|---|
-| توابع PHP | توابع جدید را با پیشوند `evented_` بنویسید؛ نام‌های تاریخیِ بدون پیشوند (`send_pattern_sms`, `theme_enqueue`, `is_current_path`, `captcha_verify`, `handle_*`) را برای سازگاری تغییر ندهید | `evented_get_course_price_label()` (جدید) |
+| توابع PHP | توابع جدید را با پیشوند `evented_` بنویسید؛ نام‌های تاریخیِ بدون پیشوند (`send_pattern_sms`, `theme_enqueue`, `is_current_path`, `handle_*`) را برای سازگاری تغییر ندهید | `evented_get_course_price_label()` (جدید) |
 | کلاس‌های PHP | `Evented*` (PascalCase) | `EventedAuthHandler` |
 | اکشن/هوک | `evented_*` (lowercase snake) | `evented_verify_otp` |
 | post/user/term meta | snake_case با پیشوند `_` برای post-meta | `_course_outcomes`, `first_name_fa` |

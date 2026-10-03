@@ -42,7 +42,7 @@
 
 - پشته: PHP 7.4+/8، وردپرس + LearnDash؛ فرانت: jQuery/Owl/Plyr بدون باندلر.
 - صفحات پنل = برگه‌ها با `Template Name` در زیرپوشهٔ `panel/`؛ مسیر واقعی برگه‌ها از اسلاگ آن‌ها می‌آید (نه مسیر فایل).
-- احراز هویت: OTP با سشن (`evented_otp*`/`evented_mobile`)؛ ارسال از طریق `inc/sms.php` + wrapper بله `evented_send_otp_with_bale` (ارسال واقعی بیرونی است؛ در لوکال mock شود).
+- احراز هویت: OTP با سشن امن (`evented_otp*`/`evented_mobile`)؛ ارسال از طریق `inc/sms.php` + wrapper بله `evented_send_otp_with_bale` (ارسال واقعی بیرونی است؛ در لوکال mock شود).
 - جدول `{wp}_evented_transactions` خارج از قالب ساخته می‌شود؛ قالب فقط `SELECT` می‌کند (نصب‌های قدیمی باید جدول را rename کنند).
 - دسترسی درس: `sfwd_lms_has_access()` یا `sample_lesson === 'on'`.
 - سبک خطا: پیام‌های فارسی، کاربرپسند؛ خطاهای AJAX با `wp_send_json_error(['message'=>...])`.
@@ -53,10 +53,7 @@
 |---|---|---|
 | هاردکد دامنه (رفع‌شده) | هیچ — در کد فعلی وجود ندارد | در کد جدید هم دامنه ننویسید؛ توابع وردپرس |
 | چاپ خام `$_GET` در inline JS (رفع‌شده) | هیچ — `page-login.php` با `wp_validate_redirect` + `wp_json_encode` مقداردهی می‌کند | در کد جدید هم همین الگو |
-| HTML با رشتهٔ PHP برای مودال/کارت | `single-sfwd-courses.php` (`$modals_html`) | قالب/partial با escape |
-| کد مردهٔ نیمه‌فعال | `inc/captcha.php`, `if(false)` وبینار، PhotoSwipe, `Untitled-1.json` | حذف یا اتصال کامل |
 | توابع کمکی تکراری در چند فایل | helpers قیمت/تصویر در front-page و panel | `inc/helpers.php` متمرکز |
-| session بدون نام/طول عمر | `inc/login.php` | تنظیمات امن سشن یا جایگزین |
 
 ## ۵. روش پاسخ‌دهی مدل (Behavior)
 

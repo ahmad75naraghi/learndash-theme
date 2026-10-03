@@ -297,7 +297,7 @@ add_action('wp_enqueue_scripts', static function () {
 	}
 	// استایل کارت دوره در همهٔ فهرست‌ها مشترک است (کارت واحد)
 	if (is_front_page() || is_post_type_archive('sfwd-courses') || is_tax('ld_course_category') || is_author() || is_page() || is_search() || is_404()) {
-		wp_enqueue_style('ee-catalog', PATH_DIR_URL . '/assets/css/newhome/ee-catalog.css', array('ee-shell'), '1.1.0');
+		wp_enqueue_style('ee-catalog', PATH_DIR_URL . '/assets/css/newhome/ee-catalog.css', array('ee-shell'), '1.2.0');
 	}
 	if (!is_front_page()) {
 		return;

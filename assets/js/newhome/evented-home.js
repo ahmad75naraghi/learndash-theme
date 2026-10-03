@@ -99,6 +99,38 @@
         }
     });
 
+    /* دستهٔ مادر: زیرشاخه در پنل سمت چپ + پشتیبانی کیبورد */
+    document.querySelectorAll('.ee-sub-item.has-children').forEach(function (item) {
+        var parent = item.querySelector(':scope > .ee-sub-link');
+        var flyout = item.querySelector(':scope > .ee-sub-flyout');
+        if (!parent || !flyout) { return; }
+        parent.setAttribute('aria-expanded', 'false');
+        item.addEventListener('mouseenter', function () { parent.setAttribute('aria-expanded', 'true'); });
+        item.addEventListener('mouseleave', function () { parent.setAttribute('aria-expanded', 'false'); });
+        item.addEventListener('focusin', function () { parent.setAttribute('aria-expanded', 'true'); });
+        item.addEventListener('focusout', function (e) {
+            if (!item.contains(e.relatedTarget)) { parent.setAttribute('aria-expanded', 'false'); }
+        });
+        parent.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowLeft') {
+                var first = flyout.querySelector('.ee-sub-link');
+                if (first) { e.preventDefault(); first.focus(); }
+            }
+        });
+        flyout.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight') { e.preventDefault(); parent.focus(); }
+        });
+    });
+    document.querySelectorAll('.ee-nav .ee-sub').forEach(function (sub) {
+        sub.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape') { return; }
+            var item = sub.closest('.ee-nav-item');
+            var trigger = item ? item.querySelector(':scope > a') : null;
+            if (item) { item.classList.remove('is-open'); }
+            if (trigger) { e.preventDefault(); trigger.focus(); }
+        });
+    });
+
     /* ---------- جستجوی موبایل: باز/بسته با دکمهٔ ذره‌بین ---------- */
     var sToggle = document.getElementById('eeSearchToggle');
     var sBox    = document.getElementById('eeSearchM');

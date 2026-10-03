@@ -22,7 +22,7 @@ defined('ABSPATH') || exit;
 
 /* نسخهٔ ساختار کش — با تغییر ساختار آرایه‌ها این عدد را بالا ببرید تا کش قدیمی نادیده گرفته شود. */
 if (!defined('EVENTED_NAV_CACHE_VER')) {
-	define('EVENTED_NAV_CACHE_VER', '4');
+	define('EVENTED_NAV_CACHE_VER', '13');
 }
 
 /**
@@ -43,11 +43,11 @@ function evented_nav_cache_ttl()
 function evented_nav_post_type_candidates()
 {
 	$map = array(
-		'library'   => array('library', 'book', 'books', 'ebook', 'ebooks', 'ketab', 'ketabkhaneh', 'wp_library'),
+		'library'   => array('lib', 'library', 'book', 'books', 'ebook', 'ebooks', 'ketab', 'ketabkhaneh', 'wp_library'),
 		'gallery'   => array('gallery', 'galleries', 'photo', 'photos', 'album', 'albums', 'envira', 'foogallery'),
 		'video'     => array('video', 'videos', 'clip', 'clips', 'film', 'movie'),
-		'downloads' => array('download', 'downloads', 'dlm_download', 'edd_download', 'file', 'files', 'attachment_file'),
-		'podcast'   => array('podcast', 'podcasts', 'episode', 'episodes', 'audio', 'seriously-simple-podcasting'),
+		'downloads' => array('wpdmpro', 'download', 'downloads', 'dlm_download', 'edd_download', 'file', 'files', 'attachment_file'),
+		'podcast'   => array('sr_playlist', 'podcast', 'podcasts', 'episode', 'episodes', 'audio', 'seriously-simple-podcasting'),
 		'courses'   => array('sfwd-courses'),
 	);
 
@@ -80,9 +80,12 @@ function evented_nav_find_post_type($key)
 /**
  * ترم‌های یک تاکسونومی به‌صورت آیتم زیرمنو.
  *
+ * در تاکسونومی‌های سلسله‌مراتبی، خروجی درختی است و count هر والد از مجموع
+ * محتوای مستقیم خودش و تمام فرزندان (در هر عمق) محاسبه می‌شود.
+ *
  * @param string $taxonomy تاکسونومی.
- * @param int    $limit    حداکثر تعداد.
- * @return array<int, array{title:string,url:string,count:int}>
+ * @param int    $limit    حداکثر تعداد ترم در هر سطح.
+ * @return array<int, array{title:string,url:string,count:int,children:array}>
  */
 function evented_nav_term_children($taxonomy, $limit = 12)
 {
@@ -90,38 +93,98 @@ function evented_nav_term_children($taxonomy, $limit = 12)
 		return array();
 	}
 
-	$args = array(
-		'taxonomy'   => $taxonomy,
-		'hide_empty' => true,
-		'number'     => (int) $limit,
-		'orderby'    => 'count',
-		'order'      => 'DESC',
-	);
-	if (is_taxonomy_hierarchical($taxonomy)) {
-		$args['parent'] = 0;
+	$limit = max(1, (int) $limit);
+	if (!is_taxonomy_hierarchical($taxonomy)) {
+		$terms = get_terms(array(
+			'taxonomy'   => $taxonomy,
+			'hide_empty' => true,
+			'number'     => $limit,
+			'orderby'    => 'count',
+			'order'      => 'DESC',
+		));
+		if (is_wp_error($terms) || empty($terms)) {
+			return array();
+		}
+
+		$out = array();
+		foreach ($terms as $term) {
+			if (!$term instanceof WP_Term) {
+				continue;
+			}
+			$link = get_term_link($term);
+			if (is_wp_error($link)) {
+				continue;
+			}
+			$out[] = array(
+				'title'    => (string) $term->name,
+				'url'      => (string) $link,
+				'count'    => (int) $term->count,
+				'children' => array(),
+			);
+		}
+		return $out;
 	}
 
-	$terms = get_terms($args);
+	/* همهٔ ترم‌ها لازم‌اند تا جمع descendants حتی برای والدِ بدون نوشته درست باشد. */
+	$terms = get_terms(array(
+		'taxonomy'   => $taxonomy,
+		'hide_empty' => false,
+		'number'     => 0,
+		'pad_counts' => true,
+		'orderby'    => 'count',
+		'order'      => 'DESC',
+	));
 	if (is_wp_error($terms) || empty($terms)) {
 		return array();
 	}
 
-	$out = array();
+	$by_id       = array();
+	$children_of = array();
+	$totals      = array();
 	foreach ($terms as $term) {
 		if (!$term instanceof WP_Term) {
 			continue;
 		}
-		$link = get_term_link($term);
-		if (is_wp_error($link)) {
-			continue;
-		}
-		$out[] = array(
-			'title' => (string) $term->name,
-			'url'   => (string) $link,
-			'count' => (int) $term->count,
-		);
+		$id                       = (int) $term->term_id;
+		$parent                   = (int) $term->parent;
+		$by_id[$id]               = $term;
+		$totals[$id]              = (int) $term->count; // با pad_counts: یکتای والد + همهٔ descendants.
+		$children_of[$parent][]   = $id;
 	}
-	return $out;
+
+	/* مرتب‌سازی هر سطح بر اساس count تجمعی، سپس نام؛ ترم‌های واقعاً خالی حذف می‌شوند. */
+	foreach ($children_of as &$ids) {
+		usort($ids, static function ($a, $b) use ($totals, $by_id) {
+			$diff = (isset($totals[$b]) ? $totals[$b] : 0) <=> (isset($totals[$a]) ? $totals[$a] : 0);
+			return 0 !== $diff ? $diff : strnatcasecmp((string) $by_id[$a]->name, (string) $by_id[$b]->name);
+		});
+	}
+	unset($ids);
+
+	$build = static function ($parent, $trail = array()) use (&$build, $limit, $by_id, $children_of, $totals) {
+		$items = array();
+		foreach (isset($children_of[$parent]) ? $children_of[$parent] : array() as $term_id) {
+			if (count($items) >= $limit || empty($totals[$term_id]) || isset($trail[$term_id])) {
+				continue;
+			}
+			$term = $by_id[$term_id];
+			$link = get_term_link($term);
+			if (is_wp_error($link)) {
+				continue;
+			}
+			$next_trail           = $trail;
+			$next_trail[$term_id] = true;
+			$items[] = array(
+				'title'    => (string) $term->name,
+				'url'      => (string) $link,
+				'count'    => (int) $totals[$term_id],
+				'children' => $build($term_id, $next_trail),
+			);
+		}
+		return $items;
+	};
+
+	return $build(0);
 }
 
 /**
@@ -217,8 +280,29 @@ function evented_nav_build_cpt_item($key, $title, $icon, $page_slugs)
 	$url       = evented_nav_manual_url($key);
 	$page_id   = 0;
 
-	if ('' !== $post_type) {
+	if (
+		'' !== $post_type
+		&& !in_array($key, array('video', 'downloads'), true)
+		&& !in_array($post_type, array('clip', 'wpdmpro'), true)
+	) {
 		$children = evented_nav_post_type_children($post_type);
+	}
+
+	/* در گالری، والدها فقط عنوان گروه هستند و فقط زیر‌دسته‌های نهایی لینک دارند. */
+	if ('gallery' === $key && !empty($children)) {
+		$gallery_headings = static function ($items) use (&$gallery_headings) {
+			$output = array();
+			foreach ((array) $items as $item) {
+				if (!empty($item['children'])) {
+					$item['is_heading'] = true;
+					$item['url']        = '';
+					$item['children']   = $gallery_headings($item['children']);
+				}
+				$output[] = $item;
+			}
+			return $output;
+		};
+		$children = $gallery_headings($children);
 	}
 
 	/* اولویت: آدرس دستی → برگهٔ هم‌نام (shamiim.ir بخش‌ها را با برگه می‌سازد) → بایگانی پست‌تایپ → مسیر پیش‌فرض */
@@ -286,7 +370,9 @@ function evented_nav_build_items(): array {
 
     // CPT ها
     $items[] = evented_nav_build_cpt_item('library', 'کتابخانه', 'local_library', ['lib', 'library', 'کتابخانه', 'books', 'ketabkhaneh']);
-    $items[] = evented_nav_build_cpt_item('gallery', 'گالری', 'photo_library', ['gallery', 'گالری-مناسبتی', 'گالری-موضوعی', 'galleries']);
+    $gallery_item = evented_nav_build_cpt_item('gallery', 'گالری', 'photo_library', ['gallery']);
+    $gallery_item['url'] = (string) home_url('/gallery/');
+    $items[] = $gallery_item;
     $items[] = evented_nav_build_cpt_item('video', 'ویدیو', 'smart_display', ['videos', 'video']);
     $items[] = evented_nav_build_cpt_item('downloads', 'دانلودها', 'download_for_offline', ['download', 'downloads']);
 
@@ -409,17 +495,20 @@ function evented_nav_flush_cache($tabs_too = true)
 function evented_flush_course_caches() {
 	delete_transient('evented_home_course_tabs');
 	delete_transient('evented_nav_course_mega');
+	delete_transient('evented_nav_course_mega_v2');
 }
 add_action('save_post_sfwd-courses', 'evented_flush_course_caches');
 add_action('deleted_post', function ($post_id) {
 	if ('sfwd-courses' === get_post_type($post_id)) { evented_flush_course_caches(); }
 });
 add_action('set_object_terms', function ($object_id) {
+	/* جابه‌جایی محتوا بین ترم‌ها، count تجمعی و ترتیب زیرمنو را تغییر می‌دهد. */
+	evented_nav_flush_cache(false);
 	if ('sfwd-courses' === get_post_type($object_id)) { evented_flush_course_caches(); }
 });
 
 /**
- * دادهٔ مگامنوی «دوره‌ها»: هر دستهٔ دوره یک تب با حداکثر ۴ دوره (کش ۱۲ ساعته).
+ * دادهٔ مگامنوی «دوره‌ها»: هر دسته یک تب با حداکثر ۸ دوره در دو ردیف چهارتایی (کش ۱۲ ساعته).
  *
  * @return array<int,array{id:int,name:string,url:string,count:int,courses:array}>
  */
@@ -428,7 +517,8 @@ function evented_nav_course_mega()
 	if (!post_type_exists('sfwd-courses') || !taxonomy_exists('ld_course_category')) {
 		return array();
 	}
-	$cached = get_transient('evented_nav_course_mega');
+	$cache_key = 'evented_nav_course_mega_v2';
+	$cached    = get_transient($cache_key);
 	if (is_array($cached)) {
 		return $cached;
 	}
@@ -441,7 +531,7 @@ function evented_nav_course_mega()
 				continue;
 			}
 			$q = new WP_Query(array(
-				'post_type' => 'sfwd-courses', 'posts_per_page' => 4, 'no_found_rows' => true, 'ignore_sticky_posts' => true,
+				'post_type' => 'sfwd-courses', 'posts_per_page' => 8, 'no_found_rows' => true, 'ignore_sticky_posts' => true,
 				'tax_query' => array(array('taxonomy' => 'ld_course_category', 'field' => 'term_id', 'terms' => (int) $term->term_id)),
 			));
 			$courses = array();
@@ -468,7 +558,7 @@ function evented_nav_course_mega()
 			$tabs[] = array('id' => (int) $term->term_id, 'name' => (string) $term->name, 'url' => (string) $link, 'count' => (int) $term->count, 'courses' => $courses);
 		}
 	}
-	set_transient('evented_nav_course_mega', $tabs, 12 * HOUR_IN_SECONDS);
+	set_transient($cache_key, $tabs, 12 * HOUR_IN_SECONDS);
 	return $tabs;
 }
 
@@ -491,7 +581,10 @@ add_action('transition_post_status', function ($new_status, $old_status, $post) 
 		evented_nav_flush_cache(false);
 		return;
 	}
-	/* انتشار/برداشتن یک نوشته → تب‌های مقالات خانه باید تازه شوند (دسته‌ها ثابت می‌مانند) */
+	/* انتشار/برداشتن محتوا count دسته‌های منو را تغییر می‌دهد. */
+	if ('publish' === $new_status || 'publish' === $old_status) {
+		evented_nav_flush_cache(false);
+	}
 	if ('post' === $post->post_type && ('publish' === $new_status || 'publish' === $old_status)) {
 		evented_home_tabs_flush_posts();
 	}

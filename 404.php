@@ -24,7 +24,7 @@ $ee_404_courses = function_exists('evented_latest_courses') ? evented_latest_cou
 			<form class="ee-search-inline ee-404-search" role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
 				<label class="screen-reader-text" for="ee-404-s"><?php esc_html_e('جستجو', 'evented-edu'); ?></label>
 				<input id="ee-404-s" type="search" name="s" placeholder="<?php esc_attr_e('جستجو در دوره‌ها و مقالات...', 'evented-edu'); ?>">
-				<button type="submit"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg></button>
+				<button type="submit" aria-label="<?php esc_attr_e('جستجو', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg></button>
 			</form>
 
 			<div class="ee-404-links">

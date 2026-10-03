@@ -58,7 +58,7 @@ $ee_icons = array('level' => 'signal_cellular_alt', 'price' => 'sell', 'status' 
 			<div class="ee-fside-box is-search">
 				<label class="ee-fside-search">
 					<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
-					<input type="search" name="s" value="<?php echo esc_attr($ee_search); ?>" placeholder="<?php esc_attr_e('جستجو در دوره‌ها…', 'evented-edu'); ?>" autocomplete="off">
+					<input type="search" name="s" value="<?php echo esc_attr($ee_search); ?>" placeholder="<?php esc_attr_e('جستجو در دوره‌ها…', 'evented-edu'); ?>" aria-label="<?php esc_attr_e('جستجو در دوره‌ها', 'evented-edu'); ?>" autocomplete="off">
 					<?php if ('' !== $ee_search) : ?><a class="ee-fside-clear" href="<?php echo esc_url(remove_query_arg(array('s', 'post_type'))); ?>" aria-label="<?php esc_attr_e('پاک کردن جستجو', 'evented-edu'); ?>"><svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-close"></use></svg></a><?php endif; ?>
 				</label>
 			</div>

@@ -12,8 +12,14 @@ $current_user_id = get_current_user_id();
 $fav_courses_str = get_user_meta( $current_user_id, 'fav_courses', true );
 $wishlist_courses = $fav_courses_str ? explode(',', $fav_courses_str) : array();
 
-// پاکسازی آرایه برای جلوگیری از آیدی‌های خالی
-$wishlist_courses = array_filter( array_map( 'intval', $wishlist_courses ) );
+// پاکسازی آرایه و حذف دوره‌های حذف‌شده/منتشرنشده تا حالت خالی درست نمایش داده شود.
+$wishlist_courses = array_values(array_filter(array_map('intval', $wishlist_courses), static function ($course_id) {
+    return 'sfwd-courses' === get_post_type($course_id) && 'publish' === get_post_status($course_id);
+}));
+$wishlist_courses = array_reverse($wishlist_courses);
+if (function_exists('evented_panel_prime_courses')) {
+    evented_panel_prime_courses($wishlist_courses);
+}
 
 // تولید Nonce برای امنیت درخواست‌های ایجکس
 $wishlist_nonce = wp_create_nonce( 'wishlist_nonce' );
@@ -21,7 +27,7 @@ $wishlist_nonce = wp_create_nonce( 'wishlist_nonce' );
 get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current' => 'wishlist', 'ee_panel_title' => 'علاقه‌مندی‌ها')); ?>
         <!-- Search Bar -->
         <div class="search-bar">
-            <input type="text" id="wishlist-search" placeholder="جستجو دوره ها">
+            <input type="search" id="wishlist-search" placeholder="جستجو در علاقه‌مندی‌ها" aria-label="جستجو در علاقه‌مندی‌ها">
             <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7.92037 15.8407C3.55451 15.8407 0 12.2862 0 7.92037C0 3.55451 3.55451 0 7.92037 0C12.2862 0 15.8407 3.55451 15.8407 7.92037C15.8407 12.2862 12.2862 15.8407 7.92037 15.8407ZM7.92037 1.15908C4.18814 1.15908 1.15908 4.19586 1.15908 7.92037C1.15908 11.6449 4.18814 14.6817 7.92037 14.6817C11.6526 14.6817 14.6817 11.6449 14.6817 7.92037C14.6817 4.19586 11.6526 1.15908 7.92037 1.15908Z" fill="#444444"/>
                 <path d="M16.0342 16.6134C15.8874 16.6134 15.7405 16.5593 15.6246 16.4434L14.0792 14.8979C13.8551 14.6738 13.8551 14.3029 14.0792 14.0788C14.3033 13.8547 14.6742 13.8547 14.8983 14.0788L16.4437 15.6243C16.6678 15.8484 16.6678 16.2193 16.4437 16.4434C16.3278 16.5593 16.181 16.6134 16.0342 16.6134Z" fill="#444444"/>
@@ -36,15 +42,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                 <?php 
                 if ( ! empty( $wishlist_courses ) ) : 
                     
-                    // برعکس کردن آرایه تا دوره‌هایی که جدیدتر اضافه شده‌اند بالاتر نمایش داده شوند
-                    $wishlist_courses = array_reverse( $wishlist_courses );
-
-                    foreach ( $wishlist_courses as $course_id ) : 
-                        
-                        if ( get_post_type( $course_id ) !== 'sfwd-courses' || get_post_status( $course_id ) !== 'publish' ) {
-                            continue;
-                        }
-
+                    foreach ($wishlist_courses as $course_id) :
                         $course_title = get_the_title( $course_id );
                         $course_link = get_permalink( $course_id );
                         $author_id = get_post_field( 'post_author', $course_id );
@@ -65,14 +63,14 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                     <div class="course-card wishlist-item" data-title="<?php echo esc_attr($course_title); ?>">
                         
                         <!-- دکمه حذف از علاقه‌مندی‌ها با کلاس یکسان -->
-                        <button class="remove-from-wishlist ee-u-remove-fab" data-course-id="<?php echo esc_attr($course_id); ?>" title="حذف از علاقه‌مندی‌ها">
+                        <button type="button" class="remove-from-wishlist ee-u-remove-fab" data-course-id="<?php echo esc_attr($course_id); ?>" title="حذف از علاقه‌مندی‌ها" aria-label="<?php echo esc_attr('حذف «' . $course_title . '» از علاقه‌مندی‌ها'); ?>">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
                         </button>
 
                         <a href="<?php echo esc_url($course_link); ?>" class="ee-u-plain-link">
                             <div class="card-header">
                                 <div class="image-placeholder">
-                                    <img src="<?php echo esc_url($course_thumbnail); ?>" />
+                                    <img src="<?php echo esc_url($course_thumbnail); ?>" alt="<?php echo esc_attr($course_title); ?>" loading="lazy" decoding="async">
                                 </div>
                             </div>
                             <div class="card-body">

@@ -1,102 +1,68 @@
-# TODO — تسک‌های باز، باگ‌های شناخته‌شده و چک‌لیست‌ها
+# TODO — وضعیت کارها و کنترل انتشار
 
-> این فایل لیست عملیاتی کارهاست (منبع: بازبینی کامل کد). هر آیتم شامل محل دقیق و راه‌حل پیشنهادی است.
-> برای شرح عمیق‌ترِ «چرا» به `TECH_DEBT.md` و برای اولویت‌بندی فازها به `ROADMAP.md` مراجعه کنید.
+> این فایل پس از ممیزی کامل کد در ۱۴۰۵/۰۷ با وضعیت واقعی مخزن هماهنگ شده است. شرح معماری در `ARCHITECTURE.md` و بدهی‌های باقی‌مانده در `TECH_DEBT.md` است.
 
-## ۱. بحرانی (P0 — باید قبل از انتشار/استقرار جدید حل شود)
+## ۱. امنیت و احراز هویت — انجام‌شده
 
-- [ ] **محافظت از فراخوانی تابع بله** — `inc/login.php` در دو نقطه `falnic_send_otp_with_bale($mobile, $otp)` را بدون `function_exists` صدا می‌زند؛ در نبودِ آن (mu-plugin/افزونه) Fatal Error رخ می‌دهد.
-  راه‌حل: `if (function_exists('falnic_send_otp_with_bale')) { falnic_send_otp_with_bale(...); }`
-- [ ] **escape کردن `redirect_to`** — `page-login.php` (۳ نقطهٔ فعال + ۱ نمونهٔ کامنت‌شده در inline JS):
-  `window.location.href = '<?= $_GET['redirect_to'] ?? home_url(); ?>'` — باید `esc_url_raw()` + `esc_js()` شود (و باگ double-encode ناشی از `urlencode` در `FalnicAuthHandler::redirect_login_url` هم رفع شود).
-- [ ] **الزام تأیید OTP در ساخت حساب** — `handle_save_user_register_name` (`inc/login.php`) بدون بررسی `fl_otp_verified` با دانستن nonce کاربر می‌سازد.
-- [x] **اعتبارنامهٔ SMS در سورس** — به تنظیمات قالب (تب پیامک) / ثابت‌های `EVENTED_SMS_*` منتقل شد.
-- [x] **دکمهٔ «انتخاب تصویر» در تنظیمات قالب** — بازتولید با jsdom روی HTML رندرشدهٔ واقعی: دو مسیر شکست بی‌صدا (early-return اسکریپت و `ReferenceError` در نبود `wp.media`) رفع شد، به‌همراه افزودن اسلایدر ناقص (کپی `innerHTML` به‌جای کل ردیف)، جایگزین ورود دستی نشانی و watchdog صفحه.
-- [x] **لوگوی سفارشی در فوتر بدون استایل** — قواعد `.ee-logo-img` اضافه شد.
-- [x] **لینک‌های سخت‌کد سایدبار پنل** — شش لینک `/panel/…` به `home_url()` تبدیل شد.
-- [x] **انتقال هاردکدهای دامنه** — هیچ `edu.falnic.com` / `themes/edu-falnic` در کد نمانده (CI با `bin/lint.sh` جلوی بازگشت آن را می‌گیرد).
+- [x] فراخوانی بله با wrapper محافظت‌شده و پشتیبانی از نام legacy؛ نبود provider باعث Fatal Error نمی‌شود.
+- [x] اعتبارسنجی و خروجی امن `redirect_to` و حذف double-encode در صفحهٔ ورود و فیلتر `login_url`.
+- [x] الزام OTP معتبر، تازه و متعلق به همان شماره/هدف برای ساخت حساب، تعیین رمز و بازیابی رمز.
+- [x] اصلاح لاگین خودکار پس از `wp_set_password()` با استفاده از شیء کاربر واقعی.
+- [x] rate-limit ورود با رمز (۵ تلاش در ۱۵ دقیقه برای ترکیب شماره و IP) با پیام عمومی ضد user-enumeration.
+- [x] سخت‌سازی نشست OTP: نام اختصاصی، strict mode، cookie-only، HttpOnly، Secure روی HTTPS، SameSite=Lax و regeneration پس از تأیید.
+- [x] یکسان‌سازی ارقام فارسی/عربی موبایل و اعتبارسنجی سمت سرور.
+- [x] یکسان‌سازی قانون رمز فرم و سرور: حداقل ۸ کاراکتر، حروف کوچک/بزرگ، عدد و نویسهٔ ویژه.
+- [x] الزام رمز فعلی برای تغییر رمز از پنل.
+- [x] whitelist فیلدهای پروفایل/تنظیمات و اعتبارسنجی course ID در علاقه‌مندی و دیدگاه.
+- [x] تکمیل درس فقط از API عمومی LearnDash، بعد از کنترل رابطهٔ درس/دوره و دسترسی ثبت‌نام؛ دستکاری مستقیم متای پیشرفت حذف شد.
+- [x] انتقال اعتبارنامهٔ SMS به تنظیمات/ثابت‌های `EVENTED_SMS_*`.
 
-## ۲. امنیت (Security)
+## ۲. باگ‌های عملکردی — انجام‌شده
 
-- [ ] **Rate limit برای ورود با رمز** — `falnic_login_user` محدودیت ندارد (فقط OTP ترنزینت ۶۰ثانیه دارد).
-- [ ] **بهبود سشن** — `session_start()` در قالب بدون نام/تنظیمات امن؛ جایگزینی/سخت‌سازی بررسی شود.
-- [ ] **بررسی مجدد whitelist فیلدهای** `save_user_profile`/`save_account_settings` (nonce + current_user هست؛ whitelist نسبی است).
+- [x] ریدایرکت صفحات پنل و گارد مهمان بدون پسوند `.php`.
+- [x] fallback واقعی `index.php` و قالب‌های مستقل archive/home/search.
+- [x] رفع toast موفقیت بی‌قیدوشرط و کد نمونهٔ غیرقابل‌دسترسی در ورود.
+- [x] ورود مدیران از `wp-login.php` بدون گرفتار شدن در ریدایرکت `/login`.
+- [x] متاباکس رسمی صوت و پیوست درس (`_lesson_audio_url` و `_lesson_attachments`).
+- [x] افزودن TTF واقعی Vazirmatn Regular/Bold، OTL/RTL و خانوادهٔ cache-safe به mPDF گواهینامه.
+- [x] انتقال خودکار وابستگی production از `vendor/` توسعه به `inc/lib/` در ZIP رسمی؛ Composer روی سرور لازم نیست.
+- [x] fallback مستقل HTML/A4 برای چاپ یا ذخیره PDF در صورت حذف/مسدودشدن mPDF توسط هاست.
+- [x] تست تولید PDF فارسی از staging نهایی و الزام وجود autoloader/mPDF/TTF در بستهٔ Release.
 
-## ۳. باگ‌های عملکردی (Functional)
+## ۳. صفحهٔ اصلی و محتوای داینامیک — انجام‌شده
 
-- [x] **ریدایرکت اشتباه `panel/certificates.php`** — رفع شد (همهٔ قالب‌های پنل به `/login?redirect_to=` صفحهٔ خودشان می‌روند).
-- [x] **redirect_to های دارای `.php`** — در `panel/my-courses.php`, `panel/payments.php`, `panel/wishlist.php`, `panel/settings.php` مقدار `.../panel/xxx.php` است (باید بدون `.php`).
-- [x] **`page-panel.php` خالی** — کاربر لاگین‌شده را به `/panel/my-courses` ریدایرکت می‌کند؛ همچنین باگ‌های باز نشدن صفحات پنل (نبود `global $wpdb` در داشبورد، include نسبی سایدبار و بارگذاری‌نشدن `panel.css` برای قالب‌های `panel/*`) رفع شد.
-- [x] **`index.php` باکس دیباگ** — با یک قالب بازگشتی واقعی جایگزین شد؛ آرشیو/برگهٔ نوشته‌ها/جستجو هم به `archive.php`/`home.php`/`search.php` منتقل شدند.
-- [ ] **لاگین با OTP برای کاربر موجود → `wp_set_current_user($user->ID)` روی null** در `handle_register_user` (چون `wp_set_password` id برنمی‌گرداند) — تست و اصلاح.
-- [x] **`falnic_submit_cta`** — hook و کد مرتبط دیگر در پروژه وجود ندارد (حذف شده).
-- [x] **`author.php` لینک فیسبوک** — قالب بازنویسی شد؛ شبکه‌های اجتماعی از `evented_instructor_data()` (کلیدهای `youtube`/`linkedin`/`instagram`/`facebook` در user meta) خوانده می‌شوند.
-- [x] **`author.js`** — دیگر enqueue نمی‌شود (قالب مدرس با پوستهٔ ee-* بازنویسی شد)؛ فایل باقی‌مانده مرده است و می‌توان حذفش کرد.
-- [x] **settings.php نمایش ایمیل جعلی** — ایمیل‌های placeholder (شروع با `09`) خالی نمایش داده می‌شوند تا کاربر ایمیل واقعی ثبت کند.
-- [ ] **toast موفقیت بی‌قیدوشرط در صفحهٔ لاگین** — بعد از `falnic_reset_password`/`falnic_register_user` بدون بررسی پاسخ سرور پیام موفقیت می‌آید.
-- [x] **دوره‌های مرتبط بدون فیلتر دسته** — در قالب جدید دوره از `evented_related_courses()` استفاده می‌شود: `tax_query` روی `ld_course_category` فعال است و اگر دوره دسته نداشت، به آخرین دوره‌ها برمی‌گردد.
+- [x] دسته‌های دوره و کاتالوگ از `ld_course_category` و دوره‌های واقعی، همراه با AJAX «بارگذاری بیشتر».
+- [x] اساتید از کاربران نقش `group_leader`.
+- [x] آخرین/ویژه/تب‌های مقالات از نوشته‌ها و دسته‌های وردپرس.
+- [x] تجربهٔ دانشجویان از آخرین دیدگاه‌های تأییدشدهٔ دارای `review_rating` روی دوره‌ها.
+- [x] اسلایدر، متون، CTA، سه گام، شبکه‌ها و نشانی‌ها از تنظیمات قالب.
+- [x] فیلتر واقعی دوره‌ها بر اساس سطح، قیمت، وضعیت، مدرس، امتیاز و مرتب‌سازی.
+- [x] حذف بلوک دورهٔ قدیمی داخل `if (false)`، دادهٔ نمونهٔ login، بلاک نویسندهٔ خاموش و کدهای کامنت‌شدهٔ گواهینامه؛ CSS/JS ورود نیز به asset مستقل منتقل شد.
 
-## ۴. Asset های مفقود / خالی (404 / بی‌اثر)
+## ۴. دارایی‌ها و پاک‌سازی — انجام‌شده
 
-| فایل | وضعیت | پیشنهاد |
-|---|---|---|
-| ~~`assets/js/archive-post.js`~~ | ✅ enqueue حذف شد (رفتار آرشیو در `evented-home.js`) | — |
-| ~~`assets/js/single-post.js`~~ | ✅ enqueue حذف شد | — |
-| ~~`assets/css/single-post.css`~~ | ✅ ساخته شد (استایل تک‌نوشته) | — |
-| ~~`assets/css/single-page.css`~~ | ✅ شرط enqueue حذف شد (برگه‌ها از `ee-courses.css` استفاده می‌کنند) | — |
-| ~~`assets/css/archive-product.css`~~ | ✅ شرط enqueue حذف شد (۴۰۴ در همهٔ برگه‌ها رفع شد) | — |
-| ~~`assets/css/archive-post.css`~~ | ✅ پر شد (استایل آرشیو نوشته‌ها) | — |
-| ~~`screenshot.png`~~ | ✅ تصویر واقعی ۱۲۰۰×۹۰۰ (رندر واقعی هدر/هیرو/کارت‌های دوره) اضافه شد | — |
-| ~~`assets/css/photoswipe.min .css`~~ | ✅ حذف شد | — |
-| ~~`images/default-cat.jpg`~~ | ✅ در `page-courses-cat.php` حذف شد؛ کارت دستهٔ بدون تصویر آیکن Material می‌گیرد | — |
-| ~~`assets/fonts/DanaVF.ttf`~~ | ✅ captcha حذف شد | — |
-| ~~فونت FontAwesome~~ | ✅ `author.php` بازنویسی شد و از Material Symbols استفاده می‌کند | — |
+- [x] CSS/JSهای مفقود و کتابخانه‌های مرده (Plyr، PhotoSwipe، Owl و jQuery فرانت) حذف شده‌اند.
+- [x] فونت‌ها و آیکن‌های رابط محلی‌اند و درخواست خارجی style/script مسدود می‌شود.
+- [x] فایل‌های صفر‌بایتی تصادفی ریشه (`0,`، `A4-L,`، `true,` و مشابه) حذف شدند.
+- [x] `panel.css` به پالت و شل `ee-*` نزدیک و دارایی‌های پنل شرطی شده‌اند.
+- [x] syntax فایل‌های JS و توازن آکولاد CSS بررسی شد.
+- [x] CI روی PHP 7.4/8.1/8.3، JS و CSS در `.github/workflows/lint.yml` فعال است.
 
-> Plyr، PhotoSwipe، Owl، `main.js`، `front-page.css/js`، `single-courses.css/js`، `author.js/css` و `archive-courses.css` حذف شدند؛ فرانت‌اند بدون jQuery است.
+## ۵. کارایی، واکنش‌گرایی و پنل — انجام‌شده در کد
 
-## ۵. کد مرده / غیرفعال (Dead Code)
+- [x] preload فونت/LCP، defer اسکریپت‌ها، حذف emoji و cache داده‌های سنگین صفحهٔ اصلی.
+- [x] بارگذاری Jalali Date Picker فقط در پروفایل، حذف `ORDER BY RAND()` و محدودسازی رندر dashboard.
+- [x] صفحه‌بندی دوره‌ها و تراکنش‌ها، prime کردن object cache و نمایش وضعیت‌های کامل تراکنش.
+- [x] ناوبری موبایل پنل و breakpointهای 320 تا 1440 با target لمسی و مودال واکنش‌گرا.
+- [x] تست static و چک‌لیست QA/Lighthouse/staging/rollback در `docs/QA-RELEASE-CHECKLIST.md`.
+- [x] smoke test واقعی WordPress برای مسیرها/AJAX و integration واقعی `Theme_Upgrader` روی Playground disposable.
 
-- [x] `inc/captcha.php` حذف شد؛ `captcha_verify()` هم از `inc/login.php` حذف شد.
-- [ ] بخش «وبینار پیش رو» در `front-page.php` داخل `if (false) {}`.
-- [x] PhotoSwipe حذف شد.
-- [x] `assets_functions.php` بازنویسی شد (فقط دارایی‌های پنل).
-- [x] `Untitled-1.json` حذف شد؛ Schema.org اکنون در `inc/seo.php` تولید می‌شود.
-- [x] `single-courses.css/js` حذف شدند.
-- [ ] کلیدهای پادکست درس (`_lesson_audio`/`_lesson_audio_url`/`sfwd-lessons_lesson_audio_url`) و پیوست‌ها (`_lesson_attachments`) بر اساس کلیدهای سفارشی این قالب حدس زده شده‌اند؛ باید با دادهٔ واقعی سایت بررسی و در صورت نیاز متاباکس رسمی اضافه شود.
-- [ ] اسکریپت particle canvas کامنت‌شده در `front-page.php`.
-- [x] متغیر/کلاس بلااستفاده (`FalnicAuthHandler::$crm_guids`) دیگر در login.php وجود ندارد.
+## ۶. مستندات و انتشار
 
-## ۶. استاتیک‌هایی که باید داینامیک شوند
+- [x] `README.md`، `ARCHITECTURE.md`، `TECH_DEBT.md`، `TODO.md` و `CHANGELOG.md` با وضعیت کد هماهنگ شدند.
+- [x] PR شمارهٔ ۲ قبلاً در `main` ادغام شده است.
+- [ ] آزمون پذیرش روی staging دارای WordPress + LearnDash واقعی + جدول تراکنش + سرویس پیامک آزمایشی.
+- [ ] اجرای `composer install --no-dev --optimize-autoloader` در artifact استقرار.
+- [ ] ساخت release/tag فقط پس از موفقیت آزمون staging؛ این عملیات نباید صرفاً از داخل قالب و بدون تأیید محیط تولید انجام شود.
 
-- [ ] دسته‌بندی‌ها (۸ کارت) در `front-page.php` — هاردکد با لینک دستی.
-- [ ] اساتید (۲ کارت: علی کاظمی/محمد نصیری) در `front-page.php`.
-- [ ] نظرات/تجربیات (۴ کارت) در `front-page.php`.
-- [x] مقالات در `author.php` — از کوئری اصلی بایگانی نویسنده چاپ می‌شوند.
-- [ ] مقالات (۶ کارت به `falnic.com/blog`) در `front-page.php`.
-- [x] سایدبار دسته/فهرست‌ها واقعی شد (`template-parts/lms/courses-sidebar.php`: جستجو، دسته‌ها با شمار دوره‌ها، آخرین دوره‌ها، اشتراک‌گذاری).
-- [ ] فیلتر/مرتب‌سازی پیشرفته (سطح، مدت، قیمت) در بایگانی دوره و فهرست اساتید — هنوز پیاده نشده.
-
-## ۷. مستندات/کیفیت
-
-- [ ] تکمیل پوشش‌دهی هر تغییر جدید در `CHANGELOG.md`.
-- [ ] به‌روزرسانی جدول «کلیدهای متا» در `ARCHITECTURE.md` هنگام افزودن فیلد جدید.
-- [x] افزودن تست خودکار — `.github/workflows/lint.yml` + `bin/lint.sh` (php -l روی PHP 7.4/8.1/8.3، node --check، توازن CSS، الگوهای ممنوع).
-
-## پاک‌سازی ۱۴۰۵/۰۶ (انجام‌شده)
-
-- [x] `assets/css/panel.css` هرس شد (۱۶۸۸ → ۱۳۷۵ خط؛ قوانین کلاس‌های بلااستفاده و بلوک‌های کامنت‌شده حذف شدند).
-- [x] `style=""`های ایستا در قالب‌ها به کلاس‌های ابزاری `ee-u-*` (در `ee-shell.css`) تبدیل شدند؛ فقط مقادیر پویا (درصد پیشرفت، `--p`، `--c`، `background-image`) inline مانده‌اند.
-- [x] کد مردهٔ `captcha_verify()` حذف شد.
-- [x] `screenshot.png` واقعی ۱۲۰۰×۹۰۰.
-- [ ] ادامهٔ بازطراحی `panel.css` به زبان بصری `ee-*`.
-- [x] CI برای `php -l` (`bin/lint.sh`).
-
-## دور ۱۴۰۵/۰۶ — تکمیل باقی‌مانده‌ها
-- [x] سختی‌سازی کلاینت SMS (timeout/لاگ).
-- [x] whitelist فیلدهای profile/settings و wishlist.
-- [x] متاباکس واقعی رسانهٔ درس.
-- [x] متن‌های ایستای front-page (۳ گام) → تنظیمات قالب؛ پیش‌فرض‌ها با حوزهٔ سایت هماهنگ شد.
-- [x] panel.css به پالت ee-*.
-- [ ] `session_start` در inc/login.php — طبق تصمیم، کد ورود قالب دست نمی‌خورد (افزونهٔ جداگانه).
-- [ ] تست روی staging با LearnDash واقعی.
-- [ ] Merge PR #2 و تگ ریلیز 2.1.0.
+دو مورد آخر **کار اجرایی محیط استقرار** هستند و تغییر کد محسوب نمی‌شوند. مالک استقرار باید آن‌ها را هنگام انتشار تأیید کند.

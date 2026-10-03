@@ -18,35 +18,35 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>نام (فارسی)</label>
-                        <input type="text" name="first_name_fa" class="form-control" data-ee-script="fa" inputmode="text" lang="fa" pattern="[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\u200c]*" title="فقط حروف فارسی/عربی" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_fa', true)); ?>" placeholder="نام خود را به فارسی وارد کنید">
+                        <label for="eeFirstNameFa">نام (فارسی)</label>
+                        <input type="text" id="eeFirstNameFa" name="first_name_fa" class="form-control" data-ee-script="fa" inputmode="text" lang="fa" pattern="[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\u200c]*" title="فقط حروف فارسی/عربی" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_fa', true)); ?>" placeholder="نام خود را به فارسی وارد کنید">
                     </div>
                     <div class="form-group">
-                        <label>نام خانوادگی (فارسی)</label>
-                        <input type="text" name="last_name_fa" class="form-control" data-ee-script="fa" inputmode="text" lang="fa" pattern="[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\u200c]*" title="فقط حروف فارسی/عربی" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_fa', true)); ?>" placeholder="نام خانوادگی خود را به فارسی وارد کنید">
+                        <label for="eeLastNameFa">نام خانوادگی (فارسی)</label>
+                        <input type="text" id="eeLastNameFa" name="last_name_fa" class="form-control" data-ee-script="fa" inputmode="text" lang="fa" pattern="[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\u200c]*" title="فقط حروف فارسی/عربی" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_fa', true)); ?>" placeholder="نام خانوادگی خود را به فارسی وارد کنید">
                     </div>
                     
                     <div class="form-group">
-                        <label>نام (انگلیسی)</label>
-                        <input type="text" name="first_name_en" class="form-control" data-ee-script="en" lang="en" pattern="[A-Za-z\s\.\-']*" title="فقط حروف انگلیسی" autocapitalize="words" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_en', true)); ?>" placeholder="نام خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
+                        <label for="eeFirstNameEn">نام (انگلیسی)</label>
+                        <input type="text" id="eeFirstNameEn" name="first_name_en" class="form-control" data-ee-script="en" lang="en" pattern="[A-Za-z\s\.\-']*" title="فقط حروف انگلیسی" autocapitalize="words" value="<?php echo esc_attr(get_user_meta($user_id, 'first_name_en', true)); ?>" placeholder="نام خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
                     </div>
                     <div class="form-group">
-                        <label>نام خانوادگی (انگلیسی)</label>
-                        <input type="text" name="last_name_en" class="form-control" data-ee-script="en" lang="en" pattern="[A-Za-z\s\.\-']*" title="فقط حروف انگلیسی" autocapitalize="words" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_en', true)); ?>" placeholder="نام خانوادگی خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
+                        <label for="eeLastNameEn">نام خانوادگی (انگلیسی)</label>
+                        <input type="text" id="eeLastNameEn" name="last_name_en" class="form-control" data-ee-script="en" lang="en" pattern="[A-Za-z\s\.\-']*" title="فقط حروف انگلیسی" autocapitalize="words" value="<?php echo esc_attr(get_user_meta($user_id, 'last_name_en', true)); ?>" placeholder="نام خانوادگی خود را به انگلیسی وارد کنید" dir="ltr" style="text-align: right;">
                     </div>
 
                     <div class="form-group">
-                        <label>جنسیت</label>
+                        <label for="eeGender">جنسیت</label>
                         <?php $gender = get_user_meta($user_id, 'gender', true); ?>
-                        <select name="gender" class="form-control">
+                        <select id="eeGender" name="gender" class="form-control">
                             <option value="" disabled <?php echo !$gender ? 'selected' : ''; ?>>انتخاب</option>
                             <option value="male" <?php echo $gender == 'male' ? 'selected' : ''; ?>>مرد</option>
                             <option value="female" <?php echo $gender == 'female' ? 'selected' : ''; ?>>زن</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>تاریخ تولد</label>
-                        <input type="text" name="birth_date" class="form-control" value="<?php echo esc_attr(get_user_meta($user_id, 'birth_date', true)); ?>" placeholder="مثال: 1370/01/01" data-jdp>
+                        <label for="eeBirthDate">تاریخ تولد</label>
+                        <input type="text" id="eeBirthDate" name="birth_date" class="form-control" inputmode="numeric" autocomplete="bday" value="<?php echo esc_attr(get_user_meta($user_id, 'birth_date', true)); ?>" placeholder="مثال: 1370/01/01" data-jdp>
                     </div>
                 </div>
 
@@ -57,7 +57,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
                             <path d="M12 8V13" stroke="#00966D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M11.9941 16H12.0031" stroke="#00966D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        اطلاعات گواهی‌نامه پس از ثبت، قابل تغییر نخواهد بود.
+                        نام‌های فارسی و انگلیسی روی گواهینامه درج می‌شوند؛ پیش از ذخیره آن‌ها را دقیق بررسی کنید.
                     </div>
                     <button type="submit" class="btn-submit">ذخیره اطلاعات</button>
                 </div>

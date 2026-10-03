@@ -211,6 +211,29 @@ a.ee-cat-chip:hover i { background: #fff; }
 .ee-ct-empty { grid-column: 1 / -1; text-align: center; padding: 2.2rem 1rem; background: #fff; border: 1px dashed var(--ee-line); border-radius: 1.4rem; color: var(--ee-soft); font-size: .84rem; }
 .ee-ct-empty .ee-ic { display: block; margin: 0 auto .4rem; font-size: 2.2rem; color: var(--ee-teal); }
 .ee-ct-error { grid-column: 1 / -1; text-align: center; padding: 1.2rem; background: var(--ee-roseL); border-radius: 1.2rem; color: #9d174d; font-size: .8rem; }
+
+/* سربرگ و کارت‌های کاتالوگ روی موبایل باریک */
+@media (max-width: 639.98px) {
+    .ee-catalog { margin-top: 1.35rem; padding-block: 1.6rem 1.8rem; }
+    .ee-ct-head, .ee-ct-heading { min-width: 0; }
+    .ee-ct-head { gap: .7rem; margin-bottom: 1rem; }
+    .ee-ct-kicker { max-width: 100%; font-size: .66rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ee-ct-title {
+        max-width: 100%; margin-block: .45rem .2rem; font-size: clamp(.88rem, 4.25vw, 1.02rem); line-height: 1.6;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ee-ct-sub { font-size: .68rem; line-height: 1.75; }
+    .ee-ct-stats { gap: .45rem; }
+    .ee-ct-stat { min-width: 4rem; padding: .4rem .65rem; }
+    .ee-ct-stat b { font-size: 1rem; }
+    .ee-ct-tab { max-width: min(13rem, 78vw); font-size: .7rem; }
+    .ee-ct-tab-tx { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ee-ct-bar { gap: .55rem; }
+    .ee-ct-status { flex: 0 1 auto; min-width: 0; font-size: .66rem; overflow: hidden; text-overflow: ellipsis; }
+    .ee-cat-title { font-size: .82rem; line-height: 1.7; min-height: 3.4em; overflow-wrap: break-word; word-break: normal; }
+    .ee-cat-foot { min-width: 0; gap: .35rem; }
+    .ee-cat-price, .ee-cat-go { font-size: .68rem; }
+}
 .ee-ct-error button { font: inherit; font-weight: 800; color: #fff; background: #be185d; border: 0; padding: .35rem .9rem; border-radius: 999px; cursor: pointer; margin-inline-start: .5rem; }
 
 /* ---------- حرکت کمتر ---------- */
