@@ -32,13 +32,24 @@ jobs:
       - name: Test updater, certificate font, panel helpers and static QA
         run: |
           php tests/theme-updater-test.php
-          if php -r 'exit(PHP_VERSION_ID >= 80100 ? 0 : 1);'; then
-            composer install --no-interaction --prefer-dist --no-progress
-            php tests/certificate-font-test.php
-          fi
+          composer update --no-dev --no-interaction --prefer-dist --no-progress
+          php tests/certificate-font-test.php
           php tests/panel-helpers-test.php
           python3 tests/static-audit.py
-          bash bin/build-theme-release.sh /tmp/evented-edu.zip
+          if [[ "${{ matrix.php }}" == '8.3' ]]; then
+            bash bin/build-theme-release.sh /tmp/evented-edu.zip
+          fi
+
+      - name: Upload deployable theme package
+        if: matrix.php == '8.3'
+        uses: actions/upload-artifact@v5
+        with:
+          name: evented-edu-2.4.2
+          path: |
+            /tmp/evented-edu.zip
+            composer.lock
+          if-no-files-found: error
+          retention-days: 14
 
   wordpress-smoke:
     name: WordPress runtime smoke
@@ -52,6 +63,15 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: bin/dev-playground.sh
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer
+
+      - name: Install deployable PDF dependencies
+        run: composer update --no-dev --classmap-authoritative --no-interaction --prefer-dist --no-progress
 
       - name: Install visual-test browser
         run: |

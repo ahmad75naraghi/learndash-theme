@@ -16,7 +16,7 @@ defined('ABSPATH') || exit;
  */
 
 
-// Composer در محیط استقرار باید با `composer install --no-dev` نصب شده باشد.
+// بستهٔ رسمی قالب vendor/mPDF را همراه خود دارد؛ روی سرور Composer لازم نیست.
 $evented_autoload = get_template_directory() . '/vendor/autoload.php';
 if (file_exists($evented_autoload)) {
     require_once $evented_autoload;
