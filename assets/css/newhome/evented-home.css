@@ -74,6 +74,10 @@
 .ee-hero-feat > .ee-slider,
 .ee-hero-feat > .ee-feature { flex: 0 0 var(--ee-slider-height, 360px); height: var(--ee-slider-height, 360px); }
 .ee-slider .ee-feature { height: 100%; min-height: 0; }
+@media (min-width: 640px) and (max-width: 1023.98px) {
+    .ee-hero-feat > .ee-slider,
+    .ee-hero-feat > .ee-feature { flex-basis: var(--ee-slider-height-tablet, 320px); height: var(--ee-slider-height-tablet, 320px); }
+}
 @media (max-width: 639.98px) {
     .ee-hero-feat > .ee-slider,
     .ee-hero-feat > .ee-feature { flex-basis: var(--ee-slider-height-mobile, 260px); height: var(--ee-slider-height-mobile, 260px); }
@@ -86,6 +90,9 @@
     background: linear-gradient(135deg, var(--ee-tealL), #fff 55%, var(--ee-mint));
     display: flex; flex-direction: column; justify-content: flex-end;
     height: var(--ee-slider-height, 360px); min-height: 220px;
+}
+@media (min-width: 640px) and (max-width: 1023.98px) {
+    .ee-hero-feat .ee-feature { height: var(--ee-slider-height-tablet, 320px); min-height: 200px; }
 }
 @media (max-width: 639.98px) {
     .ee-hero-feat .ee-feature { height: var(--ee-slider-height-mobile, 260px); min-height: 180px; }

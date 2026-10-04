@@ -32,7 +32,7 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_script('ee-home-js', PATH_DIR_URL . '/assets/js/newhome/evented-home.js', array(), '1.4.0', true);
 
     if (is_front_page()) {
-        wp_enqueue_style('ee-home', PATH_DIR_URL . '/assets/css/newhome/evented-home.css', array('ee-shell'), '1.5.0');
+        wp_enqueue_style('ee-home', PATH_DIR_URL . '/assets/css/newhome/evented-home.css', array('ee-shell'), '1.5.1');
     } elseif (
         is_page_template(array('page-library.php', 'page-videos.php', 'page-gallery.php', 'page-download.php', 'page-podcast.php'))
         || is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))

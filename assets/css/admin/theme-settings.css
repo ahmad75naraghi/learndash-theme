@@ -5,14 +5,16 @@
 /* فیلد پنهان شناسهٔ پیوست — فقط برای JS است */
 .evented-settings-wrap .evented-slide-image-id { display: none; }
 .evented-slider-size {
-    display: grid; grid-template-columns: repeat(2, minmax(0, 15rem)); gap: .8rem 1.2rem;
+    display: grid; grid-template-columns: repeat(3, minmax(0, 15rem)); gap: .8rem 1.2rem;
     margin: 1rem 0; padding: 1rem; border: 1px solid #c3c4c7; border-radius: 10px; background: #fff;
 }
 .evented-slider-size legend { padding: 0 .4rem; font-weight: 700; }
 .evented-slider-size > label { display: grid; gap: .35rem; color: #1d2327; font-weight: 600; }
+.evented-slider-size > label small { color: #646970; font-weight: 400; }
 .evented-number-unit { display: inline-flex; align-items: center; gap: .4rem; font-weight: 400; }
 .evented-number-unit input { width: 6rem; direction: ltr; }
 .evented-slider-size .description { grid-column: 1 / -1; margin: 0; }
+@media (max-width: 900px) { .evented-slider-size { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .evented-slider-size { grid-template-columns: minmax(0, 1fr); }.evented-slider-size .description { grid-column: auto; } }
 
 .evented-slide-row {

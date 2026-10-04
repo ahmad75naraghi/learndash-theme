@@ -291,7 +291,7 @@ try {
             if (sliderUi.maxDotHeight > 10 || sliderUi.maxDotWidth > 24 || sliderUi.wrapHeight > 28) {
               report('failure', viewportName, route, `slider dots are oversized (${Math.round(sliderUi.maxDotWidth)}x${Math.round(sliderUi.maxDotHeight)}, wrapper ${Math.round(sliderUi.wrapHeight)}px)`);
             }
-            const expectedHeight = viewport.width <= 639 ? 260 : 360;
+            const expectedHeight = viewport.width <= 639 ? 260 : (viewport.width <= 1023 ? 320 : 360);
             if (Math.abs(sliderUi.featureHeight - expectedHeight) > 3) {
               report('failure', viewportName, route, `configured slider height was not applied (${Math.round(sliderUi.featureHeight)}px, expected ${expectedHeight}px)`);
             }
