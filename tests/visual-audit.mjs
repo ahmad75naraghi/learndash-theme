@@ -221,10 +221,30 @@ try {
               }).length;
               formEscapes ||= formRect.left < -2 || formRect.right > document.documentElement.clientWidth + 2;
             }
-            return { missing: false, forms: forms.length, fields: fieldsCount, overlapping, escapedControls, formEscapes };
+            const modern = document.querySelector('.wpProQuiz_text > .wpProQuiz_forms');
+            const modernFields = modern ? [...modern.querySelectorAll(':scope > fieldset')] : [];
+            const modernStyle = modern ? getComputedStyle(modern) : null;
+            const lastRect = modernFields.at(-1)?.getBoundingClientRect();
+            const modernRect = modern?.getBoundingClientRect();
+            return {
+              missing: false,
+              forms: forms.length,
+              fields: fieldsCount,
+              overlapping,
+              escapedControls,
+              formEscapes,
+              modernDisplay: modernStyle?.display || '',
+              modernColumns: modernStyle?.gridTemplateColumns.split(' ').length || 0,
+              modernFields: modernFields.length,
+              lastFieldRatio: lastRect && modernRect ? lastRect.width / modernRect.width : 0,
+            };
           });
-          if (formLayout.missing || formLayout.forms < 2 || formLayout.fields < 8) report('failure', viewportName, route, 'quiz participant form fixture is missing');
+          if (formLayout.missing || formLayout.forms < 2 || formLayout.fields < 14 || formLayout.modernFields !== 11) report('failure', viewportName, route, 'quiz participant form fixture is missing');
           else {
+            if (formLayout.modernDisplay !== 'grid') report('failure', viewportName, route, `quiz participant form uses ${formLayout.modernDisplay || 'no'} layout instead of grid`);
+            const expectedColumns = viewport.width <= 700 ? 1 : 2;
+            if (formLayout.modernColumns !== expectedColumns) report('failure', viewportName, route, `quiz form has ${formLayout.modernColumns} column(s), expected ${expectedColumns}`);
+            if (formLayout.lastFieldRatio < .8) report('failure', viewportName, route, 'odd final quiz field does not span the form width');
             if (formLayout.overlapping) report('failure', viewportName, route, 'quiz participant form fields overlap');
             if (formLayout.escapedControls) report('failure', viewportName, route, `${formLayout.escapedControls} quiz form control(s) escape the form`);
             if (formLayout.formEscapes) report('failure', viewportName, route, 'quiz participant form escapes viewport');

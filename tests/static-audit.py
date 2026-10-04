@@ -47,12 +47,12 @@ for path in (ROOT / "panel").glob("*.php"):
 
 required_snippets = {
     "assets/assets_functions.php": ["'profile' === $panel_section", "jalalidatepicker-js"],
-    "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.9.0'", "evented-home.css', array('ee-shell'), '1.5.0'"],
+    "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.9.0'", "evented-home.css', array('ee-shell'), '1.5.0'", "ee-lms.css', array('ee-shell'), '1.6.0'"],
     "assets/css/panel.css": ["@media (max-width: 359.98px)", ".ee-panel-pager", "Final containment layer", ".transactions-table", "overflow-x: auto"],
     "assets/css/login.css": ["width: min(960px, 100%)", "min-height: 100dvh", "@media (max-width: 420px)", ".otp-field"],
     "page-login.php": ["login.css?ver=1.1.0"],
     "assets/css/newhome/ee-courses.css": ["Narrow viewport hardening", "@media (max-width: 520px)", ".ee-cf-field", ".ee-page-body table"],
-    "assets/css/newhome/ee-lms.css": ["Keep LearnDash", ".ee-quiz-body table", ".ee-audio-row audio", "white-space: normal", "فرم اطلاعات شرکت‌کننده", ".wpProQuiz_forms fieldset", "grid-template-columns: repeat(2, minmax(0, 1fr))", ".wpProQuiz_formFields > label", ".wpProQuiz_forms > table", "table-layout: fixed", "font-size: 16px"],
+    "assets/css/newhome/ee-lms.css": ["Keep LearnDash", ".ee-quiz-body table", ".ee-audio-row audio", "white-space: normal", "فرم اطلاعات شرکت‌کننده", ".wpProQuiz_text > .wpProQuiz_forms", "> div:not(.wpProQuiz_forms)", ".wpProQuiz_forms fieldset:focus-within", "grid-template-columns: repeat(2, minmax(0, 1fr))", ".wpProQuiz_required::after", ".wpProQuiz_formFields > label", ".wpProQuiz_forms > table", "table-layout: fixed", ".learndash-quiz-review__button", "font-size: 16px"],
     "assets/css/single-post.css": ["Long editorial content", ".ee-post-body table", ".ee-comment-list .children", ".ee-podcast-player audio"],
     "assets/css/archive-post.css": ["Archive and resource cards", ".ee-arch-search", "overflow-wrap: break-word"],
     "panel/payments.php": ["LIMIT %d OFFSET %d", "evented_panel_pagination"],
