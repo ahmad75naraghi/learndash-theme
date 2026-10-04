@@ -974,7 +974,7 @@ a.ee-cur-item:hover .ee-cur-title { color: var(--ee-tealP); }
     flex: 0 0 auto; width: 1.05rem; height: 1.05rem; margin: 0; accent-color: var(--ee-tealP);
 }
 .ee-quiz-body .wpProQuiz_forms .wpProQuiz_required {
-    display: inline-flex; margin-inline-start: .25rem; color: #be123c; font-size: 0; font-weight: 700;
+    display: inline; margin-inline-start: .25rem; color: #be123c; font-size: 0; font-weight: 700;
 }
 .ee-quiz-body .wpProQuiz_forms .wpProQuiz_required::after { content: "الزامی"; font-size: .62rem; }
 .ee-quiz-body .wpProQuiz_forms .wpProQuiz_invalidate {

@@ -47,7 +47,7 @@ for path in (ROOT / "panel").glob("*.php"):
 
 required_snippets = {
     "assets/assets_functions.php": ["'profile' === $panel_section", "jalalidatepicker-js"],
-    "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.9.0'", "evented-home.css', array('ee-shell'), '1.5.1'", "ee-lms.css', array('ee-shell'), '1.6.1'"],
+    "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.9.0'", "evented-home.css', array('ee-shell'), '1.5.1'", "ee-lms.css', array('ee-shell'), '1.6.2'"],
     "assets/css/panel.css": ["@media (max-width: 359.98px)", ".ee-panel-pager", "Final containment layer", ".transactions-table", "overflow-x: auto"],
     "assets/css/login.css": ["width: min(960px, 100%)", "min-height: 100dvh", "@media (max-width: 420px)", ".otp-field"],
     "page-login.php": ["login.css?ver=1.1.0"],
