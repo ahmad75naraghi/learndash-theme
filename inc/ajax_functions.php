@@ -154,13 +154,13 @@ function handle_save_user_profile() {
     $only_fa = function ($v) { return trim(preg_replace('/[^\x{0600}-\x{06FF}\x{0750}-\x{077F}\x{FB50}-\x{FDFF}\x{FE70}-\x{FEFF}\s\x{200C}]/u', '', sanitize_text_field(wp_unslash((string) $v)))); };
     $only_en = function ($v) { return trim(preg_replace("/[^A-Za-z\s.\-']/", '', sanitize_text_field(wp_unslash((string) $v)))); };
     $birth_date = sanitize_text_field(wp_unslash((string) ($_POST['birth_date'] ?? '')));
-    $birth_date = function_exists('evented_normalize_digits') ? evented_normalize_digits($birth_date) : $birth_date;
+    $birth_date = function_exists('evented_jalali_latin_digits') ? evented_jalali_latin_digits($birth_date) : $birth_date;
     if ('' !== $birth_date) {
-        if (!preg_match('/^(\d{4})\/(\d{2})\/(\d{2})$/', $birth_date, $birth_parts)
-            || (int) $birth_parts[2] < 1 || (int) $birth_parts[2] > 12
-            || (int) $birth_parts[3] < 1 || (int) $birth_parts[3] > 31) {
+        $birth_parts = function_exists('evented_jalali_parse') ? evented_jalali_parse($birth_date) : false;
+        if (!$birth_parts) {
             wp_send_json_error('تاریخ تولد معتبر نیست؛ نمونهٔ صحیح: ۱۳۷۰/۰۱/۰۱');
         }
+        $birth_date = sprintf('%04d/%02d/%02d', $birth_parts['year'], $birth_parts['month'], $birth_parts['day']);
     }
     $fields = [
         'first_name_fa' => $only_fa($_POST['first_name_fa'] ?? ''),

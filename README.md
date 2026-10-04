@@ -78,6 +78,7 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 │   ├── resume.php                ادامهٔ یادگیری: آخرین درس، چیپ هدر، کارت پنل، یادآور کاربران غیرفعال (کرون)
 │   ├── pwa.php                   PWA: manifest، سرویس‌ورکر (/ee-sw.js)، صفحهٔ آفلاین، دکمهٔ نصب
 │   ├── notifications.php         اعلان‌ها: جدول {wp}_evented_notifications، REST، رویدادها، پیامک اختیاری
+│   ├── jalali.php               موتور مرکزی تاریخ شمسی، تبدیل دوطرفه، فرمت و فیلترهای امن
 │   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها) + هلپرهای LMS
 │   ├── certificates.php          گواهینامهٔ فارسی: mPDF بسته‌شده در inc/lib + fallback چاپی مستقل
 │   ├── navigation.php            منوی استاتیک هدر/فوتر/کشوی موبایل (کش هفتگی) + فیلتر بخش جستجو + تب‌های مقالات خانه
@@ -235,7 +236,7 @@ define('EVENTED_SMS_BODY_ID', 12345);
 
 1. مقدار `Version` در `style.css` افزایش یابد.
 2. بعد از merge، بسته با `bash bin/build-theme-release.sh /tmp/evented-edu.zip` ساخته شود.
-3. GitHub Release با tag هم‌نسخه (مثلاً `v2.4.10`) ساخته و فایل `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به آن پیوست شود.
+3. GitHub Release با tag هم‌نسخه (مثلاً `v2.5.0`) ساخته و فایل `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به آن پیوست شود.
 4. وجود `evented-edu/inc/lib/autoload.php`، کلاس `Mpdf\\Mpdf` و دو TTF گواهینامه در خود ZIP تأیید شود.
 5. در پیشخوان «تنظیمات قالب → بررسی دوباره» زده شود و نصب از صفحهٔ به‌روزرسانی‌های وردپرس انجام گیرد.
 

@@ -50,6 +50,7 @@ function evented_reports_admin_assets($hook)
 	if (false === strpos((string) $hook, 'evented-reports')) { return; }
 	wp_enqueue_style('evented-reports', PATH_DIR_URL . '/assets/css/admin/reports.css', array(), '1.0.0');
 	wp_enqueue_script('evented-reports', PATH_DIR_URL . '/assets/js/admin/reports.js', array(), '1.0.0', true);
+	if (function_exists('evented_enqueue_jalali_picker')) { evented_enqueue_jalali_picker(); }
 }
 add_action('admin_enqueue_scripts', 'evented_reports_admin_assets');
 
@@ -59,7 +60,7 @@ function evented_reports_date($timestamp, $with_time = true)
 	$timestamp = (int) $timestamp;
 	if ($timestamp < 1) { return '—'; }
 	$format = $with_time ? 'Y/m/d H:i' : 'Y/m/d';
-	return function_exists('wp_date') ? wp_date($format, $timestamp) : date_i18n($format, $timestamp);
+	return function_exists('evented_jalali_format') ? evented_jalali_format($timestamp, $format, true) : wp_date($format, $timestamp);
 }
 
 /** جلوگیری از اجرای فرمول هنگام بازشدن CSV در Excel. */
@@ -81,25 +82,18 @@ function evented_reports_filters($type)
 		'search'    => sanitize_text_field($get('s')),
 		'course_id' => absint($get('course_id')),
 		'quiz_id'   => 'quiz' === $type ? absint($get('quiz_id')) : 0,
-		'date_from' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_from) && evented_reports_filter_timestamp($date_from) ? $date_from : '',
-		'date_to'   => preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_to) && evented_reports_filter_timestamp($date_to, true) ? $date_to : '',
+		'date_from' => evented_reports_filter_timestamp($date_from) ? evented_jalali_persian_digits(str_replace('-', '/', evented_jalali_latin_digits($date_from))) : '',
+		'date_to'   => evented_reports_filter_timestamp($date_to, true) ? evented_jalali_persian_digits(str_replace('-', '/', evented_jalali_latin_digits($date_to))) : '',
 		'passed'    => 'quiz' === $type && in_array($passed, array('yes', 'no'), true) ? $passed : '',
 		'per_page'  => $per_page,
 		'paged'     => max(1, absint($get('paged'))),
 	);
 }
 
-/** تبدیل تاریخ میلادی فیلتر در timezone وردپرس به timestamp. */
+/** تبدیل ورودی شمسی فیلتر در timezone وردپرس به timestamp استاندارد. */
 function evented_reports_filter_timestamp($date, $end_of_day = false)
 {
-	try {
-		$time = DateTimeImmutable::createFromFormat('!Y-m-d H:i:s', $date . ($end_of_day ? ' 23:59:59' : ' 00:00:00'), wp_timezone());
-		$errors = DateTimeImmutable::getLastErrors();
-		if (false === $time || (is_array($errors) && ($errors['warning_count'] || $errors['error_count']))) { return 0; }
-		return $time->getTimestamp();
-	} catch (Exception $exception) {
-		return 0;
-	}
+	return function_exists('evented_jalali_to_timestamp') ? evented_jalali_to_timestamp($date, $end_of_day) : 0;
 }
 
 /** شرط‌های SQL مشترک؛ همهٔ مقادیر از prepare عبور می‌کنند. */
@@ -280,7 +274,7 @@ function evented_reports_filter_form($type, $filters)
 		<label><span>جستجو</span><input type="search" name="s" value="<?php echo esc_attr($filters['search']); ?>" placeholder="کاربر یا عنوان"></label>
 		<label><span>دوره</span><select name="course_id"><option value="0">همهٔ دوره‌ها</option><?php foreach ($courses as $course) : ?><option value="<?php echo (int) $course->ID; ?>"<?php selected($filters['course_id'], (int) $course->ID); ?>><?php echo esc_html($course->post_title); ?></option><?php endforeach; ?></select></label>
 		<?php if ('quiz' === $type) : ?><label><span>شناسه آزمون</span><input type="number" min="1" name="quiz_id" value="<?php echo $filters['quiz_id'] ?: ''; ?>" placeholder="مثلاً 123"></label><label><span>نتیجه</span><select name="passed"><option value="">همه</option><option value="yes"<?php selected($filters['passed'], 'yes'); ?>>قبول</option><option value="no"<?php selected($filters['passed'], 'no'); ?>>مردود</option></select></label><?php endif; ?>
-		<label><span>از تاریخ</span><input type="date" name="date_from" value="<?php echo esc_attr($filters['date_from']); ?>"></label><label><span>تا تاریخ</span><input type="date" name="date_to" value="<?php echo esc_attr($filters['date_to']); ?>"></label>
+		<label><span>از تاریخ شمسی</span><input type="text" name="date_from" value="<?php echo esc_attr($filters['date_from']); ?>" inputmode="numeric" placeholder="۱۴۰۵/۰۱/۰۱" data-jdp data-jalali-range="start"></label><label><span>تا تاریخ شمسی</span><input type="text" name="date_to" value="<?php echo esc_attr($filters['date_to']); ?>" inputmode="numeric" placeholder="۱۴۰۵/۱۲/۲۹" data-jdp data-jalali-range="end"></label>
 		<label><span>در هر صفحه</span><select name="per_page"><?php foreach (array(25,50,100,200) as $size) : ?><option value="<?php echo $size; ?>"<?php selected($filters['per_page'], $size); ?>><?php echo $size; ?></option><?php endforeach; ?></select></label>
 		<div class="ee-report-filter-buttons"><button class="button button-primary">اعمال فیلتر</button><a class="button" href="<?php echo esc_url(admin_url('admin.php?page=' . $page)); ?>">پاک کردن</a></div>
 	</form>

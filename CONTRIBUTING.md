@@ -77,7 +77,7 @@ screenshot.png
 ```json
 {
   "env": { "browser": true, "jquery": true, "es2020": true },
-  "globals": { "ajax_object": "readonly", "Plyr": "readonly", "jalaliDatepicker": "readonly" },
+  "globals": { "ajax_object": "readonly", "Plyr": "readonly", "jalaliDatepicker": "readonly", "EventedJalali": "readonly" },
   "rules": {
     "no-unused-vars": "warn",
     "no-undef": "error",

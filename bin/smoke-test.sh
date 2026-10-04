@@ -405,6 +405,8 @@ require_text "$tmp/reports-overview.html" 'گزارش تکمیل دوره‌ها
 fetch '/wp-admin/admin.php?page=evented-reports-courses' "$tmp/reports-courses.html"
 require_text "$tmp/reports-courses.html" 'دورهٔ گزارش آزمایشی' 'completed course fixture is missing from reports'
 require_text "$tmp/reports-courses.html" 'reports.css?ver=1.0.0' 'reports stylesheet was not enqueued'
+require_text "$tmp/reports-courses.html" 'data-jalali-range="start"' 'Jalali report range start is missing'
+require_text "$tmp/reports-courses.html" 'jalali-loader.js?ver=1.0.0' 'conditional Jalali picker was not enqueued on reports'
 require_text "$tmp/reports-courses.html" 'خروجی CSV برای Excel' 'server-side CSV action is missing'
 fetch '/wp-admin/admin.php?page=evented-reports-quizzes&quiz_id=999999' "$tmp/reports-quiz-empty.html"
 require_text "$tmp/reports-quiz-empty.html" 'نتیجه‌ای مطابق فیلترها پیدا نشد' 'quiz ID filter did not produce an empty result'

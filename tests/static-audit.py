@@ -46,7 +46,10 @@ for path in (ROOT / "panel").glob("*.php"):
             errors.append(f"panel image missing lazy loading: {path.relative_to(ROOT)}")
 
 required_snippets = {
-    "assets/assets_functions.php": ["'profile' === $panel_section", "jalalidatepicker-js"],
+    "assets/assets_functions.php": ["'profile' === $panel_section", "evented_enqueue_jalali_picker"],
+    "inc/jalali.php": ["evented_jalali_from_gregorian", "evented_jalali_to_gregorian", "evented_jalali_checkdate", "evented_jalali_to_timestamp", "evented_jalali_format", "evented_jalali_is_machine_format", "post_date_column_time", "evented_enqueue_jalali_picker"],
+    "assets/js/jalali-core.js": ["EventedJalali", "toGregorian", "fromGregorian", "isValid", "toPersianDigits"],
+    "assets/js/jalali-loader.js": ["jalaliReady", "MutationObserver", "setCustomValidity", "jalaliDatepicker.startWatch"],
     "functions.php": ["is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.9.0'", "evented-home.css', array('ee-shell'), '1.5.1'", "ee-lms.css', array('ee-shell'), '1.6.2'"],
     "assets/css/panel.css": ["@media (max-width: 359.98px)", ".ee-panel-pager", "Final containment layer", ".transactions-table", "overflow-x: auto"],
     "assets/css/login.css": ["width: min(960px, 100%)", "min-height: 100dvh", "@media (max-width: 420px)", ".otp-field"],

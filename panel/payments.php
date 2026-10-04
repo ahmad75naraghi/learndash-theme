@@ -70,7 +70,7 @@ get_template_part('template-parts/panel/shell', 'open', array('ee_panel_current'
 
                     // تبدیل تاریخ میلادی دیتابیس به فرمت نمایشی (اگر افزونه شمسی‌ساز مثل wp-parsidate دارید، خودکار شمسی می‌شود)
                     $timestamp = strtotime($tx->created_at);
-                    $date_display = wp_date('Y/m/d', $timestamp);
+                    $date_display = function_exists('evented_jalali_format') ? evented_jalali_format($timestamp, 'Y/m/d', true) : wp_date('Y/m/d', $timestamp);
                     $time_display = wp_date('H:i:s', $timestamp);
 
                     // فرمت مبلغ

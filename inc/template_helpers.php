@@ -123,41 +123,8 @@ function evented_wp_date($format, $timestamp = null)
  */
 function evented_gregorian_to_jalali($gy, $gm, $gd)
 {
-	$gy = (int) $gy;
-	$gm = (int) $gm;
-	$gd = (int) $gd;
-
-	$g_days_in_month = array(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334);
-	$gy2             = ($gm > 2) ? ($gy + 1) : $gy;
-
-	$days = 355666
-		+ (365 * $gy)
-		+ (int) (($gy2 + 3) / 4)
-		- (int) (($gy2 + 99) / 100)
-		+ (int) (($gy2 + 399) / 400)
-		+ $gd
-		+ $g_days_in_month[$gm - 1];
-
-	$jy    = -1595 + (33 * (int) ($days / 12053));
-	$days %= 12053;
-
-	$jy   += 4 * (int) ($days / 1461);
-	$days %= 1461;
-
-	if ($days > 365) {
-		$jy   += (int) (($days - 1) / 365);
-		$days  = ($days - 1) % 365;
-	}
-
-	if ($days < 186) {
-		$jm = 1 + (int) ($days / 31);
-		$jd = 1 + ($days % 31);
-	} else {
-		$jm = 7 + (int) (($days - 186) / 30);
-		$jd = 1 + (($days - 186) % 30);
-	}
-
-	return array($jy, $jm, $jd);
+	$result = function_exists('evented_jalali_from_gregorian') ? evented_jalali_from_gregorian($gy, $gm, $gd) : false;
+	return $result ?: array(0, 0, 0);
 }
 
 /**
@@ -172,65 +139,7 @@ function evented_gregorian_to_jalali($gy, $gm, $gd)
  */
 function evented_format_jalali($timestamp, $format = 'j F Y')
 {
-	$months = array(
-		1  => 'فروردین',
-		2  => 'اردیبهشت',
-		3  => 'خرداد',
-		4  => 'تیر',
-		5  => 'مرداد',
-		6  => 'شهریور',
-		7  => 'مهر',
-		8  => 'آبان',
-		9  => 'آذر',
-		10 => 'دی',
-		11 => 'بهمن',
-		12 => 'اسفند',
-	);
-
-	/* نام روز هفته بر پایهٔ N (روز ISO در منطقهٔ زمانی سایت: ۱=دوشنبه … ۷=یکشنبه) */
-	$weekdays = array(
-		'6' => 'شنبه',
-		'7' => 'یکشنبه',
-		'1' => 'دوشنبه',
-		'2' => 'سه‌شنبه',
-		'3' => 'چهارشنبه',
-		'4' => 'پنجشنبه',
-		'5' => 'جمعه',
-	);
-
-	$timestamp = (int) $timestamp;
-
-	list($jy, $jm, $jd) = evented_gregorian_to_jalali(
-		(int) evented_wp_date('Y', $timestamp),
-		(int) evented_wp_date('n', $timestamp),
-		(int) evented_wp_date('j', $timestamp)
-	);
-
-	$weekday_no = (string) evented_wp_date('N', $timestamp);
-	$weekday_fa = isset($weekdays[$weekday_no]) ? $weekdays[$weekday_no] : '';
-
-	$replace = array(
-		'Y' => (string) $jy,
-		'y' => substr((string) $jy, -2),
-		'm' => str_pad((string) $jm, 2, '0', STR_PAD_LEFT),
-		'd' => str_pad((string) $jd, 2, '0', STR_PAD_LEFT),
-		'j' => (string) $jd,
-		'F' => isset($months[$jm]) ? $months[$jm] : '',
-		'l' => $weekday_fa,
-	);
-
-	$out = '';
-	$len = strlen($format);
-	for ($i = 0; $i < $len; $i++) {
-		$char = $format[$i];
-		if ('\\' === $char && $i + 1 < $len) {
-			$out .= $format[++$i];
-			continue;
-		}
-		$out .= isset($replace[$char]) ? $replace[$char] : $char;
-	}
-
-	return $out;
+	return function_exists('evented_jalali_format') ? evented_jalali_format($timestamp, $format, false) : '';
 }
 
 /**
@@ -250,12 +159,9 @@ function evented_post_date($post = null, $format = 'j F Y')
 		return '';
 	}
 
-	$from_wp = get_the_date('', $post);
-	if ($from_wp && !preg_match('/[0-9]/', $from_wp)) {
-		return $from_wp; // خروجی افزونهٔ شمسی‌ساز (بدون رقم لاتین)
-	}
-
-	return evented_format_jalali(evented_post_timestamp($post), $format);
+	return function_exists('evented_jalali_format')
+		? evented_jalali_format(evented_post_timestamp($post), $format, true)
+		: evented_format_jalali(evented_post_timestamp($post), $format);
 }
 
 /**
@@ -1808,13 +1714,9 @@ function evented_time_ago($from, $to = 0)
  */
 function evented_today_label()
 {
-	$wp = function_exists('evented_wp_date') ? evented_wp_date('l j F Y') : date_i18n('l j F Y');
-	if ($wp && !preg_match('/[0-9]/', $wp)) {
-		return $wp; // افزونهٔ شمسی‌ساز
-	}
-	$days = array('Saturday' => 'شنبه', 'Sunday' => 'یکشنبه', 'Monday' => 'دوشنبه', 'Tuesday' => 'سه‌شنبه', 'Wednesday' => 'چهارشنبه', 'Thursday' => 'پنجشنبه', 'Friday' => 'جمعه');
-	$d    = function_exists('evented_wp_date') ? evented_wp_date('l') : date('l');
-	return (isset($days[$d]) ? $days[$d] . ' ' : '') . evented_format_jalali(current_time('timestamp'), 'j F Y');
+	return function_exists('evented_jalali_format')
+		? evented_jalali_format(time(), 'l j F Y', true)
+		: date_i18n('l j F Y');
 }
 
 /**
