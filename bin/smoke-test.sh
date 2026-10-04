@@ -396,7 +396,7 @@ require_text "$tmp/settings.html" 'evented-update-card' 'theme settings/update c
 require_text "$tmp/settings.html" 'name="slider_height"' 'desktop slider height setting is missing'
 require_text "$tmp/settings.html" 'name="slider_height_tablet"' 'tablet slider height setting is missing'
 require_text "$tmp/settings.html" 'name="slider_height_mobile"' 'mobile slider height setting is missing'
-require_text "$tmp/settings.html" 'theme-settings.css?ver=1.3.0' 'slider settings stylesheet cache version is stale'
+require_text "$tmp/settings.html" 'theme-settings.css?ver=1.3.1' 'slider settings stylesheet cache version is stale'
 
 # مرکز گزارش‌گیری داخلی: داده، فیلتر، asset و خروجی server-side.
 fetch '/wp-admin/admin.php?page=evented-reports' "$tmp/reports-overview.html"
