@@ -987,7 +987,7 @@ a.ee-cur-item:hover .ee-cur-title { color: var(--ee-tealP); }
     background: linear-gradient(135deg, var(--ee-tealP), #0f766e); box-shadow: 0 12px 24px -15px rgb(0 105 92 / .9);
 }
 @media (max-width: 700px) {
-    .ee-quiz-body .wpProQuiz_forms { grid-template-columns: minmax(0, 1fr); padding: .75rem; gap: .7rem; }
+    .ee-quiz-body .wpProQuiz_text > .wpProQuiz_forms { grid-template-columns: minmax(0, 1fr); padding: .75rem; gap: .7rem; }
     .ee-quiz-body .wpProQuiz_forms > table,
     .ee-quiz-body .wpProQuiz_forms > table tbody { display: block; width: 100%; }
     .ee-quiz-body .wpProQuiz_forms > table tr {
@@ -1000,7 +1000,7 @@ a.ee-cur-item:hover .ee-cur-title { color: var(--ee-tealP); }
     .ee-quiz-body .wpProQuiz_forms > table td:last-child { display: block; width: 100%; padding: 0; }
 }
 @media (max-width: 420px) {
-    .ee-quiz-body .wpProQuiz_forms { padding: .65rem; }
+    .ee-quiz-body .wpProQuiz_text > .wpProQuiz_forms { padding: .65rem; }
     .ee-quiz-body .wpProQuiz_forms input[type="text"],
     .ee-quiz-body .wpProQuiz_forms input[type="email"],
     .ee-quiz-body .wpProQuiz_forms input[type="number"],

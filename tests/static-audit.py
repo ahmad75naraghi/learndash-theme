@@ -52,7 +52,7 @@ required_snippets = {
     "assets/css/login.css": ["width: min(960px, 100%)", "min-height: 100dvh", "@media (max-width: 420px)", ".otp-field"],
     "page-login.php": ["login.css?ver=1.1.0"],
     "assets/css/newhome/ee-courses.css": ["Narrow viewport hardening", "@media (max-width: 520px)", ".ee-cf-field", ".ee-page-body table"],
-    "assets/css/newhome/ee-lms.css": ["Keep LearnDash", ".ee-quiz-body table", ".ee-audio-row audio", "white-space: normal", "فرم اطلاعات شرکت‌کننده", ".wpProQuiz_text > .wpProQuiz_forms", "> div:not(.wpProQuiz_forms)", ".wpProQuiz_forms fieldset:focus-within", "grid-template-columns: repeat(2, minmax(0, 1fr))", ".wpProQuiz_required::after", ".wpProQuiz_formFields > label", ".wpProQuiz_forms > table", "table-layout: fixed", ".learndash-quiz-review__button", "font-size: 16px"],
+    "assets/css/newhome/ee-lms.css": ["Keep LearnDash", ".ee-quiz-body table", ".ee-audio-row audio", "white-space: normal", "فرم اطلاعات شرکت‌کننده", ".wpProQuiz_text > .wpProQuiz_forms", "@media (max-width: 700px)", "> div:not(.wpProQuiz_forms)", ".wpProQuiz_forms fieldset:focus-within", "grid-template-columns: repeat(2, minmax(0, 1fr))", ".wpProQuiz_required::after", ".wpProQuiz_formFields > label", ".wpProQuiz_forms > table", "table-layout: fixed", ".learndash-quiz-review__button", "font-size: 16px"],
     "assets/css/single-post.css": ["Long editorial content", ".ee-post-body table", ".ee-comment-list .children", ".ee-podcast-player audio"],
     "assets/css/archive-post.css": ["Archive and resource cards", ".ee-arch-search", "overflow-wrap: break-word"],
     "panel/payments.php": ["LIMIT %d OFFSET %d", "evented_panel_pagination"],

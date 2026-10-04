@@ -117,24 +117,22 @@ try {
 
     const login = await context.newPage();
     let loginResponse;
-    for (let attempt = 0; attempt < 5; attempt++) {
+    let authenticated = false;
+    for (let attempt = 0; attempt < 5 && !authenticated; attempt++) {
       loginResponse = await login.goto(`${base}/wp-login.php`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-      const hasLoginForm = await login.locator('#user_login').count();
-      const hasSession = (await context.cookies()).some(cookie => cookie.name.startsWith('wordpress_logged_in_'));
-      if (hasLoginForm || hasSession || attempt === 4 || loginResponse && loginResponse.status() >= 400 && ![500, 502, 503, 504].includes(loginResponse.status())) break;
-      await login.waitForTimeout(1_000 * (attempt + 1));
+      const userInput = login.locator('#user_login');
+      if (await userInput.count()) {
+        await userInput.fill(username);
+        await login.locator('#user_pass').fill(password);
+        await Promise.all([
+          login.waitForLoadState('domcontentloaded'),
+          login.locator('#wp-submit').click(),
+        ]);
+      }
+      authenticated = (await context.cookies()).some(cookie => cookie.name.startsWith('wordpress_logged_in_'));
+      if (!authenticated) await login.waitForTimeout(1_000 * (attempt + 1));
     }
-    const userInput = login.locator('#user_login');
-    if (await userInput.count()) {
-      await userInput.fill(username);
-      await login.locator('#user_pass').fill(password);
-      await Promise.all([
-        login.waitForLoadState('domcontentloaded'),
-        login.locator('#wp-submit').click(),
-      ]);
-    }
-    const authenticated = (await context.cookies()).some(cookie => cookie.name.startsWith('wordpress_logged_in_'));
-    if (!authenticated) report('failure', viewportName, '/wp-login.php', `authentication setup failed (HTTP ${loginResponse?.status() ?? 'no response'})`);
+    if (!authenticated) report('failure', viewportName, '/wp-login.php', `authentication setup failed after retries (HTTP ${loginResponse?.status() ?? 'no response'})`);
     await login.close();
 
     for (const [slug, route] of routes) {
