@@ -234,6 +234,7 @@ try {
               modernDisplay: modernStyle?.display || '',
               modernColumns: modernStyle?.gridTemplateColumns.split(' ').length || 0,
               modernFields: modernFields.length,
+              borderedModernFields: modernFields.filter(field => parseFloat(getComputedStyle(field).borderTopWidth) > 0).length,
               lastFieldRatio: lastRect && modernRect ? lastRect.width / modernRect.width : 0,
             };
           });
@@ -243,6 +244,7 @@ try {
             const expectedColumns = viewport.width <= 700 ? 1 : 2;
             if (formLayout.modernColumns !== expectedColumns) report('failure', viewportName, route, `quiz form has ${formLayout.modernColumns} column(s), expected ${expectedColumns}`);
             if (formLayout.lastFieldRatio < .8) report('failure', viewportName, route, 'odd final quiz field does not span the form width');
+            if (formLayout.borderedModernFields) report('failure', viewportName, route, `${formLayout.borderedModernFields} modern quiz field(s) still have a visible border`);
             if (formLayout.overlapping) report('failure', viewportName, route, 'quiz participant form fields overlap');
             if (formLayout.escapedControls) report('failure', viewportName, route, `${formLayout.escapedControls} quiz form control(s) escape the form`);
             if (formLayout.formEscapes) report('failure', viewportName, route, 'quiz participant form escapes viewport');
