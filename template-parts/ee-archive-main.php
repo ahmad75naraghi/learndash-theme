@@ -75,8 +75,9 @@ if (is_wp_error($ee_arch_cats)) {
 		return $term instanceof WP_Term && !empty($ee_exact_totals[(int) $term->term_id]);
 	}));
 	foreach ($ee_arch_cats as $ee_term) { $ee_term->count = (int) $ee_exact_totals[(int) $ee_term->term_id]; }
-	usort($ee_arch_cats, static function ($a, $b) use ($ee_arch_taxonomy) {
-		return 'galery_cat' === $ee_arch_taxonomy ? strnatcasecmp($a->name, $b->name) : ((int) $b->count <=> (int) $a->count);
+	usort($ee_arch_cats, static function ($a, $b) {
+		$count_order = (int) $b->count <=> (int) $a->count;
+		return 0 !== $count_order ? $count_order : strnatcasecmp($a->name, $b->name);
 	});
 	if ('category' === $ee_arch_taxonomy && $ee_terms_limit > 0) { $ee_arch_cats = array_slice($ee_arch_cats, 0, $ee_terms_limit); }
 }

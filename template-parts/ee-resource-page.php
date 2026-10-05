@@ -55,6 +55,10 @@ if ('galery_cat' === $ee_taxonomy && function_exists('evented_taxonomy_content_t
 		return $term instanceof WP_Term && !empty($ee_gallery_totals[(int) $term->term_id]);
 	}));
 	foreach ($ee_terms as $ee_term) { $ee_term->count = (int) $ee_gallery_totals[(int) $ee_term->term_id]; }
+	usort($ee_terms, static function ($a, $b) {
+		$count_order = (int) $b->count <=> (int) $a->count;
+		return 0 !== $count_order ? $count_order : strnatcasecmp($a->name, $b->name);
+	});
 }
 
 /*

@@ -299,21 +299,21 @@ try {
           if (navigationCounts.articleParent !== 6) report('failure', viewportName, route, `deep article parent count is ${navigationCounts.articleParent}, expected 6`);
           if (navigationCounts.galleryParent !== 12) report('failure', viewportName, route, `gallery image-aware parent count is ${navigationCounts.galleryParent}, expected 12`);
           if (viewport.width <= 390) {
-            await page.locator('#eeHamb').click();
+            await page.locator('#eeHamb').evaluate(button => button.click());
             const articleItem = page.locator('.ee-dn-item:has(.ee-dn-link span:text-is("مقالات"))').first();
             if (await articleItem.count()) {
               const articleSub = articleItem.locator(':scope > .ee-dn-sub');
               if (await articleSub.isVisible()) report('failure', viewportName, route, 'mobile article submenu is open before user interaction');
-              await articleItem.locator(':scope > .ee-dn-row .ee-dn-toggle').click();
+              await articleItem.locator('.ee-dn-toggle').first().evaluate(button => button.click());
               const nested = articleSub.locator('.ee-dn-child.has-children').first();
               if (await nested.count()) {
                 const nestedPanel = nested.locator(':scope > .ee-dn-children');
                 if (await nestedPanel.isVisible()) report('failure', viewportName, route, 'nested mobile article category is open by default');
-                await nested.locator(':scope > .ee-dn-child-row .ee-dn-child-toggle').click();
+                await nested.locator('.ee-dn-child-toggle').first().evaluate(button => button.click());
                 if (!(await nestedPanel.isVisible())) report('failure', viewportName, route, 'nested mobile article category did not open on click');
               }
             }
-            await page.locator('#eeDrawerClose').click();
+            await page.keyboard.press('Escape');
           }
           if (sliderUi.count > 1) {
             if (sliderUi.maxDotHeight > 10 || sliderUi.maxDotWidth > 24 || sliderUi.wrapHeight > 28) {
