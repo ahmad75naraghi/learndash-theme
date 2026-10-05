@@ -211,10 +211,10 @@ add_filter('themes_api', function ($result, $action, $args) {
 		return $result;
 	}
 	return (object) array(
-		'name'          => 'evented-edu',
+		'name'          => 'قالب آموزشی شمیم',
 		'slug'          => evented_theme_updater_slug(),
 		'version'       => $release['version'],
-		'author'        => '<a href="https://github.com/ahmad75naraghi">evented team</a>',
+		'author'        => '<a href="https://github.com/ahmad75naraghi">تیم توسعهٔ شمیم</a>',
 		'homepage'      => $release['url'],
 		'requires'      => '6.0',
 		'requires_php'  => '7.4',

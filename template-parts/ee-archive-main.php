@@ -61,14 +61,24 @@ $ee_arch_count = isset($GLOBALS['wp_query']->found_posts) ? (int) $GLOBALS['wp_q
 /* ---------- چیپ‌های taxonomy مرتبط با نمای جاری ---------- */
 $ee_arch_cats = taxonomy_exists($ee_arch_taxonomy) ? get_terms(array(
 	'taxonomy'   => $ee_arch_taxonomy,
-	'hide_empty' => !$ee_category_cards,
+	'hide_empty' => in_array($ee_arch_taxonomy, array('category','galery_cat'), true) ? false : !$ee_category_cards,
 	'pad_counts' => $ee_category_cards,
-	'number'     => $ee_terms_limit,
-	'orderby'    => 'count',
-	'order'      => 'DESC',
+	'number'     => in_array($ee_arch_taxonomy, array('category','galery_cat'), true) ? 0 : $ee_terms_limit,
+	'orderby'    => 'galery_cat' === $ee_arch_taxonomy ? 'name' : 'count',
+	'order'      => 'galery_cat' === $ee_arch_taxonomy ? 'ASC' : 'DESC',
 )) : array();
 if (is_wp_error($ee_arch_cats)) {
 	$ee_arch_cats = array();
+} elseif (in_array($ee_arch_taxonomy, array('category','galery_cat'), true) && function_exists('evented_taxonomy_content_totals')) {
+	$ee_exact_totals = evented_taxonomy_content_totals($ee_arch_taxonomy);
+	$ee_arch_cats = array_values(array_filter($ee_arch_cats, static function ($term) use ($ee_exact_totals) {
+		return $term instanceof WP_Term && !empty($ee_exact_totals[(int) $term->term_id]);
+	}));
+	foreach ($ee_arch_cats as $ee_term) { $ee_term->count = (int) $ee_exact_totals[(int) $ee_term->term_id]; }
+	usort($ee_arch_cats, static function ($a, $b) use ($ee_arch_taxonomy) {
+		return 'galery_cat' === $ee_arch_taxonomy ? strnatcasecmp($a->name, $b->name) : ((int) $b->count <=> (int) $a->count);
+	});
+	if ('category' === $ee_arch_taxonomy && $ee_terms_limit > 0) { $ee_arch_cats = array_slice($ee_arch_cats, 0, $ee_terms_limit); }
 }
 $ee_queried_term = get_queried_object();
 $ee_arch_current = ($ee_queried_term instanceof WP_Term && $ee_arch_taxonomy === $ee_queried_term->taxonomy) ? (int) $ee_queried_term->term_id : 0;

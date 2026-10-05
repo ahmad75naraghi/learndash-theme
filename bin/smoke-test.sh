@@ -397,6 +397,8 @@ require_text "$tmp/settings.html" 'name="slider_height"' 'desktop slider height 
 require_text "$tmp/settings.html" 'name="slider_height_tablet"' 'tablet slider height setting is missing'
 require_text "$tmp/settings.html" 'name="slider_height_mobile"' 'mobile slider height setting is missing'
 require_text "$tmp/settings.html" 'theme-settings.css?ver=1.3.1' 'slider settings stylesheet cache version is stale'
+fetch '/wp-admin/admin.php?page=evented-theme-settings&tab=content_display' "$tmp/settings-content.html"
+require_text "$tmp/settings-content.html" 'name="ee[post_author_box]"' 'independent article author-box setting is missing'
 
 # مرکز گزارش‌گیری داخلی: داده، فیلتر، asset و خروجی server-side.
 fetch '/wp-admin/admin.php?page=evented-reports' "$tmp/reports-overview.html"

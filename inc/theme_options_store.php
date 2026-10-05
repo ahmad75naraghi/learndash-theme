@@ -116,6 +116,7 @@ function evented_options_schema()
 			'icon'   => 'dashicons-visibility',
 			'fields' => array(
 				'post_meta_author'   => array('label' => 'نمایش نام نویسنده', 'type' => 'checkbox', 'default' => 1, 'desc' => 'در صفحهٔ نوشته، کارت‌های آرشیو و کارت‌های مقالات صفحهٔ اصلی.'),
+				'post_author_box'    => array('label' => 'نمایش جعبهٔ معرفی نویسنده زیر مقاله', 'type' => 'checkbox', 'default' => 1, 'desc' => 'با خاموش‌کردن، کارت تصویر، توضیح و پیوند پروفایل نویسنده کاملاً حذف می‌شود.'),
 				'post_meta_date'     => array('label' => 'نمایش تاریخ انتشار', 'type' => 'checkbox', 'default' => 1),
 				'post_meta_views'    => array('label' => 'نمایش تعداد بازدید', 'type' => 'checkbox', 'default' => 1, 'desc' => 'خاموش‌کردن این گزینه فقط عدد را پنهان می‌کند و ثبت بازدید ادامه دارد.'),
 				'post_meta_reading'  => array('label' => 'نمایش زمان مطالعه', 'type' => 'checkbox', 'default' => 1),

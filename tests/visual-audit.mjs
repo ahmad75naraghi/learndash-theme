@@ -287,6 +287,34 @@ try {
               featureHeight: feature?.getBoundingClientRect().height || 0,
             };
           });
+          const navigationCounts = await page.evaluate(() => {
+            const latin = value => Number(String(value || '').replace(/[۰-۹]/g, c => '۰۱۲۳۴۵۶۷۸۹'.indexOf(c)).replace(/[^0-9]/g, ''));
+            const itemCount = title => {
+              const labels = [...document.querySelectorAll('.ee-nav .ee-sub-label')];
+              const label = labels.find(node => node.textContent.trim() === title);
+              return label ? latin(label.closest('.ee-sub-link')?.querySelector('small')?.textContent) : -1;
+            };
+            return { articleParent: itemCount('سواد رسانه'), galleryParent: itemCount('گزارش تصویری') };
+          });
+          if (navigationCounts.articleParent !== 6) report('failure', viewportName, route, `deep article parent count is ${navigationCounts.articleParent}, expected 6`);
+          if (navigationCounts.galleryParent !== 12) report('failure', viewportName, route, `gallery image-aware parent count is ${navigationCounts.galleryParent}, expected 12`);
+          if (viewport.width <= 390) {
+            await page.locator('#eeHamb').click();
+            const articleItem = page.locator('.ee-dn-item:has(.ee-dn-link span:text-is("مقالات"))').first();
+            if (await articleItem.count()) {
+              const articleSub = articleItem.locator(':scope > .ee-dn-sub');
+              if (await articleSub.isVisible()) report('failure', viewportName, route, 'mobile article submenu is open before user interaction');
+              await articleItem.locator(':scope > .ee-dn-row .ee-dn-toggle').click();
+              const nested = articleSub.locator('.ee-dn-child.has-children').first();
+              if (await nested.count()) {
+                const nestedPanel = nested.locator(':scope > .ee-dn-children');
+                if (await nestedPanel.isVisible()) report('failure', viewportName, route, 'nested mobile article category is open by default');
+                await nested.locator(':scope > .ee-dn-child-row .ee-dn-child-toggle').click();
+                if (!(await nestedPanel.isVisible())) report('failure', viewportName, route, 'nested mobile article category did not open on click');
+              }
+            }
+            await page.locator('#eeDrawerClose').click();
+          }
           if (sliderUi.count > 1) {
             if (sliderUi.maxDotHeight > 10 || sliderUi.maxDotWidth > 24 || sliderUi.wrapHeight > 28) {
               report('failure', viewportName, route, `slider dots are oversized (${Math.round(sliderUi.maxDotWidth)}x${Math.round(sliderUi.maxDotHeight)}, wrapper ${Math.round(sliderUi.wrapHeight)}px)`);

@@ -41,21 +41,28 @@ $ee_today = function_exists('evented_today_label') ? evented_today_label() : dat
 /* پیام‌رسان‌ها (فیلتر evented_channel_links در template_helpers) */
 $ee_channels = function_exists('evented_channel_links') ? (array) evented_channel_links() : array();
 
-/* زیرمنوی درختی برای نمایش خوانا در دسکتاپ و موبایل به فهرست عمق‌دار تبدیل می‌شود. */
-$ee_flatten_children = static function ($children, $depth = 0) use (&$ee_flatten_children) {
-	$flat = array();
-	foreach ((array) $children as $child) {
-		if (empty($child['title']) || (empty($child['url']) && empty($child['is_heading']))) {
-			continue;
-		}
-		$child['depth']        = (int) $depth;
-		$child['has_children'] = !empty($child['children']);
-		$flat[]                = $child;
-		if (!empty($child['children'])) {
-			$flat = array_merge($flat, $ee_flatten_children($child['children'], $depth + 1));
-		}
+/* موبایل: هر سطح زیر‌دسته آکاردئون مستقل دارد و تا زمان کلیک بسته می‌ماند. */
+$ee_render_mobile_children = static function ($children, $id_prefix, $depth = 0) use (&$ee_render_mobile_children) {
+	foreach ((array) $children as $index => $child) {
+		$is_heading = !empty($child['is_heading']);
+		if (empty($child['title']) || (empty($child['url']) && !$is_heading)) { continue; }
+		$has_children = !empty($child['children']);
+		$child_id = sanitize_html_class($id_prefix . '-' . $depth . '-' . $index);
+		?>
+		<div class="ee-dn-child ee-sub-depth-<?php echo (int) min(5, $depth); ?><?php echo $has_children ? ' has-children' : ''; ?>">
+			<div class="ee-dn-child-row">
+				<?php if ($is_heading) : ?><span class="ee-dn-child-link is-heading"><?php else : ?><a class="ee-dn-child-link" href="<?php echo esc_url($child['url']); ?>"><?php endif; ?>
+					<span><?php echo esc_html($child['title']); ?></span>
+					<?php if (!empty($child['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $child['count'])); ?></small><?php endif; ?>
+				<?php if ($is_heading) : ?></span><?php else : ?></a><?php endif; ?>
+				<?php if ($has_children) : ?>
+					<button class="ee-dn-child-toggle" type="button" aria-expanded="false" aria-controls="<?php echo esc_attr($child_id); ?>" aria-label="نمایش زیر‌دسته‌های <?php echo esc_attr($child['title']); ?>"><svg class="ee-ic" aria-hidden="true"><use href="#i-expand_more"></use></svg></button>
+				<?php endif; ?>
+			</div>
+			<?php if ($has_children) : ?><div class="ee-dn-children" id="<?php echo esc_attr($child_id); ?>" hidden><?php $ee_render_mobile_children($child['children'], $child_id, $depth + 1); ?></div><?php endif; ?>
+		</div>
+		<?php
 	}
-	return $flat;
 };
 
 /* دسکتاپ: درخت واقعی نگه داشته می‌شود تا فرزندان هر دسته در پنل کناری باز شوند. */
@@ -265,14 +272,7 @@ $ee_render_desktop_children = static function ($children, $depth = 0) use (&$ee_
                     </div>
                     <?php if ($ee_has_sub) : ?>
                         <div class="ee-dn-sub" id="<?php echo esc_attr($ee_sub_id); ?>" hidden>
-                            <?php foreach ($ee_flatten_children($ee_it['children']) as $ee_sub) :
-                                $ee_sub_depth   = min(4, max(0, (int) $ee_sub['depth']));
-                                $ee_sub_heading = !empty($ee_sub['is_heading']); ?>
-                                <?php if ($ee_sub_heading) : ?><div class="ee-dn-sub-heading ee-sub-depth-<?php echo (int) $ee_sub_depth; ?>" role="heading" aria-level="3"><?php else : ?><a class="ee-sub-depth-<?php echo (int) $ee_sub_depth; ?><?php echo !empty($ee_sub['has_children']) ? ' has-children' : ''; ?>" href="<?php echo esc_url($ee_sub['url']); ?>"><?php endif; ?>
-                                    <span><?php if ($ee_sub_depth > 0) : ?><svg class="ee-ic ee-sub-branch" aria-hidden="true" focusable="false"><use href="#i-chevron_left"></use></svg><?php endif; ?><?php echo esc_html($ee_sub['title']); ?></span>
-                                    <?php if (!empty($ee_sub['count'])) : ?><small><?php echo esc_html(number_format_i18n((int) $ee_sub['count'])); ?></small><?php endif; ?>
-                                <?php if ($ee_sub_heading) : ?></div><?php else : ?></a><?php endif; ?>
-                            <?php endforeach; ?>
+                            <?php $ee_render_mobile_children($ee_it['children'], $ee_sub_id); ?>
                             <a class="ee-dn-all" href="<?php echo esc_url($ee_it['url']); ?>">همهٔ <?php echo esc_html($ee_it['title']); ?></a>
                         </div>
                     <?php endif; ?>

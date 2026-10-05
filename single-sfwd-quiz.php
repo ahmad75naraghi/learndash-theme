@@ -148,34 +148,26 @@ while (have_posts()) :
 						</div>
 					</div>
 
-					<!-- آمار آزمون -->
+					<?php $ee_has_stats = !empty($ee_quiz['questions']) || !empty($ee_quiz['time_limit']) || !empty($ee_quiz['passing']) || $ee_max_try > 0 || !empty($ee_quiz['certificate']); ?>
+					<?php if ($ee_has_stats) : ?>
 					<ul class="ee-qz-stats">
-						<li class="t1">
-							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-help_center"></use></svg>
-							<b><?php echo !empty($ee_quiz['questions']) ? esc_html($ee_fa($ee_quiz['questions'])) : '—'; ?></b>
-							<small><?php esc_html_e('سؤال', 'evented-edu'); ?></small>
-						</li>
-						<li class="t2">
-							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-timer"></use></svg>
-							<b><?php echo !empty($ee_quiz['time_limit']) ? esc_html($ee_fa((int) ceil($ee_quiz['time_limit'] / 60))) : '∞'; ?></b>
-							<small><?php echo !empty($ee_quiz['time_limit']) ? esc_html__('دقیقه', 'evented-edu') : esc_html__('بدون محدودیت زمان', 'evented-edu'); ?></small>
-						</li>
-						<li class="t3">
-							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-trending_up"></use></svg>
-							<b><?php echo !empty($ee_quiz['passing']) ? esc_html($ee_fa($ee_quiz['passing'])) . '٪' : '—'; ?></b>
-							<small><?php esc_html_e('حد نصاب قبولی', 'evented-edu'); ?></small>
-						</li>
-						<li class="t4">
-							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-replay"></use></svg>
-							<b><?php echo $ee_max_try ? esc_html($ee_fa($ee_max_try)) : '∞'; ?></b>
-							<small><?php echo $ee_max_try ? esc_html__('بار مجاز', 'evented-edu') : esc_html__('تلاش نامحدود', 'evented-edu'); ?></small>
-						</li>
-						<li class="t5<?php echo empty($ee_quiz['certificate']) ? ' is-off' : ''; ?>">
-							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-workspace_premium"></use></svg>
-							<b><?php echo !empty($ee_quiz['certificate']) ? esc_html__('دارد', 'evented-edu') : esc_html__('ندارد', 'evented-edu'); ?></b>
-							<small><?php esc_html_e('گواهینامه', 'evented-edu'); ?></small>
-						</li>
+						<?php if (!empty($ee_quiz['questions'])) : ?><li class="t1">
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-help_center"></use></svg><b><?php echo esc_html($ee_fa($ee_quiz['questions'])); ?></b><small><?php esc_html_e('سؤال', 'evented-edu'); ?></small>
+						</li><?php endif; ?>
+						<?php if (!empty($ee_quiz['time_limit'])) : ?><li class="t2">
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-timer"></use></svg><b><?php echo esc_html($ee_fa((int) ceil($ee_quiz['time_limit'] / 60))); ?></b><small><?php esc_html_e('دقیقه', 'evented-edu'); ?></small>
+						</li><?php endif; ?>
+						<?php if (!empty($ee_quiz['passing'])) : ?><li class="t3">
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-trending_up"></use></svg><b><?php echo esc_html($ee_fa($ee_quiz['passing'])) . '٪'; ?></b><small><?php esc_html_e('حد نصاب قبولی', 'evented-edu'); ?></small>
+						</li><?php endif; ?>
+						<?php if ($ee_max_try > 0) : ?><li class="t4">
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-replay"></use></svg><b><?php echo esc_html($ee_fa($ee_max_try)); ?></b><small><?php esc_html_e('بار مجاز', 'evented-edu'); ?></small>
+						</li><?php endif; ?>
+						<?php if (!empty($ee_quiz['certificate'])) : ?><li class="t5">
+							<svg class="ee-ic" aria-hidden="true" focusable="false"><use href="#i-workspace_premium"></use></svg><b><?php esc_html_e('دارد', 'evented-edu'); ?></b><small><?php esc_html_e('گواهینامه', 'evented-edu'); ?></small>
+						</li><?php endif; ?>
 					</ul>
+					<?php endif; ?>
 				</header>
 
 				<?php if ($ee_logged_in && $ee_used > 0) : ?>

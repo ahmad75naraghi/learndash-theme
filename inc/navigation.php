@@ -22,7 +22,7 @@ defined('ABSPATH') || exit;
 
 /* نسخهٔ ساختار کش — با تغییر ساختار آرایه‌ها این عدد را بالا ببرید تا کش قدیمی نادیده گرفته شود. */
 if (!defined('EVENTED_NAV_CACHE_VER')) {
-	define('EVENTED_NAV_CACHE_VER', '13');
+	define('EVENTED_NAV_CACHE_VER', '14');
 }
 
 /**
@@ -78,6 +78,65 @@ function evented_nav_find_post_type($key)
 }
 
 /**
+ * شمارش دقیق محتوای منتشرشدهٔ هر ترم به‌همراه تمام فرزندان در هر عمق.
+ * شمارندهٔ ذخیره‌شدهٔ term_taxonomy استفاده نمی‌شود تا واردات انبوه یا کش قدیمی
+ * باعث عدد ناقص نشود. یک نوشته که در چند فرزند است در شمار والد فقط یک بار حساب می‌شود.
+ *
+ * @param string $taxonomy تاکسونومی.
+ * @return array<int,int> term_id => unique published objects in full subtree.
+ */
+function evented_taxonomy_content_totals($taxonomy)
+{
+	global $wpdb;
+	static $memo = array();
+	$taxonomy = sanitize_key($taxonomy);
+	if (isset($memo[$taxonomy])) { return $memo[$taxonomy]; }
+	$cache_key = 'evented_tax_totals_v' . EVENTED_NAV_CACHE_VER . '_' . $taxonomy;
+	$cached = get_transient($cache_key);
+	if (is_array($cached)) { $memo[$taxonomy] = $cached; return $cached; }
+	$tax_obj  = get_taxonomy($taxonomy);
+	if (!$tax_obj || empty($tax_obj->object_type)) { return array(); }
+
+	$post_types   = array_values(array_filter(array_map('sanitize_key', (array) $tax_obj->object_type), 'post_type_exists'));
+	$type_holders = implode(',', array_fill(0, count($post_types), '%s'));
+	if ('' === $type_holders) { return array(); }
+	$params = array_merge(array($taxonomy), $post_types);
+	$thumb_join = 'galery_cat' === $taxonomy
+		? " INNER JOIN {$wpdb->postmeta} AS thumb ON thumb.post_id = p.ID AND thumb.meta_key = '_thumbnail_id' AND thumb.meta_value <> ''"
+		: '';
+	$sql = "SELECT tt.term_id, p.ID AS object_id
+		FROM {$wpdb->term_taxonomy} AS tt
+		INNER JOIN {$wpdb->term_relationships} AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id
+		INNER JOIN {$wpdb->posts} AS p ON p.ID = tr.object_id{$thumb_join}
+		WHERE tt.taxonomy = %s AND p.post_status = 'publish' AND p.post_type IN ({$type_holders})";
+	$rows = $wpdb->get_results($wpdb->prepare($sql, $params)); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+	$direct = array();
+	foreach ((array) $rows as $row) { $direct[(int) $row->term_id][(int) $row->object_id] = true; }
+	$terms = get_terms(array('taxonomy'=>$taxonomy,'hide_empty'=>false,'number'=>0,'fields'=>'all'));
+	if (is_wp_error($terms)) { return array(); }
+	$children = array();
+	foreach ($terms as $term) { $children[(int) $term->parent][] = (int) $term->term_id; }
+	$sets = array();
+	$collect = static function ($term_id, $trail = array()) use (&$collect, &$sets, $direct, $children) {
+		if (isset($sets[$term_id])) { return $sets[$term_id]; }
+		if (isset($trail[$term_id])) { return array(); }
+		$trail[$term_id] = true;
+		$set = isset($direct[$term_id]) ? $direct[$term_id] : array();
+		foreach (isset($children[$term_id]) ? $children[$term_id] : array() as $child_id) {
+			$set += $collect($child_id, $trail);
+		}
+		$sets[$term_id] = $set;
+		return $set;
+	};
+	$totals = array();
+	foreach ($terms as $term) { $totals[(int) $term->term_id] = count($collect((int) $term->term_id)); }
+	$memo[$taxonomy] = $totals;
+	set_transient($cache_key, $totals, 12 * HOUR_IN_SECONDS);
+	return $totals;
+}
+
+/**
  * ترم‌های یک تاکسونومی به‌صورت آیتم زیرمنو.
  *
  * در تاکسونومی‌های سلسله‌مراتبی، خروجی درختی است و count هر والد از مجموع
@@ -93,7 +152,7 @@ function evented_nav_term_children($taxonomy, $limit = 12)
 		return array();
 	}
 
-	$limit = max(1, (int) $limit);
+	$limit = max(0, (int) $limit);
 	if (!is_taxonomy_hierarchical($taxonomy)) {
 		$terms = get_terms(array(
 			'taxonomy'   => $taxonomy,
@@ -130,8 +189,8 @@ function evented_nav_term_children($taxonomy, $limit = 12)
 		'taxonomy'   => $taxonomy,
 		'hide_empty' => false,
 		'number'     => 0,
-		'pad_counts' => true,
-		'orderby'    => 'count',
+		'pad_counts' => false,
+		'orderby'    => 'name',
 		'order'      => 'DESC',
 	));
 	if (is_wp_error($terms) || empty($terms)) {
@@ -140,7 +199,7 @@ function evented_nav_term_children($taxonomy, $limit = 12)
 
 	$by_id       = array();
 	$children_of = array();
-	$totals      = array();
+	$totals      = evented_taxonomy_content_totals($taxonomy);
 	foreach ($terms as $term) {
 		if (!$term instanceof WP_Term) {
 			continue;
@@ -148,7 +207,7 @@ function evented_nav_term_children($taxonomy, $limit = 12)
 		$id                       = (int) $term->term_id;
 		$parent                   = (int) $term->parent;
 		$by_id[$id]               = $term;
-		$totals[$id]              = (int) $term->count; // با pad_counts: یکتای والد + همهٔ descendants.
+		$totals[$id]              = isset($totals[$id]) ? (int) $totals[$id] : 0;
 		$children_of[$parent][]   = $id;
 	}
 
@@ -164,7 +223,7 @@ function evented_nav_term_children($taxonomy, $limit = 12)
 	$build = static function ($parent, $trail = array()) use (&$build, $limit, $by_id, $children_of, $totals) {
 		$items = array();
 		foreach (isset($children_of[$parent]) ? $children_of[$parent] : array() as $term_id) {
-			if (count($items) >= $limit || empty($totals[$term_id]) || isset($trail[$term_id])) {
+			if (($limit > 0 && count($items) >= $limit) || empty($totals[$term_id]) || isset($trail[$term_id])) {
 				continue;
 			}
 			$term = $by_id[$term_id];
@@ -280,7 +339,9 @@ function evented_nav_build_cpt_item($key, $title, $icon, $page_slugs)
 	$url       = evented_nav_manual_url($key);
 	$page_id   = 0;
 
-	if (
+	if ('gallery' === $key && taxonomy_exists('galery_cat')) {
+		$children = evented_nav_term_children('galery_cat', 0);
+	} elseif (
 		'' !== $post_type
 		&& !in_array($key, array('video', 'downloads'), true)
 		&& !in_array($post_type, array('clip', 'wpdmpro'), true)
@@ -485,6 +546,9 @@ function evented_nav_url($key)
 function evented_nav_flush_cache($tabs_too = true)
 {
 	delete_transient('evented_nav_items_v' . EVENTED_NAV_CACHE_VER);
+	foreach (array('category','galery_cat','ld_course_category','wpdmcategory') as $taxonomy) {
+		delete_transient('evented_tax_totals_v' . EVENTED_NAV_CACHE_VER . '_' . $taxonomy);
+	}
 	if ($tabs_too) {
 		delete_transient('evented_home_tabs_v' . EVENTED_NAV_CACHE_VER);
 		delete_transient('evented_home_course_tabs');
@@ -506,6 +570,18 @@ add_action('set_object_terms', function ($object_id) {
 	evented_nav_flush_cache(false);
 	if ('sfwd-courses' === get_post_type($object_id)) { evented_flush_course_caches(); }
 });
+add_action('transition_post_status', function ($new_status, $old_status, $post) {
+	if ($new_status === $old_status || !$post instanceof WP_Post) { return; }
+	if (in_array($post->post_type, array('post','gallery','lib','sfwd-courses'), true)) {
+		evented_nav_flush_cache(false);
+	}
+}, 10, 3);
+$evented_flush_gallery_thumbnail = static function ($meta_id, $post_id, $meta_key) {
+	if ('_thumbnail_id' === $meta_key && 'gallery' === get_post_type($post_id)) { evented_nav_flush_cache(false); }
+};
+add_action('added_post_meta', $evented_flush_gallery_thumbnail, 10, 3);
+add_action('updated_post_meta', $evented_flush_gallery_thumbnail, 10, 3);
+add_action('deleted_post_meta', $evented_flush_gallery_thumbnail, 10, 3);
 
 /**
  * دادهٔ مگامنوی «دوره‌ها»: هر دسته یک تب با حداکثر ۸ دوره در دو ردیف چهارتایی (کش ۱۲ ساعته).

@@ -346,3 +346,45 @@
         f.submit();
     });
 })();
+
+/* ---- فارسی‌سازی رشته‌های رابطی که LearnDash پس از بارگذاری پویا می‌سازد ---- */
+(function () {
+    'use strict';
+    var root = document.querySelector('.learndash-wrapper, .wpProQuiz_content, .ee-quiz-body, .ee-lesson-body');
+    if (!root) { return; }
+    var map = {
+        'In Progress':'در حال پیشرفت','Not Started':'شروع نشده','Completed':'تکمیل‌شده','Complete':'تکمیل‌شده',
+        'Course Content':'محتوای دوره','Lesson Content':'محتوای درس','Topic Content':'محتوای موضوع','Quiz Content':'محتوای آزمون',
+        'Back to Course':'بازگشت به دوره','Back to Lesson':'بازگشت به درس','Start Quiz':'شروع آزمون','Restart Quiz':'شروع دوبارهٔ آزمون',
+        'Finish Quiz':'پایان آزمون','Review Questions':'مرور سؤال‌ها','Next':'بعدی','Previous':'قبلی','Continue':'ادامه',
+        'Mark Complete':'علامت‌گذاری به‌عنوان تکمیل‌شده','Correct':'صحیح','Incorrect':'نادرست','Results':'نتایج','Loading':'در حال بارگذاری'
+    };
+    function translate(value) {
+        var text = String(value || '').trim();
+        if (map[text]) { return map[text]; }
+        var match = text.match(/^Back to\s+(.+)$/i); if (match) { return 'بازگشت به ' + match[1]; }
+        match = text.match(/^Start\s+(.+)$/i); if (match) { return 'شروع ' + match[1]; }
+        match = text.match(/^(.+)\s+Content$/i); if (match) { return 'محتوای ' + match[1]; }
+        return value;
+    }
+    function scan(scope) {
+        if (!scope || scope.nodeType !== 1) { return; }
+        var walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT);
+        var node;
+        while ((node = walker.nextNode())) {
+            if (!node.parentElement || node.parentElement.closest('script,style,textarea,.ee-post-body,.wpProQuiz_question_text')) { continue; }
+            var next = translate(node.nodeValue);
+            if (next !== node.nodeValue) { node.nodeValue = next; }
+        }
+        scope.querySelectorAll('input[type="button"],input[type="submit"],button[title],[aria-label],[placeholder]').forEach(function (control) {
+            if (control.value && /^(button|submit)$/i.test(control.type || '')) { control.value = translate(control.value); }
+            ['title','aria-label','placeholder'].forEach(function (attr) {
+                if (control.hasAttribute(attr)) { control.setAttribute(attr, translate(control.getAttribute(attr))); }
+            });
+        });
+    }
+    scan(root);
+    if ('MutationObserver' in window) {
+        new MutationObserver(function (records) { records.forEach(function (record) { record.addedNodes.forEach(function (node) { if (node.nodeType === 1) { scan(node); } }); }); }).observe(root, {childList:true,subtree:true});
+    }
+})();

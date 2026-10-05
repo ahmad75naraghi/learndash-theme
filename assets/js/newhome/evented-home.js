@@ -64,12 +64,18 @@
                 item.classList.toggle('is-open', !open);
             });
         });
-        // آیتم فعال از ابتدا باز باشد
-        var activeItem = drawer.querySelector('.ee-dn-item.ee-active.has-sub');
-        if (activeItem) {
-            var ab = activeItem.querySelector('.ee-dn-toggle');
-            if (ab) { ab.click(); }
-        }
+        // زیر‌دسته‌های هر بخش نیز مستقل‌اند و هرگز به‌صورت پیش‌فرض باز نمی‌شوند.
+        drawer.querySelectorAll('.ee-dn-child-toggle').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var row = btn.closest('.ee-dn-child');
+                var children = row ? row.querySelector(':scope > .ee-dn-children') : null;
+                if (!children) { return; }
+                var open = btn.getAttribute('aria-expanded') === 'true';
+                btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+                children.hidden = open;
+                row.classList.toggle('is-open', !open);
+            });
+        });
     }
 
     /* ---------- زیرمنوی دسکتاپ: باز شدن با کلید/لمس (هاور در CSS) ---------- */

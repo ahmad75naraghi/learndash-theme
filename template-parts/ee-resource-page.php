@@ -47,8 +47,15 @@ if ($ee_term_id && $ee_taxonomy && taxonomy_exists($ee_taxonomy)) {
 if ('oldest' === $ee_order) { $ee_query_args['order'] = 'ASC'; }
 if ('title' === $ee_order) { $ee_query_args['orderby'] = 'title'; $ee_query_args['order'] = 'ASC'; }
 $ee_items = post_type_exists($ee_type) ? new WP_Query($ee_query_args) : null;
-$ee_terms = ($ee_taxonomy && taxonomy_exists($ee_taxonomy)) ? get_terms(array('taxonomy' => $ee_taxonomy, 'hide_empty' => true, 'number' => 20, 'orderby' => 'count', 'order' => 'DESC')) : array();
+$ee_terms = ($ee_taxonomy && taxonomy_exists($ee_taxonomy)) ? get_terms(array('taxonomy' => $ee_taxonomy, 'hide_empty' => false, 'number' => 0, 'orderby' => 'name', 'order' => 'ASC')) : array();
 $ee_terms = is_wp_error($ee_terms) ? array() : (array) $ee_terms;
+if ('galery_cat' === $ee_taxonomy && function_exists('evented_taxonomy_content_totals')) {
+	$ee_gallery_totals = evented_taxonomy_content_totals($ee_taxonomy);
+	$ee_terms = array_values(array_filter($ee_terms, static function ($term) use ($ee_gallery_totals) {
+		return $term instanceof WP_Term && !empty($ee_gallery_totals[(int) $term->term_id]);
+	}));
+	foreach ($ee_terms as $ee_term) { $ee_term->count = (int) $ee_gallery_totals[(int) $ee_term->term_id]; }
+}
 
 /*
  * fallback ضروری: page-videos.php ممکن است از سلسله‌مراتب page-{slug}.php انتخاب شود

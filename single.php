@@ -231,12 +231,12 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'articles'
                 </nav>
 
                 <!-- دربارهٔ نویسنده -->
-                <?php if ($ee_meta_on('author')) : ?>
+                <?php if ($ee_meta_on('author') && (!function_exists('evented_opt') || evented_opt('post_author_box', 1))) : ?>
                 <div class="ee-author-box">
                     <span class="ee-ab-av"><?php echo get_avatar($ee_author_id, 72); ?></span>
                     <div class="ee-ab-txt">
                         <h3><?php the_author(); ?></h3>
-                        <p><?php echo esc_html(get_the_author_meta('description') ? get_the_author_meta('description') : __('نویسندهٔ پایگاه آموزش evented-edu', 'evented-edu')); ?></p>
+                        <p><?php echo esc_html(get_the_author_meta('description') ? get_the_author_meta('description') : __('نویسندهٔ پایگاه آموزشی شمیم', 'evented-edu')); ?></p>
                         <a class="ee-ab-link" href="<?php echo esc_url(get_author_posts_url($ee_author_id)); ?>">
                             <?php esc_html_e('مشاهدهٔ پروفایل و نوشته‌ها', 'evented-edu'); ?>
                             <svg class="ee-ic" aria-hidden="true" focusable="false">
