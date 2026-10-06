@@ -11,6 +11,8 @@ $cases = array(
     'درس Content' => 'محتوای درس',
     'Back to دوره' => 'بازگشت به دوره',
     'Start آزمون' => 'شروع آزمون',
+    'Quiz is loading...' => 'آزمون در حال بارگذاری است…',
+    'Please wait for Quiz Results' => 'لطفاً برای نمایش نتایج آزمون صبر کنید',
 );
 foreach ($cases as $source => $expected) {
     if (evented_learndash_fa_text($source) !== $expected) {

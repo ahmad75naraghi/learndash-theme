@@ -350,14 +350,21 @@
 /* ---- فارسی‌سازی رشته‌های رابطی که LearnDash پس از بارگذاری پویا می‌سازد ---- */
 (function () {
     'use strict';
-    var root = document.querySelector('.learndash-wrapper, .wpProQuiz_content, .ee-quiz-body, .ee-lesson-body');
-    if (!root) { return; }
+    var roots = document.querySelectorAll('.learndash-wrapper, .wpProQuiz_content, .ee-quiz-body, .ee-lesson-body');
+    if (!roots.length) { return; }
     var map = {
         'In Progress':'در حال پیشرفت','Not Started':'شروع نشده','Completed':'تکمیل‌شده','Complete':'تکمیل‌شده',
         'Course Content':'محتوای دوره','Lesson Content':'محتوای درس','Topic Content':'محتوای موضوع','Quiz Content':'محتوای آزمون',
         'Back to Course':'بازگشت به دوره','Back to Lesson':'بازگشت به درس','Start Quiz':'شروع آزمون','Restart Quiz':'شروع دوبارهٔ آزمون',
         'Finish Quiz':'پایان آزمون','Review Questions':'مرور سؤال‌ها','Next':'بعدی','Previous':'قبلی','Continue':'ادامه',
-        'Mark Complete':'علامت‌گذاری به‌عنوان تکمیل‌شده','Correct':'صحیح','Incorrect':'نادرست','Results':'نتایج','Loading':'در حال بارگذاری'
+        'Mark Complete':'علامت‌گذاری به‌عنوان تکمیل‌شده','Correct':'صحیح','Incorrect':'نادرست','Results':'نتایج','Loading':'در حال بارگذاری',
+        'Quiz is loading...':'آزمون در حال بارگذاری است…','Please wait':'لطفاً صبر کنید','Please wait for Quiz Results':'لطفاً برای نمایش نتایج آزمون صبر کنید','Course Status':'وضعیت دوره','Your Course Status':'وضعیت دورهٔ شما',
+        'Expand All':'بازکردن همه','Collapse All':'بستن همه','Materials':'منابع','Login to Enroll':'برای ثبت‌نام وارد شوید','Take this Course':'شرکت در این دوره',
+        'Enrolled':'ثبت‌نام‌شده','Free':'رایگان','Buy Now':'خرید دوره','Certificate':'گواهینامه','Download Certificate':'دریافت گواهینامه',
+        'Assignment':'تکلیف','Assignments':'تکالیف','Upload Assignment':'بارگذاری تکلیف','Comments':'دیدگاه‌ها','Skip question':'ردشدن از سؤال',
+        'Answered':'پاسخ‌داده‌شده','Review':'مرور','Your time':'زمان شما','Time has elapsed':'زمان به پایان رسیده است',
+        'You must fill out this field.':'تکمیل این فیلد الزامی است.','This field is required.':'تکمیل این فیلد الزامی است.',
+        'You must answer this question.':'پاسخ‌دادن به این سؤال الزامی است.','Your answer was correct!':'پاسخ شما صحیح بود!','Your answer was incorrect.':'پاسخ شما نادرست بود.'
     };
     function translate(value) {
         var text = String(value || '').trim();
@@ -365,7 +372,13 @@
         var match = text.match(/^Back to\s+(.+)$/i); if (match) { return 'بازگشت به ' + match[1]; }
         match = text.match(/^Start\s+(.+)$/i); if (match) { return 'شروع ' + match[1]; }
         match = text.match(/^(.+)\s+Content$/i); if (match) { return 'محتوای ' + match[1]; }
-        return value;
+        var mixed = text;
+        [
+            ['Click Here to Continue','برای ادامه کلیک کنید'],['Please wait','لطفاً صبر کنید'],['In Progress','در حال پیشرفت'],
+            ['Not Started','شروع نشده'],['Time Limit','محدودیت زمانی'],['Back to','بازگشت به'],['Start','شروع'],['Content','محتوا'],
+            ['Questions','سؤال‌ها'],['Question','سؤال'],['Results','نتایج'],['Course','دوره'],['Lesson','درس'],['Topic','موضوع'],['Quiz','آزمون']
+        ].forEach(function (pair) { mixed = mixed.replace(new RegExp(pair[0], 'gi'), pair[1]); });
+        return mixed !== text ? mixed : value;
     }
     function scan(scope) {
         if (!scope || scope.nodeType !== 1) { return; }
@@ -383,8 +396,10 @@
             });
         });
     }
-    scan(root);
-    if ('MutationObserver' in window) {
-        new MutationObserver(function (records) { records.forEach(function (record) { record.addedNodes.forEach(function (node) { if (node.nodeType === 1) { scan(node); } }); }); }).observe(root, {childList:true,subtree:true});
-    }
+    roots.forEach(function (root) {
+        scan(root);
+        if ('MutationObserver' in window) {
+            new MutationObserver(function (records) { records.forEach(function (record) { record.addedNodes.forEach(function (node) { if (node.nodeType === 1) { scan(node); } }); }); }).observe(root, {childList:true,subtree:true});
+        }
+    });
 })();

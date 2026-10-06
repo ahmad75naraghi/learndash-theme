@@ -338,6 +338,10 @@ require_text "$tmp/resource-page-videos-.html" 'page-template-default' 'videos f
 video_grid_count=$(grep -Foc 'class="ee-resource-grid"' "$tmp/resource-page-videos-.html" || true)
 [[ "$video_grid_count" -eq 1 ]] || fail "videos page rendered its archive $video_grid_count times instead of once"
 reject_text "$tmp/resource-page-videos-.html" 'wp-audio-shortcode' 'videos page executed legacy page shortcodes and duplicated structural content'
+fetch '/quiz-embed/' "$tmp/quiz-embed.html"
+require_text "$tmp/quiz-embed.html" 'data-ee-embedded-quiz' 'embedded ld_quiz wrapper is missing'
+require_text "$tmp/quiz-embed.html" 'ee-lms.css?ver=1.6.3' 'embedded ld_quiz stylesheet was not enqueued'
+require_text "$tmp/quiz-embed.html" 'ee-lms.js?ver=1.3.1' 'embedded ld_quiz script was not enqueued'
 fetch '/library/page/2/' "$tmp/resource-page-paged.html"
 require_text "$tmp/resource-page-paged.html" 'کتاب آزمایشی' 'resource pagination did not return the second page'
 fetch '/videos/?resource_search=%D9%88%DB%8C%D8%AF%D8%A6%D9%88' "$tmp/resource-page-search.html"

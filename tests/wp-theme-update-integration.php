@@ -62,7 +62,7 @@ $theme = wp_get_theme($stylesheet);
 
 $result['checks'] = array(
 	'upgrader_returned_true' => true === $installed,
-	'version_is_2_5_1'       => '2.5.1' === (string) $theme->get('Version'),
+	'version_is_2_5_2'       => '2.5.2' === (string) $theme->get('Version'),
 	'theme_stays_active'      => $stylesheet === get_option('stylesheet'),
 	'option_is_preserved'     => $marker === get_option('evented_update_integration_marker'),
 	'obsolete_file_removed'   => !file_exists($sentinel),

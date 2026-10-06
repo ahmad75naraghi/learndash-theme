@@ -17,6 +17,29 @@ require_once get_stylesheet_directory() . '/inc/includes.php';
  *   - بایگانی/دستهٔ دوره، دوره‌ها، اساتید،
  *     پروفایل مدرس، برگه و ۴۰۴             → ee-shell.css + newhome/ee-courses.css
  */
+/** آیا محتوای صفحه یکی از شورت‌کدهای تعاملی LearnDash را دارد؟ */
+function evented_has_embedded_lms_shortcode()
+{
+    if (!is_singular()) { return false; }
+    $post = get_queried_object();
+    if (!$post instanceof WP_Post || '' === (string) $post->post_content) { return false; }
+    foreach (array('ld_quiz', 'learndash_quiz', 'ld_course', 'ld_lesson', 'ld_topic') as $tag) {
+        if (has_shortcode($post->post_content, $tag)) { return true; }
+    }
+    return (bool) apply_filters('evented_has_embedded_lms_shortcode', false, $post);
+}
+
+/** assetهای کامل LMS؛ هم برای قالب تکی و هم برای شورت‌کد داخل برگه. */
+function evented_enqueue_lms_assets($with_courses = false)
+{
+    wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.6.3');
+    wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.3.1', true);
+    wp_localize_script('ee-lms', 'eeLms', array('ajax_url' => admin_url('admin-ajax.php')));
+    if ($with_courses) {
+        wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.3.0');
+    }
+}
+
 add_action('wp_enqueue_scripts', function () {
     if (!function_exists('evented_is_ee_view') || !evented_is_ee_view()) {
         return;
@@ -30,6 +53,12 @@ add_action('wp_enqueue_scripts', function () {
 
     // رفتارها: منوی موبایل، اسلایدر هیرو، کپی لینک اشتراک‌گذاری
     wp_enqueue_script('ee-home-js', PATH_DIR_URL . '/assets/js/newhome/evented-home.js', array(), '1.5.0', true);
+
+    /* برگه‌ای که [ld_quiz] دارد باید دقیقاً assetهای صفحهٔ تکی آزمون را دریافت کند. */
+    $ee_embedded_lms = evented_has_embedded_lms_shortcode();
+    if ($ee_embedded_lms) {
+        evented_enqueue_lms_assets(true);
+    }
 
     if (is_front_page()) {
         wp_enqueue_style('ee-home', PATH_DIR_URL . '/assets/css/newhome/evented-home.css', array('ee-shell'), '1.5.1');
@@ -49,14 +78,7 @@ add_action('wp_enqueue_scripts', function () {
         }
     } elseif (is_singular(array('sfwd-courses', 'sfwd-lessons', 'sfwd-topic', 'sfwd-quiz'))) {
         // دوره، درس و آزمون: استایل + رفتارها (آکاردئون، دیدگاه، تکمیل درس، علاقه‌مندی)
-        wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.6.2');
-        wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.3.0', true);
-        wp_localize_script('ee-lms', 'eeLms', array('ajax_url' => admin_url('admin-ajax.php')));
-
-        if (is_singular('sfwd-quiz')) {
-            // سایدبار آزمون کارت دوره و گرید دوره‌ها را نشان می‌دهد.
-            wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.3.0');
-        }
+        evented_enqueue_lms_assets(is_singular('sfwd-quiz'));
     } elseif (
         is_post_type_archive('sfwd-courses')
         || is_tax('ld_course_category')
@@ -68,7 +90,7 @@ add_action('wp_enqueue_scripts', function () {
         // برگهٔ عمومی و صفحهٔ ۴۰۴.
         wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.3.0');
         // سایدبار فیلتر دوره‌ها و نوار مرتب‌سازی (باز/بسته در موبایل، ارسال خودکار)
-        wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.3.0', true);
+        wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.3.1', true);
     } elseif (is_home() || is_archive() || is_search()) {
         wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.9.0');
     }

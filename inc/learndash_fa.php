@@ -14,8 +14,14 @@ function evented_learndash_fa_text($value)
         'View Questions'=>'مشاهدهٔ سؤال‌ها','Next'=>'بعدی','Previous'=>'قبلی','Continue'=>'ادامه','Mark Complete'=>'علامت‌گذاری به‌عنوان تکمیل‌شده',
         'Click Here to Continue'=>'برای ادامه کلیک کنید','Correct'=>'صحیح','Incorrect'=>'نادرست','Question'=>'سؤال','Questions'=>'سؤال‌ها',
         'Results'=>'نتایج','Print Results'=>'چاپ نتایج','Leaderboard'=>'جدول برترین‌ها','Show Leaderboard'=>'نمایش جدول برترین‌ها',
-        'Loading'=>'در حال بارگذاری','Please wait'=>'لطفاً صبر کنید','Time Limit'=>'محدودیت زمانی','Your response'=>'پاسخ شما',
-        'You have already completed this quiz.'=>'شما قبلاً این آزمون را تکمیل کرده‌اید.',
+        'Loading'=>'در حال بارگذاری','Quiz is loading...'=>'آزمون در حال بارگذاری است…','Please wait'=>'لطفاً صبر کنید','Please wait for Quiz Results'=>'لطفاً برای نمایش نتایج آزمون صبر کنید','Time Limit'=>'محدودیت زمانی','Your response'=>'پاسخ شما',
+        'Course Status'=>'وضعیت دوره','Your Course Status'=>'وضعیت دورهٔ شما','Expand All'=>'بازکردن همه','Collapse All'=>'بستن همه','Materials'=>'منابع',
+        'Login to Enroll'=>'برای ثبت‌نام وارد شوید','Take this Course'=>'شرکت در این دوره','Enrolled'=>'ثبت‌نام‌شده','Free'=>'رایگان','Buy Now'=>'خرید دوره','Closed'=>'بسته',
+        'Certificate'=>'گواهینامه','Download Certificate'=>'دریافت گواهینامه','Available on'=>'قابل دسترسی از','Estimated Time'=>'زمان تقریبی','Prerequisites'=>'پیش‌نیازها',
+        'Assignment'=>'تکلیف','Assignments'=>'تکالیف','Upload Assignment'=>'بارگذاری تکلیف','Comments'=>'دیدگاه‌ها','Skip question'=>'ردشدن از سؤال','Back'=>'بازگشت',
+        'Answered'=>'پاسخ‌داده‌شده','Review'=>'مرور','Your time'=>'زمان شما','Time has elapsed'=>'زمان به پایان رسیده است',
+        'You must fill out this field.'=>'تکمیل این فیلد الزامی است.','This field is required.'=>'تکمیل این فیلد الزامی است.','You must answer this question.'=>'پاسخ‌دادن به این سؤال الزامی است.',
+        'Your answer was correct!'=>'پاسخ شما صحیح بود!','Your answer was incorrect.'=>'پاسخ شما نادرست بود.','You have already completed this quiz.'=>'شما قبلاً این آزمون را تکمیل کرده‌اید.',
     );
     $trimmed = trim($value);
     if (isset($map[$trimmed])) {
@@ -26,7 +32,13 @@ function evented_learndash_fa_text($value)
     if (preg_match('/^Back to\s+(.+)$/iu', $trimmed, $m)) { return 'بازگشت به ' . $m[1]; }
     if (preg_match('/^Start\s+(.+)$/iu', $trimmed, $m)) { return 'شروع ' . $m[1]; }
     if (preg_match('/^(.+)\s+Content$/iu', $trimmed, $m)) { return 'محتوای ' . $m[1]; }
-    return $value;
+    /* پیام‌هایی که label فارسی داخل جملهٔ انگلیسی تزریق شده است. */
+    $mixed = str_ireplace(
+        array('Click Here to Continue','Please wait','In Progress','Not Started','Time Limit','Back to','Start','Content','Questions','Question','Results','Course','Lesson','Topic','Quiz'),
+        array('برای ادامه کلیک کنید','لطفاً صبر کنید','در حال پیشرفت','شروع نشده','محدودیت زمانی','بازگشت به','شروع','محتوا','سؤال‌ها','سؤال','نتایج','دوره','درس','موضوع','آزمون'),
+        $trimmed
+    );
+    return $mixed !== $trimmed ? $mixed : $value;
 }
 
 function evented_learndash_fa_gettext($translation, $text, $domain)
@@ -38,3 +50,19 @@ function evented_learndash_fa_gettext($translation, $text, $domain)
 }
 add_filter('gettext','evented_learndash_fa_gettext',50,3);
 add_filter('gettext_with_context',static function($translation,$text,$context,$domain){ return evented_learndash_fa_gettext($translation,$text,$domain); },50,4);
+add_filter('ngettext',static function($translation,$single,$plural,$number,$domain){ return evented_learndash_fa_gettext($translation,1===(int)$number?$single:$plural,$domain); },50,5);
+add_filter('ngettext_with_context',static function($translation,$single,$plural,$number,$context,$domain){ return evented_learndash_fa_gettext($translation,1===(int)$number?$single:$plural,$domain); },50,6);
+
+/**
+ * شورت‌کد آزمون در یک برگهٔ معمولی wrapper قالب تکی را ندارد؛ بدون این wrapper
+ * selectorهای ایزولهٔ ee-lms عمداً روی آن اعمال نمی‌شوند.
+ */
+function evented_wrap_embedded_learndash_shortcode($output, $tag, $attr, $m)
+{
+    if (!in_array($tag, array('ld_quiz','learndash_quiz'), true) || is_admin() || is_singular('sfwd-quiz')) {
+        return $output;
+    }
+    if (false !== strpos((string) $output, 'data-ee-embedded-quiz')) { return $output; }
+    return '<section class="ee-qz-engine ee-embedded-quiz" data-ee-embedded-quiz><div class="ee-quiz-body">' . $output . '</div></section>';
+}
+add_filter('do_shortcode_tag','evented_wrap_embedded_learndash_shortcode',20,4);

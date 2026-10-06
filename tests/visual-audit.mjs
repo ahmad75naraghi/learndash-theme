@@ -26,6 +26,7 @@ const routes = [
   ['course-single', '/sfwd-courses/report-course/'],
   ['lesson-single', '/sfwd-lessons/report-lesson/'],
   ['quiz-single', '/sfwd-quiz/report-quiz/'],
+  ['quiz-embed', '/quiz-embed/'],
   ['library-page', '/library/'],
   ['videos-page', '/videos/'],
   ['podcast-page', '/podcast/'],
@@ -249,6 +250,27 @@ try {
             if (formLayout.escapedControls) report('failure', viewportName, route, `${formLayout.escapedControls} quiz form control(s) escape the form`);
             if (formLayout.formEscapes) report('failure', viewportName, route, 'quiz participant form escapes viewport');
           }
+        }
+
+        if (slug === 'quiz-embed') {
+          const embedded = await page.evaluate(() => {
+            const root = document.querySelector('[data-ee-embedded-quiz] .ee-quiz-body');
+            const button = root?.querySelector('input[name="startQuiz"]');
+            const cssLoaded = [...document.styleSheets].some(sheet => String(sheet.href || '').includes('ee-lms.css'));
+            const text = root?.innerText || '';
+            return {
+              hasRoot: !!root,
+              cssLoaded,
+              buttonValue: button?.value || '',
+              buttonHeight: button?.getBoundingClientRect().height || 0,
+              hasEnglishUi: /\b(?:In Progress|Content|Back to|Start Quiz)\b/i.test(`${text} ${button?.value || ''}`),
+            };
+          });
+          if (!embedded.hasRoot) report('failure', viewportName, route, 'embedded ld_quiz output is missing the theme wrapper');
+          if (!embedded.cssLoaded) report('failure', viewportName, route, 'ee-lms.css was not loaded for embedded ld_quiz');
+          if (embedded.buttonValue !== 'شروع آزمون') report('failure', viewportName, route, `embedded quiz button was not Persian (${embedded.buttonValue})`);
+          if (embedded.buttonHeight < 40) report('failure', viewportName, route, 'embedded quiz start button did not receive LMS styling');
+          if (embedded.hasEnglishUi) report('failure', viewportName, route, 'embedded LearnDash UI still contains mixed English labels');
         }
 
         // Under a heavy multi-page audit Playground can briefly return 502/503 for a
