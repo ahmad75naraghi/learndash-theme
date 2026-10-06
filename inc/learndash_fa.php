@@ -22,6 +22,11 @@ function evented_learndash_fa_text($value)
         'Answered'=>'پاسخ‌داده‌شده','Review'=>'مرور','Your time'=>'زمان شما','Time has elapsed'=>'زمان به پایان رسیده است',
         'You must fill out this field.'=>'تکمیل این فیلد الزامی است.','This field is required.'=>'تکمیل این فیلد الزامی است.','You must answer this question.'=>'پاسخ‌دادن به این سؤال الزامی است.',
         'Your answer was correct!'=>'پاسخ شما صحیح بود!','Your answer was incorrect.'=>'پاسخ شما نادرست بود.','You have already completed this quiz.'=>'شما قبلاً این آزمون را تکمیل کرده‌اید.',
+        'Congratulations! You have passed this quiz.'=>'تبریک! شما در این آزمون قبول شدید.','You have failed this quiz.'=>'شما در این آزمون قبول نشدید.',
+        'Please go back and complete the previous lesson.'=>'لطفاً بازگردید و درس قبلی را تکمیل کنید.','Please go back and complete the previous topic.'=>'لطفاً بازگردید و موضوع قبلی را تکمیل کنید.',
+        "You don't have access to this content"=>'شما به این محتوا دسترسی ندارید','This content is protected, please log in or enroll in the course to view this content.'=>'این محتوا محافظت شده است؛ برای مشاهده وارد شوید یا در دوره ثبت‌نام کنید.',
+        'You have earned %s out of %s points.'=>'شما از %s امتیاز، %s امتیاز کسب کرده‌اید.','Your score is %s.'=>'امتیاز شما %s است.','Average score'=>'میانگین امتیاز','Your score'=>'امتیاز شما',
+        'Back to %s'=>'بازگشت به %s','Start %s'=>'شروع %s','%s Content'=>'محتوای %s','Next %s'=>'%s بعدی','Previous %s'=>'%s قبلی',
     );
     $trimmed = trim($value);
     if (isset($map[$trimmed])) {
@@ -34,10 +39,15 @@ function evented_learndash_fa_text($value)
     if (preg_match('/^(.+)\s+Content$/iu', $trimmed, $m)) { return 'محتوای ' . $m[1]; }
     /* پیام‌هایی که label فارسی داخل جملهٔ انگلیسی تزریق شده است. */
     $mixed = str_ireplace(
-        array('Click Here to Continue','Please wait','In Progress','Not Started','Time Limit','Back to','Start','Content','Questions','Question','Results','Course','Lesson','Topic','Quiz'),
-        array('برای ادامه کلیک کنید','لطفاً صبر کنید','در حال پیشرفت','شروع نشده','محدودیت زمانی','بازگشت به','شروع','محتوا','سؤال‌ها','سؤال','نتایج','دوره','درس','موضوع','آزمون'),
+        array('Click Here to Continue','Please wait','In Progress','Not Started','Time Limit','Download Certificate','Mark Complete','Expand All','Collapse All','Back to','Start','Restart','Finish','Content','Questions','Question','Results','Assignments','Assignment','Materials','Certificate','Course','Lesson','Topic','Quiz','Correct','Incorrect','Completed','Complete','Progress','Points','Point','Score','Next','Previous','Continue','Submit','Review','Skip','Loading'),
+        array('برای ادامه کلیک کنید','لطفاً صبر کنید','در حال پیشرفت','شروع نشده','محدودیت زمانی','دریافت گواهینامه','علامت‌گذاری به‌عنوان تکمیل‌شده','بازکردن همه','بستن همه','بازگشت به','شروع','شروع دوباره','پایان','محتوا','سؤال‌ها','سؤال','نتایج','تکالیف','تکلیف','منابع','گواهینامه','دوره','درس','موضوع','آزمون','صحیح','نادرست','تکمیل‌شده','تکمیل','پیشرفت','امتیازها','امتیاز','نمره','بعدی','قبلی','ادامه','ارسال','مرور','ردشدن','در حال بارگذاری'),
         $trimmed
     );
+    if ($mixed !== $trimmed && preg_match('/[A-Za-z]/', $mixed)) {
+        $words = array('the'=>'','of'=>'از','to'=>'به','for'=>'برای','and'=>'و','or'=>'یا','your'=>'شما','you'=>'شما','have'=>'','has'=>'','is'=>'است','are'=>'هستند','was'=>'بود','must'=>'باید','this'=>'این','that'=>'آن','before'=>'پیش از','after'=>'پس از','available'=>'در دسترس','required'=>'الزامی','optional'=>'اختیاری','show'=>'نمایش','hide'=>'پنهان‌کردن','view'=>'مشاهده','time'=>'زمان','elapsed'=>'سپری‌شده','status'=>'وضعیت','all'=>'همه');
+        $mixed = preg_replace_callback('/\b(?:the|of|to|for|and|or|your|you|have|has|is|are|was|must|this|that|before|after|available|required|optional|show|hide|view|time|elapsed|status|all)\b/i', static function ($match) use ($words) { return $words[strtolower($match[0])]; }, $mixed);
+        $mixed = preg_replace('/\s{2,}/u', ' ', trim($mixed));
+    }
     return $mixed !== $trimmed ? $mixed : $value;
 }
 
@@ -45,8 +55,10 @@ function evented_learndash_fa_gettext($translation, $text, $domain)
 {
     $domains = array('learndash','learndash-theme','learndash-propanel','wp-pro-quiz','learndash-quiz','ld-content-cloner');
     if (!in_array((string) $domain, $domains, true)) { return $translation; }
+    $source_fa = evented_learndash_fa_text($text);
+    if ($source_fa !== $text && !preg_match('/[A-Za-z]/', $source_fa)) { return $source_fa; }
     $translated = evented_learndash_fa_text($translation);
-    return $translated === $translation ? evented_learndash_fa_text($text) : $translated;
+    return $translated === $translation ? $source_fa : $translated;
 }
 add_filter('gettext','evented_learndash_fa_gettext',50,3);
 add_filter('gettext_with_context',static function($translation,$text,$context,$domain){ return evented_learndash_fa_gettext($translation,$text,$domain); },50,4);

@@ -85,7 +85,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
         return;
     }
     wp_enqueue_media();
-    wp_enqueue_style('evented-theme-settings', PATH_DIR_URL . '/assets/css/admin/theme-settings.css', array(), '1.3.1');
+    wp_enqueue_style('evented-theme-settings', PATH_DIR_URL . '/assets/css/admin/theme-settings.css', array(), '1.3.2');
     wp_enqueue_script('evented-theme-settings-js', PATH_DIR_URL . '/assets/js/admin/theme-settings.js', array('jquery'), '1.1.0', true);
     wp_localize_script('evented-theme-settings-js', 'eeSettings', array(
         'mediaTitle'    => 'انتخاب تصویر اسلایدر',
@@ -225,39 +225,9 @@ function evented_render_theme_settings_page()
     $schema = evented_options_schema();
     $values        = array_merge(evented_options_defaults(), (array) get_option(EVENTED_OPT_KEY, array()));
     $base          = admin_url('admin.php?page=evented-theme-settings');
-    $theme         = wp_get_theme();
-    $theme_version = (string) $theme->get('Version');
-    $release       = function_exists('evented_theme_updater_get_release') ? evented_theme_updater_get_release() : null;
-    $has_update    = is_array($release) && !empty($release['version']) && version_compare((string) $release['version'], $theme_version, '>');
-    $check_url     = wp_nonce_url(admin_url('admin-post.php?action=evented_check_theme_update'), 'evented_check_theme_update');
     ?>
     <div class="wrap evented-settings-wrap">
         <h1>تنظیمات قالب <?php echo esc_html(get_bloginfo('name')); ?></h1>
-
-        <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- فقط پیام نتیجهٔ redirect است. ?>
-        <?php if (isset($_GET['evented_update_checked'])) : ?>
-            <div class="notice notice-success is-dismissible"><p>بررسی به‌روزرسانی GitHub انجام شد.</p></div>
-        <?php endif; ?>
-
-        <div class="evented-update-card">
-            <span class="dashicons dashicons-update-alt" aria-hidden="true"></span>
-            <div>
-                <strong>به‌روزرسانی قالب</strong>
-                <p>نسخهٔ نصب‌شده: <b dir="ltr"><?php echo esc_html($theme_version); ?></b>
-                    <?php if ($has_update) : ?>
-                        — نسخهٔ <b dir="ltr"><?php echo esc_html($release['version']); ?></b> آمادهٔ نصب است.
-                    <?php elseif ($release) : ?>
-                        — قالب به‌روز است.
-                    <?php else : ?>
-                        — هنوز Release عمومی معتبری در GitHub منتشر نشده یا ارتباط موقتاً در دسترس نیست.
-                    <?php endif; ?>
-                </p>
-            </div>
-            <div class="evented-update-actions">
-                <?php if ($has_update) : ?><a class="button button-primary" href="<?php echo esc_url(self_admin_url('update-core.php')); ?>">مشاهده و نصب</a><?php endif; ?>
-                <a class="button" href="<?php echo esc_url($check_url); ?>">بررسی دوباره</a>
-            </div>
-        </div>
 
         <?php if ($updated) : ?>
             <div class="notice notice-success is-dismissible"><p>✅ تغییرات با موفقیت ذخیره شد.</p></div>

@@ -180,7 +180,23 @@ function evented_theme_updater_build_update($release, $installed, $slug)
 	);
 }
 
-/* معرفی نسخهٔ جدید به صفحهٔ «به‌روزرسانی‌ها»ی وردپرس. */
+/* این قالب همیشه از بستهٔ امن Release به‌صورت خودکار به‌روز می‌شود. */
+add_filter('auto_update_theme', function ($update, $item) {
+	$slug = evented_theme_updater_slug();
+	$item_slug = is_object($item) && isset($item->theme) ? (string) $item->theme : (is_array($item) && isset($item['theme']) ? (string) $item['theme'] : '');
+	return $slug === $item_slug ? true : $update;
+}, 20, 2);
+
+/* لینک روشن/خاموش‌کردن خودکار زیر کارت قالب لازم نیست؛ سیاست این قالب همیشه خودکار است. */
+add_filter('theme_auto_update_setting_html', function ($html, $stylesheet) {
+	return evented_theme_updater_slug() === (string) $stylesheet ? '' : $html;
+}, 20, 2);
+add_action('admin_head-themes.php', function () {
+	$slug = evented_theme_updater_slug();
+	echo '<style>.theme[data-slug="' . esc_attr($slug) . '"] .update-message{display:none!important}</style>';
+});
+
+/* معرفی نسخهٔ جدید به موتور به‌روزرسان خودکار وردپرس. */
 add_filter('pre_set_site_transient_update_themes', function ($transient) {
 	if (!is_object($transient)) {
 		$transient = new stdClass();
@@ -192,7 +208,11 @@ add_filter('pre_set_site_transient_update_themes', function ($transient) {
 	$slug    = evented_theme_updater_slug();
 	$theme   = wp_get_theme($slug);
 	$current = $theme->exists() ? (string) $theme->get('Version') : '';
-	$update  = evented_theme_updater_build_update(evented_theme_updater_get_release(), $current, $slug);
+	$release = evented_theme_updater_get_release();
+	$completed = (string) get_site_option('evented_theme_last_completed_release', '');
+	$update  = (is_array($release) && !empty($release['version']) && $completed === (string) $release['version'])
+		? null
+		: evented_theme_updater_build_update($release, $current, $slug);
 	if ($update) {
 		$transient->response[$slug] = $update;
 	} else {
@@ -260,21 +280,12 @@ add_action('upgrader_process_complete', function ($upgrader, $hook_extra) {
 	$slug   = evented_theme_updater_slug();
 	$themes = isset($hook_extra['themes']) ? (array) $hook_extra['themes'] : array();
 	if ((isset($hook_extra['theme']) && $slug === $hook_extra['theme']) || in_array($slug, $themes, true)) {
+		$release = evented_theme_updater_get_release();
+		if (isset($upgrader->result) && !is_wp_error($upgrader->result) && is_array($release) && !empty($release['version'])) {
+			update_site_option('evented_theme_last_completed_release', (string) $release['version']);
+		}
 		delete_site_transient(EVENTED_THEME_UPDATE_CACHE);
 		delete_site_transient('update_themes');
+		wp_clean_themes_cache(true);
 	}
 }, 10, 2);
-
-/* دکمهٔ بررسی اجباری در صفحهٔ تنظیمات قالب. */
-add_action('admin_post_evented_check_theme_update', function () {
-	if (!current_user_can('update_themes')) {
-		wp_die(esc_html__('شما اجازهٔ بررسی به‌روزرسانی قالب را ندارید.', 'evented-edu'), '', array('response' => 403));
-	}
-	check_admin_referer('evented_check_theme_update');
-	delete_site_transient(EVENTED_THEME_UPDATE_CACHE);
-	delete_site_transient('update_themes');
-	evented_theme_updater_get_release(true);
-	wp_update_themes();
-	wp_safe_redirect(add_query_arg('evented_update_checked', '1', admin_url('admin.php?page=evented-theme-settings')));
-	exit;
-});

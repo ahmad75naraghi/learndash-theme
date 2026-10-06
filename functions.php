@@ -32,8 +32,8 @@ function evented_has_embedded_lms_shortcode()
 /** assetهای کامل LMS؛ هم برای قالب تکی و هم برای شورت‌کد داخل برگه. */
 function evented_enqueue_lms_assets($with_courses = false)
 {
-    wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.6.3');
-    wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.3.1', true);
+    wp_enqueue_style('ee-lms', PATH_DIR_URL . '/assets/css/newhome/ee-lms.css', array('ee-shell'), '1.6.4');
+    wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.4.0', true);
     wp_localize_script('ee-lms', 'eeLms', array('ajax_url' => admin_url('admin-ajax.php')));
     if ($with_courses) {
         wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.3.0');
@@ -90,7 +90,7 @@ add_action('wp_enqueue_scripts', function () {
         // برگهٔ عمومی و صفحهٔ ۴۰۴.
         wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.3.0');
         // سایدبار فیلتر دوره‌ها و نوار مرتب‌سازی (باز/بسته در موبایل، ارسال خودکار)
-        wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.3.1', true);
+        wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.4.0', true);
     } elseif (is_home() || is_archive() || is_search()) {
         wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.9.0');
     }

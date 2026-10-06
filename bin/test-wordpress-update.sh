@@ -31,12 +31,13 @@ if [[ -n "${SMOKE_USERNAME:-}" && -n "${SMOKE_PASSWORD:-}" ]]; then
 		--data-urlencode 'testcookie=1' "$base/wp-login.php" -o /dev/null
 	grep -Fq 'wordpress_logged_in_' "$cookie" || { echo 'Explicit WordPress login failed.' >&2; exit 1; }
 fi
-curl -sS "${curl_retry[@]}" --max-time 30 --max-redirs 10 -c "$cookie" -b "$cookie" -L "$base/wp-admin/admin.php?page=evented-theme-settings" -o "$response"
+curl -sS "${curl_retry[@]}" --max-time 30 --max-redirs 10 -c "$cookie" -b "$cookie" -L "$base/evented-update-integration.php?nonce_only=1" -o "$response"
 nonce=$(python3 - "$response" <<'PY'
-import html, re, sys
-text = html.unescape(open(sys.argv[1], encoding='utf-8').read())
-match = re.search(r'admin-post\.php\?action=evented_check_theme_update&_wpnonce=([A-Za-z0-9_-]+)', text)
-print(match.group(1) if match else '')
+import json, sys
+try:
+    print(json.load(open(sys.argv[1], encoding='utf-8')).get('nonce', ''))
+except Exception:
+    print('')
 PY
 )
 [[ -n "$nonce" ]] || { echo 'Could not extract authenticated updater nonce.' >&2; exit 1; }

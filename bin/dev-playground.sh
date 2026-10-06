@@ -27,7 +27,7 @@ add_action('init', static function () {
 	register_taxonomy('wpdmtag', array('clip', 'wpdmpro'), array('public' => true, 'hierarchical' => false, 'show_ui' => true));
 }, 10);
 add_shortcode('ld_quiz', static function () {
-	return '<div class="learndash-wrapper"><div class="ld-lesson-status"><div class="ld-status">In Progress</div></div><div class="ld-table-list-title"><span class="ld-text">درس Content</span></div><div class="wpProQuiz_content"><div class="wpProQuiz_text"><div><input class="wpProQuiz_button" type="button" value="Start آزمون" name="startQuiz"></div></div></div><a class="ld-course-step-back" href="#">Back to دوره</a></div>';
+	return '<section class="ee-qz-result is-fail" data-ee-quiz-best="50"><div class="ee-qz-gauge" style="--p:50"><b>۵۰<i>٪</i></b></div></section><div class="learndash-wrapper"><div class="ld-lesson-status"><div class="ld-status">In Progress</div></div><div class="ld-table-list-title"><span class="ld-text">درس Content</span></div><div class="wpProQuiz_content"><div class="wpProQuiz_text"><div><input class="wpProQuiz_button" type="button" value="Start آزمون" name="startQuiz"></div></div><div class="wpProQuiz_results"><div class="wpProQuiz_points">Your score: <span>100%</span></div><input class="wpProQuiz_button wpProQuiz_button_restartQuiz" type="button" value="Restart Quiz" name="restartQuiz"></div></div><a class="ld-course-step-back" href="#">Back to دوره</a></div>';
 });
 PHP
 cat > "$WORK/bp.json" <<'JSON'

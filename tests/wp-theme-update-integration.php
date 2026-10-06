@@ -18,6 +18,9 @@ if (!is_user_logged_in() || !current_user_can('update_themes')) {
 	$result['error'] = 'authenticated administrator required';
 	$finish($result, 403);
 }
+if (isset($_GET['nonce_only'])) {
+	$finish(array('success' => true, 'nonce' => wp_create_nonce('evented_check_theme_update')));
+}
 if (!wp_verify_nonce(isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '', 'evented_check_theme_update')) {
 	$result['error'] = 'invalid nonce';
 	$finish($result, 403);
@@ -62,7 +65,7 @@ $theme = wp_get_theme($stylesheet);
 
 $result['checks'] = array(
 	'upgrader_returned_true' => true === $installed,
-	'version_is_2_5_2'       => '2.5.2' === (string) $theme->get('Version'),
+	'version_is_2_5_3'       => '2.5.3' === (string) $theme->get('Version'),
 	'theme_stays_active'      => $stylesheet === get_option('stylesheet'),
 	'option_is_preserved'     => $marker === get_option('evented_update_integration_marker'),
 	'obsolete_file_removed'   => !file_exists($sentinel),

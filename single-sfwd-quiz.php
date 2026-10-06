@@ -172,7 +172,7 @@ while (have_posts()) :
 
 				<?php if ($ee_logged_in && $ee_used > 0) : ?>
 					<!-- نتیجهٔ من -->
-					<section class="ee-qz-result is-<?php echo $ee_passed ? 'pass' : 'fail'; ?>" aria-label="<?php esc_attr_e('نتیجهٔ من', 'evented-edu'); ?>">
+					<section class="ee-qz-result is-<?php echo $ee_passed ? 'pass' : 'fail'; ?>" data-ee-quiz-best="<?php echo esc_attr((string) round($ee_best['pct'])); ?>" aria-label="<?php esc_attr_e('نتیجهٔ من', 'evented-edu'); ?>">
 						<div class="ee-qz-gauge" style="--p:<?php echo (int) round($ee_best['pct']); ?>">
 							<svg viewBox="0 0 36 36" aria-hidden="true"><path class="bg" d="M18 2.5a15.5 15.5 0 1 1 0 31 15.5 15.5 0 0 1 0-31"/><path class="fg" d="M18 2.5a15.5 15.5 0 1 1 0 31 15.5 15.5 0 0 1 0-31"/></svg>
 							<b><?php echo esc_html($ee_fa((int) round($ee_best['pct']))); ?><i>٪</i></b>

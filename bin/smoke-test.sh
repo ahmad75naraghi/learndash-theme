@@ -340,8 +340,8 @@ video_grid_count=$(grep -Foc 'class="ee-resource-grid"' "$tmp/resource-page-vide
 reject_text "$tmp/resource-page-videos-.html" 'wp-audio-shortcode' 'videos page executed legacy page shortcodes and duplicated structural content'
 fetch '/quiz-embed/' "$tmp/quiz-embed.html"
 require_text "$tmp/quiz-embed.html" 'data-ee-embedded-quiz' 'embedded ld_quiz wrapper is missing'
-require_text "$tmp/quiz-embed.html" 'ee-lms.css?ver=1.6.3' 'embedded ld_quiz stylesheet was not enqueued'
-require_text "$tmp/quiz-embed.html" 'ee-lms.js?ver=1.3.1' 'embedded ld_quiz script was not enqueued'
+require_text "$tmp/quiz-embed.html" 'ee-lms.css?ver=1.6.4' 'embedded ld_quiz stylesheet was not enqueued'
+require_text "$tmp/quiz-embed.html" 'ee-lms.js?ver=1.4.0' 'embedded ld_quiz script was not enqueued'
 fetch '/library/page/2/' "$tmp/resource-page-paged.html"
 require_text "$tmp/resource-page-paged.html" 'کتاب آزمایشی' 'resource pagination did not return the second page'
 fetch '/videos/?resource_search=%D9%88%DB%8C%D8%AF%D8%A6%D9%88' "$tmp/resource-page-search.html"
@@ -396,11 +396,11 @@ PY
 fi
 
 fetch '/wp-admin/admin.php?page=evented-theme-settings' "$tmp/settings.html"
-require_text "$tmp/settings.html" 'evented-update-card' 'theme settings/update card did not render (admin session required)'
+reject_text "$tmp/settings.html" 'evented-update-card' 'manual theme update card must not be rendered'
 require_text "$tmp/settings.html" 'name="slider_height"' 'desktop slider height setting is missing'
 require_text "$tmp/settings.html" 'name="slider_height_tablet"' 'tablet slider height setting is missing'
 require_text "$tmp/settings.html" 'name="slider_height_mobile"' 'mobile slider height setting is missing'
-require_text "$tmp/settings.html" 'theme-settings.css?ver=1.3.1' 'slider settings stylesheet cache version is stale'
+require_text "$tmp/settings.html" 'theme-settings.css?ver=1.3.2' 'slider settings stylesheet cache version is stale'
 fetch '/wp-admin/admin.php?page=evented-theme-settings&tab=content_display' "$tmp/settings-content.html"
 require_text "$tmp/settings-content.html" 'name="ee[post_author_box]"' 'independent article author-box setting is missing'
 

@@ -263,13 +263,20 @@ try {
               cssLoaded,
               buttonValue: button?.value || '',
               buttonHeight: button?.getBoundingClientRect().height || 0,
-              hasEnglishUi: /\b(?:In Progress|Content|Back to|Start Quiz)\b/i.test(`${text} ${button?.value || ''}`),
+              bestResult: root?.querySelector('[data-ee-quiz-best]')?.dataset.eeQuizBest || '',
+              restartHidden: (() => {
+                const restart = root?.querySelector('input[name="restartQuiz"]');
+                return !!restart && restart.disabled && getComputedStyle(restart).display === 'none';
+              })(),
+              hasEnglishUi: /\b(?:In Progress|Content|Back to|Start Quiz|Restart Quiz|Your score)\b/i.test(`${text} ${[...root?.querySelectorAll('input') || []].map(input => input.value).join(' ')}`),
             };
           });
           if (!embedded.hasRoot) report('failure', viewportName, route, 'embedded ld_quiz output is missing the theme wrapper');
           if (!embedded.cssLoaded) report('failure', viewportName, route, 'ee-lms.css was not loaded for embedded ld_quiz');
           if (embedded.buttonValue !== 'شروع آزمون') report('failure', viewportName, route, `embedded quiz button was not Persian (${embedded.buttonValue})`);
           if (embedded.buttonHeight < 40) report('failure', viewportName, route, 'embedded quiz start button did not receive LMS styling');
+          if (embedded.bestResult !== '100') report('failure', viewportName, route, `best quiz result was not synchronized (${embedded.bestResult})`);
+          if (!embedded.restartHidden) report('failure', viewportName, route, 'restart button remains enabled after a 100% result');
           if (embedded.hasEnglishUi) report('failure', viewportName, route, 'embedded LearnDash UI still contains mixed English labels');
         }
 

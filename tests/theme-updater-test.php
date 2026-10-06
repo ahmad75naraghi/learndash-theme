@@ -30,6 +30,10 @@ $assert = static function ($condition, $message) use (&$failures) {
 		$failures[] = $message;
 	}
 };
+$auto_callback = $GLOBALS['ee_test_filters']['auto_update_theme'][0] ?? null;
+$setting_callback = $GLOBALS['ee_test_filters']['theme_auto_update_setting_html'][0] ?? null;
+$assert(is_callable($auto_callback) && true === $auto_callback(false, (object) array('theme'=>'evented-edu')), 'Theme auto-update must always be enabled.');
+$assert(is_callable($setting_callback) && '' === $setting_callback('<button>toggle</button>', 'evented-edu'), 'Manual auto-update toggle must be hidden.');
 
 $base = array(
 	'tag_name'     => 'v2.4.4',
@@ -70,7 +74,7 @@ $assert(null === evented_theme_updater_normalize_release($evil), 'Packages outsi
 $update = evented_theme_updater_build_update($release, '2.1.0', 'evented-edu');
 $assert(is_array($update) && '2.4.4' === $update['new_version'], 'A newer release must create a WordPress update response.');
 $assert(null === evented_theme_updater_build_update($release, '2.4.4', 'evented-edu'), 'The installed version must not update to itself.');
-$assert(null === evented_theme_updater_build_update($release, '2.5.2', 'evented-edu'), 'Downgrades must never be offered.');
+$assert(null === evented_theme_updater_build_update($release, '2.5.3', 'evented-edu'), 'Downgrades must never be offered.');
 
 /* Simulate the random root directory produced by a GitHub zipball. */
 $callbacks = isset($GLOBALS['ee_test_filters']['upgrader_source_selection']) ? $GLOBALS['ee_test_filters']['upgrader_source_selection'] : array();
@@ -103,7 +107,7 @@ if (is_callable($source_callback)) {
 $wp_filesystem->delete($tmp, true);
 
 $style = file_get_contents(dirname(__DIR__) . '/style.css');
-$assert(1 === preg_match('/^Version:\s*2\.5\.2\s*$/m', $style), 'style.css must advertise version 2.5.2.');
+$assert(1 === preg_match('/^Version:\s*2\.5\.2\s*$/m', $style), 'style.css must advertise version 2.5.3.');
 $assert(1 === preg_match('#^Update URI:\s*https://github\.com/ahmad75naraghi/learndash-theme\s*$#m', $style), 'style.css must have the GitHub Update URI.');
 
 if ($failures) {
