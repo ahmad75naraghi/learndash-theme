@@ -50,7 +50,7 @@ required_snippets = {
     "inc/jalali.php": ["evented_jalali_from_gregorian", "evented_jalali_to_gregorian", "evented_jalali_checkdate", "evented_jalali_to_timestamp", "evented_jalali_format", "evented_jalali_is_machine_format", "post_date_column_time", "evented_enqueue_jalali_picker"],
     "assets/js/jalali-core.js": ["EventedJalali", "toGregorian", "fromGregorian", "isValid", "toPersianDigits"],
     "assets/js/jalali-loader.js": ["jalaliReady", "MutationObserver", "setCustomValidity", "jalaliDatepicker.startWatch"],
-    "functions.php": ["evented_has_embedded_lms_shortcode", "has_shortcode($post->post_content, $tag)", "evented_enqueue_lms_assets", "is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.9.0'", "evented-home.css', array('ee-shell'), '1.5.1'", "ee-lms.css', array('ee-shell'), '1.6.4'"],
+    "functions.php": ["evented_has_embedded_lms_shortcode", "has_shortcode($post->post_content, $tag)", "evented_enqueue_lms_assets", "is_page(array('library', 'videos', 'video', 'gallery-page', 'download'))", "is_page('podcast')", "archive-post.css', array('ee-shell'), '1.9.1'", "evented-home.css', array('ee-shell'), '1.5.1'", "ee-lms.css', array('ee-shell'), '1.6.4'"],
     "assets/css/panel.css": ["@media (max-width: 359.98px)", ".ee-panel-pager", "Final containment layer", ".transactions-table", "overflow-x: auto"],
     "assets/css/login.css": ["width: min(960px, 100%)", "min-height: 100dvh", "@media (max-width: 420px)", ".otp-field"],
     "page-login.php": ["login.css?ver=1.1.0"],
@@ -101,7 +101,7 @@ required_snippets = {
     "assets/css/admin/podcast-tracks.css": [".ee-podcast-admin-row", ".ee-podcast-admin-fields"],
     "page-download.php": ["ee-download", "Template Name: دانلودها"],
     "single-wpdmpro.php": ["evented_download_data", "ee-download-files", "evented_share_links"],
-    "template-parts/ee-download-archive.php": ["download_search", "download_order", "ee-download-grid", "evented_download_data"],
+    "template-parts/ee-download-archive.php": ["download_search", "download_order", "ee-download-grid", "evented_download_data", "ee-download-card-icon", "ee-download-file-kind"],
     "inc/video_playlist.php": ["EVENTED_VIDEO_PLAYLIST_META", "register_post_meta('clip'", "evented_save_video_playlist", "evented_migrate_video_playlists", "__block_editor_compatible_meta_box"],
     "single-clip.php": ["'show_meta' => true", "'taxonomy' => ''"],
     "archive-clip.php": ["'ee_taxonomy' => ''"],
@@ -109,7 +109,7 @@ required_snippets = {
     "archive-gallery.php": ["ee_taxonomy' => 'galery_cat'", "'ee_category_cards' => true", "'ee_hide_sidebar' => true"],
     "taxonomy-galery_cat.php": ["'ee_hide_sidebar' => true"],
     "single-gallery.php": ["'hide_sidebar' => true"],
-    "template-parts/ee-resource-page.php": ["resource_search", "resource_cat", "evented_pagination", "evented_empty_state", "wp_style_is('archive-post'", "'1.9.0'"],
+    "template-parts/ee-resource-page.php": ["resource_search", "resource_cat", "evented_pagination", "evented_empty_state", "wp_style_is('archive-post'", "'1.9.1'"],
     "page-library.php": ["'post_type' => 'lib'", "'taxonomy' => 'wpdmcategory'"],
     "page-videos.php": ["'post_type' => 'clip'", "'taxonomy' => ''"],
     "page-gallery.php": ["'post_type' => 'gallery'", "'taxonomy' => 'galery_cat'"],
@@ -123,7 +123,7 @@ for rel, snippets in required_snippets.items():
             errors.append(f"required QA contract missing in {rel}: {snippet}")
 
 forbidden_snippets = {
-    "template-parts/ee-download-archive.php": ["download_cat", "wpdmcategory", "ee-resource-chips"],
+    "template-parts/ee-download-archive.php": ["download_cat", "wpdmcategory", "ee-resource-chips", "ee-resource-card-media", "<img", "$data['preview']"],
     "single-wpdmpro.php": ["wpdmcategory", "ee-download-terms"],
     "inc/live_search.php": ["rawurlencode($q)", "'video'        => 'smart_display'", "'downloads'    => 'download'"],
     "inc/theme_updater.php": ["$payload['zipball_url']"],

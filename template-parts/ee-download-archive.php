@@ -18,7 +18,7 @@ if ('oldest' === $order) { $args['order'] = 'ASC'; }
 if ('title' === $order) { $args['orderby'] = 'title'; $args['order'] = 'ASC'; }
 $downloads = post_type_exists('wpdmpro') ? new WP_Query($args) : null;
 if (!wp_style_is('archive-post', 'enqueued')) {
-	wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.9.0');
+	wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.9.1');
 }
 get_template_part('template-parts/ee', 'head', array('ee_body_class' => 'ee-archive ee-download-archive'));
 get_template_part('template-parts/ee', 'header', array('ee_active' => 'downloads'));
@@ -37,12 +37,26 @@ get_template_part('template-parts/ee', 'header', array('ee_active' => 'downloads
 		</form>
 		<?php if ($downloads instanceof WP_Query && $downloads->have_posts()) : ?>
 			<div class="ee-resource-grid ee-download-grid">
-			<?php while ($downloads->have_posts()) : $downloads->the_post(); $data = evented_download_data(get_the_ID()); ?>
+			<?php while ($downloads->have_posts()) : $downloads->the_post();
+				$data = evented_download_data(get_the_ID());
+				$extensions = array_values(array_unique(array_filter(wp_list_pluck($data['files'], 'extension'))));
+				$type_label = 1 === count($extensions) ? strtoupper($extensions[0]) : (count($extensions) > 1 ? 'چندفرمتی' : 'فایل');
+				$excerpt = trim((string) get_the_excerpt());
+				?>
 				<article <?php post_class('ee-resource-card ee-download-card'); ?>>
-					<a class="ee-resource-card-media" href="<?php the_permalink(); ?>" aria-label="مشاهدهٔ <?php echo esc_attr(get_the_title()); ?>"><?php if ($data['preview']) { ?><img src="<?php echo esc_url($data['preview']); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" loading="lazy" decoding="async"><?php } else { ?><span class="ee-resource-placeholder"><svg class="ee-ic" aria-hidden="true"><use href="#i-download_for_offline"></use></svg></span><?php } ?></a>
-					<div class="ee-resource-card-body"><h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2><p><?php echo esc_html(wp_trim_words(get_the_excerpt(), 18)); ?></p>
-						<div class="ee-download-card-stats"><?php if ($data['size']) : ?><span><svg class="ee-ic" aria-hidden="true"><use href="#i-download"></use></svg><?php echo esc_html($data['size']); ?></span><?php endif; ?><span><?php echo esc_html(number_format_i18n($data['file_count'])); ?> فایل</span><span><?php echo esc_html(number_format_i18n($data['downloads'])); ?> دانلود</span></div>
-						<div class="ee-download-card-actions"><a class="ee-resource-card-more" href="<?php the_permalink(); ?>">جزئیات<svg class="ee-ic" aria-hidden="true"><use href="#i-arrow_back"></use></svg></a><?php if (1 === $data['file_count']) : ?><a class="ee-btn ee-btn-primary ee-download-direct" href="<?php echo esc_url($data['files'][0]['url']); ?>">دانلود</a><?php endif; ?></div>
+					<div class="ee-download-card-top">
+						<a class="ee-download-card-icon" href="<?php the_permalink(); ?>" aria-label="مشاهدهٔ جزئیات <?php echo esc_attr(get_the_title()); ?>"><svg class="ee-ic" aria-hidden="true"><use href="#i-download_for_offline"></use></svg></a>
+						<div class="ee-download-card-heading"><span class="ee-download-file-kind"><?php echo esc_html($type_label); ?></span><h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2></div>
+						<span class="ee-download-file-count"><?php echo esc_html(number_format_i18n($data['file_count'])); ?> فایل</span>
+					</div>
+					<div class="ee-resource-card-body">
+						<?php if ($excerpt) : ?><p><?php echo esc_html(wp_trim_words($excerpt, 22)); ?></p><?php endif; ?>
+						<div class="ee-download-card-stats">
+							<?php if ($data['size']) : ?><span><svg class="ee-ic" aria-hidden="true"><use href="#i-download"></use></svg><?php echo esc_html($data['size']); ?></span><?php endif; ?>
+							<span><svg class="ee-ic" aria-hidden="true"><use href="#i-calendar_month"></use></svg><?php echo esc_html(get_the_date()); ?></span>
+							<span><svg class="ee-ic" aria-hidden="true"><use href="#i-download_for_offline"></use></svg><?php echo esc_html(number_format_i18n($data['downloads'])); ?> دانلود</span>
+						</div>
+						<div class="ee-download-card-actions"><a class="ee-resource-card-more" href="<?php the_permalink(); ?>">مشاهدهٔ جزئیات<svg class="ee-ic" aria-hidden="true"><use href="#i-arrow_back"></use></svg></a><?php if (1 === $data['file_count']) : ?><a class="ee-btn ee-btn-primary ee-download-direct" href="<?php echo esc_url($data['files'][0]['url']); ?>"><svg class="ee-ic" aria-hidden="true"><use href="#i-download"></use></svg>دانلود مستقیم</a><?php endif; ?></div>
 					</div>
 				</article>
 			<?php endwhile; ?>

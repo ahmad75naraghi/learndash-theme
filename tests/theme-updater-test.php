@@ -74,7 +74,7 @@ $assert(null === evented_theme_updater_normalize_release($evil), 'Packages outsi
 $update = evented_theme_updater_build_update($release, '2.1.0', 'evented-edu');
 $assert(is_array($update) && '2.4.4' === $update['new_version'], 'A newer release must create a WordPress update response.');
 $assert(null === evented_theme_updater_build_update($release, '2.4.4', 'evented-edu'), 'The installed version must not update to itself.');
-$assert(null === evented_theme_updater_build_update($release, '2.5.3', 'evented-edu'), 'Downgrades must never be offered.');
+$assert(null === evented_theme_updater_build_update($release, '2.5.4', 'evented-edu'), 'Downgrades must never be offered.');
 
 /* Simulate the random root directory produced by a GitHub zipball. */
 $callbacks = isset($GLOBALS['ee_test_filters']['upgrader_source_selection']) ? $GLOBALS['ee_test_filters']['upgrader_source_selection'] : array();
@@ -107,7 +107,7 @@ if (is_callable($source_callback)) {
 $wp_filesystem->delete($tmp, true);
 
 $style = file_get_contents(dirname(__DIR__) . '/style.css');
-$assert(1 === preg_match('/^Version:\s*2\.5\.3\s*$/m', $style), 'style.css must advertise version 2.5.3.');
+$assert(1 === preg_match('/^Version:\s*2\.5\.4\s*$/m', $style), 'style.css must advertise version 2.5.4.');
 $assert(1 === preg_match('#^Update URI:\s*https://github\.com/ahmad75naraghi/learndash-theme\s*$#m', $style), 'style.css must have the GitHub Update URI.');
 
 if ($failures) {

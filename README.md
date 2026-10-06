@@ -236,7 +236,7 @@ define('EVENTED_SMS_BODY_ID', 12345);
 
 1. مقدار `Version` در `style.css` افزایش یابد.
 2. بعد از merge، بسته با `bash bin/build-theme-release.sh /tmp/evented-edu.zip` ساخته شود.
-3. GitHub Release با tag هم‌نسخه (مثلاً `v2.5.3`) ساخته و فایل `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به آن پیوست شود.
+3. GitHub Release با tag هم‌نسخه (مثلاً `v2.5.4`) ساخته و فایل `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به آن پیوست شود.
 4. وجود `evented-edu/inc/lib/autoload.php`، کلاس `Mpdf\\Mpdf` و دو TTF گواهینامه در خود ZIP تأیید شود.
 5. در پیشخوان «تنظیمات قالب → بررسی دوباره» زده شود و نصب از صفحهٔ به‌روزرسانی‌های وردپرس انجام گیرد.
 

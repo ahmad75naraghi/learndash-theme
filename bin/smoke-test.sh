@@ -333,7 +333,7 @@ require_text "$tmp/resource-page-library-.html" 'name="resource_cat"' 'library t
 reject_text "$tmp/resource-page-videos-.html" 'name="resource_cat"' 'videos page must not render a taxonomy filter'
 require_text "$tmp/resource-page-gallery-page-.html" 'name="resource_cat"' 'gallery taxonomy filter is missing'
 reject_text "$tmp/resource-page-gallery-page-.html" 'class="ee-side"' 'gallery page template must not render a sidebar'
-require_text "$tmp/resource-page-videos-.html" 'archive-post.css?ver=1.9.0' 'videos page did not enqueue its dedicated layout stylesheet'
+require_text "$tmp/resource-page-videos-.html" 'archive-post.css?ver=1.9.1' 'videos page did not enqueue its dedicated layout stylesheet'
 require_text "$tmp/resource-page-videos-.html" 'page-template-default' 'videos fixture unexpectedly relies on a manually assigned page template'
 video_grid_count=$(grep -Foc 'class="ee-resource-grid"' "$tmp/resource-page-videos-.html" || true)
 [[ "$video_grid_count" -eq 1 ]] || fail "videos page rendered its archive $video_grid_count times instead of once"

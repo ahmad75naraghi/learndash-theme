@@ -252,6 +252,22 @@ try {
           }
         }
 
+        if (slug === 'downloads-page') {
+          const downloads = await page.evaluate(() => {
+            const cards = [...document.querySelectorAll('.ee-download-card')];
+            return {
+              count: cards.length,
+              images: cards.reduce((total, card) => total + card.querySelectorAll('img, .ee-resource-card-media').length, 0),
+              icons: cards.filter(card => card.querySelector('.ee-download-card-icon .ee-ic')).length,
+              escaped: cards.some(card => card.getBoundingClientRect().right > document.documentElement.clientWidth + 1 || card.getBoundingClientRect().left < -1),
+            };
+          });
+          if (!downloads.count) report('failure', viewportName, route, 'download archive has no cards');
+          if (downloads.images) report('failure', viewportName, route, `${downloads.images} image/media element(s) remain in image-free download cards`);
+          if (downloads.icons !== downloads.count) report('failure', viewportName, route, 'download cards are missing their file icon');
+          if (downloads.escaped) report('failure', viewportName, route, 'download card escapes the viewport');
+        }
+
         if (slug === 'quiz-embed') {
           const embedded = await page.evaluate(() => {
             const root = document.querySelector('[data-ee-embedded-quiz] .ee-quiz-body');

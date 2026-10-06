@@ -68,9 +68,9 @@ add_action('wp_enqueue_scripts', function () {
         || is_page('podcast')
     ) {
         // هم Page Template انتخابی و هم page-{slug}.php باید asset کامل منابع را بگیرند.
-        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.9.0');
+        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.9.1');
     } elseif (is_singular(array('post', 'lib', 'clip', 'gallery', 'wpdmpro', 'sr_playlist'))) {
-        wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.9.0');
+        wp_enqueue_style('single-post', PATH_DIR_URL . '/assets/css/single-post.css', array('ee-shell'), '1.9.1');
         if (is_singular('clip')) {
             wp_enqueue_script('ee-resource-video', PATH_DIR_URL . '/assets/js/resource-video.js', array(), '1.1.0', true);
         } elseif (is_singular('sr_playlist')) {
@@ -92,6 +92,6 @@ add_action('wp_enqueue_scripts', function () {
         // سایدبار فیلتر دوره‌ها و نوار مرتب‌سازی (باز/بسته در موبایل، ارسال خودکار)
         wp_enqueue_script('ee-lms', PATH_DIR_URL . '/assets/js/newhome/ee-lms.js', array(), '1.4.0', true);
     } elseif (is_home() || is_archive() || is_search()) {
-        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.9.0');
+        wp_enqueue_style('archive-post', PATH_DIR_URL . '/assets/css/archive-post.css', array('ee-shell'), '1.9.1');
     }
 }, 20);
