@@ -107,7 +107,7 @@ if (is_callable($source_callback)) {
 $wp_filesystem->delete($tmp, true);
 
 $style = file_get_contents(dirname(__DIR__) . '/style.css');
-$assert(1 === preg_match('/^Version:\s*2\.5\.2\s*$/m', $style), 'style.css must advertise version 2.5.3.');
+$assert(1 === preg_match('/^Version:\s*2\.5\.3\s*$/m', $style), 'style.css must advertise version 2.5.3.');
 $assert(1 === preg_match('#^Update URI:\s*https://github\.com/ahmad75naraghi/learndash-theme\s*$#m', $style), 'style.css must have the GitHub Update URI.');
 
 if ($failures) {
