@@ -446,10 +446,11 @@
         return root.closest('[data-ee-embedded-quiz], .ee-qz-layout, .learndash-wrapper') || root;
     }
     function hidePerfectScoreReset(root, percent) {
+        var perfect = percent >= 100;
         quizContainer(root).querySelectorAll('input[name="restartQuiz"],button[name="restartQuiz"],.wpProQuiz_button_restartQuiz,.ld-quiz-actions .ld-button-restart').forEach(function (button) {
-            button.hidden = percent >= 100;
-            button.setAttribute('aria-hidden', percent >= 100 ? 'true' : 'false');
-            if (percent >= 100) { button.setAttribute('disabled', 'disabled'); } else { button.removeAttribute('disabled'); }
+            if (button.hidden !== perfect) { button.hidden = perfect; }
+            if (button.getAttribute('aria-hidden') !== (perfect ? 'true' : 'false')) { button.setAttribute('aria-hidden', perfect ? 'true' : 'false'); }
+            if (button.disabled !== perfect) { button.disabled = perfect; }
         });
     }
     function syncResult(root, shouldScroll) {
