@@ -1,0 +1,29 @@
+#evented-video-playlist .inside { margin: 0; padding: 16px; background: #f7faf9; }
+.ee-video-admin { direction: rtl; }
+.ee-video-admin > .description { margin: 0 0 14px; color: #526663; font-size: 13px; }
+.ee-video-admin-list { display: grid; gap: 12px; }
+.ee-video-admin-row { overflow: hidden; border: 1px solid #cbdcd9; border-radius: 10px; background: #fff; box-shadow: 0 2px 8px rgb(15 118 110 / 5%); }
+.ee-video-admin-row > header { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 12px; border-bottom: 1px solid #e2ecea; background: #f1f8f7; }
+.ee-video-admin-row > header strong { overflow: hidden; color: #173d39; text-overflow: ellipsis; white-space: nowrap; }
+.ee-video-admin-handle { color: #78918d; }
+.ee-video-admin-order { display: flex; align-items: center; gap: 10px; margin-right: auto; }
+.ee-video-admin-order .button-link { min-width: 24px; color: #526663; }
+.ee-video-admin-order .button-link-delete { border: 0; color: #b42318; background: none; cursor: pointer; }
+.ee-video-admin-fields { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; padding: 14px; }
+.ee-video-admin-thumb { display: grid; align-content: start; gap: 8px; }
+.ee-video-admin-preview { display: grid; place-items: center; overflow: hidden; aspect-ratio: 16 / 9; border: 1px dashed #9abbb6; border-radius: 8px; color: #60827d; background: #eef6f5; }
+.ee-video-admin-preview img { width: 100%; height: 100%; object-fit: cover; }
+.ee-video-admin-preview .dashicons { width: 32px; height: 32px; font-size: 32px; }
+.ee-video-admin-main { display: grid; grid-template-columns: minmax(180px, .65fr) minmax(240px, 1fr); gap: 12px; }
+.ee-video-admin-main label { display: grid; align-content: start; gap: 5px; color: #263c39; font-weight: 600; }
+.ee-video-admin-main input, .ee-video-admin-main textarea { width: 100%; border-color: #afc8c4; font-weight: 400; }
+.ee-video-admin-main input:focus, .ee-video-admin-main textarea:focus { border-color: #00796b; box-shadow: 0 0 0 1px #00796b; }
+.ee-video-admin-description { grid-column: 1 / -1; }
+.ee-video-admin-add { display: inline-flex !important; align-items: center; gap: 5px; margin-top: 14px !important; }
+.ee-video-admin-add .dashicons { width: 17px; height: 17px; font-size: 17px; }
+@media (max-width: 782px) {
+  .ee-video-admin-fields, .ee-video-admin-main { grid-template-columns: 1fr; }
+  .ee-video-admin-thumb { grid-template-columns: 120px minmax(0, 1fr); align-items: center; }
+  .ee-video-admin-preview { grid-row: span 2; }
+  .ee-video-admin-description { grid-column: auto; }
+}

@@ -8,11 +8,42 @@
     var $ = function (sel, ctx) { return (ctx || document).querySelector(sel); };
     var $$ = function (sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); };
 
+    /* انتخاب سریع بخش پنل در موبایل */
+    $$('[data-ee-panel-nav]').forEach(function (select) {
+        select.addEventListener('change', function () {
+            var url = select.value;
+            if (url) { window.location.assign(url); }
+        });
+    });
+
+    /* راهنمای کوتاه هر بخش پنل */
+    $$('[data-ee-panel-help]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var help = document.getElementById(button.getAttribute('aria-controls'));
+            if (!help) { return; }
+            var open = button.getAttribute('aria-expanded') === 'true';
+            button.setAttribute('aria-expanded', open ? 'false' : 'true');
+            help.hidden = open;
+        });
+    });
+
     /* --- مودال خروج --- */
     var logoutModal = $('#eeLogoutModal');
     var logoutConfirm = $('#eeLogoutConfirm');
-    function openModal(m) { if (!m) { return; } m.hidden = false; document.body.style.overflow = 'hidden'; var f = m.querySelector('a,button'); if (f) { f.focus(); } }
-    function closeModal(m) { if (!m) { return; } m.hidden = true; document.body.style.overflow = ''; }
+    function openModal(m) {
+        if (!m) { return; }
+        m._eeReturnFocus = document.activeElement;
+        m.hidden = false;
+        document.body.style.overflow = 'hidden';
+        var f = m.querySelector('input:not([type=hidden]),a,button,select,textarea');
+        if (f) { f.focus(); }
+    }
+    function closeModal(m) {
+        if (!m) { return; }
+        m.hidden = true;
+        document.body.style.overflow = '';
+        if (m._eeReturnFocus && m._eeReturnFocus.focus) { m._eeReturnFocus.focus(); }
+    }
 
     $$('[data-ee-logout]').forEach(function (b) {
         b.addEventListener('click', function (e) {
@@ -34,7 +65,19 @@
         });
     });
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') { $$('.ee-modal:not([hidden])').forEach(closeModal); $$('.overlay.is-open, .password-modal.is-open').forEach(function (o) { o.classList.remove('is-open'); }); }
+        var activeModal = $('.ee-modal:not([hidden])');
+        if (e.key === 'Escape') {
+            $$('.ee-modal:not([hidden])').forEach(closeModal);
+            $$('.overlay.is-open, .password-modal.is-open').forEach(function (o) { o.classList.remove('is-open'); });
+        }
+        if (e.key === 'Tab' && activeModal) {
+            var focusable = $$('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])', activeModal)
+                .filter(function (el) { return el.offsetParent !== null; });
+            if (!focusable.length) { e.preventDefault(); return; }
+            var first = focusable[0], last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
     });
 
     /* --- مودال‌های قدیمی پنل (رسید تراکنش، تغییر رمز) --- */
@@ -139,21 +182,20 @@
     }
     var passForm = $('#eePassForm');
     if (passForm) {
-        var p1 = $('#eeNewPass'), p2 = $('#eeNewPass2'), submit = passForm.querySelector('[type=submit]');
+        var currentPass = $('#eeCurrentPass'), p1 = $('#eeNewPass'), p2 = $('#eeNewPass2'), submit = passForm.querySelector('[type=submit]');
         var bars = $$('.ee-strength i', passForm), rules = {};
         $$('.ee-pass-rules li', passForm).forEach(function (li) { rules[li.getAttribute('data-rule')] = li; });
         function evalPass() {
             var v = p1.value || '';
-            var ok = { length: v.length >= 8, number: /\d/.test(v), letter: /[A-Za-z\u0600-\u06FF]/.test(v), mix: (/[a-z]/.test(v) && /[A-Z]/.test(v)) || /[^A-Za-z0-9]/.test(v) };
+            var ok = { length: v.length >= 8, number: /\d/.test(v), letter: /[a-z]/.test(v) && /[A-Z]/.test(v), mix: /[^A-Za-z0-9\s]/.test(v) };
             var score = 0; Object.keys(ok).forEach(function (k) { if (rules[k]) { rules[k].classList.toggle('is-ok', ok[k]); } if (ok[k]) { score++; } });
-            if (v.length >= 12) { score = Math.min(4, score + 1); }
             bars.forEach(function (b, i) { b.className = i < score ? (score <= 2 ? 'is-weak' : score === 3 ? 'is-mid' : 'is-strong') : ''; });
-            var valid = ok.length && ok.number && ok.letter && p2.value === v && v !== '';
+            var valid = currentPass.value !== '' && ok.length && ok.number && ok.letter && ok.mix && p2.value === v && v !== '';
             submit.disabled = !valid;
             if (p2.value && p2.value !== v) { p2.setCustomValidity('x'); } else { p2.setCustomValidity(''); }
             return valid;
         }
-        p1.addEventListener('input', evalPass); p2.addEventListener('input', evalPass);
+        currentPass.addEventListener('input', evalPass); p1.addEventListener('input', evalPass); p2.addEventListener('input', evalPass);
         $$('.ee-eye', passForm).forEach(function (b) {
             b.addEventListener('click', function () { var t = document.getElementById(b.getAttribute('data-ee-eye')); if (t) { t.type = t.type === 'password' ? 'text' : 'password'; } });
         });
@@ -161,10 +203,10 @@
             e.preventDefault();
             if (!evalPass()) { modalMsg(passForm, p2.value !== p1.value ? 'تکرار رمز با رمز جدید یکسان نیست.' : 'رمز عبور شرایط لازم را ندارد.', false); return; }
             var old = submit.textContent; submit.disabled = true; submit.textContent = 'در حال ذخیره...';
-            post({ action: 'save_account_settings', user_password: p1.value, user_password2: p2.value, security: ($('#settings_nonce') || {}).value || '' }).then(function (res) {
+            post({ action: 'save_account_settings', current_password: currentPass.value, user_password: p1.value, user_password2: p2.value, security: ($('#settings_nonce') || {}).value || '' }).then(function (res) {
                 var ok = !!(res && res.success);
                 modalMsg(passForm, ok ? 'رمز عبور تغییر کرد.' : ((res && res.data) || 'خطایی رخ داد!'), ok);
-                if (ok) { setTimeout(function () { closeModal($('#eePassModal')); p1.value = ''; p2.value = ''; evalPass(); modalMsg(passForm, '', true); flash($('#settings-msg'), 'رمز عبور با موفقیت تغییر کرد.', true); }, 900); }
+                if (ok) { setTimeout(function () { closeModal($('#eePassModal')); currentPass.value = ''; p1.value = ''; p2.value = ''; evalPass(); modalMsg(passForm, '', true); flash($('#settings-msg'), 'رمز عبور با موفقیت تغییر کرد.', true); }, 900); }
             }).catch(function () { modalMsg(passForm, 'خطای ارتباط با سرور', false); })
               .then(function () { submit.textContent = old; evalPass(); });
         });
@@ -207,9 +249,17 @@
     });
     function liveFilter(inputSel, itemSel, attr) {
         var input = $(inputSel); if (!input) { return; }
+        var status = document.createElement('p');
+        status.className = 'ee-panel-search-empty'; status.setAttribute('role', 'status'); status.hidden = true;
+        status.textContent = 'موردی با این عبارت پیدا نشد.';
+        var host = input.closest('.search-bar'); if (host) { host.insertAdjacentElement('afterend', status); }
         input.addEventListener('input', function () {
-            var term = input.value.trim().toLowerCase();
-            $$(itemSel).forEach(function (el) { var t = (el.getAttribute(attr) || '').toLowerCase(); el.style.display = t.indexOf(term) !== -1 ? '' : 'none'; });
+            var term = input.value.trim().toLowerCase(), visible = 0;
+            $$(itemSel).forEach(function (el) {
+                var t = (el.getAttribute(attr) || '').toLowerCase(), show = t.indexOf(term) !== -1;
+                el.style.display = show ? '' : 'none'; if (show) { visible++; }
+            });
+            status.hidden = visible !== 0 || term === '';
         });
     }
     liveFilter('#wishlist-search', '.wishlist-item', 'data-title');

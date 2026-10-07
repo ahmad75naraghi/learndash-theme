@@ -346,3 +346,153 @@
         f.submit();
     });
 })();
+
+/* ---- فارسی‌سازی رشته‌های رابطی که LearnDash پس از بارگذاری پویا می‌سازد ---- */
+(function () {
+    'use strict';
+    var roots = document.querySelectorAll('.learndash-wrapper, .wpProQuiz_content, .ee-quiz-body, .ee-lesson-body');
+    if (!roots.length) { return; }
+    var map = {
+        'In Progress':'در حال پیشرفت','Not Started':'شروع نشده','Completed':'تکمیل‌شده','Complete':'تکمیل‌شده',
+        'Course Content':'محتوای دوره','Lesson Content':'محتوای درس','Topic Content':'محتوای موضوع','Quiz Content':'محتوای آزمون',
+        'Back to Course':'بازگشت به دوره','Back to Lesson':'بازگشت به درس','Start Quiz':'شروع آزمون','Restart Quiz':'شروع دوبارهٔ آزمون',
+        'Finish Quiz':'پایان آزمون','Review Questions':'مرور سؤال‌ها','Next':'بعدی','Previous':'قبلی','Continue':'ادامه',
+        'Mark Complete':'علامت‌گذاری به‌عنوان تکمیل‌شده','Correct':'صحیح','Incorrect':'نادرست','Results':'نتایج','Loading':'در حال بارگذاری',
+        'Quiz is loading...':'آزمون در حال بارگذاری است…','Please wait':'لطفاً صبر کنید','Please wait for Quiz Results':'لطفاً برای نمایش نتایج آزمون صبر کنید','Course Status':'وضعیت دوره','Your Course Status':'وضعیت دورهٔ شما',
+        'Expand All':'بازکردن همه','Collapse All':'بستن همه','Materials':'منابع','Login to Enroll':'برای ثبت‌نام وارد شوید','Take this Course':'شرکت در این دوره',
+        'Enrolled':'ثبت‌نام‌شده','Free':'رایگان','Buy Now':'خرید دوره','Certificate':'گواهینامه','Download Certificate':'دریافت گواهینامه',
+        'Assignment':'تکلیف','Assignments':'تکالیف','Upload Assignment':'بارگذاری تکلیف','Comments':'دیدگاه‌ها','Skip question':'ردشدن از سؤال',
+        'Answered':'پاسخ‌داده‌شده','Review':'مرور','Your time':'زمان شما','Time has elapsed':'زمان به پایان رسیده است',
+        'You must fill out this field.':'تکمیل این فیلد الزامی است.','This field is required.':'تکمیل این فیلد الزامی است.',
+        'You must answer this question.':'پاسخ‌دادن به این سؤال الزامی است.','Your answer was correct!':'پاسخ شما صحیح بود!','Your answer was incorrect.':'پاسخ شما نادرست بود.',
+        'Congratulations! You have passed this quiz.':'تبریک! شما در این آزمون قبول شدید.','You have failed this quiz.':'شما در این آزمون قبول نشدید.',
+        'Please go back and complete the previous lesson.':'لطفاً بازگردید و درس قبلی را تکمیل کنید.','Please go back and complete the previous topic.':'لطفاً بازگردید و موضوع قبلی را تکمیل کنید.',
+        "You don't have access to this content":'شما به این محتوا دسترسی ندارید','Your score':'امتیاز شما','Average score':'میانگین امتیاز'
+    };
+    function translate(value) {
+        var text = String(value || '').trim();
+        if (map[text]) { return map[text]; }
+        var match = text.match(/^Back to\s+(.+)$/i); if (match) { return 'بازگشت به ' + match[1]; }
+        match = text.match(/^Start\s+(.+)$/i); if (match) { return 'شروع ' + match[1]; }
+        match = text.match(/^(.+)\s+Content$/i); if (match) { return 'محتوای ' + match[1]; }
+        var mixed = text;
+        [
+            ['Click Here to Continue','برای ادامه کلیک کنید'],['Please wait','لطفاً صبر کنید'],['In Progress','در حال پیشرفت'],
+            ['Not Started','شروع نشده'],['Time Limit','محدودیت زمانی'],['Download Certificate','دریافت گواهینامه'],['Mark Complete','علامت‌گذاری به‌عنوان تکمیل‌شده'],
+            ['Expand All','بازکردن همه'],['Collapse All','بستن همه'],['Back to','بازگشت به'],['Start','شروع'],['Restart','شروع دوباره'],['Finish','پایان'],['Content','محتوا'],
+            ['Questions','سؤال‌ها'],['Question','سؤال'],['Results','نتایج'],['Assignments','تکالیف'],['Assignment','تکلیف'],['Materials','منابع'],['Certificate','گواهینامه'],
+            ['Course','دوره'],['Lesson','درس'],['Topic','موضوع'],['Quiz','آزمون'],['Correct','صحیح'],['Incorrect','نادرست'],['Completed','تکمیل‌شده'],
+            ['Complete','تکمیل'],['Progress','پیشرفت'],['Points','امتیازها'],['Point','امتیاز'],['Score','نمره'],['Next','بعدی'],['Previous','قبلی'],
+            ['Continue','ادامه'],['Submit','ارسال'],['Review','مرور'],['Skip','ردشدن'],['Loading','در حال بارگذاری']
+        ].forEach(function (pair) { mixed = mixed.replace(new RegExp(pair[0], 'gi'), pair[1]); });
+        if (mixed !== text && /[A-Za-z]/.test(mixed)) {
+            var words = {the:'',of:'از',to:'به',for:'برای',and:'و',or:'یا',your:'شما',you:'شما',have:'',has:'',is:'است',are:'هستند',was:'بود',must:'باید',this:'این',that:'آن',before:'پیش از',after:'پس از',available:'در دسترس',required:'الزامی',optional:'اختیاری',show:'نمایش',hide:'پنهان‌کردن',view:'مشاهده',time:'زمان',elapsed:'سپری‌شده',status:'وضعیت',all:'همه'};
+            mixed = mixed.replace(/\b(the|of|to|for|and|or|your|you|have|has|is|are|was|must|this|that|before|after|available|required|optional|show|hide|view|time|elapsed|status|all)\b/gi, function (word) { return words[word.toLowerCase()]; }).replace(/\s{2,}/g, ' ').trim();
+        }
+        return mixed !== text ? mixed : value;
+    }
+    function scan(scope) {
+        if (!scope || scope.nodeType !== 1) { return; }
+        var walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT);
+        var node;
+        while ((node = walker.nextNode())) {
+            if (!node.parentElement || node.parentElement.closest('script,style,textarea,.ee-post-body,.wpProQuiz_question_text')) { continue; }
+            var next = translate(node.nodeValue);
+            if (next !== node.nodeValue) { node.nodeValue = next; }
+        }
+        scope.querySelectorAll('input[type="button"],input[type="submit"],button[title],[aria-label],[placeholder]').forEach(function (control) {
+            if (control.value && /^(button|submit)$/i.test(control.type || '')) { control.value = translate(control.value); }
+            ['title','aria-label','placeholder'].forEach(function (attr) {
+                if (control.hasAttribute(attr)) { control.setAttribute(attr, translate(control.getAttribute(attr))); }
+            });
+        });
+    }
+    roots.forEach(function (root) {
+        scan(root);
+        if ('MutationObserver' in window) {
+            new MutationObserver(function (records) { records.forEach(function (record) { record.addedNodes.forEach(function (node) { if (node.nodeType === 1) { scan(node); } else if (node.nodeType === 3 && node.parentElement) { scan(node.parentElement); } }); }); }).observe(root, {childList:true,subtree:true});
+        }
+    });
+})();
+
+/* ---- همگام‌سازی نتیجهٔ آزمون، حذف تلاش مجدد در نمرهٔ کامل و اصلاح اسکرول ---- */
+(function () {
+    'use strict';
+    var quizRoots = document.querySelectorAll('.wpProQuiz_content');
+    var isLmsPage = quizRoots.length || document.querySelector('.learndash-wrapper, .ee-lms-main, .ee-lesson-main');
+    if (!isLmsPage) { return; }
+
+    if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+    function topOfPage() { if (!location.hash) { window.scrollTo({top:0,left:0,behavior:'auto'}); } }
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', topOfPage, {once:true}); } else { topOfPage(); }
+    window.addEventListener('pageshow', topOfPage);
+    window.setTimeout(topOfPage, 120);
+    window.setTimeout(topOfPage, 550);
+
+    function latin(value) {
+        return String(value || '').replace(/[۰-۹]/g, function (c) { return String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c)); }).replace(/[٠-٩]/g, function (c) { return String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)); });
+    }
+    function currentPercent(root) {
+        var boxes = root.querySelectorAll('.wpProQuiz_points, .wpProQuiz_resultValue, .ld-quiz-result-percentage');
+        var found = -1;
+        boxes.forEach(function (box) {
+            if (box.offsetParent === null) { return; }
+            var matches = latin(box.textContent).match(/(?:^|\D)(100|[0-9]{1,2})\s*[%٪]/g) || [];
+            matches.forEach(function (part) { var n = parseInt(part.replace(/\D/g, ''), 10); if (n >= 0 && n <= 100) { found = n; } });
+        });
+        return found;
+    }
+    function quizContainer(root) {
+        return root.closest('[data-ee-embedded-quiz], .ee-qz-layout, .learndash-wrapper') || root;
+    }
+    function hidePerfectScoreReset(root, percent) {
+        var perfect = percent >= 100;
+        quizContainer(root).querySelectorAll('input[name="restartQuiz"],button[name="restartQuiz"],.wpProQuiz_button_restartQuiz,.ld-quiz-actions .ld-button-restart').forEach(function (button) {
+            if (button.hidden !== perfect) { button.hidden = perfect; }
+            if (button.getAttribute('aria-hidden') !== (perfect ? 'true' : 'false')) { button.setAttribute('aria-hidden', perfect ? 'true' : 'false'); }
+            if (button.disabled !== perfect) { button.disabled = perfect; }
+        });
+    }
+    function syncResult(root, shouldScroll) {
+        var percent = currentPercent(root);
+        if (percent < 0) { return; }
+        hidePerfectScoreReset(root, percent);
+        var card = quizContainer(root).querySelector('[data-ee-quiz-best]') || document.querySelector('[data-ee-quiz-best]');
+        if (card) {
+            var previous = Number(card.getAttribute('data-ee-quiz-best') || 0);
+            if (percent > previous) {
+                card.setAttribute('data-ee-quiz-best', String(percent));
+                card.classList.toggle('is-pass', percent >= 100);
+                card.classList.toggle('is-fail', percent < 100);
+                var gauge = card.querySelector('.ee-qz-gauge');
+                if (gauge) { gauge.style.setProperty('--p', String(percent)); }
+                var value = card.querySelector('.ee-qz-gauge b');
+                if (value) { value.innerHTML = String(percent).replace(/\d/g, function (n) { return '۰۱۲۳۴۵۶۷۸۹'[Number(n)]; }) + '<i>٪</i>'; }
+            }
+        }
+        if (shouldScroll) {
+            var target = root.closest('.ee-qz-engine, [data-ee-embedded-quiz]') || root;
+            window.setTimeout(function () { target.scrollIntoView({behavior:'smooth',block:'start'}); }, 80);
+        }
+    }
+    quizRoots.forEach(function (root) {
+        var hadResult = currentPercent(root) >= 0;
+        syncResult(root, false);
+        root.addEventListener('click', function (event) {
+            if (event.target instanceof Element && event.target.closest('.wpProQuiz_QuestionButton, input[name="next"], input[name="check"], input[name="finishQuiz"]')) {
+                window.setTimeout(function () {
+                    var target = root.closest('.ee-qz-engine, [data-ee-embedded-quiz]') || root;
+                    target.scrollIntoView({behavior:'smooth',block:'start'});
+                    syncResult(root, true);
+                }, 120);
+            }
+        });
+        if ('MutationObserver' in window) {
+            new MutationObserver(function () {
+                var hasResult = currentPercent(root) >= 0;
+                syncResult(root, !hadResult && hasResult);
+                hadResult = hasResult;
+            }).observe(root, {childList:true,subtree:true,attributes:true,attributeFilter:['style','class','hidden']});
+        }
+    });
+})();

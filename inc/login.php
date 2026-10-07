@@ -1,6 +1,83 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
+/**
+ * شروع نشست کوتاه‌عمر احراز هویت با کوکی امن و نام اختصاصی.
+ *
+ * @return bool
+ */
+function evented_auth_start_session()
+{
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        return true;
+    }
+    if (headers_sent()) {
+        return false;
+    }
+
+    $secure = is_ssl();
+    $domain = defined('COOKIE_DOMAIN') && COOKIE_DOMAIN ? COOKIE_DOMAIN : '';
+
+    ini_set('session.use_strict_mode', '1');
+    ini_set('session.use_only_cookies', '1');
+    session_name('evented_auth_' . substr(md5(home_url('/')), 0, 12));
+    session_set_cookie_params(array(
+        'lifetime' => 0,
+        'path'     => '/',
+        'domain'   => $domain,
+        'secure'   => $secure,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ));
+
+    return session_start();
+}
+
+/**
+ * یکسان‌سازی ارقام و اعتبارسنجی شماره موبایل ایران.
+ */
+function evented_auth_mobile($mobile)
+{
+    $mobile = sanitize_text_field(wp_unslash((string) $mobile));
+    return str_replace(
+        array('۰','۱','۲','۳','۴','۵','۶','۷','۸','۹', '٠','١','٢','٣','٤','٥','٦','٧','٨','٩'),
+        array('0','1','2','3','4','5','6','7','8','9', '0','1','2','3','4','5','6','7','8','9'),
+        trim($mobile)
+    );
+}
+
+/**
+ * قانون رمز سمت سرور؛ همسان با چهار شرط نمایش‌داده‌شده در فرم ورود.
+ *
+ * @return string پیام خطا یا رشتهٔ خالی
+ */
+function evented_auth_password_error($password)
+{
+    if (strlen($password) < 8) {
+        return 'رمز عبور باید حداقل ۸ کاراکتر باشد.';
+    }
+    if (!preg_match('/[a-z]/', $password) || !preg_match('/[A-Z]/', $password)) {
+        return 'رمز عبور باید شامل حروف کوچک و بزرگ انگلیسی باشد.';
+    }
+    if (!preg_match('/[0-9]/', $password)) {
+        return 'رمز عبور باید حداقل یک عدد داشته باشد.';
+    }
+    if (!preg_match('/[^A-Za-z0-9\s]/', $password)) {
+        return 'رمز عبور باید حداقل یک نویسهٔ ویژه داشته باشد.';
+    }
+    return '';
+}
+
+/**
+ * اعتبار زمانی تأیید OTP را در مراحل بعدی جریان ثبت‌نام/بازیابی کنترل می‌کند.
+ */
+function evented_auth_otp_is_fresh()
+{
+    $issued = isset($_SESSION['evented_otp_time']) ? (int) $_SESSION['evented_otp_time'] : 0;
+    $ttl    = max(2, (int) (function_exists('evented_opt') ? evented_opt('otp_ttl', 10) : 10));
+    return $issued > 0 && (time() - $issued) <= $ttl * MINUTE_IN_SECONDS;
+}
+
 class EventedAuthHandler
 {
     public function __construct()
@@ -53,11 +130,11 @@ class EventedAuthHandler
     {
         check_ajax_referer('evented_nonce', 'nonce');
 
-        $mobile    = sanitize_text_field($_POST['phone'] ?? '');
+        $mobile    = evented_auth_mobile($_POST['phone'] ?? '');
         $otp_input = sanitize_text_field($_POST['otp'] ?? '');
 
-        if (!session_id()) {
-            session_start();
+        if (!evented_auth_start_session()) {
+            wp_send_json_error(array('message' => 'امکان آغاز نشست امن وجود ندارد. لطفاً دوباره تلاش کنید.'));
         }
 
         // کد باید ابتدا درخواست شده باشد
@@ -69,7 +146,7 @@ class EventedAuthHandler
 
         // انقضای کد (۱۰ دقیقه)
         if ((time() - (int) $_SESSION['evented_otp_time']) > max(2, (int) (function_exists('evented_opt') ? evented_opt('otp_ttl', 10) : 10)) * MINUTE_IN_SECONDS) {
-            unset($_SESSION['evented_otp'], $_SESSION['evented_otp_time'], $_SESSION['evented_mobile'], $_SESSION['evented_otp_purpose']);
+            unset($_SESSION['evented_otp'], $_SESSION['evented_otp_time'], $_SESSION['evented_mobile'], $_SESSION['evented_otp_purpose'], $_SESSION['evented_otp_verified'], $_SESSION['evented_otp_verified_for']);
             wp_send_json_error([
                 'message' => 'کد تایید منقضی شده است. لطفاً دوباره درخواست دهید.'
             ]);
@@ -88,7 +165,7 @@ class EventedAuthHandler
             $_SESSION['evented_otp_attempts'] = $attempts;
 
             if ($attempts >= 5) {
-                unset($_SESSION['evented_otp'], $_SESSION['evented_otp_time'], $_SESSION['evented_otp_attempts']);
+                unset($_SESSION['evented_otp'], $_SESSION['evented_otp_time'], $_SESSION['evented_otp_attempts'], $_SESSION['evented_otp_verified'], $_SESSION['evented_otp_verified_for']);
                 wp_send_json_error([
                     'message' => 'تعداد تلاش‌های ناموفق زیاد شد. لطفاً کد جدید درخواست دهید.'
                 ]);
@@ -101,6 +178,7 @@ class EventedAuthHandler
 
         // کد درست بود؛ شمارندهٔ تلاش پاک شود
         unset($_SESSION['evented_otp_attempts']);
+        session_regenerate_id(true);
 
         $mobile  = $_SESSION['evented_mobile'];
         $purpose = $_SESSION['evented_otp_purpose'] ?? '';
@@ -135,7 +213,15 @@ class EventedAuthHandler
             return;
         }
 
-        // لاگین با OTP
+        // لاگین با OTP؛ دادهٔ یک‌بارمصرف پس از مصرف کامل پاک می‌شود.
+        unset(
+            $_SESSION['evented_otp'],
+            $_SESSION['evented_otp_time'],
+            $_SESSION['evented_otp_purpose'],
+            $_SESSION['evented_otp_verified'],
+            $_SESSION['evented_otp_verified_for'],
+            $_SESSION['evented_mobile']
+        );
         wp_clear_auth_cookie();
         wp_set_current_user($user->ID);
         wp_set_auth_cookie($user->ID, true);
@@ -151,22 +237,28 @@ class EventedAuthHandler
     {
         check_ajax_referer('evented_nonce', 'nonce');
 
-        $mobile   = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
-        $password = isset($_POST['password']) ? sanitize_text_field($_POST['password']) : '';
-        $confirmPassword = isset($_POST['confirmPassword']) ? sanitize_text_field($_POST['confirmPassword']) : '';
+        $mobile          = evented_auth_mobile($_POST['phone'] ?? '');
+        $password        = isset($_POST['password']) ? (string) wp_unslash($_POST['password']) : '';
+        $confirmPassword = isset($_POST['confirmPassword']) ? (string) wp_unslash($_POST['confirmPassword']) : '';
 
-        if (!session_id()) {
-            session_start();
+        if (!evented_auth_start_session()) {
+            wp_send_json_error(array('message' => 'امکان آغاز نشست امن وجود ندارد. لطفاً دوباره تلاش کنید.'));
         }
 
-        if (empty($mobile) || empty($password) || strlen($password) < 8) {
-            wp_send_json_error(['message' => 'گذرواژه باید حداقل ۸ کاراکتر و واجد شرایط امنیتی باشد']);
+        if (!preg_match('/^09[0-9]{9}$/', $mobile) || empty($password)) {
+            wp_send_json_error(array('message' => 'شماره موبایل یا رمز عبور نامعتبر است.'));
+        }
+        $password_error = evented_auth_password_error($password);
+        if ('' !== $password_error) {
+            wp_send_json_error(array('message' => $password_error));
         }
 
         // بررسی اینکه آیا موبایل وارد شده و کد تایید قبلا وریفای شده است یا خیر
         if (
             empty($_SESSION['evented_mobile']) ||
             empty($_SESSION['evented_otp_verified']) ||
+            !evented_auth_otp_is_fresh() ||
+            ($_SESSION['evented_otp_verified_for'] ?? '') !== 'register' ||
             $_SESSION['evented_mobile'] !== $mobile
         ) {
             wp_send_json_error(['message' => 'دسترسی غیرمجاز یا پایان اعتبار نشست.']);
@@ -190,7 +282,14 @@ class EventedAuthHandler
         wp_set_password($password, $user->ID);
 
         // پاک‌سازی نشست تایید
-        unset($_SESSION['evented_otp_verified'], $_SESSION['evented_otp_verified_for'], $_SESSION['evented_otp']);
+        unset(
+            $_SESSION['evented_otp_verified'],
+            $_SESSION['evented_otp_verified_for'],
+            $_SESSION['evented_otp'],
+            $_SESSION['evented_otp_time'],
+            $_SESSION['evented_otp_purpose'],
+            $_SESSION['evented_mobile']
+        );
 
         // لاگین خودکار
         wp_clear_auth_cookie();
@@ -209,13 +308,8 @@ class EventedAuthHandler
     {
         check_ajax_referer('evented_nonce', 'nonce');
 
-        $mobile  = sanitize_text_field($_POST['mobile'] ?? '');
-        $purpose = sanitize_text_field($_POST['purpose'] ?? '');
-
-        $persian = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
-        $english = ['0','1','2','3','4','5','6','7','8','9'];
-
-        $mobile = str_replace($persian, $english, trim($mobile));
+        $mobile  = evented_auth_mobile($_POST['mobile'] ?? '');
+        $purpose = sanitize_key($_POST['purpose'] ?? '');
 
         if (!preg_match('/^09[0-9]{9}$/', $mobile)) {
             wp_send_json_error([
@@ -260,12 +354,13 @@ class EventedAuthHandler
             ]);
         }
 
-        if (!session_id()) {
-            session_start();
+        if (!evented_auth_start_session()) {
+            wp_send_json_error(array('message' => 'امکان آغاز نشست امن وجود ندارد. لطفاً دوباره تلاش کنید.'));
         }
 
         $otp = wp_rand(10000, 99999);
 
+        unset($_SESSION['evented_otp_verified'], $_SESSION['evented_otp_verified_for']);
         $_SESSION['evented_otp']         = $otp;
         $_SESSION['evented_mobile']      = $mobile;
         $_SESSION['evented_otp_time']    = time();
@@ -294,18 +389,14 @@ class EventedAuthHandler
     {
         check_ajax_referer('evented_nonce', 'nonce');
 
-        $mobile = sanitize_text_field($_POST['mobile'] ?? '');
-
-        $persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-        $english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-        $mobile  = str_replace($persian, $english, trim($mobile));
+        $mobile = evented_auth_mobile($_POST['mobile'] ?? '');
 
         if ($this->is_rate_limited($mobile)) {
             wp_send_json_error(['message' => 'شما به تازگی یک کد برای این شماره دریافت کرده اید.']);
         }
 
-        if (!session_id()) {
-            session_start();
+        if (!evented_auth_start_session()) {
+            wp_send_json_error(array('message' => 'امکان آغاز نشست امن وجود ندارد. لطفاً دوباره تلاش کنید.'));
         }
 
         if (!preg_match('/^09[0-9]{9}$/', $mobile)) {
@@ -316,6 +407,7 @@ class EventedAuthHandler
 
         if ($user_status === "register") {
             $otp = wp_rand(10000, 99999);
+            unset($_SESSION['evented_otp_verified'], $_SESSION['evented_otp_verified_for']);
             $_SESSION['evented_otp']      = $otp;
             $_SESSION['evented_mobile']   = $mobile;
             $_SESSION['evented_otp_time'] = time();
@@ -342,13 +434,13 @@ class EventedAuthHandler
     {
         check_ajax_referer('evented_nonce', 'nonce');
 
-        if (!session_id()) {
-            session_start();
+        if (!evented_auth_start_session()) {
+            wp_send_json_error(array('message' => 'امکان آغاز نشست امن وجود ندارد. لطفاً دوباره تلاش کنید.'));
         }
 
-        $mobile          = sanitize_text_field($_POST['phone'] ?? '');
-        $password        = sanitize_text_field($_POST['password'] ?? '');
-        $confirmPassword = sanitize_text_field($_POST['confirmPassword'] ?? '');
+        $mobile          = evented_auth_mobile($_POST['phone'] ?? '');
+        $password        = isset($_POST['password']) ? (string) wp_unslash($_POST['password']) : '';
+        $confirmPassword = isset($_POST['confirmPassword']) ? (string) wp_unslash($_POST['confirmPassword']) : '';
 
         if (
             empty($mobile) ||
@@ -360,10 +452,9 @@ class EventedAuthHandler
             ]);
         }
 
-        if (strlen($password) < 8) {
-            wp_send_json_error([
-                'message' => 'رمز عبور باید حداقل ۸ کاراکتر باشد.'
-            ]);
+        $password_error = evented_auth_password_error($password);
+        if ('' !== $password_error) {
+            wp_send_json_error(array('message' => $password_error));
         }
 
         if ($password !== $confirmPassword) {
@@ -376,6 +467,7 @@ class EventedAuthHandler
         if (
             empty($_SESSION['evented_otp_verified']) ||
             empty($_SESSION['evented_otp_verified_for']) ||
+            !evented_auth_otp_is_fresh() ||
             $_SESSION['evented_otp_verified_for'] !== 'reset_password'
         ) {
             wp_send_json_error([
@@ -405,10 +497,14 @@ class EventedAuthHandler
         wp_set_password($password, $user->ID);
 
         // پاکسازی نشست
-        unset($_SESSION['evented_otp']);
-        unset($_SESSION['evented_otp_time']);
-        unset($_SESSION['evented_otp_verified']);
-        unset($_SESSION['evented_otp_verified_for']);
+        unset(
+            $_SESSION['evented_otp'],
+            $_SESSION['evented_otp_time'],
+            $_SESSION['evented_otp_purpose'],
+            $_SESSION['evented_otp_verified'],
+            $_SESSION['evented_otp_verified_for'],
+            $_SESSION['evented_mobile']
+        );
 
         // لاگین خودکار
         wp_clear_auth_cookie();
@@ -467,8 +563,8 @@ class EventedAuthHandler
     public function handle_login_user() {
         check_ajax_referer('evented_nonce', 'nonce');
 
-        $mobile   = sanitize_text_field($_POST['mobile'] ?? '');
-        $password = sanitize_text_field($_POST['password']) ?? '';
+        $mobile   = evented_auth_mobile($_POST['mobile'] ?? '');
+        $password = isset($_POST['password']) ? (string) wp_unslash($_POST['password']) : '';
 
         if (empty($mobile) || empty($password)) {
             wp_send_json_error([
@@ -476,30 +572,28 @@ class EventedAuthHandler
             ]);
         }
 
-        $user = get_user_by('login', $mobile);
-
-        if (!$user) {
-            wp_send_json_error([
-                'message' => 'کاربری با این شماره موبایل یافت نشد.'
-            ]);
+        if (!preg_match('/^09[0-9]{9}$/', $mobile)) {
+            wp_send_json_error(array('message' => 'شماره موبایل یا رمز عبور صحیح نیست.'));
         }
 
-        // محدود کردن تلاش‌های ناموفق (۵ بار در ۱۵ دقیقه برای هر شماره)
-        $fail_key   = 'evented_login_fail_' . md5($mobile);
+        $user = get_user_by('login', $mobile);
+
+        // محدودیت مستقل برای ترکیب شماره و IP؛ کاربرِ موجود/ناموجود پاسخ یکسان می‌گیرد.
+        $remote_ip  = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
+        $fail_key   = 'evented_login_fail_' . md5($mobile . '|' . $remote_ip);
         $fail_count = (int) get_transient($fail_key);
 
         if ($fail_count >= 5) {
-            wp_send_json_error([
+            wp_send_json_error(array(
                 'message' => 'تلاش‌های ناموفق زیاد است. لطفاً ۱۵ دقیقه دیگر دوباره تلاش کنید.'
-            ]);
+            ));
         }
 
-        // بررسی رمز عبور
-        if (!wp_check_password($password, $user->data->user_pass, $user->ID)) {
+        if (!$user || !wp_check_password($password, $user->data->user_pass, $user->ID)) {
             set_transient($fail_key, $fail_count + 1, 15 * MINUTE_IN_SECONDS);
-            wp_send_json_error([
-                'message' => 'رمز عبور اشتباه است.'
-            ]);
+            wp_send_json_error(array(
+                'message' => 'شماره موبایل یا رمز عبور صحیح نیست.'
+            ));
         }
 
         // ورود موفق؛ شمارندهٔ شکست پاک شود
@@ -520,17 +614,22 @@ class EventedAuthHandler
     public function handle_save_user_register_name() {
         check_ajax_referer('evented_nonce', 'nonce');
 
-        $mobile   = sanitize_text_field($_POST['mobile'] ?? '');
+        $mobile   = evented_auth_mobile($_POST['mobile'] ?? '');
         $first_name   = sanitize_text_field($_POST['firstname'] ?? '');
         $last_name   = sanitize_text_field($_POST['lastname'] ?? '');
 
-        if (!session_id()) {
-            session_start();
+        if (!evented_auth_start_session()) {
+            wp_send_json_error(array('message' => 'امکان آغاز نشست امن وجود ندارد. لطفاً دوباره تلاش کنید.'));
         }
 
         // امنیت: فقط پس از تأیید OTP برای همین شماره اجازهٔ ساخت حساب بده
         $verified_mobile = $_SESSION['evented_mobile'] ?? '';
-        if (empty($_SESSION['evented_otp_verified']) || $verified_mobile !== $mobile) {
+        if (
+            empty($_SESSION['evented_otp_verified'])
+            || !evented_auth_otp_is_fresh()
+            || ($_SESSION['evented_otp_verified_for'] ?? '') !== 'register'
+            || $verified_mobile !== $mobile
+        ) {
             wp_send_json_error(['message' => 'ابتدا کد تایید شماره موبایل را تایید کنید.']);
             return;
         }

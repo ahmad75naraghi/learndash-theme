@@ -42,15 +42,17 @@ function theme_enqueue()
         return;
     }
 
-    wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.0.0');
-    wp_enqueue_style('ee-panel', PATH_DIR_URL . '/assets/css/newhome/ee-panel.css', array('ee-shell'), '1.0.0');
-    wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', array('ee-panel'), '2.2.0');
+    wp_enqueue_style('ee-courses', PATH_DIR_URL . '/assets/css/newhome/ee-courses.css', array('ee-shell'), '1.3.0');
+    wp_enqueue_style('ee-panel', PATH_DIR_URL . '/assets/css/newhome/ee-panel.css', array('ee-shell'), '1.2.0');
+    wp_enqueue_style('panel-css', PATH_DIR_URL . '/assets/css/panel.css', array('ee-panel'), '2.4.0');
 
-    wp_enqueue_style('jalalidatepicker-css', PATH_DIR_URL . '/assets/css/jalalidatepicker.min.css', array(), '1.0.0');
-    wp_enqueue_script('jalalidatepicker-js', PATH_DIR_URL . '/assets/js/jalalidatepicker.min.js', array(), '1.0.0', true);
-    wp_add_inline_script('jalalidatepicker-js', 'window.jalaliDatepicker && jalaliDatepicker.startWatch({ persianDigits: true, showTodayBtn: true, showEmptyBtn: true, hasSecond: false });');
+    /* موتور سبک تاریخ فقط در پروفایل و سایر نماهای دارای ورودی شمسی بارگذاری می‌شود. */
+    $panel_section = function_exists('evented_panel_current_section') ? evented_panel_current_section() : '';
+    if (('profile' === $panel_section || is_page_template('panel/profile.php')) && function_exists('evented_enqueue_jalali_picker')) {
+        evented_enqueue_jalali_picker();
+    }
 
-    wp_enqueue_script('ee-panel', PATH_DIR_URL . '/assets/js/newhome/ee-panel.js', array(), '1.1.0', true);
+    wp_enqueue_script('ee-panel', PATH_DIR_URL . '/assets/js/newhome/ee-panel.js', array(), '1.4.0', true);
     wp_localize_script('ee-panel', 'eePanel', array(
         'ajax_url'       => admin_url('admin-ajax.php'),
         'wishlist_nonce' => wp_create_nonce('wishlist_nonce'),

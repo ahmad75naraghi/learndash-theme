@@ -23,44 +23,47 @@
 |---|---|---|
 | CMS | وردپرس (نسخهٔ ۶+، به‌روز) | فارسی، RTL |
 | LMS | **LearnDash** (نسخهٔ 3.6+) | پست‌تایپ `sfwd-courses`، درس، سکشن، گواهینامه، پرداخت |
-| زبان/سمت‌سرور | PHP 8.x (سازگار با 7.4) | استفاده از `str_starts_with()` و `??` |
+| زبان/سمت‌سرور | PHP 8.x (سازگار با 7.4) | بدون وابستگی به توابع معرفی‌شده در PHP 8 |
 | فرانت‌اند | فقط Vanilla JS (بدون jQuery/Owl/Plyr) | همهٔ اسکریپت‌ها در `assets/js/newhome/`؛ فقط `jalalidatepicker` (محلی) به‌عنوان vendor |
 | فونت/آیکن | **Vazirmatn متغیر** (`assets/fonts/Vazirmatn-Variable.woff2`, OFL) + «دانا» به‌عنوان fallback؛ آیکن‌ها اسپرایت SVG محلی (`assets/icons/ee-icons.svg`, Material Symbols) | `assets/css/newhome/ee-fonts.css` — **هیچ درخواست خارجی** (`inc/no_external.php` بقیه را هم مسدود می‌کند) |
 | پیامک OTP/اعلان | SOAP پنل پیامک (payamak-panel) | `inc/sms.php` — اعتبارنامه از **تنظیمات قالب → پیامک** یا ثابت‌های `EVENTED_SMS_*` |
 | پیام‌رسان | ربات بله — تابع `evented_send_otp_with_bale()` | قالب یک wrapper محافظت‌شده دارد؛ ارسال واقعی به mu-plugin/افزونه (هم‌نام یا legacy با نام `falnic_send_otp_with_bale`) واگذار می‌شود |
 | پایگاه‌دادهٔ تراکنش | جدول سفارشی `{wp}_evented_transactions` | ⚠️ سازندهٔ جدول در این قالب نیست؛ نصب‌های قدیمی باید جدول را تغییر نام دهند (migration) |
-| تست | ندارد (در این مرحله) | بخش ۷ را ببینید |
+| تست | lint خودکار PHP/JS/CSS در GitHub Actions | تست یکپارچهٔ LearnDash روی staging لازم است |
 
 ## ۳. ساختار دایرکتوری‌ها
 
 ```
 learndash-theme/                  (در سرور: wp-content/themes/<نام-پوشه> — کد از get_template_directory_uri() می‌خواند)
-├── style.css / functions.php     هدر قالب + بوت‌استرپ (PATH_DIR* + require ها)
+├── style.css / functions.php     هدر قالب + بوت‌استرپ و enqueue پوسته
 ├── README.md / ARCHITECTURE.md / CHANGELOG.md / CONTRIBUTING.md / AI.md
 ├── ROADMAP.md / TODO.md / TECH_DEBT.md
-├── front-page.php                صفحهٔ اصلی (بخش‌های داینامیک/استاتیک — رجوع: ARCHITECTURE §5)
+├── front-page.php                صفحهٔ اصلی داینامیک — رجوع: ARCHITECTURE §5
 ├── single.php                    تک‌نوشته (پوستهٔ ee-*؛ مقاله + سایدبار + دیدگاه)
 ├── archive.php / home.php / search.php   آرشیو نوشته‌ها، برگهٔ نوشته‌ها، نتایج جستجو
+├── page-videos.php              برگهٔ /videos/ با WP_Query صفحه‌بندی‌شده روی CPT خارجی clip
 ├── comments.php                  فهرست دیدگاه‌ها + فرم دیدگاه (فارسی)
 ├── template-parts/               ee-head · ee-header · ee-footer · ee-sidebar · ee-archive-main · lms/* (enroll-card، curriculum، course-sidebar، lesson-list، course-grid، category-grid، courses-sidebar)
 ├── single-sfwd-courses.php       صفحهٔ دوره (پوستهٔ ee-*: سرفصل‌ها، آکاردئون‌ها، نظرات، سایدبار ثبت‌نام)
 ├── single-sfwd-lessons.php       صفحهٔ درس (کلیپ/پادکست/متن، آزمون، تکمیل درس، فهرست درس‌ها)
-├── single-sfwd-quizzes.php       صفحهٔ آزمون (فکت‌های آزمون + بدنهٔ لرن‌دش + فهرست درس‌ها)
+├── single-sfwd-quiz.php          صفحهٔ آزمون (فکت‌های آزمون + بدنهٔ لرن‌دش + فهرست درس‌ها)
 ├── taxonomy-ld_course_category.php  آرشیو دستهٔ دوره (سربرگ دسته + گرید دوره‌ها + سوالات متداول)
 ├── archive-sfwd-courses.php      بایگانی همهٔ دوره‌ها (پوستهٔ ee-*)
 ├── author.php                    پروفایل مدرس  |  template-instructors.php  لیست اساتید
 ├── page-login.php                صفحهٔ ورود/OTP (HTML مستقل، بدون wp_head)
-├── page-panel.php                برگهٔ /panel → پیشخوان پنل (روی پوستهٔ ee-*)
+├── page-panel.php                برگهٔ /panel → پیشخوان پنل
 ├── page.php / page-courses.php / page-courses-cat.php / 404.php   برگهٔ عمومی · فهرست دوره‌ها · دسته‌بندی‌ها · ۴۰۴ (همه با پوستهٔ ee-*)
 ├── index.php                     قالب بازگشتی عمومی (fallback) برای انواع پست بدون قالب اختصاصی
 ├── assets/
 │   ├── assets_functions.php      enqueue دارایی‌های پنل کاربری (بقیه در functions.php)
-│   ├── css/  single-post · archive-post · panel (محتوای پنل) · jalalidatepicker
+│   ├── css/  login · single-post · archive-post · panel (محتوای پنل) · jalalidatepicker
 │   ├── css/newhome/  ee-fonts (فونت/آیکن محلی) · ee-shell (پوستهٔ مشترک) · evented-home · ee-lms · ee-courses (+ نوار فیلتر) · ee-panel · ee-live-search · ee-notify
+│   ├── js/login.js                رفتار صفحهٔ ورود/OTP مستقل
 │   ├── js/newhome/evented-home.js  کشوی منوی موبایل · زیرمنوها · جستجوی موبایل · تب‌های مقالات · اسلایدر هیرو · کپی لینک
 │   ├── js/newhome/ee-lms.js        آکاردئون · گروه درس‌ها · دیدگاه/امتیاز · تکمیل درس · علاقه‌مندی
 │   ├── js/newhome/ee-live-search.js  جستجوی زندهٔ هدر  |  ee-notify.js  زنگولهٔ اعلان‌ها  |  ee-panel.js  رفتارهای پنل
 │   ├── icons/ee-icons.svg        اسپرایت SVG آیکن‌ها (با `ee_icon('name')` استفاده می‌شود)
+│   ├── images/social/            نشان‌های محلی ایتا، بله، روبیکا، آی‌گپ و سروش
 │   ├── fonts/  Vazirmatn-Variable.woff2 · evented-edu-font.woff2 (دانا)
 │   └── img/  front-page (۲۳) · single-page (۸) · panel (۲)
 ├── inc/
@@ -75,15 +78,17 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 │   ├── resume.php                ادامهٔ یادگیری: آخرین درس، چیپ هدر، کارت پنل، یادآور کاربران غیرفعال (کرون)
 │   ├── pwa.php                   PWA: manifest، سرویس‌ورکر (/ee-sw.js)، صفحهٔ آفلاین، دکمهٔ نصب
 │   ├── notifications.php         اعلان‌ها: جدول {wp}_evented_notifications، REST، رویدادها، پیامک اختیاری
+│   ├── jalali.php               موتور مرکزی تاریخ شمسی، تبدیل دوطرفه، فرمت و فیلترهای امن
 │   ├── template_helpers.php      هلپرهای پوستهٔ ee-* (شمسی، بازدید، اشتراک، مرتبط‌ها) + هلپرهای LMS
+│   ├── certificates.php          گواهینامهٔ فارسی: mPDF بسته‌شده در inc/lib + fallback چاپی مستقل
 │   ├── navigation.php            منوی استاتیک هدر/فوتر/کشوی موبایل (کش هفتگی) + فیلتر بخش جستجو + تب‌های مقالات خانه
-│   ├── login.php                 کلاس FalnicAuthHandler (OTP/ورود) + captcha_verify
+│   ├── theme_updater.php         به‌روزرسان امن قالب از artifact کامل GitHub Release
+│   ├── login.php                 کلاس EventedAuthHandler + نشست امن OTP/ورود
 │   ├── sms.php                   send_pattern_sms (SOAP)
 │   ├── meta_functions.php        متاباکس دوره/دسته/کاربر + فیلتر آواتار
 │   ├── theme_options.php         MIME ها، گارد subscriber، is_current_path()
 │   ├── theme_settings.php        صفحهٔ «تنظیمات قالب» تب‌دار: اسلایدر، عمومی/تماس، شبکه‌ها، متن‌های خانه، پیامک، سئو، اعلان‌ها
-│   ├── ajax_functions.php        ۵ اکشن AJAX (نظر/تکمیل درس/علاقه‌مندی/پروفایل/تنظیمات)
-│   └── ajax_functions.php
+│   └── ajax_functions.php        ۵ اکشن AJAX (نظر/تکمیل درس/علاقه‌مندی/پروفایل/تنظیمات)
 ├── template-parts/panel/         shell-open.php / shell-close.php (سایدبار پنل + مودال خروج روی هدر/فوتر ee-*)
 └── panel/                        تمپلیت‌های پنل (Template Name: Panel - …)
     ├── dashboard.php و my-courses.php و certificates.php
@@ -99,7 +104,10 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 | `/ld_course_category/<slug>/` | `taxonomy-ld_course_category.php` | آرشیو دستهٔ دوره + سوالات متداول دسته |
 | `/courses/<slug>/` | `single-sfwd-courses.php` | صفحهٔ دوره |
 | `/lessons/<slug>/` | `single-sfwd-lessons.php` | صفحهٔ درس (کلیپ/پادکست/متن + فهرست درس‌ها) |
-| آزمون (`sfwd-quizzes`) | `single-sfwd-quizzes.php` | صفحهٔ آزمون (فکت‌ها + بدنهٔ لرن‌دش) |
+| آزمون (`sfwd-quiz`) | `single-sfwd-quiz.php` | صفحهٔ آزمون (فکت‌ها + بدنهٔ لرن‌دش) |
+| برگهٔ کتابخانه | `page-library.php` | کوئری `lib` با فیلتر اختیاری `wpdmcategory` |
+| برگهٔ ویدئو | `page-videos.php` | کوئری `clip` بدون taxonomy یا دسته‌بندی |
+| برگهٔ گالری | `page-gallery.php` | کوئری `gallery` با فیلتر `galery_cat`؛ بدون سایدبار. برای جلوگیری از تعارض archive از slug دیگری مانند `gallery-page` استفاده شود |
 | برگهٔ «دوره‌ها» | `page-courses.php` | گرید همهٔ دوره‌ها با صفحه‌بندی |
 | `/<post-slug>/` | `single.php` | تک‌نوشته (مقاله + سایدبار + دیدگاه) |
 | برگهٔ «نوشته‌ها» (is_home) | `home.php` | آرشیو همهٔ نوشته‌ها |
@@ -119,17 +127,18 @@ learndash-theme/                  (در سرور: wp-content/themes/<نام-پو
 
 | مورد | نسخه/شرط |
 |---|---|
-| PHP | 8.x با افزونهٔ `soap`، `gd`، `dom`/`libxml` |
+| PHP | 7.4+ (ترجیحاً 8.x) با افزونهٔ `soap`، `gd`، `dom`/`libxml` و `mbstring` |
 | وردپرس | 6.x |
 | LearnDash | نسخهٔ فعال (با Course Builder) |
-| فونت TTF برای captcha | `DanaVF.ttf` در `assets/fonts/` — در ریپو **نیست** (اختیاری تا زمان فعال‌سازی captcha) |
+| Composer/mPDF | در توسعه با Composer؛ در ZIP رسمی، وابستگی‌های production آماده زیر `inc/lib/` هستند و روی سرور Composer لازم نیست |
 | جدول `{wp}_evented_transactions` | باید ساخته شود (DDL در `ARCHITECTURE.md` §3) |
 | تابع بله | اختیاری: `evented_send_otp_with_bale()` یا legacy `falnic_send_otp_with_bale()` در mu-plugin (بدون آن، فقط پیامک ارسال می‌شود) |
 
 ### ۵.۲ نصب (لوکال)
 
 ```bash
-# ۱) قالب را در مسیر تم‌ها قرار دهید:
+# ۱) وابستگی PHP را نصب و قالب را در مسیر تم‌ها قرار دهید:
+composer install --no-dev --optimize-autoloader
 wp-content/themes/<theme-folder>/
 
 # ۲) در پیشخوان: نمایش ← پوسته‌ها ← فعال‌سازی «evented-edu»
@@ -161,24 +170,38 @@ wp-content/themes/<theme-folder>/
 |---|---|---|
 | صفحه اصلی | `home_url()` | — |
 | مقالات | برگهٔ «نوشته‌ها» (تنظیمات ← خواندن) یا برگهٔ `blog` | دسته‌بندی‌های وبلاگ (پرمحتواترین‌ها) |
-| کتابخانه / گالری / ویدیو / دانلودها / پادکست | بایگانی پست‌تایپ افزونه (اسلاگ‌های رایج مثل `library`, `gallery`, `video`, `download(s)`, `podcast` امتحان می‌شوند) → در نبود آن، برگهٔ هم‌نام → در نهایت مسیر پیش‌فرض | ترم‌های اولین تاکسونومی آن پست‌تایپ |
+| کتابخانه / گالری / ویدیو | پست‌تایپ‌های داخلی قالب `lib`، `gallery` و `clip`؛ داده‌های قبلی CPT UI بدون تبدیل باقی می‌مانند | `wpdmcategory` فقط برای کتابخانه، `galery_cat` فقط برای گالری؛ ویدئو بدون taxonomy |
+| دانلودها / پادکست | پست‌تایپ‌های سازگار قالب `wpdmpro` و `sr_playlist` → برگهٔ هم‌نام | دانلود بدون taxonomy؛ پادکست با `playlist-category` و `playlist-tag` |
 | دوره‌ها | بایگانی `sfwd-courses` یا برگهٔ `courses` | دسته‌های `ld_course_category` |
 | ویژه رمضان / مسابقات / معرفی سایت / ارتباط با ما | برگه با اسلاگ `ramadan` / `contests` / `about` / `contact` (اسلاگ‌های جایگزین هم پشتیبانی می‌شوند) | — |
 
-- اگر افزونه اسلاگ متفاوتی برای پست‌تایپ دارد: `add_filter('evented_nav_post_type_candidates', fn($m) => array_merge($m, ['library' => ['my_books']]))`.
+### مهاجرت از Custom Post Type UI
+
+قالب در `inc/content_types.php` همان شناسه‌های پایگاه داده را ثبت می‌کند: `lib`، `clip`، `gallery` و taxonomy سلسله‌مراتبی `galery_cat`. بنابراین خاموش‌کردن CPT UI داده‌ها، شناسه نوشته‌ها، آدرس‌های تکی و رابطه‌های taxonomy را حذف یا تبدیل نمی‌کند. ابتدا این نسخهٔ قالب را فعال نگه دارید، سپس CPT UI را غیرفعال و یک‌بار «تنظیمات ← پیوندهای یکتا ← ذخیره تغییرات» را اجرا کنید؛ قالب علاوه بر آن rewriteها را خودکار یک‌بار بازسازی می‌کند. `wpdmcategory` متعلق به Download Manager است و فقط به کتابخانه متصل می‌ماند؛ `clip` عمداً از `wpdmcategory` و `wpdmtag` جدا شده و هیچ taxonomy عمومی ندارد.
+
+در نمای تکی `clip`، بخش «اطلاعات و فایل‌های ویدئو» متاهای قدیمی پست را همراه با نام دقیق کلید نمایش می‌دهد و URLهای رسانه را استخراج می‌کند. کلیدهای بالقوه حساس (رمز، token، nonce، API key، session و اطلاعات تماس) عمداً در خروجی عمومی نمایش داده نمی‌شوند؛ فیلتر `evented_resource_public_meta` برای تغییر این خروجی در دسترس است.
+
+پادکست‌ها با همان post type قدیمی `sr_playlist` مدیریت می‌شوند. فایل‌های جدید در `_evented_podcast_tracks` ذخیره می‌شوند و ابزار «پادکست‌ها ← همگام‌سازی قسمت‌ها» دادهٔ `alb_tracklist` افزونهٔ Sonaar را بدون حذف منبع منتقل می‌کند؛ جزئیات در `docs/PODCAST-MIGRATION.md` آمده است.
+
+- اگر افزونهٔ دیگری اسلاگ متفاوتی دارد: `add_filter('evented_nav_post_type_candidates', fn($m) => array_merge($m, ['library' => ['my_books']]))`.
 - بعد از فعال‌کردن افزونه یا ساختن برگه‌ها، کش خودکار باطل می‌شود؛ در صورت نیاز از «بازسازی منو و کش قالب» در نوار مدیریت استفاده کنید.
 - فیلتر جستجوی هدر (`?post_type=`) از همین آیتم‌ها ساخته می‌شود؛ حالت «همه‌جا» فقط همین پست‌تایپ‌ها + برگه‌ها را می‌گردد.
 - ورود مدیران: `/wp-admin` و `wp-login.php?admin=1` به فرم استاندارد وردپرس می‌روند؛ `/login` مخصوص کاربران (موبایل + OTP) است.
 
+### مرکز گزارش‌گیری
+
+منوی مستقل **گزارش‌گیری** جایگزین افزونهٔ قدیمی `report_courses` است و گزارش تکمیل دوره و نتایج آزمون را با فیلتر، صفحه‌بندی، چاپ و خروجی stream شدهٔ CSV/JSON ارائه می‌کند. shortcode سازگار `[update_meta_value]` و ثبت IP آزمون نیز به‌صورت امن حفظ شده‌اند؛ جزئیات در `docs/REPORTING.md` آمده است.
+
 ## ۶. پیکربندی
 
-همهٔ تنظیمات از **نمایش → تنظیمات قالب** خوانده می‌شوند (آپشن `evented_theme_options`، دسترسی با `evented_opt('key')`):
+همهٔ تنظیمات از منوی اصلی **تنظیمات قالب** (بلافاصله زیر «پیشخوان») خوانده می‌شوند؛ داده‌ها در آپشن `evented_theme_options` می‌مانند و با `evented_opt('key')` در دسترس‌اند:
 
 | تب | کلیدهای مهم |
 |---|---|
 | عمومی/تماس | `site_tagline_fa`, `license_text`, `phone`, `phone_hours`, `email`, `address`, `copyright`, `terms_url` |
-| شبکه‌ها | `channel_id` (ایتا/بله/روبیکا/سروش) یا URL کامل هرکدام، `telegram_url`, `instagram_url`, `youtube_url`, `linkedin_url` |
+| شبکه‌ها | `channel_id` (ایتا/بله/روبیکا/آی‌گپ/سروش) یا URL کامل هرکدام، `telegram_url`, `instagram_url`, `youtube_url`, `linkedin_url` |
 | صفحهٔ اصلی | عنوان/زیرعنوان بخش‌ها، `tabs_count`, `tabs_per` |
+| نمایش اطلاعات نوشته‌ها | `post_meta_author`, `post_meta_date`, `post_meta_views`, `post_meta_reading`, `post_meta_comments`, `post_meta_category`؛ روی نوشتهٔ تکی، آرشیو/جستجو و کارت‌های صفحهٔ اصلی |
 | پیامک | `sms_username`, `sms_password`, `sms_body_id`, `sms_notify_body_id`, `otp_ttl`, `otp_rate` |
 | سئو | `seo_enabled`, `seo_home_title`, `seo_home_desc`, `seo_default_img`, `org_name`, `org_logo` |
 | اعلان‌ها | `notify_enabled`, `notify_new_lesson`, `notify_comment`, `notify_sms`, `notify_keep_days` + فرم «ارسال اعلان دستی» |
@@ -195,17 +218,55 @@ define('EVENTED_SMS_BODY_ID', 12345);
 
 **سیاست «بدون درخواست خارجی»:** فونت‌ها، آیکن‌ها و همهٔ اسکریپت‌ها محلی‌اند و `inc/no_external.php` هر استایل/اسکریپت ثبت‌شده از دامنهٔ دیگر را روی فرانت‌اند حذف می‌کند (استثنا با فیلتر `evented_allowed_external_hosts`).
 
+### ۶.۱ گواهینامهٔ فارسی و mPDF
+
+- تولید اصلی گواهی آزمون در `inc/certificates.php` با mPDF، صفحهٔ A4 افقی، پس‌زمینهٔ گواهی و مختصات میلی‌متری انجام می‌شود.
+- نام دانشجو، کد ملی، عنوان دوره و تاریخ از داده‌های مجاز LearnDash/User Meta خوانده می‌شوند؛ درخواست باید متعلق به کاربر جاری باشد، مگر مدیر دارای `manage_options`.
+- فونت‌های واقعی `Vazirmatn-Regular.ttf` و `Vazirmatn-Bold.ttf` با خانوادهٔ اختصاصی `eventedcert`، OTL و RTL داخل PDF استفاده می‌شوند. WOFF2 رابط سایت جایگزین TTF در mPDF نیست.
+- بستهٔ رسمی انتشار mPDF و وابستگی‌های production را زیر `inc/lib/` دارد. این نام عمداً به‌جای `vendor/` انتخاب شده تا فیلترهای امنیتی بعضی هاست‌ها پوشه را هنگام نصب پوسته حذف نکنند.
+- فونت‌های عمومی و بلااستفادهٔ حجیم mPDF از artifact حذف می‌شوند؛ `bin/build-theme-release.sh` از staging نهایی یک PDF فارسی واقعی می‌سازد و سپس ZIP را منتشر می‌کند.
+- اگر کتابخانه روی یک هاست غیرعادی حذف یا مسدود شود، همان گواهی به‌صورت HTML دقیق A4 با دکمهٔ «چاپ / ذخیره PDF» نمایش داده می‌شود و کاربر با خطای توقف مواجه نمی‌شود.
+- برای نصب production فقط asset نام‌گذاری‌شدهٔ `evented-edu.zip` از GitHub Release معتبر است؛ فایل‌های خودکار **Source code.zip** بستهٔ runtime گواهینامه را تضمین نمی‌کنند.
+
+### ۶.۲ به‌روزرسانی خودکار از GitHub
+
+`inc/theme_updater.php` هر شش ساعت آخرین **GitHub Release** عمومی مخزن `ahmad75naraghi/learndash-theme` را بررسی می‌کند. بررسی دستی از کارت «به‌روزرسانی قالب» در بالای صفحهٔ تنظیمات در دسترس است. فقط نسخهٔ پایدار با شمارهٔ SemVer بالاتر و بسته‌ای از میزبان‌های رسمی GitHub پذیرفته می‌شود؛ Draft و prerelease نادیده گرفته می‌شوند.
+
+فرایند انتشار:
+
+1. مقدار `Version` در `style.css` افزایش یابد.
+2. بعد از merge، بسته با `bash bin/build-theme-release.sh /tmp/evented-edu.zip` ساخته شود.
+3. GitHub Release با tag هم‌نسخه (مثلاً `v2.5.4`) ساخته و فایل `/tmp/evented-edu.zip` با نام دقیق `evented-edu.zip` به آن پیوست شود.
+4. وجود `evented-edu/inc/lib/autoload.php`، کلاس `Mpdf\\Mpdf` و دو TTF گواهینامه در خود ZIP تأیید شود.
+5. در پیشخوان «تنظیمات قالب → بررسی دوباره» زده شود و نصب از صفحهٔ به‌روزرسانی‌های وردپرس انجام گیرد.
+
+zipball رسمی سورس بستهٔ قابل استقرار نیست و updater آن را پیشنهاد نمی‌دهد؛ artifact استاندارد `evented-edu.zip` تنها بستهٔ کامل است. تنظیمات، نوشته‌ها و محتوای سایت در دیتابیس‌اند و با جایگزینی فایل‌های قالب حذف نمی‌شوند.
+
 ## ۷. تست‌ها
 
-- **وضعیت فعلی:** هیچ فریم‌ورک تست خودکار در ریپو وجود ندارد. تست‌ها دستی/اسموک هستند.
+- GitHub Actions روی PHP 7.4/8.1/8.3، JavaScript و CSS اجرا می‌شود.
+- `tests/theme-updater-test.php` parsing امن Release، جلوگیری از downgrade/prerelease/host ناشناس و نرمال‌سازی پوشهٔ بسته را آزمایش می‌کند.
+- `tests/panel-helpers-test.php` نرمال‌سازی ارقام فارسی/عربی پنل و `tests/static-audit.py` قراردادهای asset، دسترس‌پذیری تصاویر، صفحه‌بندی و کارایی را بررسی می‌کنند.
+- `tests/certificate-font-test.php` بارگذاری mPDF، انتخاب TTF فارسی و تولید PDF واقعی را روی PHPهای پشتیبانی‌شده می‌آزماید.
+- `bin/build-theme-release.sh` ساختار ZIP، نسخه، `Update URI`، `inc/lib`، فونت‌ها و تولید PDF از staging نهایی را اعتبارسنجی می‌کند.
+- ماتریس کامل موبایل، بودجهٔ Lighthouse، سناریوهای پنل و rollback در `docs/QA-RELEASE-CHECKLIST.md` است.
 - دستورهای پیشنهادی برای بررسی سلامت کد:
 
 ```bash
 # لینت PHP (همهٔ فایل‌ها)
 find . -name "*.php" -not -path "./node_modules/*" -print0 | xargs -0 -n1 php -l
 
-# بررسی سینتکس JS (در صورت نصب node)
-node --check assets/js/main.js
+# lint کامل + تست updater + ساخت بستهٔ انتشار
+bash bin/lint.sh
+php tests/theme-updater-test.php
+php tests/panel-helpers-test.php
+python3 tests/static-audit.py
+bash bin/build-theme-release.sh /tmp/evented-edu.zip
+
+# integration واقعی روی WordPress Playground
+bash bin/dev-playground.sh
+SMOKE_WRITE_PROFILE=1 bash bin/smoke-test.sh http://127.0.0.1:9400 /tmp/wp/site/debug.log
+bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site
 
 # بررسی tag های ناقص HTML (در صورت نصب tidy) برای هر صفحهٔ کلیدی
 ```
@@ -229,6 +290,8 @@ node --check assets/js/main.js
 | `ROADMAP.md` | نقشهٔ راه نسخه‌ها و ویژگی‌های برنامه‌ریزی‌شده |
 | `TODO.md` | تسک‌های معلق، باگ‌های شناخته‌شده (چک‌لیست) |
 | `TECH_DEBT.md` | بدهی فنی، کدهای نیازمند ریفکتور، تنگناهای عملکرد |
+| `docs/QA-RELEASE-CHECKLIST.md` | ماتریس واکنش‌گرایی، بودجهٔ سرعت، تست پنل، staging و rollback |
+| `docs/CERTIFICATES.md` | معماری mPDF، فونت فارسی، fallback چاپی، بسته‌بندی و عیب‌یابی گواهینامه |
 
 ---
 

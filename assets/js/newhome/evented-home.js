@@ -64,12 +64,18 @@
                 item.classList.toggle('is-open', !open);
             });
         });
-        // آیتم فعال از ابتدا باز باشد
-        var activeItem = drawer.querySelector('.ee-dn-item.ee-active.has-sub');
-        if (activeItem) {
-            var ab = activeItem.querySelector('.ee-dn-toggle');
-            if (ab) { ab.click(); }
-        }
+        // زیر‌دسته‌های هر بخش نیز مستقل‌اند و هرگز به‌صورت پیش‌فرض باز نمی‌شوند.
+        drawer.querySelectorAll('.ee-dn-child-toggle').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var row = btn.closest('.ee-dn-child');
+                var children = row ? row.querySelector(':scope > .ee-dn-children') : null;
+                if (!children) { return; }
+                var open = btn.getAttribute('aria-expanded') === 'true';
+                btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+                children.hidden = open;
+                row.classList.toggle('is-open', !open);
+            });
+        });
     }
 
     /* ---------- زیرمنوی دسکتاپ: باز شدن با کلید/لمس (هاور در CSS) ---------- */
@@ -97,6 +103,38 @@
         if (!e.target.closest('.ee-nav-item')) {
             document.querySelectorAll('.ee-nav .ee-nav-item.is-open').forEach(function (o) { o.classList.remove('is-open'); });
         }
+    });
+
+    /* دستهٔ مادر: زیرشاخه در پنل سمت چپ + پشتیبانی کیبورد */
+    document.querySelectorAll('.ee-sub-item.has-children').forEach(function (item) {
+        var parent = item.querySelector(':scope > .ee-sub-link');
+        var flyout = item.querySelector(':scope > .ee-sub-flyout');
+        if (!parent || !flyout) { return; }
+        parent.setAttribute('aria-expanded', 'false');
+        item.addEventListener('mouseenter', function () { parent.setAttribute('aria-expanded', 'true'); });
+        item.addEventListener('mouseleave', function () { parent.setAttribute('aria-expanded', 'false'); });
+        item.addEventListener('focusin', function () { parent.setAttribute('aria-expanded', 'true'); });
+        item.addEventListener('focusout', function (e) {
+            if (!item.contains(e.relatedTarget)) { parent.setAttribute('aria-expanded', 'false'); }
+        });
+        parent.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowLeft') {
+                var first = flyout.querySelector('.ee-sub-link');
+                if (first) { e.preventDefault(); first.focus(); }
+            }
+        });
+        flyout.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight') { e.preventDefault(); parent.focus(); }
+        });
+    });
+    document.querySelectorAll('.ee-nav .ee-sub').forEach(function (sub) {
+        sub.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape') { return; }
+            var item = sub.closest('.ee-nav-item');
+            var trigger = item ? item.querySelector(':scope > a') : null;
+            if (item) { item.classList.remove('is-open'); }
+            if (trigger) { e.preventDefault(); trigger.focus(); }
+        });
     });
 
     /* ---------- جستجوی موبایل: باز/بسته با دکمهٔ ذره‌بین ---------- */

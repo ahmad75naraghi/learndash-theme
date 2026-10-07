@@ -77,7 +77,14 @@
         if (req.mode === 'navigate' || accept.indexOf('text/html') !== -1) {
             e.respondWith(
                 fetch(req).then(function (res) {
-                    if (res && res.ok && res.type === 'basic' && !res.headers.get('set-cookie')) {
+                    // Browsers intentionally hide Set-Cookie from JavaScript, so checking
+                    // that header cannot protect personalized pages. Respect WordPress and
+                    // plugin cache policy instead and never persist cookie-varying HTML.
+                    var policy = res ? (res.headers.get('cache-control') || '') : '';
+                    var vary = res ? (res.headers.get('vary') || '') : '';
+                    var explicitlyPrivate = res ? res.headers.get('x-evented-private') === '1' : true;
+                    var privateResponse = explicitlyPrivate || /(?:private|no-store|no-cache)/i.test(policy) || /(?:^|,)\s*cookie\s*(?:,|$)/i.test(vary);
+                    if (res && res.ok && res.type === 'basic' && !privateResponse) {
                         var copy = res.clone();
                         caches.open(PAGES).then(function (c) { c.put(req, copy); trim(PAGES, MAX_PAGES); });
                     }

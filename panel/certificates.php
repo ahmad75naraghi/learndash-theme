@@ -31,7 +31,7 @@ if (function_exists('learndash_user_get_enrolled_courses') && function_exists('l
             }
 
             // پاکسازی تگ‌های احتمالی HTML در صورتی که نسخه لرندش رشته <a> برگرداند
-            if (str_starts_with($cert_link, '<a') && preg_match('/href=[\'"]([^\'"]+)[\'"]/', $cert_link, $matches)) {
+            if (0 === strpos($cert_link, '<a') && preg_match('/href=[\'"]([^\'"]+)[\'"]/', $cert_link, $matches)) {
                 $cert_link = $matches[1];
             }
 
@@ -85,13 +85,13 @@ if (function_exists('learndash_get_certificate_link')) {
             }
 
             // پاکسازی ساختار احتمالی تگ HTML
-            if (str_starts_with($cert_url, '<a') && preg_match('/href=[\'"]([^\'"]+)[\'"]/', $cert_url, $matches)) {
+            if (0 === strpos($cert_url, '<a') && preg_match('/href=[\'"]([^\'"]+)[\'"]/', $cert_url, $matches)) {
                 $cert_url = $matches[1];
             }
 
             // افزودن پارامتر زمان آزمون جهت اعتبارسنجی تمپلیت خروجی PDF
             $attempt_time = ! empty($attempt['time']) ? (int) $attempt['time'] : 0;
-            if ($attempt_time > 0 && ! str_contains($cert_url, 'time=')) {
+            if ($attempt_time > 0 && false === strpos($cert_url, 'time=')) {
                 $cert_url = add_query_arg('time', $attempt_time, $cert_url);
             }
 
@@ -138,7 +138,7 @@ get_template_part('template-parts/panel/shell', 'open', [
             ?>
                 <div class="card">
                     <div class="certificate-thumb">
-                        <img src="<?= esc_url(get_template_directory_uri() . '/assets/img/panel/certificate-thumb.png'); ?>" alt="تصویر گواهینامه" />
+                        <img src="<?= esc_url(get_template_directory_uri() . '/assets/img/panel/certificate-thumb.png'); ?>" alt="تصویر گواهینامه" width="181" height="121" loading="lazy" decoding="async">
                     </div>
                     <div class="card-content">
                         <div>
@@ -174,7 +174,7 @@ get_template_part('template-parts/panel/shell', 'open', [
         <?php else : ?>
             <div class="no-exist-notice">
                 <div>
-                    <img src="<?= esc_url(get_template_directory_uri() . '/assets/img/panel/certificate-sample.png'); ?>" alt="بدون گواهینامه" />
+                    <img src="<?= esc_url(get_template_directory_uri() . '/assets/img/panel/certificate-sample.png'); ?>" alt="بدون گواهینامه" width="111" height="78" loading="lazy" decoding="async">
                 </div>
                 <p>هنوز دوره‌ای شرکت نکردی!!</p>
                 <p>با تکمیل هر دوره و قبولی در آزمون، گواهینامهٔ آن همین‌جا قابل دریافت است.</p>

@@ -2,8 +2,14 @@ name: Lint
 
 on:
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
+
+# Test jobs are read-only. Release publishing receives write access only in its
+# own job after a tested commit lands on main.
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
   lint:
@@ -14,7 +20,7 @@ jobs:
       matrix:
         php: ['7.4', '8.1', '8.3']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -22,9 +28,135 @@ jobs:
           coverage: none
           tools: none
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Run lint script
         run: bash bin/lint.sh
+
+      - name: Test updater, certificate font, panel helpers and static QA
+        run: |
+          php tests/theme-updater-test.php
+          composer update --no-dev --no-interaction --prefer-dist --no-progress
+          php tests/certificate-font-test.php
+          php tests/panel-helpers-test.php
+          php tests/jalali-test.php
+          php tests/learndash-fa-test.php
+          python3 tests/static-audit.py
+          if [[ "${{ matrix.php }}" == '8.3' ]]; then
+            bash bin/build-theme-release.sh /tmp/evented-edu.zip
+          fi
+
+      - name: Upload deployable theme package
+        if: matrix.php == '8.3'
+        uses: actions/upload-artifact@v5
+        with:
+          name: evented-edu-2.5.4
+          path: |
+            /tmp/evented-edu.zip
+            composer.lock
+          if-no-files-found: error
+          retention-days: 14
+
+  wordpress-smoke:
+    name: WordPress runtime smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: bin/dev-playground.sh
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer
+
+      - name: Install deployable PDF dependencies
+        run: composer update --no-dev --classmap-authoritative --no-interaction --prefer-dist --no-progress
+
+      - name: Install visual-test browser
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          npx playwright install chromium
+
+      # Playground و درخواست‌ها در یک step می‌مانند تا runner پردازش orphan را بین stepها پاک نکند.
+      - name: Test WordPress routes, responsive layout and a real theme replacement
+        env:
+          SMOKE_WRITE_PROFILE: '1'
+          SMOKE_USERNAME: admin
+          SMOKE_PASSWORD: password
+        run: |
+          set -o pipefail
+          bash bin/dev-playground.sh
+          set +e
+          bash bin/smoke-test.sh http://127.0.0.1:9400 /tmp/wp/site/debug.log > /tmp/runtime-output.log 2>&1
+          smoke_status=$?
+          # جایگزینی قالب عملیات destructive است؛ پیش از ممیزی ۱۰۰ صفحه‌ای اجرا می‌شود
+          # تا restart موقت worker باعث تکرار نیمه‌کارهٔ Theme_Upgrader نشود.
+          bash bin/test-wordpress-update.sh http://127.0.0.1:9400 /tmp/wp/site >> /tmp/runtime-output.log 2>&1
+          update_status=$?
+          node tests/visual-audit.mjs http://127.0.0.1:9400 /tmp/visual-audit >> /tmp/runtime-output.log 2>&1
+          visual_status=$?
+          cat /tmp/runtime-output.log
+          {
+            echo '### WordPress runtime output'
+            echo '```text'
+            cat /tmp/runtime-output.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if (( visual_status != 0 )); then echo '::error title=Visual layout audit::Responsive browser audit failed'; fi
+          if (( update_status != 0 )); then echo '::error title=WordPress updater integration::Theme_Upgrader integration failed'; fi
+          if (( smoke_status != 0 || visual_status != 0 || update_status != 0 )); then exit 1; fi
+
+      - name: Upload responsive screenshots
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: responsive-screenshots
+          path: /tmp/visual-audit
+          if-no-files-found: warn
+          retention-days: 7
+
+  publish-release:
+    name: Publish installable theme release
+    needs: [lint, wordpress-smoke]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          coverage: none
+          tools: composer
+
+      - name: Build PHP 7.4-compatible deployable package
+        run: |
+          composer update --no-dev --classmap-authoritative --no-interaction --prefer-dist --no-progress
+          php tests/certificate-font-test.php
+          bash bin/build-theme-release.sh /tmp/evented-edu.zip
+
+      - name: Publish versioned release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          version=$(sed -nE 's/^Version:[[:space:]]*([^[:space:]]+).*/\1/p' style.css | head -1)
+          if gh release view "v$version" >/dev/null 2>&1; then
+            echo "Release v$version already exists."
+            exit 0
+          fi
+          gh release create "v$version" /tmp/evented-edu.zip \
+            --target "$TARGET_SHA" \
+            --title "evented-edu $version" \
+            --notes "نسخهٔ نصب‌شدنی کامل قالب شامل mPDF، وابستگی‌های Composer و فونت‌های TTF فارسی گواهینامه."

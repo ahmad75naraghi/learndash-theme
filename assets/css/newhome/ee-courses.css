@@ -390,3 +390,28 @@
 .ee-fside-help a { display: inline-flex; align-items: center; gap: .25rem; font-size: .72rem; font-weight: 800; color: var(--ee-lavD); }
 .ee-fside-help a:hover .ee-ic { transform: translateX(-3px); }
 .ee-fside-help a .ee-ic { transition: transform .2s; }
+
+/* Narrow viewport hardening for archive, instructor and utility pages. */
+@media (max-width: 520px) {
+    .ee-list-grid, .ee-list-col, .ee-page-card, .ee-page-body, .ee-instructor-card, .ee-ic-body { min-width: 0; }
+    .ee-list-head { padding: .8rem; }
+    .ee-lh-media, .ee-lh-media img { width: 100%; }
+    .ee-lh-media img { height: auto; max-height: 11rem; aspect-ratio: 16 / 9; }
+    .ee-lh-title { font-size: 1.15rem; overflow-wrap: break-word; }
+    .ee-cf-row { align-items: stretch; }
+    .ee-cf-lead { flex-basis: 100%; }
+    .ee-cf-field { flex: 1 1 100%; min-width: 0; border-radius: .75rem; }
+    .ee-cf-field select { width: 100%; max-width: 100%; min-width: 0; }
+    .ee-ccard-body { min-width: 0; padding: .7rem; }
+    .ee-ccard-foot { align-items: flex-start; flex-direction: column; }
+    .ee-ccard-by { width: 100%; white-space: normal; overflow-wrap: break-word; }
+    .ee-stats { gap: .35rem; }
+    .ee-stats li { min-width: 0; padding-inline: .25rem; overflow-wrap: break-word; }
+    .ee-instructor-card { padding: .9rem; }
+    .ee-page-body table { display: block; width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .ee-page-body img, .ee-page-body video, .ee-page-body iframe { max-width: 100%; height: auto; }
+}
+@media (max-width: 350px) {
+    .ee-stats { grid-template-columns: minmax(0, 1fr); }
+    .ee-stats li + li { border-inline-start: 0; border-top: 1px solid var(--ee-line); }
+}

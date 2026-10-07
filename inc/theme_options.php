@@ -2,8 +2,14 @@
 // اجازه آپلود فایل‌های دیگر
 function add_custom_mime_types($mimes)
 {
-
-    $mimes['svg']  = 'image/svg+xml';
+    // SVG can contain scripts and external references. Without a dedicated SVG
+    // sanitizer, allow it only to users WordPress trusts with unfiltered markup.
+    // This also limits multisite uploads to super administrators.
+    if (current_user_can('unfiltered_html')) {
+        $mimes['svg'] = 'image/svg+xml';
+    } else {
+        unset($mimes['svg'], $mimes['svgz']);
+    }
     $mimes['epub'] = 'application/epub+zip';
     $mimes['csv']  = 'text/csv';
     $mimes['ico'] = 'image/x-icon';
@@ -86,7 +92,7 @@ function is_current_path($path)
 {
     $current_path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
     $target_path = trim($path, '/');
-    return $current_path === $target_path || str_starts_with($current_path, $target_path . '/');
+    return $current_path === $target_path || 0 === strpos($current_path, $target_path . '/');
 }
 
 
@@ -142,8 +148,12 @@ final class WP_User_Switcher {
         $target_user_id = isset($_GET['user_id']) ? absint($_GET['user_id']) : 0;
         check_admin_referer('switch_to_' . $target_user_id);
 
-        if (!current_user_can('manage_options') || !$target_user_id) {
-            wp_die(__('دسترسی غیرمجاز.', 'textdomain'), 403);
+        if (!current_user_can('manage_options') || !$target_user_id || !get_userdata($target_user_id)) {
+            wp_die(
+                esc_html__('دسترسی غیرمجاز یا کاربر مقصد نامعتبر است.', 'evented-edu'),
+                '',
+                array('response' => 403)
+            );
         }
 
         $admin_id = get_current_user_id();
@@ -187,12 +197,12 @@ final class WP_User_Switcher {
 
         $token = isset($_COOKIE[self::COOKIE_NAME]) ? sanitize_text_field($_COOKIE[self::COOKIE_NAME]) : '';
         if (!$token) {
-            wp_die(__('توکن بازگشت یافت نشد.', 'textdomain'), 403);
+            wp_die(esc_html__('توکن بازگشت یافت نشد.', 'evented-edu'), '', array('response' => 403));
         }
 
         $original_admin_id = get_transient('switch_auth_' . $token);
         if (!$original_admin_id || !user_can($original_admin_id, 'manage_options')) {
-            wp_die(__('نشست نامعتبر یا منقضی شده است.', 'textdomain'), 403);
+            wp_die(esc_html__('نشست نامعتبر یا منقضی شده است.', 'evented-edu'), '', array('response' => 403));
         }
 
         // پاکسازی توکن و کوکی

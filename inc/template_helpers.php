@@ -123,41 +123,8 @@ function evented_wp_date($format, $timestamp = null)
  */
 function evented_gregorian_to_jalali($gy, $gm, $gd)
 {
-	$gy = (int) $gy;
-	$gm = (int) $gm;
-	$gd = (int) $gd;
-
-	$g_days_in_month = array(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334);
-	$gy2             = ($gm > 2) ? ($gy + 1) : $gy;
-
-	$days = 355666
-		+ (365 * $gy)
-		+ (int) (($gy2 + 3) / 4)
-		- (int) (($gy2 + 99) / 100)
-		+ (int) (($gy2 + 399) / 400)
-		+ $gd
-		+ $g_days_in_month[$gm - 1];
-
-	$jy    = -1595 + (33 * (int) ($days / 12053));
-	$days %= 12053;
-
-	$jy   += 4 * (int) ($days / 1461);
-	$days %= 1461;
-
-	if ($days > 365) {
-		$jy   += (int) (($days - 1) / 365);
-		$days  = ($days - 1) % 365;
-	}
-
-	if ($days < 186) {
-		$jm = 1 + (int) ($days / 31);
-		$jd = 1 + ($days % 31);
-	} else {
-		$jm = 7 + (int) (($days - 186) / 30);
-		$jd = 1 + (($days - 186) % 30);
-	}
-
-	return array($jy, $jm, $jd);
+	$result = function_exists('evented_jalali_from_gregorian') ? evented_jalali_from_gregorian($gy, $gm, $gd) : false;
+	return $result ?: array(0, 0, 0);
 }
 
 /**
@@ -172,65 +139,7 @@ function evented_gregorian_to_jalali($gy, $gm, $gd)
  */
 function evented_format_jalali($timestamp, $format = 'j F Y')
 {
-	$months = array(
-		1  => 'فروردین',
-		2  => 'اردیبهشت',
-		3  => 'خرداد',
-		4  => 'تیر',
-		5  => 'مرداد',
-		6  => 'شهریور',
-		7  => 'مهر',
-		8  => 'آبان',
-		9  => 'آذر',
-		10 => 'دی',
-		11 => 'بهمن',
-		12 => 'اسفند',
-	);
-
-	/* نام روز هفته بر پایهٔ N (روز ISO در منطقهٔ زمانی سایت: ۱=دوشنبه … ۷=یکشنبه) */
-	$weekdays = array(
-		'6' => 'شنبه',
-		'7' => 'یکشنبه',
-		'1' => 'دوشنبه',
-		'2' => 'سه‌شنبه',
-		'3' => 'چهارشنبه',
-		'4' => 'پنجشنبه',
-		'5' => 'جمعه',
-	);
-
-	$timestamp = (int) $timestamp;
-
-	list($jy, $jm, $jd) = evented_gregorian_to_jalali(
-		(int) evented_wp_date('Y', $timestamp),
-		(int) evented_wp_date('n', $timestamp),
-		(int) evented_wp_date('j', $timestamp)
-	);
-
-	$weekday_no = (string) evented_wp_date('N', $timestamp);
-	$weekday_fa = isset($weekdays[$weekday_no]) ? $weekdays[$weekday_no] : '';
-
-	$replace = array(
-		'Y' => (string) $jy,
-		'y' => substr((string) $jy, -2),
-		'm' => str_pad((string) $jm, 2, '0', STR_PAD_LEFT),
-		'd' => str_pad((string) $jd, 2, '0', STR_PAD_LEFT),
-		'j' => (string) $jd,
-		'F' => isset($months[$jm]) ? $months[$jm] : '',
-		'l' => $weekday_fa,
-	);
-
-	$out = '';
-	$len = strlen($format);
-	for ($i = 0; $i < $len; $i++) {
-		$char = $format[$i];
-		if ('\\' === $char && $i + 1 < $len) {
-			$out .= $format[++$i];
-			continue;
-		}
-		$out .= isset($replace[$char]) ? $replace[$char] : $char;
-	}
-
-	return $out;
+	return function_exists('evented_jalali_format') ? evented_jalali_format($timestamp, $format, false) : '';
 }
 
 /**
@@ -250,12 +159,9 @@ function evented_post_date($post = null, $format = 'j F Y')
 		return '';
 	}
 
-	$from_wp = get_the_date('', $post);
-	if ($from_wp && !preg_match('/[0-9]/', $from_wp)) {
-		return $from_wp; // خروجی افزونهٔ شمسی‌ساز (بدون رقم لاتین)
-	}
-
-	return evented_format_jalali(evented_post_timestamp($post), $format);
+	return function_exists('evented_jalali_format')
+		? evented_jalali_format(evented_post_timestamp($post), $format, true)
+		: evented_format_jalali(evented_post_timestamp($post), $format);
 }
 
 /**
@@ -401,6 +307,18 @@ function evented_share_links($url, $title)
 		),
 	);
 
+	/* آی‌گپ share URL عمومی ندارد؛ در بلوک اشتراک به کانال تنظیم‌شدهٔ سایت می‌رود. */
+	$igap_url = 'https://profile.igap.net/';
+	foreach (evented_channel_links() as $channel) {
+		if ('igap' === ($channel['key'] ?? '')) { $igap_url = (string) $channel['url']; break; }
+	}
+	$links[] = array('key' => 'igap', 'label' => 'آی‌گپ', 'url' => $igap_url, 'color' => '#84cc16', 'svg' => '');
+	/* همهٔ محل‌های اشتراک از asset واقعی و محلی برند استفاده می‌کنند. */
+	foreach ($links as &$link) {
+		$link['svg'] = evented_channel_icon_html($link, 'ee-channel-icon-share');
+	}
+	unset($link);
+
 	/**
 	 * Filters the share links array.
 	 *
@@ -440,6 +358,12 @@ function evented_channel_links()
 			'color' => '#06b6d4',
 		),
 		array(
+			'key'   => 'igap',
+			'label' => 'آی‌گپ',
+			'url'   => 'https://profile.igap.net/' . $id,
+			'color' => '#84cc16',
+		),
+		array(
 			'key'   => 'soroush',
 			'label' => 'سروش',
 			'url'   => 'https://splus.ir/' . $id,
@@ -453,6 +377,38 @@ function evented_channel_links()
 	 * @param array $channels فهرست کانال‌ها.
 	 */
 	return (array) apply_filters('evented_channel_links', $channels);
+}
+
+/**
+ * نشان محلی و واقعی پیام‌رسان را برای هدر، فوتر و سایدبار می‌سازد.
+ *
+ * @param array  $channel دادهٔ خروجی evented_channel_links().
+ * @param string $class   کلاس اختیاری wrapper.
+ * @return string HTML امن یا رشتهٔ خالی برای کلید ناشناخته.
+ */
+function evented_channel_icon_html($channel, $class = '')
+{
+	$key = isset($channel['key']) ? sanitize_key($channel['key']) : '';
+	$assets = array(
+		'eitaa'   => 'eitaa.svg',
+		'bale'    => 'bale.svg',
+		'rubika'  => 'rubika.svg',
+		'igap'    => 'igap.png',
+		'soroush' => 'soroush.svg',
+	);
+	$classes = trim('ee-channel-icon ee-channel-icon-' . ($key ? $key : 'generic') . ' ' . sanitize_html_class($class));
+	$color   = isset($channel['color']) ? sanitize_hex_color($channel['color']) : '';
+	$style   = $color ? ' style="--ee-channel-color:' . esc_attr($color) . '"' : '';
+	if (!isset($assets[$key])) {
+		$label = isset($channel['label']) ? (string) $channel['label'] : '';
+		$first = function_exists('mb_substr') ? mb_substr($label, 0, 1) : substr($label, 0, 1);
+		return '<span class="' . esc_attr($classes . ' ee-channel-icon-fallback') . '"' . $style . ' aria-hidden="true">' . esc_html($first) . '</span>';
+	}
+
+	$src = get_template_directory_uri() . '/assets/images/social/' . $assets[$key];
+	return '<span class="' . esc_attr($classes) . '"' . $style . ' aria-hidden="true">'
+		. '<img src="' . esc_url($src) . '" alt="" width="20" height="20" decoding="async">'
+		. '</span>';
 }
 
 /**
@@ -1232,6 +1188,217 @@ function evented_empty_state($args = array())
 }
 
 /**
+ * استخراج URLها از مقدار متا (scalar، آرایه یا آبجکت).
+ *
+ * @param mixed $value مقدار متا.
+ * @return string[]
+ */
+function evented_resource_meta_urls($value)
+{
+	$urls = array();
+	if (is_array($value) || is_object($value)) {
+		foreach ((array) $value as $item) {
+			$urls = array_merge($urls, evented_resource_meta_urls($item));
+		}
+		return array_values(array_unique($urls));
+	}
+	if (!is_scalar($value) || is_bool($value)) {
+		return $urls;
+	}
+	$text = str_replace('\\/', '/', html_entity_decode((string) $value, ENT_QUOTES, 'UTF-8'));
+	if (preg_match_all('~https?://[^\s<>"\']+~iu', $text, $matches)) {
+		foreach ($matches[0] as $url) {
+			$url = rtrim($url, '.,;:!?)]}');
+			if (wp_http_validate_url($url)) {
+				$urls[] = esc_url_raw($url);
+			}
+		}
+	}
+	return array_values(array_unique($urls));
+}
+
+/**
+ * پلی‌لیست ویدئوی قدیمی را از دادهٔ Elementor یا متای ساختاریافته بازیابی می‌کند.
+ *
+ * ویجت Video Playlist المنتور فایل واقعی را داخل settings.tabs نگه می‌دارد؛
+ * بنابراین اجرای Elementor برای حفظ و نمایش داده‌های قبلی لازم نیست.
+ *
+ * @param int $post_id شناسهٔ ویدئو.
+ * @return array<int,array{title:string,description:string,url:string,poster:string,thumbnail_id:int,direct:bool}>
+ */
+function evented_clip_playlist($post_id)
+{
+	$items = array();
+	$add   = static function ($row) use (&$items) {
+		if (!is_array($row)) {
+			return;
+		}
+		$external = isset($row['external_url']) && is_array($row['external_url']) ? $row['external_url'] : array();
+		$hosted   = isset($row['hosted_url']) && is_array($row['hosted_url']) ? $row['hosted_url'] : array();
+		$url      = (string) ($external['url'] ?? $hosted['url'] ?? $row['video_url'] ?? $row['url'] ?? '');
+		if ('' === $url) {
+			$type = isset($row['type']) ? sanitize_key($row['type']) : '';
+			$url  = 'youtube' === $type ? (string) ($row['youtube_url'] ?? '') : ('vimeo' === $type ? (string) ($row['vimeo_url'] ?? '') : '');
+		}
+		$url = esc_url_raw(str_replace('\\/', '/', html_entity_decode(trim($url), ENT_QUOTES, 'UTF-8')));
+		if (!in_array((string) wp_parse_url($url, PHP_URL_SCHEME), array('http', 'https'), true) || !wp_parse_url($url, PHP_URL_HOST)) {
+			return;
+		}
+		$thumbnail = isset($row['thumbnail']) && is_array($row['thumbnail']) ? $row['thumbnail'] : array();
+		$poster    = esc_url_raw((string) ($thumbnail['url'] ?? $row['thumbnail_url'] ?? $row['poster'] ?? ''));
+		if (!empty($row['thumbnail_id'])) {
+			$attachment_poster = wp_get_attachment_image_url(absint($row['thumbnail_id']), 'medium_large');
+			$poster = $attachment_poster ?: $poster;
+		}
+		$path      = (string) wp_parse_url($url, PHP_URL_PATH);
+		$items[]   = array(
+			'title'       => sanitize_text_field((string) ($row['title'] ?? '')),
+			'description' => sanitize_textarea_field((string) ($row['description'] ?? '')),
+			'url'         => $url,
+			'poster'      => $poster,
+			'thumbnail_id'=> absint($thumbnail['id'] ?? $row['thumbnail_id'] ?? 0),
+			'direct'      => (bool) preg_match('/\.(?:mp4|webm|ogv|ogg|m3u8)$/i', $path),
+		);
+	};
+	$walk = static function ($node) use (&$walk, $add) {
+		if (!is_array($node)) {
+			return;
+		}
+		if (isset($node['tabs']) && is_array($node['tabs'])) {
+			foreach ($node['tabs'] as $tab) {
+				$add($tab);
+			}
+		}
+		foreach ($node as $child) {
+			if (is_array($child)) {
+				$walk($child);
+			}
+		}
+	};
+
+	$canonical = defined('EVENTED_VIDEO_PLAYLIST_META') ? get_post_meta((int) $post_id, EVENTED_VIDEO_PLAYLIST_META, true) : array();
+	if (is_array($canonical) && !empty($canonical)) {
+		foreach ($canonical as $row) {
+			$add($row);
+		}
+	} else {
+		foreach ((array) get_post_meta((int) $post_id, '_elementor_data', false) as $raw) {
+			$data = is_string($raw) ? json_decode($raw, true) : $raw;
+			if (is_array($data)) {
+				$walk($data);
+			}
+		}
+		foreach ((array) get_post_meta((int) $post_id, 'clip_playlist', true) as $row) {
+			$add($row);
+		}
+		/* آخرین fallback: URLهای مستقیم پراکنده نیز به یک پلی‌لیست استاندارد تبدیل‌پذیرند. */
+		if (!$items && function_exists('evented_resource_public_meta')) {
+			$legacy_urls = array();
+			foreach (evented_resource_public_meta((int) $post_id) as $meta_row) {
+				$legacy_urls = array_merge($legacy_urls, (array) $meta_row['urls']);
+			}
+			$legacy_urls = array_values(array_unique($legacy_urls));
+			$direct_index = 0;
+			foreach ($legacy_urls as $legacy_url) {
+				$legacy_path = (string) wp_parse_url($legacy_url, PHP_URL_PATH);
+				if (!preg_match('/\.(?:mp4|webm|ogv|ogg|m3u8)$/i', $legacy_path)) {
+					continue;
+				}
+				$add(array(
+					'title' => 0 === $direct_index ? get_the_title((int) $post_id) : sprintf(__('قسمت %s', 'evented-edu'), number_format_i18n($direct_index + 1)),
+					'url' => $legacy_url,
+					'thumbnail_id' => get_post_thumbnail_id((int) $post_id),
+				));
+				$direct_index++;
+			}
+		}
+	}
+	foreach ($items as $index => &$item) {
+		if ('' === $item['title']) {
+			$item['title'] = sprintf(__('قسمت %s', 'evented-edu'), number_format_i18n($index + 1));
+		}
+	}
+	unset($item);
+
+	return (array) apply_filters('evented_clip_playlist', $items, (int) $post_id);
+}
+
+/**
+ * متاهای قابل نمایش عمومی یک منبع را برمی‌گرداند.
+ *
+ * کلیدهای دارای نشانهٔ رمز، توکن، نشست یا اطلاعات تماس هرگز عمومی نمی‌شوند؛
+ * بقیهٔ کلیدها (از جمله کلیدهای قدیمی افزونهٔ ویدئو) برای بازیابی داده حفظ می‌شوند.
+ *
+ * @param int $post_id شناسه نوشته.
+ * @return array<int, array{key:string,values:array,urls:array}>
+ */
+function evented_resource_public_meta($post_id)
+{
+	$post_id = (int) $post_id;
+	$all     = get_post_meta($post_id);
+	$output  = array();
+	$blocked = '/(?:pass(?:word|wd)?|secret|token|nonce|api[_-]?key|license|credential|session|cookie|e-?mail|phone|mobile|auth)/i';
+	$internal = '/^(?:_edit_|_wp_page_template$|_elementor_|_yoast_wpseo_|_astra_|_thumbnail_id$|_course_rating_|classic-editor-remember$|site-(?:sidebar-layout|content-layout|post-title)$|theme-transparent-header-meta$|stick-header-meta$|ast-|ekit_post_views_count$)/i';
+
+	foreach (array_keys((array) $all) as $key) {
+		$key = (string) $key;
+		if ('' === $key || preg_match($blocked, $key) || preg_match($internal, $key) || 0 === strpos($key, '_oembed_')) {
+			continue;
+		}
+		$values = get_post_meta($post_id, $key, false);
+		$values = array_values(array_filter((array) $values, static function ($value) {
+			return !(null === $value || '' === $value || array() === $value);
+		}));
+		if (empty($values)) {
+			continue;
+		}
+		$urls = array();
+		foreach ($values as $value) {
+			$urls = array_merge($urls, evented_resource_meta_urls($value));
+		}
+		$output[] = array('key' => $key, 'values' => $values, 'urls' => array_values(array_unique($urls)));
+	}
+
+	return (array) apply_filters('evented_resource_public_meta', $output, $post_id);
+}
+
+/**
+ * تبدیل امن مقدار متا به HTML خوانا؛ هیچ HTML ذخیره‌شده‌ای اجرا نمی‌شود.
+ *
+ * @param mixed $value مقدار متا.
+ * @param int   $depth عمق آرایه.
+ * @return string
+ */
+function evented_resource_meta_value_html($value, $depth = 0)
+{
+	$value = maybe_unserialize($value);
+	if ((is_array($value) || is_object($value)) && $depth < 5) {
+		$items = '';
+		foreach ((array) $value as $key => $item) {
+			$label = is_int($key) ? '' : '<strong>' . esc_html((string) $key) . '</strong>';
+			$items .= '<li>' . $label . evented_resource_meta_value_html($item, $depth + 1) . '</li>';
+		}
+		return '<ul class="ee-resource-meta-list">' . $items . '</ul>';
+	}
+	if (is_bool($value)) {
+		return '<span>' . ($value ? esc_html__('بله', 'evented-edu') : esc_html__('خیر', 'evented-edu')) . '</span>';
+	}
+	if (!is_scalar($value)) {
+		return '<span>—</span>';
+	}
+	$text = (string) $value;
+	if (function_exists('mb_strlen') && mb_strlen($text) > 4000) {
+		$text = mb_substr($text, 0, 4000) . '…';
+	} elseif (strlen($text) > 4000) {
+		$text = substr($text, 0, 4000) . '…';
+	}
+	if (wp_http_validate_url($text)) {
+		return '<a href="' . esc_url($text) . '" target="_blank" rel="noopener nofollow">' . esc_html($text) . '</a>';
+	}
+	return '<span>' . nl2br(esc_html($text)) . '</span>';
+}
+
+/**
  * نوار ابزار بالای فهرست نتایج: «نمایش X دوره» + مرتب‌سازی جمع‌وجور.
  *
  * @param int    $total تعداد کل.
@@ -1300,6 +1467,12 @@ function evented_instructor_data($user)
 		return array();
 	}
 
+	$cache_key = 'evented_instructor_' . $user_id;
+	$cached    = get_transient($cache_key);
+	if (is_array($cached)) {
+		return $cached;
+	}
+
 	$course_count = function_exists('count_user_posts') ? (int) count_user_posts($user_id, 'sfwd-courses') : 0;
 
 	/* تعداد دانشجویان یکتا در همهٔ دوره‌های این مدرس */
@@ -1316,7 +1489,7 @@ function evented_instructor_data($user)
 		if (!empty($course_ids)) {
 			$unique = array();
 			foreach ($course_ids as $course_id) {
-				$user_query = learndash_get_users_for_course((int) $course_id, array(), false);
+				$user_query = learndash_get_users_for_course((int) $course_id, array('fields' => 'ID'), false);
 				if ($user_query instanceof WP_User_Query) {
 					foreach ((array) $user_query->get_results() as $student) {
 						$student_id             = is_object($student) ? (int) $student->ID : (int) $student;
@@ -1328,7 +1501,7 @@ function evented_instructor_data($user)
 		}
 	}
 
-	return array(
+	$data = array(
 		'id'           => $user_id,
 		'name'         => (string) get_the_author_meta('display_name', $user_id),
 		'bio'          => (string) get_the_author_meta('description', $user_id),
@@ -1345,7 +1518,26 @@ function evented_instructor_data($user)
 			'facebook'  => (string) get_user_meta($user_id, 'facebook', true),
 		),
 	);
+
+	set_transient($cache_key, $data, 15 * MINUTE_IN_SECONDS);
+	return $data;
 }
+
+/** پاک‌سازی کش کارت/آمار مدرس در تغییرات مرتبط. */
+function evented_instructor_cache_flush($user_id)
+{
+	$user_id = (int) $user_id;
+	if ($user_id > 0) {
+		delete_transient('evented_instructor_' . $user_id);
+	}
+}
+add_action('profile_update', 'evented_instructor_cache_flush');
+add_action('save_post_sfwd-courses', static function ($post_id) {
+	evented_instructor_cache_flush((int) get_post_field('post_author', $post_id));
+}, 20);
+add_action('learndash_update_course_access', static function ($user_id, $course_id) {
+	evented_instructor_cache_flush((int) get_post_field('post_author', $course_id));
+}, 20, 2);
 
 /**
  * فهرست اساتید (نقش group_leader) با صفحه‌بندی.
@@ -1522,13 +1714,9 @@ function evented_time_ago($from, $to = 0)
  */
 function evented_today_label()
 {
-	$wp = function_exists('evented_wp_date') ? evented_wp_date('l j F Y') : date_i18n('l j F Y');
-	if ($wp && !preg_match('/[0-9]/', $wp)) {
-		return $wp; // افزونهٔ شمسی‌ساز
-	}
-	$days = array('Saturday' => 'شنبه', 'Sunday' => 'یکشنبه', 'Monday' => 'دوشنبه', 'Tuesday' => 'سه‌شنبه', 'Wednesday' => 'چهارشنبه', 'Thursday' => 'پنجشنبه', 'Friday' => 'جمعه');
-	$d    = function_exists('evented_wp_date') ? evented_wp_date('l') : date('l');
-	return (isset($days[$d]) ? $days[$d] . ' ' : '') . evented_format_jalali(current_time('timestamp'), 'j F Y');
+	return function_exists('evented_jalali_format')
+		? evented_jalali_format(time(), 'l j F Y', true)
+		: date_i18n('l j F Y');
 }
 
 /**

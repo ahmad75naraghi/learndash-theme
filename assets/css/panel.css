@@ -1374,3 +1374,100 @@ h2 {
 }
 
 /* --- قواعد رمز عبور: حالت نامعتبر --- */
+
+/* ======================================================================
+   تکمیل واکنش‌گرایی پنل v2.3 — mobile-first overrides
+   ====================================================================== */
+.ee-panel-main { overflow: clip; }
+.top-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; padding: .75rem; }
+.top-stats .stat-item { width: auto; min-width: 0; justify-content: flex-start; padding: .65rem; border: 1px solid var(--ee-line); border-radius: .9rem; background: #fff; transition: border-color .15s, transform .15s; }
+.top-stats .stat-item:hover { border-color: var(--ee-teal); transform: translateY(-1px); }
+.top-stats .stat-item > span:last-child { display: flex; flex-direction: column; min-width: 0; font-size: .72rem; color: var(--ee-soft); }
+.top-stats .stat-item b { color: var(--ee-ink); font-size: 1.05rem; line-height: 1.3; }
+.ee-stat-icon { width: 2.25rem; height: 2.25rem; border-radius: .7rem; display: inline-flex; align-items: center; justify-content: center; color: var(--ee-tealP); background: var(--ee-mint); flex: 0 0 auto; }
+.ee-stat-icon .ee-ic { font-size: 1.3rem; }
+.ee-panel-section-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: 1rem; }
+.ee-panel-section-head .section-title { margin: 0; }
+.ee-panel-section-head > a { font-size: .72rem; font-weight: 800; color: var(--ee-tealP); }
+.ee-dashboard-course .card-header > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ee-dashboard-course .progress-wrapper { margin-top: auto; }
+.ee-dashboard-continue { display: inline-flex; align-items: center; gap: .25rem; color: var(--ee-tealP); font-size: .75rem; font-weight: 800; }
+.ee-dashboard-continue .ee-ic { font-size: 1rem; }
+
+.ee-panel-pager { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .35rem; margin-top: 1.2rem; }
+.ee-panel-pager .page-numbers { min-width: 2.4rem; min-height: 2.4rem; padding: .35rem .65rem; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--ee-line); border-radius: .7rem; background: #fff; color: var(--ee-ink); font-size: .76rem; font-weight: 800; }
+.ee-panel-pager .page-numbers.current { background: var(--ee-tealP); border-color: var(--ee-tealP); color: #fff; }
+.ee-panel-pager .page-numbers:hover { border-color: var(--ee-teal); color: var(--ee-tealP); }
+.ee-panel-page-count { margin-inline-end: .35rem; color: var(--ee-soft); font-size: .7rem; }
+
+.transaction-content .table-row > div { min-width: 0; overflow-wrap: anywhere; }
+.transaction-content .status-pending { color: #b45309; font-weight: 800; }
+.transaction-content .status-refunded { color: #0369a1; font-weight: 800; }
+.transaction-content .datetime time { display: flex; flex-direction: column; }
+
+@media (max-width: 1199.98px) {
+    .ee-panel-main .course-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 899.98px) {
+    .ee-panel-main .course-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ee-panel-main .horizontal-grid { grid-template-columns: 1fr; }
+    .horizontal-card { padding: 1rem; }
+}
+@media (max-width: 599.98px) {
+    .ee-panel-main .course-grid {
+        display: grid; grid-template-columns: 1fr !important; grid-auto-flow: row;
+        grid-auto-columns: auto; overflow: visible; gap: .9rem;
+    }
+    .top-stats { grid-template-columns: 1fr; }
+    .top-stats .stat-item { min-height: 3.6rem; }
+    .ee-panel-section-head { align-items: flex-start; }
+    .ee-panel-section-head > a { text-align: left; max-width: 9rem; }
+    .horizontal-card-top { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); margin-bottom: 0; }
+    .horizontal-card-image { width: 6.5rem; height: 5.2rem; }
+    .horizontal-card-info { width: auto; gap: .45rem; }
+    .horizontal-card .card-tags { position: static; width: auto; margin-top: .25rem; max-height: 3.5rem; overflow: hidden; }
+    .horizontal-card .card-actions { flex-direction: column; align-items: stretch; }
+    .horizontal-card .course-actions, .horizontal-card .final-course-actions { width: 100%; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .horizontal-card .get-certificate { display: flex; align-items: center; justify-content: center; min-height: 2.75rem; }
+    .horizontal-card .final-course-actions { grid-template-columns: 1fr; }
+    .horizontal-card .submit-comment-btn, .horizontal-card .start-course-btn { min-height: 2.75rem; display: inline-flex; align-items: center; justify-content: center; }
+    .progress-desc { margin: .75rem 0 0; }
+    .card-tags { flex-wrap: wrap; }
+    .ee-modal { padding: .5rem; align-items: flex-end; }
+    .ee-modal-box { width: 100%; max-height: calc(100dvh - 1rem); overflow-y: auto; border-radius: 1.2rem 1.2rem .7rem .7rem; padding: 1.5rem 1rem 1rem; }
+    .ee-modal-actions { flex-direction: column-reverse; }
+    .ee-modal-actions .ee-btn { width: 100%; min-height: 2.75rem; justify-content: center; }
+    .ee-pass-rules { grid-template-columns: 1fr; }
+    .transaction-content .table-row > div { gap: 1rem; text-align: left; }
+    .transaction-content .table-row > div::before { text-align: right; }
+    .transaction-content .modal { height: auto; max-height: calc(100dvh - 1rem); border-radius: 1.2rem 1.2rem .5rem .5rem; padding: 3.5rem 1rem 1.2rem; overflow-y: auto; }
+    .settings-panel, .profile-panel, .transaction-content { min-width: 0; }
+}
+@media (max-width: 359.98px) {
+    .horizontal-card-top { grid-template-columns: 1fr; }
+    .horizontal-card-image { width: 100%; height: 9rem; }
+    .horizontal-card .course-actions { grid-template-columns: 1fr; }
+    .ee-panel-pager .ee-panel-page-count { flex-basis: 100%; text-align: center; margin: 0 0 .2rem; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .ee-panel-main button, .ee-panel-main a.btn-primary, .ee-panel-main .btn-receipt { min-height: 44px; }
+}
+
+/* Final containment layer for legacy panel forms and long transaction data. */
+@media (max-width: 520px) {
+    .panel-main,
+    .panel-section,
+    .panel-card,
+    .panel-form { min-width: 0; }
+    .panel-form input,
+    .panel-form select,
+    .panel-form textarea,
+    .panel-form button { max-width: 100%; min-width: 0; }
+    .panel-section table,
+    .transactions-table { display: block; width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .panel-section pre,
+    .panel-section code,
+    .transaction-id { max-width: 100%; overflow-wrap: anywhere; }
+    .panel-modal { width: calc(100vw - 1.25rem); max-width: calc(100vw - 1.25rem); max-height: calc(100dvh - 1.25rem); overflow-y: auto; }
+}

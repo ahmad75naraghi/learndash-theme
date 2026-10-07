@@ -69,6 +69,7 @@ function evented_options_schema()
 				'bale_url'    => array('label' => 'بله', 'type' => 'url', 'default' => '', 'dir' => 'ltr', 'placeholder' => 'https://ble.ir/...'),
 				'eitaa_url'   => array('label' => 'ایتا', 'type' => 'url', 'default' => '', 'dir' => 'ltr', 'placeholder' => 'https://eitaa.com/...'),
 				'rubika_url'  => array('label' => 'روبیکا', 'type' => 'url', 'default' => '', 'dir' => 'ltr', 'placeholder' => 'https://rubika.ir/...'),
+				'igap_url'    => array('label' => 'آی‌گپ', 'type' => 'url', 'default' => '', 'dir' => 'ltr', 'placeholder' => 'https://profile.igap.net/...'),
 				'soroush_url' => array('label' => 'سروش', 'type' => 'url', 'default' => '', 'dir' => 'ltr', 'placeholder' => 'https://splus.ir/...'),
 				'telegram_url'  => array('label' => 'تلگرام', 'type' => 'url', 'default' => '', 'dir' => 'ltr'),
 				'instagram_url' => array('label' => 'اینستاگرام', 'type' => 'url', 'default' => '', 'dir' => 'ltr'),
@@ -100,12 +101,27 @@ function evented_options_schema()
 				'step3_title'     => array('label' => 'گام ۳ — عنوان', 'type' => 'text', 'default' => 'دسترسی نامحدود و دائمی'),
 				'step3_text'      => array('label' => 'گام ۳ — توضیح', 'type' => 'text', 'default' => 'مشاهدهٔ ویدیوها، دریافت جزوات و شرکت در آزمون در هر زمان و مکان'),
 				'articles_title'  => array('label' => 'عنوان بخش مقالات', 'type' => 'text', 'default' => 'گزیدهٔ مقالات و دانستنی‌ها'),
+				'reviews_title'   => array('label' => 'عنوان بخش تجربهٔ دانشجویان', 'type' => 'text', 'default' => 'تجربهٔ دانشجویان'),
+				'reviews_sub'     => array('label' => 'زیرعنوان تجربهٔ دانشجویان', 'type' => 'text', 'default' => 'نظرهای واقعی شرکت‌کنندگان دوره‌ها'),
 				'blog_feat_title' => array('label' => 'عنوان بلاگ ویژه', 'type' => 'text', 'default' => 'بلاگ ویژه'),
 				'blog_feat_sub'   => array('label' => 'زیرعنوان بلاگ ویژه', 'type' => 'text', 'default' => 'منتخبی از نوشته‌های تیم آموزشی؛ تازه‌ترین تجربه‌ها و راهنماهای کاربردی'),
 				'instr_title'     => array('label' => 'عنوان بخش اساتید', 'type' => 'text', 'default' => 'اساتید و متخصصان برجسته'),
 				'instr_sub'       => array('label' => 'زیرعنوان اساتید', 'type' => 'text', 'default' => 'همراهی اساتید و کارشناسان مجرب در حوزه‌های خانواده، تربیت، رسانه و معارف'),
 				'tabs_count'      => array('label' => 'تعداد تب‌های مقالات', 'type' => 'number', 'default' => 5, 'min' => 2, 'max' => 8),
 				'tabs_per'        => array('label' => 'تعداد مقاله در هر تب', 'type' => 'number', 'default' => 3, 'min' => 2, 'max' => 6),
+			),
+		),
+		'content_display' => array(
+			'title'  => 'نمایش اطلاعات نوشته‌ها',
+			'icon'   => 'dashicons-visibility',
+			'fields' => array(
+				'post_meta_author'   => array('label' => 'نمایش نام نویسنده', 'type' => 'checkbox', 'default' => 1, 'desc' => 'در صفحهٔ نوشته، کارت‌های آرشیو و کارت‌های مقالات صفحهٔ اصلی.'),
+				'post_author_box'    => array('label' => 'نمایش جعبهٔ معرفی نویسنده زیر مقاله', 'type' => 'checkbox', 'default' => 1, 'desc' => 'با خاموش‌کردن، کارت تصویر، توضیح و پیوند پروفایل نویسنده کاملاً حذف می‌شود.'),
+				'post_meta_date'     => array('label' => 'نمایش تاریخ انتشار', 'type' => 'checkbox', 'default' => 1),
+				'post_meta_views'    => array('label' => 'نمایش تعداد بازدید', 'type' => 'checkbox', 'default' => 1, 'desc' => 'خاموش‌کردن این گزینه فقط عدد را پنهان می‌کند و ثبت بازدید ادامه دارد.'),
+				'post_meta_reading'  => array('label' => 'نمایش زمان مطالعه', 'type' => 'checkbox', 'default' => 1),
+				'post_meta_comments' => array('label' => 'نمایش تعداد دیدگاه‌ها', 'type' => 'checkbox', 'default' => 1, 'desc' => 'فرم و فهرست دیدگاه‌ها غیرفعال نمی‌شوند؛ فقط شمارنده پنهان می‌شود.'),
+				'post_meta_category' => array('label' => 'نمایش دسته‌بندی نوشته', 'type' => 'checkbox', 'default' => 1),
 			),
 		),
 		'sms' => array(
@@ -201,6 +217,22 @@ function evented_opt($key, $fallback = null)
 }
 
 /**
+ * آیا یکی از اطلاعات نمایشی نوشته باید در فرانت‌اند دیده شود؟
+ *
+ * @param string $key author|date|views|reading|comments|category.
+ * @return bool
+ */
+function evented_post_meta_visible($key)
+{
+	$allowed = array('author', 'date', 'views', 'reading', 'comments', 'category');
+	$key     = sanitize_key($key);
+	if (!in_array($key, $allowed, true)) {
+		return false;
+	}
+	return (bool) evented_opt('post_meta_' . $key, 1);
+}
+
+/**
  * پاک کردن memo (بعد از ذخیره).
  */
 function evented_options_flush()
@@ -263,8 +295,9 @@ add_filter('evented_channel_links', function ($channels) {
 	$map = array(
 		'eitaa'   => array('ایتا',   'eitaa_url',   'https://eitaa.com/',  '#f97316'),
 		'bale'    => array('بله',    'bale_url',    'https://ble.ir/',     '#3b82f6'),
-		'rubika'  => array('روبیکا', 'rubika_url',  'https://rubika.ir/',  '#06b6d4'),
-		'soroush' => array('سروش',   'soroush_url', 'https://splus.ir/',   '#10b981'),
+		'rubika'  => array('روبیکا', 'rubika_url',  'https://rubika.ir/',       '#06b6d4'),
+		'igap'    => array('آی‌گپ',  'igap_url',    'https://profile.igap.net/', '#84cc16'),
+		'soroush' => array('سروش',   'soroush_url', 'https://splus.ir/',        '#10b981'),
 		'telegram'=> array('تلگرام', 'telegram_url', '',                   '#0ea5e9'),
 	);
 	$out = array();

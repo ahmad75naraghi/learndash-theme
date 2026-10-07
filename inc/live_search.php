@@ -75,11 +75,11 @@ function evented_live_search_type_icon($post_type)
 		'post'         => 'article',
 		'sfwd-courses' => 'school',
 		'page'         => 'description',
-		'video'        => 'smart_display',
-		'podcast'      => 'podcasts',
-		'library'      => 'local_library',
+		'clip'         => 'smart_display',
+		'sr_playlist'  => 'podcasts',
+		'lib'          => 'local_library',
 		'gallery'      => 'photo_library',
-		'downloads'    => 'download',
+		'wpdmpro'      => 'download',
 	);
 	$map = (array) apply_filters('evented_live_search_type_icons', $map);
 	return isset($map[$post_type]) ? $map[$post_type] : 'search';
@@ -160,11 +160,17 @@ function evented_live_search_handler(WP_REST_Request $req)
 		);
 	}
 
-	$more = add_query_arg(array('s' => rawurlencode($q), 'post_type' => $scope), home_url('/'));
+	// add_query_arg() performs URL encoding; pre-encoding turns Persian text into
+	// a literal "%25D8..." query after WordPress encodes it a second time.
+	$more_args = array('s' => $q);
+	if ('' !== $scope) {
+		$more_args['post_type'] = $scope;
+	}
+	$more = add_query_arg($more_args, home_url('/'));
 	$data = array(
 		'items' => $items,
 		'total' => (int) $query->found_posts,
-		'more'  => '' !== $scope ? $more : add_query_arg('s', rawurlencode($q), home_url('/')),
+		'more'  => $more,
 		'q'     => $q,
 	);
 	set_transient($key, $data, 10 * MINUTE_IN_SECONDS);

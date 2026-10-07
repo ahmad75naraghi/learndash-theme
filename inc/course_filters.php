@@ -288,7 +288,7 @@ function evented_course_filter_bar($total = null)
 			<?php endforeach; ?>
 			<button type="submit" class="ee-btn ee-btn-primary ee-cf-apply">اعمال</button>
 			<?php if ($active) : ?>
-				<a class="ee-cf-reset" href="<?php echo esc_url('' !== $search ? add_query_arg('s', rawurlencode($search), $base) : $base); ?>"><?php echo ee_icon('close'); // phpcs:ignore ?> حذف فیلترها</a>
+				<a class="ee-cf-reset" href="<?php echo esc_url('' !== $search ? add_query_arg('s', $search, $base) : $base); ?>"><?php echo ee_icon('close'); // phpcs:ignore ?> حذف فیلترها</a>
 			<?php endif; ?>
 		</div>
 		<?php if ($active) : ?>

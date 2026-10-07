@@ -74,7 +74,7 @@ $ee_copyright = (string) $ee_opt('copyright', '');
                     <?php if (!empty($ee_channels)) : ?>
                         <div class="ee-fcta-ch">
                             <?php foreach ($ee_channels as $ee_ch) : ?>
-                                <a href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" title="<?php echo esc_attr('پیام‌رسان ' . $ee_ch['label']); ?>"><span class="dot" style="background:<?php echo esc_attr($ee_ch['color']); ?>;"></span><?php echo esc_html($ee_ch['label']); ?></a>
+                                <a href="<?php echo esc_url($ee_ch['url']); ?>" target="_blank" rel="noopener" title="<?php echo esc_attr('پیام‌رسان ' . $ee_ch['label']); ?>"><?php echo function_exists('evented_channel_icon_html') ? evented_channel_icon_html($ee_ch, 'ee-channel-icon-footer') : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php echo esc_html($ee_ch['label']); ?></a>
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
