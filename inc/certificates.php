@@ -10,7 +10,9 @@ defined('ABSPATH') || exit;
 /**
  * Shamiim – گواهینامه PDF (mPDF) روی لینک‌های فرانت‌اند LearnDash
  *
- * اجرا:  /certificates/xxx/?quiz=ID&user=ID&time=TS   (همان لینک‌های فعلی کاربران)
+ * اجرا:  /certificates/xxx/?quiz=ID[&time=TS]   گواهی آزمون (لینک نتیجه، پنل، شورت‌کد)
+ *        /certificates/xxx/?course_id=ID    گواهی پایان دوره
+ *        (هر دو با user=ID برای مدیر، و cert-nonce که LearnDash می‌فرستد)
  * کالیبره (فقط مدیر):  ...&debug=grid
  * تغییر زنده مختصات (فقط مدیر): ...&debug=grid&pos[name][y]=92&pos[nid][x]=170
  */
@@ -61,26 +63,6 @@ function shamiim_to_persian_digits($string)
         ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'],
         (string) $string
     );
-}
-
-function shamiim_cert_find_attempt($user_id, $quiz_id, $time)
-{
-    $attempts = get_user_meta($user_id, '_sfwd-quizzes', true);
-    if (! is_array($attempts)) {
-        return null;
-    }
-
-    foreach ($attempts as $attempt) {
-        if (
-            (int) ($attempt['quiz'] ?? 0) === $quiz_id
-            && (int) ($attempt['time'] ?? 0) === $time
-            && ! empty($attempt['pass'])
-        ) {
-            return $attempt;
-        }
-    }
-
-    return null;
 }
 
 /**
@@ -228,16 +210,65 @@ function shamiim_cert_stream_printable_html(array $texts, $cert_post_id = 0)
 }
 
 /* -------------------------------------------------------------------------
- * تولید و ارسال PDF
+ * داده‌ها: تلاش آزمون یا تکمیل دوره
  * ---------------------------------------------------------------------- */
-function shamiim_cert_stream_pdf($user_id, $quiz_id, $time, $cert_post_id = 0, $debug = false)
+
+/**
+ * آیا کاربر دوره را تکمیل کرده است؟
+ */
+function shamiim_cert_course_completed($user_id, $course_id)
 {
-    $attempt = shamiim_cert_find_attempt($user_id, $quiz_id, $time);
-    if (! $attempt) {
-        wp_die('گواهینامه‌ای یافت نشد.', 'خطا', ['response' => 404]);
+    if (function_exists('learndash_course_completed')) {
+        return (bool) learndash_course_completed($user_id, $course_id);
     }
 
-    /* --- داده‌ها --- */
+    return (bool) get_user_meta($user_id, 'course_completed_' . $course_id, true);
+}
+
+/**
+ * تلاش قبول‌شدهٔ آزمون را پیدا می‌کند.
+ *
+ * لینک‌های خود LearnDash (نتیجهٔ آزمون، شورت‌کد، پیشخوان دوره) فقط `quiz` و
+ * `cert-nonce` دارند و `time` ندارند. برای همین اگر زمان دقیق تلاش در لینک
+ * نباشد یا پیدا نشود، آخرین تلاش قبول‌شدهٔ همان آزمون استفاده می‌شود.
+ */
+function shamiim_cert_resolve_attempt($user_id, $quiz_id, $time = 0)
+{
+    $attempts = get_user_meta($user_id, '_sfwd-quizzes', true);
+    if (! is_array($attempts)) {
+        return null;
+    }
+
+    $passed = array_values(array_filter($attempts, static function ($attempt) use ($quiz_id) {
+        return is_array($attempt)
+            && (int) ($attempt['quiz'] ?? 0) === $quiz_id
+            && ! empty($attempt['pass']);
+    }));
+
+    if (! $passed) {
+        return null;
+    }
+
+    if ($time) {
+        foreach ($passed as $attempt) {
+            if ((int) ($attempt['time'] ?? 0) === $time) {
+                return $attempt;
+            }
+        }
+    }
+
+    usort($passed, static function (array $a, array $b): int {
+        return (int) ($b['time'] ?? 0) <=> (int) ($a['time'] ?? 0);
+    });
+
+    return $passed[0];
+}
+
+/**
+ * متن‌های ثابت گواهی: تاریخ صدور، نام، کد ملی و عنوان دوره.
+ */
+function shamiim_cert_build_texts($user_id, $course_title, $issue_ts)
+{
     $user_info = get_userdata($user_id);
     if (! $user_info) {
         wp_die('کاربر یافت نشد.', 'خطا', ['response' => 404]);
@@ -248,23 +279,72 @@ function shamiim_cert_stream_pdf($user_id, $quiz_id, $time, $cert_post_id = 0, $
         $student_name = $user_info->display_name ?: trim($user_info->first_name . ' ' . $user_info->last_name);
     }
 
-    $course_id = isset($attempt['course']) ? (int) $attempt['course'] : 0;
-    if (! $course_id && function_exists('learndash_get_course_id')) {
-        $course_id = (int) learndash_get_course_id($quiz_id);
-    }
-    $course_title = get_the_title($course_id ?: $quiz_id);
-
     $national_code = get_user_meta($user_id, 'national_code', true) ?: '---';
     $issue_date    = function_exists('evented_format_jalali')
-        ? evented_format_jalali($time, 'Y/m/d')
-        : date_i18n('Y/m/d', $time);
+        ? evented_format_jalali($issue_ts, 'Y/m/d')
+        : date_i18n('Y/m/d', $issue_ts);
 
-    $texts = [
+    return [
         'date'   => 'تاریخ صدور: ' . shamiim_to_persian_digits($issue_date),
         'name'   => $student_name,
         'nid'    => shamiim_to_persian_digits($national_code),
         'course' => $course_title,
     ];
+}
+
+/* -------------------------------------------------------------------------
+ * تولید و ارسال PDF
+ * ---------------------------------------------------------------------- */
+
+/**
+ * گواهی آزمون قبول‌شده.
+ */
+function shamiim_cert_stream_quiz($user_id, $quiz_id, $time, $cert_post_id = 0, $debug = false)
+{
+    $attempt = shamiim_cert_resolve_attempt($user_id, $quiz_id, $time);
+    if (! $attempt) {
+        wp_die('گواهینامه‌ای یافت نشد.', 'خطا', ['response' => 404]);
+    }
+
+    $course_id = isset($attempt['course']) ? (int) $attempt['course'] : 0;
+    if (! $course_id && function_exists('learndash_get_course_id')) {
+        $course_id = (int) learndash_get_course_id($quiz_id);
+    }
+
+    $texts = shamiim_cert_build_texts(
+        $user_id,
+        get_the_title($course_id ?: $quiz_id),
+        (int) $attempt['time']
+    );
+
+    shamiim_cert_render($texts, 'quiz-' . $quiz_id, $cert_post_id, $debug);
+}
+
+/**
+ * گواهی پایان دوره (لینک course_id در LearnDash).
+ */
+function shamiim_cert_stream_course($user_id, $course_id, $cert_post_id = 0, $debug = false)
+{
+    if (! $course_id || ! shamiim_cert_course_completed($user_id, $course_id)) {
+        wp_die('گواهینامه‌ای یافت نشد.', 'خطا', ['response' => 404]);
+    }
+
+    $completed_ts = (int) get_user_meta($user_id, 'course_completed_' . $course_id, true);
+    $texts        = shamiim_cert_build_texts(
+        $user_id,
+        get_the_title($course_id),
+        $completed_ts > 0 ? $completed_ts : time()
+    );
+
+    shamiim_cert_render($texts, 'course-' . $course_id, $cert_post_id, $debug);
+}
+
+/**
+ * ساخت و ارسال گواهی با mPDF (یا fallback چاپی اگر mPDF نبود).
+ */
+function shamiim_cert_render(array $texts, $file_id, $cert_post_id = 0, $debug = false)
+{
+    $student_name = $texts['name'];
 
     // گواهینامه هیچ‌وقت با خطای «mPDF بارگذاری نشده» متوقف نمی‌شود.
     if (! class_exists('\Mpdf\Mpdf')) {
@@ -330,19 +410,46 @@ function shamiim_cert_stream_pdf($user_id, $quiz_id, $time, $cert_post_id = 0, $
     }
     nocache_headers();
 
-    $mpdf->Output('Certificate-' . $quiz_id . '.pdf', \Mpdf\Output\Destination::INLINE);
+    $mpdf->Output('Certificate-' . $file_id . '.pdf', \Mpdf\Output\Destination::INLINE);
     exit;
 }
 
+/**
+ * از ورودی لینک (URL خام یا تگ <a> که LearnDash برمی‌گرداند) فقط URL را برمی‌گرداند.
+ */
+function shamiim_cert_extract_url($value)
+{
+    $value = trim((string) $value);
+    if ('' === $value) {
+        return '';
+    }
+
+    if (0 === strpos($value, '<') && preg_match('/href=["\']([^"\']+)["\']/i', $value, $m)) {
+        return html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
+    }
+
+    return $value;
+}
+
 /* -------------------------------------------------------------------------
- * هوک روی لینک‌های فعلی گواهینامه LearnDash (بدون wp-admin)
+ * هوک روی همهٔ لینک‌های گواهینامهٔ LearnDash (بدون wp-admin)
+ *
+ * انواع لینک‌ها:
+ *   ?quiz=ID[&time=TS][&cert-nonce=…][&user=ID]     گواهی آزمون (نتیجه، پنل، شورت‌کد)
+ *   ?course_id=ID[&cert-nonce=…][&user=ID]           گواهی پایان دوره
+ *
+ * این هوک باید قبل از موتور قدیمی LearnDash (conv_pdf/TCPDF) اجرا شود تا
+ * همهٔ مسیرها از همان قالب فارسی mPDF عبور کنند.
  * ---------------------------------------------------------------------- */
 add_action('wp', function () {
     if (! is_singular('sfwd-certificates')) {
         return;
     }
 
-    if (! isset($_GET['quiz'], $_GET['time'])) {
+    $quiz_id   = isset($_GET['quiz']) ? absint($_GET['quiz']) : 0;
+    $course_id = isset($_GET['course_id']) ? absint($_GET['course_id']) : 0;
+
+    if (! $quiz_id && ! $course_id) {
         return;
     }
 
@@ -351,21 +458,19 @@ add_action('wp', function () {
     }
 
     $current_user_id = get_current_user_id();
-    $quiz_id         = absint($_GET['quiz']);
-    $time            = absint($_GET['time']);
     $req_user_id     = isset($_GET['user']) ? absint($_GET['user']) : $current_user_id;
 
     if ($req_user_id !== $current_user_id && ! current_user_can('manage_options')) {
         wp_die('دسترسی غیرمجاز است.', 'خطای دسترسی', ['response' => 403]);
     }
 
-    $debug = isset($_GET['debug']) && 'grid' === $_GET['debug'] && current_user_can('manage_options');
+    $debug        = isset($_GET['debug']) && 'grid' === $_GET['debug'] && current_user_can('manage_options');
+    $cert_post_id = (int) get_queried_object_id();
 
-    shamiim_cert_stream_pdf(
-        $req_user_id,
-        $quiz_id,
-        $time,
-        (int) get_queried_object_id(),
-        $debug
-    );
+    if ($quiz_id) {
+        $time = isset($_GET['time']) ? absint($_GET['time']) : 0;
+        shamiim_cert_stream_quiz($req_user_id, $quiz_id, $time, $cert_post_id, $debug);
+    }
+
+    shamiim_cert_stream_course($req_user_id, $course_id, $cert_post_id, $debug);
 }, 1);
