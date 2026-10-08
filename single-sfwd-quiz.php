@@ -95,7 +95,8 @@ while (have_posts()) :
 
 	$ee_cert_link = '';
 	if ($ee_passed && !empty($ee_quiz['certificate']) && function_exists('learndash_get_certificate_link')) {
-		$ee_cert_link = (string) learndash_get_certificate_link($ee_quiz_id, get_current_user_id());
+		// LearnDash ممکن است تگ <a> برگرداند؛ فقط URL لازم است تا لینک به هندلر فارسی mPDF برود.
+		$ee_cert_link = function_exists('shamiim_cert_extract_url') ? shamiim_cert_extract_url(learndash_get_certificate_link($ee_quiz_id, get_current_user_id())) : '';
 	}
 
 	/* وضعیت کلی برای هیرو */
